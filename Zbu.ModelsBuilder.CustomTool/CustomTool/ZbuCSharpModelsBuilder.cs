@@ -14,7 +14,7 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
 
         public override int DefaultExtension(out string pbstrDefaultExtension)
         {
-            pbstrDefaultExtension = ".cs";
+            pbstrDefaultExtension = ".generated.cs";
             return 0;
         }
     }

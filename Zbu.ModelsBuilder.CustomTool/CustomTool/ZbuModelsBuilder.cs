@@ -2,6 +2,7 @@
 using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -35,16 +36,31 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
         {
             try
             {
-                IList<TypeModel> types;
+                var path = Path.GetDirectoryName(wszInputFilePath) ?? "";
+
+                foreach (var file in Directory.GetFiles(path, "*.generated.cs"))
+                    File.Delete(file);
+
+                IList<TypeModel> modelTypes;
                 using (var umbraco = Umbraco.Application.GetApplication())
                 {
-                    types = umbraco.GetContentTypes();
+                    modelTypes = umbraco.GetContentTypes();
                 }
                 var builder = new Builder();
-                builder.Prepare(types);
-                var sb = new StringBuilder();
-                builder.Generate(sb, types);
-                var code = sb.ToString();
+                builder.Prepare(modelTypes);
+                foreach (var file in Directory.GetFiles(path, "*.cs"))
+                    builder.Parse(File.ReadAllText(file), modelTypes);
+                foreach (var modelType in modelTypes)
+                {
+                    var sb = new StringBuilder();
+                    builder.Generate(sb, modelType);
+                    File.WriteAllText(Path.Combine(path, modelType.Name + ".generated.cs"), sb.ToString());
+
+                    // FIXME add to the solution!
+                    // FIXME first, clear the solution + the directory!
+                }
+
+                var code = "// DONE -- WE NEED A SUMMARY OF SOME SORT"; // FIXME
 
                 var data = Encoding.Default.GetBytes(code);
 
