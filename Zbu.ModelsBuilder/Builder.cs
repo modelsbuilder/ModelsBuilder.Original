@@ -2,18 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Roslyn.Compilers.CSharp;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Strings;
 
 namespace Zbu.ModelsBuilder
 {
     public class Builder
     {
-        public List<GenType> GetTypes()
+        /*
+        public List<TypeModel> GetTypes()
         {
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             var contentTypes = contentTypeService.GetAllContentTypes();
@@ -21,8 +17,9 @@ namespace Zbu.ModelsBuilder
 
             return GetTypes(contentTypes).ToList(); // fixme list?!
         }
+        */
 
-        public void Generate(StringBuilder sb, IEnumerable<GenType> genTypes)
+        public void Generate(StringBuilder sb, IEnumerable<TypeModel> genTypes)
         {
             //var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             //var contentTypes = contentTypeService.GetAllContentTypes();
@@ -61,7 +58,7 @@ namespace Zbu.ModelsBuilder
 
         #region Write
 
-        void WriteContentType(StringBuilder sb, GenType type)
+        void WriteContentType(StringBuilder sb, TypeModel type)
         {
             if (type.IsMixin)
             {
@@ -119,7 +116,7 @@ namespace Zbu.ModelsBuilder
             sb.Append("\t}\n");
         }
 
-        void WriteContentTypeProperties(StringBuilder sb, GenType type)
+        void WriteContentTypeProperties(StringBuilder sb, TypeModel type)
         {
             // write the properties
             foreach (var prop in type.Properties)
@@ -131,7 +128,7 @@ namespace Zbu.ModelsBuilder
                     WriteProperty(sb, prop);
         }
 
-        void WriteProperty(StringBuilder sb, GenProperty property)
+        void WriteProperty(StringBuilder sb, PropertyModel property)
         {
             sb.Append("\n");
 
@@ -149,7 +146,7 @@ namespace Zbu.ModelsBuilder
                 property.Alias);
         }
 
-        void WriteInterfaceProperty(StringBuilder sb, GenProperty property)
+        void WriteInterfaceProperty(StringBuilder sb, PropertyModel property)
         {
             sb.Append("\t\t");
             WriteClrType(sb, property.ClrType);
@@ -229,15 +226,16 @@ namespace Zbu.ModelsBuilder
 
         #endregion
 
+        /*
         #region Prepare
 
-        IEnumerable<GenType> GetTypes(IEnumerable<IContentType> types)
+        IEnumerable<TypeModel> GetTypes(IEnumerable<IContentType> types)
         {
-            var gTypes = new List<GenType>();
+            var gTypes = new List<TypeModel>();
             var aTypes = types.ToArray();
             foreach (var type in aTypes)
             {
-                var gType = new GenType
+                var gType = new TypeModel
                 {
                     Id = type.Id,
                     Alias = type.Alias,
@@ -251,7 +249,7 @@ namespace Zbu.ModelsBuilder
 
                 foreach (var property in type.PropertyTypes)
                 {
-                    var gProperty = new GenProperty
+                    var gProperty = new PropertyModel
                     {
                         Alias = property.Alias,
                         Name = property.Alias.ToCleanString(CleanStringType.PascalCase)
@@ -301,7 +299,7 @@ namespace Zbu.ModelsBuilder
                 var parentTree = GetTypeTree(gType.BaseType);
                 gType.DeclaringInterfaces.AddRange(gType.MixinTypes.Except(parentTree));
 
-                var recursiveInterfaces = new List<GenType>();
+                var recursiveInterfaces = new List<TypeModel>();
                 foreach (var i in gType.DeclaringInterfaces)
                     GetTypeTree(recursiveInterfaces, i);
                 gType.ImplementingInterfaces.AddRange(recursiveInterfaces.Except(parentTree));
@@ -310,14 +308,14 @@ namespace Zbu.ModelsBuilder
             return gTypes;
         }
 
-        List<GenType> GetTypeTree(GenType type)
+        List<TypeModel> GetTypeTree(TypeModel type)
         {
-            var tree = new List<GenType>();
+            var tree = new List<TypeModel>();
             if (type != null) GetTypeTree(tree, type);
             return tree;
         }
 
-        void GetTypeTree(List<GenType> types, GenType type)
+        void GetTypeTree(List<TypeModel> types, TypeModel type)
         {
             if (types.Contains(type) == false)
                 types.Add(type);
@@ -327,32 +325,34 @@ namespace Zbu.ModelsBuilder
                 GetTypeTree(types, mixin);
         }
 
-        public class GenType
-        {
-            public int Id;
-            public string Alias;
-            public string Name;
-            public int BaseTypeId;
-            public GenType BaseType;
-            public readonly List<GenProperty> Properties = new List<GenProperty>();
-            public readonly List<GenType> MixinTypes = new List<GenType>();
-            public readonly List<GenType> DeclaringInterfaces = new List<GenType>();
-            public readonly List<GenType> ImplementingInterfaces = new List<GenType>();
-            public bool IsMixin;
-        }
-
-        public class GenProperty
-        {
-            public string Alias;
-            public string Name;
-            public Type ClrType;
-        }
-
         #endregion    
+        */
+
+        #region Prepare
+
+        public void Prepare(IList<TypeModel> typeModels)
+        {
+            // discover interfaces that need to be declared / implemented
+            foreach (var typeModel in typeModels)
+            {
+                var parentTree = typeModel.BaseType == null
+                    ? new List<TypeModel>()
+                    : typeModel.BaseType.GetTypeTree();
+
+                typeModel.DeclaringInterfaces.AddRange(typeModel.MixinTypes.Except(parentTree));
+
+                var recursiveInterfaces = new List<TypeModel>();
+                foreach (var i in typeModel.DeclaringInterfaces)
+                    TypeModel.GetTypeTree(recursiveInterfaces, i);
+                typeModel.ImplementingInterfaces.AddRange(recursiveInterfaces.Except(parentTree));
+            }
+        }
+
+        #endregion
 
         #region Parse
 
-        public void Parse(string code, IList<GenType> genTypes)
+        public void Parse(string code, IList<TypeModel> genTypes)
         {
             var tree = SyntaxTree.ParseText(code);
             var writer = new CodeWalker();

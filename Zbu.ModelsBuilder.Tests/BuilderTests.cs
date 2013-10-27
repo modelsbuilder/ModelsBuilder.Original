@@ -14,36 +14,30 @@ namespace Zbu.ModelsBuilder.Tests
     [TestFixture]
     public class BuilderTests
     {
-        private class AppHandler : ApplicationEventHandler
-        {
-            protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-            {
-                base.ApplicationStarting(umbracoApplication, applicationContext);
-
-                // remove core converters that are replaced by web converted
-                PropertyValueConvertersResolver.Current.RemoveType<TinyMceValueConverter>();
-                PropertyValueConvertersResolver.Current.RemoveType<TextStringValueConverter>();
-                PropertyValueConvertersResolver.Current.RemoveType<SimpleEditorValueConverter>();
-            }
-        }
-
         //[SetUp]
         [TestFixtureSetUp]
         public void Setup()
         {
-            var app = Umbraco.Web.Standalone.StandaloneApplication.GetApplication(Environment.CurrentDirectory)
-                .WithoutApplicationEventHandler<Umbraco.Web.Search.ExamineEvents>()
-                .WithApplicationEventHandler<AppHandler>();
-            //if (app.Started == false)
-            app.Start();
+            //var app = Umbraco.Web.Standalone.StandaloneApplication.GetApplication(Environment.CurrentDirectory)
+            //    .WithoutApplicationEventHandler<Umbraco.Web.Search.ExamineEvents>()
+            //    .WithApplicationEventHandler<AppHandler>();
+            ////if (app.Started == false)
+            //app.Start();
         }
 
         [Test]
         public void Test()
         {
-            var sb = new StringBuilder();
+            IList<TypeModel> types;
+            using (var umbraco = Umbraco.Application.GetApplication())
+            {
+                types = umbraco.GetContentTypes();
+            }
+
             var builder = new Builder();
-            builder.Generate(sb, builder.GetTypes());
+            var sb = new StringBuilder();
+            builder.Prepare(types);
+            builder.Generate(sb, types);
             Console.WriteLine(sb.ToString());
         }
 
@@ -88,10 +82,17 @@ namespace Zbu.ModelsBuilder.Tests.Models
         public string AlternativeText { get { return this.GetPropertyValue<string>(""alternativeText""); } } // fixme
     }
 }
-"; 
-            var sb = new StringBuilder();
+";
+
+            IList<TypeModel> types;
+            using (var umbraco = Umbraco.Application.GetApplication())
+            {
+                types = umbraco.GetContentTypes();
+            }
+
             var builder = new Builder();
-            var types = builder.GetTypes();
+            var sb = new StringBuilder();
+            builder.Prepare(types);
             builder.Parse(code, types);
             builder.Generate(sb, types);
             Console.WriteLine(sb.ToString());
