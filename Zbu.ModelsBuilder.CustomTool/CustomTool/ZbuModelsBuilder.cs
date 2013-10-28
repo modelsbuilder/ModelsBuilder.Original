@@ -36,6 +36,9 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(wszDefaultNamespace))
+                    throw new Exception("Panic: no namespace");
+
                 var path = Path.GetDirectoryName(wszInputFilePath) ?? "";
 
                 var vsitem = VisualStudio.VisualStudioHelper.GetSourceItem(wszInputFilePath);
@@ -50,6 +53,7 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                     modelTypes = umbraco.GetContentTypes();
                 }
                 var builder = new Builder();
+                builder.Namespace = wszDefaultNamespace;
                 builder.Prepare(modelTypes);
                 foreach (var file in Directory.GetFiles(path, "*.cs"))
                     builder.Parse(File.ReadAllText(file), modelTypes);
