@@ -23,9 +23,10 @@ Is this going to be an issue?
 
 Todo
 ----
-Generate multiple files
-Clear files before generating
-Use the .generated.cs extension
 Configure connection string, version...
+Configure 'using' names
+What if we ignore a required model?
+Better error reporting through errors & warnings
+Name conflict if source item is also a type
 
 //
