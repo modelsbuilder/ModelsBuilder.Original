@@ -37,7 +37,8 @@ namespace Zbu.ModelsBuilder.Tests
             var builder = new Builder();
             var sb = new StringBuilder();
             builder.Prepare(types);
-            builder.Generate(sb, types);
+            foreach (var type in types)
+                builder.Generate(sb, type);
             Console.WriteLine(sb.ToString());
         }
 
@@ -94,7 +95,8 @@ namespace Zbu.ModelsBuilder.Tests.Models
             var sb = new StringBuilder();
             builder.Prepare(types);
             builder.Parse(code, types);
-            builder.Generate(sb, types);
+            foreach (var type in types)
+                builder.Generate(sb, type);
             Console.WriteLine(sb.ToString());
         }
     }

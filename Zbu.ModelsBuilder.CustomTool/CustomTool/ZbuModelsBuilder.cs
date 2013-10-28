@@ -38,6 +38,9 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
             {
                 var path = Path.GetDirectoryName(wszInputFilePath) ?? "";
 
+                var vsitem = VisualStudio.VisualStudioHelper.GetSourceItem(wszInputFilePath);
+                VisualStudio.VisualStudioHelper.ClearExistingItems(vsitem);
+
                 foreach (var file in Directory.GetFiles(path, "*.generated.cs"))
                     File.Delete(file);
 
@@ -54,24 +57,22 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                 {
                     var sb = new StringBuilder();
                     builder.Generate(sb, modelType);
-                    File.WriteAllText(Path.Combine(path, modelType.Name + ".generated.cs"), sb.ToString());
-
-                    // FIXME add to the solution!
-                    // FIXME first, clear the solution + the directory!
+                    var filename = Path.Combine(path, modelType.Name + ".generated.cs");
+                    File.WriteAllText(filename, sb.ToString());
+                    VisualStudio.VisualStudioHelper.AddGeneratedItem(vsitem, filename);
                 }
 
                 var code = "// DONE -- WE NEED A SUMMARY OF SOME SORT"; // FIXME
 
                 var data = Encoding.Default.GetBytes(code);
-
                 var ptr = Marshal.AllocCoTaskMem(data.Length);
                 Marshal.Copy(data, 0, ptr, data.Length);
-
                 pcbOutput = (uint)data.Length;
                 rgbOutputFileContents[0] = ptr;
             }
             catch (Exception e)
             {
+                // FIXME we should be better at error reporting
                 MessageBox.Show(e.Message, "Unable to generate code");
                 throw;
             }
