@@ -37,6 +37,9 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
         {
             try
             {
+                // though that only happens if you explicitely set it to whitespaces
+                // otherwise VisualStudio will use the default one... so it will work
+                // if the namespace is left empty in VS.
                 if (string.IsNullOrWhiteSpace(wszDefaultNamespace))
                     throw new Exception("No namespace.");
 

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Xml;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -130,18 +131,30 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
             if (output == null)
                 return;
 
-            // can't write to the output window - just a pane
-            // see References.Services HelperMethodsClass SDK Sample
-            var generalPaneGuid = VSConstants.GUID_OutWindowGeneralPane;
+            // note
+            // in vs2010 the general pane is not there by default
+            Guid guidGeneral = VSConstants.OutputWindowPaneGuid.GeneralPane_guid;
             IVsOutputWindowPane pane;
+            if (output.GetPane(guidGeneral, out pane) != VSConstants.S_OK || pane == null)
+            {
+                output.CreatePane(guidGeneral, "General", 1, 0); // should we create our own?
+                if (output.GetPane(guidGeneral, out pane) != VSConstants.S_OK || pane == null)
+                    return;
+            }
+            pane.Activate();
 
-            // fetch the pane wrapped in error handling:
-            // ideally, throw an exception or trace/output...
-            if (ErrorHandler.Failed(output.GetPane(ref generalPaneGuid, out pane)) || pane == null)
-                return;
+            //// can't write to the output window - just a pane
+            //// see References.Services HelperMethodsClass SDK Sample
+            //var generalPaneGuid = VSConstants.GUID_OutWindowGeneralPane; // eg GitExtensions create its own pane...
+            //IVsOutputWindowPane pane;
+
+            //// fetch the pane wrapped in error handling:
+            //// ideally, throw an exception or trace/output...
+            //if (ErrorHandler.Failed(output.GetPane(ref generalPaneGuid, out pane)) || pane == null)
+            //    return;
 
             // prepare the message for output:
-            const string format = "\nZbuModelsBuilder: {0}\n";
+            const string format = "\nZbuModelsBuilder: {0}";
             var text = string.Format(format, message);
 
             // wrap attempts to write in an error handler:
