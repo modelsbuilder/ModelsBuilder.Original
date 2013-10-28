@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using Microsoft.VisualStudio.Shell.Interop;
+using Zbu.ModelsBuilder.CustomTool.VisualStudio;
 
 namespace Zbu.ModelsBuilder.CustomTool.CustomTool
 {
@@ -37,12 +38,14 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
             try
             {
                 if (string.IsNullOrWhiteSpace(wszDefaultNamespace))
-                    throw new Exception("Panic: no namespace");
+                    throw new Exception("No namespace.");
+
+                VisualStudioHelper.ReportMessage("Starting.");
 
                 var path = Path.GetDirectoryName(wszInputFilePath) ?? "";
 
-                var vsitem = VisualStudio.VisualStudioHelper.GetSourceItem(wszInputFilePath);
-                VisualStudio.VisualStudioHelper.ClearExistingItems(vsitem);
+                var vsitem = VisualStudioHelper.GetSourceItem(wszInputFilePath);
+                VisualStudioHelper.ClearExistingItems(vsitem);
 
                 foreach (var file in Directory.GetFiles(path, "*.generated.cs"))
                     File.Delete(file);
@@ -52,19 +55,27 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                 {
                     modelTypes = umbraco.GetContentTypes();
                 }
+                
+                VisualStudioHelper.ReportMessage("Found {0} content types in Umbraco.", modelTypes.Count);
+
                 var builder = new Builder();
                 builder.Namespace = wszDefaultNamespace;
                 builder.Prepare(modelTypes);
                 foreach (var file in Directory.GetFiles(path, "*.cs"))
                     builder.Parse(File.ReadAllText(file), modelTypes);
+
+                VisualStudioHelper.ReportMessage("Need to generate {0} files.", modelTypes.Count);
+
                 foreach (var modelType in modelTypes)
                 {
                     var sb = new StringBuilder();
                     builder.Generate(sb, modelType);
                     var filename = Path.Combine(path, modelType.Name + ".generated.cs");
                     File.WriteAllText(filename, sb.ToString());
-                    VisualStudio.VisualStudioHelper.AddGeneratedItem(vsitem, filename);
+                    VisualStudioHelper.AddGeneratedItem(vsitem, filename);
                 }
+
+                VisualStudioHelper.ReportMessage("Generated {0} files.", modelTypes.Count);
 
                 var code = "// DONE -- WE NEED A SUMMARY OF SOME SORT"; // FIXME
 
@@ -73,11 +84,15 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                 Marshal.Copy(data, 0, ptr, data.Length);
                 pcbOutput = (uint)data.Length;
                 rgbOutputFileContents[0] = ptr;
+
+                VisualStudioHelper.ReportMessage("Done.");
             }
             catch (Exception e)
             {
-                // FIXME we should be better at error reporting
-                MessageBox.Show(e.Message, "Unable to generate code");
+                var message = string.Format("ZbuModelsBuilder failed to generate code: {0}: {1}",
+                    e.GetType().Name, e.Message);
+                VisualStudioHelper.ReportError(pGenerateProgress, message);
+                //MessageBox.Show(e.Message, "Unable to generate code");
                 throw;
             }
 

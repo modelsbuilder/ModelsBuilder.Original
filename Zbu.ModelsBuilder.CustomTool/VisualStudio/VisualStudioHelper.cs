@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -53,7 +54,7 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
         public static void ClearExistingItems(EnvDTE.ProjectItem sourceItem)
         {
             foreach (EnvDTE.ProjectItem existingItem in sourceItem.ProjectItems)
-                existingItem.Remove();
+                existingItem.Remove(); // or, there's .Delete() ?
         }
 
         public static void AddGeneratedItem(EnvDTE.ProjectItem sourceItem, string filename)
@@ -100,6 +101,59 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
 
             IServiceProvider serviceProvider = new ServiceProvider(project.DTE as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
             return VsShellUtilities.GetHierarchy(serviceProvider, new Guid(projectGuid));
+        }
+
+        // see http://msdn.microsoft.com/fr-fr/library/microsoft.visualstudio.shell.interop.ivsgeneratorprogress.generatorerror%28v=vs.90%29.aspx
+        // level is ignored, line should be -1 if not specified
+
+        public static void ReportError(IVsGeneratorProgress progress, string message, uint line = 0xFFFFFFFF, uint column = 0xFFFFFFFF)
+        {
+            if (progress != null)
+                progress.GeneratorError(0, 0, message, line, column);
+        }
+
+        public static void ReportWarning(IVsGeneratorProgress progress, string message, uint line = 0xFFFFFFFF, uint column = 0xFFFFFFFF)
+        {
+            if (progress != null)
+                progress.GeneratorError(1, 0, message, line, column);
+        }
+
+        // see http://stackoverflow.com/questions/16443331/visual-studio-vspackage-single-file-generator-log-message-to-error-list
+        // there's no equivalent to GenerateError above for just reporting stuff...
+        // see http://msdn.microsoft.com/en-us/library/bb187346%28v=VS.80%29.aspx
+        public static void ReportMessage(string message)
+        {
+            // fixme - should we cache that somewhere? that class should not be static in fact!
+            // fixme - NOT writing to the output window at the moment...
+
+            var output = Package.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+            if (output == null)
+                return;
+
+            // can't write to the output window - just a pane
+            // see References.Services HelperMethodsClass SDK Sample
+            var generalPaneGuid = VSConstants.GUID_OutWindowGeneralPane;
+            IVsOutputWindowPane pane;
+
+            // fetch the pane wrapped in error handling:
+            // ideally, throw an exception or trace/output...
+            if (ErrorHandler.Failed(output.GetPane(ref generalPaneGuid, out pane)) || pane == null)
+                return;
+
+            // prepare the message for output:
+            const string format = "\nZbuModelsBuilder: {0}\n";
+            var text = string.Format(format, message);
+
+            // wrap attempts to write in an error handler:
+            if (ErrorHandler.Failed(pane.OutputString(text)))
+            {
+                // throw an exception/etc. if it fails?
+            }
+        }
+
+        public static void ReportMessage(string format, params object[] args)
+        {
+            ReportMessage(string.Format(format, args));
         }
     }
 }
