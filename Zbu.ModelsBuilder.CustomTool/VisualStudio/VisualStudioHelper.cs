@@ -169,6 +169,12 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
             ReportMessage(string.Format(format, args));
         }
 
+        public static string GetSolution()
+        {
+            var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
+            return dte.Solution.FullName;
+        }
+
         public static Options GetOptions()
         {
             var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));

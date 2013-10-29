@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
+using Zbu.ModelsBuilder.CustomTool.VisualStudio;
 
 namespace Zbu.ModelsBuilder.CustomTool
 {
@@ -33,22 +35,36 @@ namespace Zbu.ModelsBuilder.CustomTool
         // we want to write to our own settings file,
         // <solution>.sln.zbu.user
         // <zbu>
-        //   <modelsBuilder umbracoVersion="6.2.0" connectionString="..." databaseProvider="..." />
+        //   <modelsBuilder version="1.4.0.0" connectionString="..." databaseProvider="..." />
         // </zbu>
 
-        //public override void LoadSettingsFromStorage()
-        //{
-        //    // set hard-coded value for now
-        //    UmbracoVersion = "6.2.0.testing";
+        public override void LoadSettingsFromStorage()
+        {
+            //base.LoadSettingsFromStorage();
 
-        //    //base.LoadSettingsFromStorage();
-        //}
+            var sln = VisualStudioHelper.GetSolution();
+            var cfg = sln + ".zbu.user";
+            if (File.Exists(cfg))
+            {
+                var txt = File.ReadAllText(cfg);
+                var pos = txt.IndexOf("|||");
+                ConnectionString = txt.Substring(0, pos);
+                DatabaseProvider = txt.Substring(pos + 3);
+            }
+        }
 
-        //public override void SaveSettingsToStorage()
-        //{
-        //    // ignore for now
-        //    //base.SaveSettingsToStorage();
-        //}
+        public override void SaveSettingsToStorage()
+        {
+            //base.SaveSettingsToStorage();
+
+            // fixme - just testing, we need a better format
+            // fixme - must also serialize OUR own version for upgrade purpose
+            var sln = VisualStudioHelper.GetSolution();
+            var cfg = sln + ".zbu.user";
+            if (File.Exists(cfg))
+                File.Delete(cfg);
+            File.WriteAllText(cfg, ConnectionString + "|||" + DatabaseProvider);
+        }
 
         // FIXME but what about the FromXml / ToXml methods?!
         // that would be for import/export?!
