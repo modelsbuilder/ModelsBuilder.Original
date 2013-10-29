@@ -17,17 +17,24 @@ namespace Zbu.ModelsBuilder.CustomTool
     /// IVsPackage interface and uses the registration attributes defined in the framework to 
     /// register itself and its components with the shell.
     /// </summary>
-    // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
-    // a package.
+
+    // tells CreatePkgDef.exe utility that this class is a package
     [PackageRegistration(UseManagedResourcesOnly = true)]
-    // This attribute is used to register the information needed to show this package
-    // in the Help/About dialog of Visual Studio.
+
+    // tells VS that we have an options dialog
+    [ProvideOptionPage(typeof(VisualStudioOptions), VisualStudioOptions.OptionsCategory, VisualStudioOptions.OptionsPageName, 0, 0, true)]
+    
+    // register infos needed to show this package in the Help/About dialog of VS
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
+
     [Guid(GuidList.PkgString)]
     [DefaultRegistryRoot("Software\\Microsoft\\VisualStudio\\11.0")]
+
+    // register the generator
     [ProvideObject(typeof(ZbuCSharpModelsBuilder))]
     [ProvideGeneratorAttribute(typeof(ZbuCSharpModelsBuilder), "ZbuModelsBuilder", "ZpqrtBnk Umbraco ModelsBuilder Custom Tool for C#", "{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}", true)] // csharp
-    public sealed class VisualStudio2012Package : Package
+
+    public sealed class ZbuModelsBuilder : Package
     {
         /// <summary>
         /// Default constructor of the package.
@@ -36,9 +43,15 @@ namespace Zbu.ModelsBuilder.CustomTool
         /// not sited yet inside Visual Studio environment. The place to do all the other 
         /// initialization is the Initialize method.
         /// </summary>
-        public VisualStudio2012Package()
+        public ZbuModelsBuilder()
         {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
+        }
+
+        void Foo()
+        {
+            var options = GetDialogPage(typeof (VisualStudioOptions)) as VisualStudioOptions;
+            // fixme - and can the tool have access to it?!
         }
 
 

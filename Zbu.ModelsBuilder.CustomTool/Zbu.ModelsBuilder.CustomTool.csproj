@@ -130,9 +130,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="VisualStudio2012Package.cs" />
+    <Compile Include="ZbuModelsBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VisualStudio2013Package.cs" />
+    <Compile Include="VisualStudioOptions.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="VisualStudio\VisualStudioHelper.cs" />
   </ItemGroup>
   <ItemGroup>

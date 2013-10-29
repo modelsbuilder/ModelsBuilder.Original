@@ -46,6 +46,11 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                 VisualStudioHelper.ReportMessage("Starting.");
 
                 var path = Path.GetDirectoryName(wszInputFilePath) ?? "";
+                
+                // fixme - clean this up
+                // fixme - currently throws, BAD INDEX in options
+                var options = VisualStudioHelper.GetOptions();
+                VisualStudioHelper.ReportWarning(pGenerateProgress, "VERSION " + options.UmbracoVersion);
 
                 var vsitem = VisualStudioHelper.GetSourceItem(wszInputFilePath);
                 VisualStudioHelper.ClearExistingItems(vsitem);
@@ -95,6 +100,8 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                 var message = string.Format("ZbuModelsBuilder failed to generate code: {0}: {1}",
                     e.GetType().Name, e.Message);
                 VisualStudioHelper.ReportError(pGenerateProgress, message);
+                VisualStudioHelper.ReportMessage(message);
+                VisualStudioHelper.ReportMessage(e.StackTrace);
                 //MessageBox.Show(e.Message, "Unable to generate code");
                 throw;
             }

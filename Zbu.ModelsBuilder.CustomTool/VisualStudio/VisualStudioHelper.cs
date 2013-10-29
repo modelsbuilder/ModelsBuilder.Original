@@ -168,5 +168,26 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
         {
             ReportMessage(string.Format(format, args));
         }
+
+        public static Options GetOptions()
+        {
+            var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
+            var properties = dte.get_Properties(VisualStudioOptions.OptionsCategory, VisualStudioOptions.OptionsPageName);
+            return new Options(properties);
+        }
+
+        public class Options
+        {
+            private readonly EnvDTE.Properties _properties;
+
+            public Options(EnvDTE.Properties properties)
+            {
+                _properties = properties;
+            }
+
+            public string UmbracoVersion { get { return (string)_properties.Item("UmbracoVersion").Value; } }
+            public string ConnectionString { get { return (string)_properties.Item("ConnectionString").Value; } }
+            public string DatabaseProvider { get { return (string)_properties.Item("DatabaseProvider").Value; } }
+        }
     }
 }
