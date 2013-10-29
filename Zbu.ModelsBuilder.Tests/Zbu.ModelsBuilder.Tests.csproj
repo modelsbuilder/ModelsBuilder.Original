@@ -83,6 +83,7 @@
     <Compile Include="RoslynTests.cs" />
     <Compile Include="SampleGeneratedCode.cs" />
     <Compile Include="SampleSourceCode.cs" />
+    <Compile Include="TestOptions.cs" />
     <Compile Include="UmbracoApplicationTests.cs" />
   </ItemGroup>
   <ItemGroup>

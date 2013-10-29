@@ -15,15 +15,15 @@ namespace Zbu.ModelsBuilder.Tests
         public void Test()
         {
             // start and terminate
-            using (var app = Application.GetApplication())
+            using (var app = Application.GetApplication(TestOptions.ConnectionString, TestOptions.DatabaseProvider))
             { }
 
             // start and terminate
-            using (var app = Application.GetApplication())
+            using (var app = Application.GetApplication(TestOptions.ConnectionString, TestOptions.DatabaseProvider))
             { }
 
             // start, use and terminate
-            using (var app = Application.GetApplication())
+            using (var app = Application.GetApplication(TestOptions.ConnectionString, TestOptions.DatabaseProvider))
             {
                 var types = app.GetContentTypes();
             }

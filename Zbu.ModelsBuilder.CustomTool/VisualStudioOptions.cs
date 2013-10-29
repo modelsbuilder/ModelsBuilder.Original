@@ -20,32 +20,14 @@ namespace Zbu.ModelsBuilder.CustomTool
         public const string OptionsPageName = "ModelsBuilder Options";
 
         [Category(OptionsCategory)]
-        [DisplayName("Test")]
-        [Description("Test description")]
-// ReSharper disable once ConvertToAutoProperty
-        public string UmbracoVersion
-        {
-            get { return _umbracoVersion; }
-            set { _umbracoVersion = value; }
-        }
+        [DisplayName("Connection string")]
+        [Description("The database connection string.")]
+        public string ConnectionString { get; set; }
 
-        private string _umbracoVersion;
-
-
-        //[Category(OptionsCategory)]
-        //[DisplayName("Umbraco version")]
-        //[Description("The Umbraco version eg 6.2.0.")]
-        //public string UmbracoVersion { get; set; }
-
-        //[Category(OptionsCategory)]
-        //[DisplayName("Connection string")]
-        //[Description("The database connection string.")]
-        //public string ConnectionString { get; set; }
-
-        //[Category(OptionsCategory)]
-        //[DisplayName("Database provider")]
-        //[Description("The database provider.")]
-        //public string DatabaseProvider { get; set; }
+        [Category(OptionsCategory)]
+        [DisplayName("Database provider")]
+        [Description("The database provider.")]
+        public string DatabaseProvider { get; set; }
 
         // by default "storage" is the registry
         // we want to write to our own settings file,

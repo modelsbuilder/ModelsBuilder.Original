@@ -14,6 +14,8 @@ namespace Zbu.ModelsBuilder.Umbraco
 {
     public class Application : IDisposable
     {
+        #region Applicationmanagement
+
 // ReSharper disable once ClassNeverInstantiated.Local
         private class AppHandler : ApplicationEventHandler
         {
@@ -33,16 +35,33 @@ namespace Zbu.ModelsBuilder.Umbraco
         private static Application _application;
         private global::Umbraco.Web.Standalone.StandaloneApplication _umbracoApplication;
 
-        private Application()
-        { }
-
-        public static Application GetApplication()
+        private Application(string connectionString, string databaseProvider)
         {
+            _connectionString = connectionString;
+            _databaseProvider = databaseProvider;
+        }
+
+        private static string UmbracoVersion
+        {
+            // this is what ApplicationContext.Configured wants in order to be happy
+            get { return global::Umbraco.Core.Configuration.UmbracoVersion.Current.ToString(3); }
+        }
+
+        private readonly string _connectionString;
+        private readonly string _databaseProvider;
+
+        public static Application GetApplication(string connectionString, string databaseProvider)
+        {
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new ArgumentException("Must not be null nor empty.", "connectionString");
+            if (string.IsNullOrWhiteSpace(databaseProvider))
+                throw new ArgumentException("Must not be null nor empty.", "databaseProvider");
+
             lock (LockO)
             {
                 if (_application == null)
                 {
-                    _application = new Application();
+                    _application = new Application(connectionString, databaseProvider);
                     _application.Start();
                 }
                 return _application;
@@ -57,13 +76,9 @@ namespace Zbu.ModelsBuilder.Umbraco
                 _installedConfigSystem = true;
             }
 
-            // FIXME should not hard-code
-            const string connectionString = @"server=localhost\sqlexpress;database=dev_umbraco6;user id=sa;password=sayg";
-            const string providerName = "System.Data.SqlClient";
-            const string version = "6.2.0";
-            ConfigurationManager.ConnectionStrings.Add(
-                new ConnectionStringSettings("umbracoDbDSN", connectionString, providerName));
-            ConfigurationManager.AppSettings.Add("umbracoConfigurationStatus", version);
+            var cstr = new ConnectionStringSettings("umbracoDbDSN", _connectionString, _databaseProvider);
+            ConfigurationManager.ConnectionStrings.Add(cstr);
+            ConfigurationManager.AppSettings.Add("umbracoConfigurationStatus", UmbracoVersion);
 
             var app = global::Umbraco.Web.Standalone.StandaloneApplication.GetApplication(Environment.CurrentDirectory)
                 .WithoutApplicationEventHandler<global::Umbraco.Web.Search.ExamineEvents>()
@@ -102,6 +117,10 @@ namespace Zbu.ModelsBuilder.Umbraco
                 _application = null;
             }
         }
+
+        #endregion
+
+        #region Services
 
         public IList<TypeModel> GetContentTypes()
         {
@@ -182,6 +201,10 @@ namespace Zbu.ModelsBuilder.Umbraco
             throw new NotImplementedException();
         }
 
+        #endregion
+
+        #region IDisposable
+
         private bool _disposed;
 
         public void Dispose()
@@ -209,5 +232,7 @@ namespace Zbu.ModelsBuilder.Umbraco
         //{
         //    Dispose(false);
         //}
+
+        #endregion
     }
 }

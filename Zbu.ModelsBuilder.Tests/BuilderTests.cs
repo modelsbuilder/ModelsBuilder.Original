@@ -29,7 +29,7 @@ namespace Zbu.ModelsBuilder.Tests
         public void Test()
         {
             IList<TypeModel> types;
-            using (var umbraco = Umbraco.Application.GetApplication())
+            using (var umbraco = Umbraco.Application.GetApplication(TestOptions.ConnectionString, TestOptions.DatabaseProvider))
             {
                 types = umbraco.GetContentTypes();
             }
@@ -86,7 +86,7 @@ namespace Zbu.ModelsBuilder.Tests.Models
 ";
 
             IList<TypeModel> types;
-            using (var umbraco = Umbraco.Application.GetApplication())
+            using (var umbraco = Umbraco.Application.GetApplication(TestOptions.ConnectionString, TestOptions.DatabaseProvider))
             {
                 types = umbraco.GetContentTypes();
             }

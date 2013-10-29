@@ -50,7 +50,7 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                 // fixme - clean this up
                 // fixme - currently throws, BAD INDEX in options
                 var options = VisualStudioHelper.GetOptions();
-                VisualStudioHelper.ReportWarning(pGenerateProgress, "VERSION " + options.UmbracoVersion);
+                options.Validate();
 
                 var vsitem = VisualStudioHelper.GetSourceItem(wszInputFilePath);
                 VisualStudioHelper.ClearExistingItems(vsitem);
@@ -59,7 +59,7 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                     File.Delete(file);
 
                 IList<TypeModel> modelTypes;
-                using (var umbraco = Umbraco.Application.GetApplication())
+                using (var umbraco = Umbraco.Application.GetApplication(options.ConnectionString, options.DatabaseProvider))
                 {
                     modelTypes = umbraco.GetContentTypes();
                 }

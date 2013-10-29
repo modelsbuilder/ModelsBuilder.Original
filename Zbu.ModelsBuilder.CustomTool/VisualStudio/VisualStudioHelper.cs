@@ -185,9 +185,18 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
                 _properties = properties;
             }
 
-            public string UmbracoVersion { get { return (string)_properties.Item("UmbracoVersion").Value; } }
             public string ConnectionString { get { return (string)_properties.Item("ConnectionString").Value; } }
             public string DatabaseProvider { get { return (string)_properties.Item("DatabaseProvider").Value; } }
+
+            public void Validate()
+            {
+                var valid = true;
+                valid &= !string.IsNullOrWhiteSpace(ConnectionString);
+                valid &= !string.IsNullOrWhiteSpace(DatabaseProvider);
+
+                if (!valid)
+                    throw new Exception("Invalid configuration.");
+            }
         }
     }
 }
