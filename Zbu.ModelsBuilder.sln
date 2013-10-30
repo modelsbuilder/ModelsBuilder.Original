@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zbu.ModelsBuilder.CustomToo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zbu.ModelsBuilder.Umbraco", "Zbu.ModelsBuilder.Umbraco\Zbu.ModelsBuilder.Umbraco.csproj", "{BA9B7672-C446-4001-BB64-2B6ABE7A42F2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zbu.ModelsBuilder.AspNet", "Zbu.ModelsBuilder.AspNet\Zbu.ModelsBuilder.AspNet.csproj", "{9670E426-0872-4A87-9DDE-805828546DE9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{BA9B7672-C446-4001-BB64-2B6ABE7A42F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA9B7672-C446-4001-BB64-2B6ABE7A42F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA9B7672-C446-4001-BB64-2B6ABE7A42F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9670E426-0872-4A87-9DDE-805828546DE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9670E426-0872-4A87-9DDE-805828546DE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9670E426-0872-4A87-9DDE-805828546DE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9670E426-0872-4A87-9DDE-805828546DE9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
