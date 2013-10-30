@@ -66,7 +66,7 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                 
                 VisualStudioHelper.ReportMessage("Found {0} content types in Umbraco.", modelTypes.Count);
 
-                var builder = new Builder();
+                var builder = new TextBuilder();
                 builder.Namespace = wszDefaultNamespace;
                 builder.Prepare(modelTypes);
                 foreach (var file in Directory.GetFiles(path, "*.cs"))

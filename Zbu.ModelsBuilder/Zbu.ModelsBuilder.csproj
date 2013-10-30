@@ -64,11 +64,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Builder.cs" />
+    <Compile Include="CodeDomBuilder.cs" />
     <Compile Include="CodeWalker.cs" />
     <Compile Include="ConfigSystem.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="PropertyModel.cs" />
     <Compile Include="StringExtensions.cs" />
+    <Compile Include="TextBuilder.cs" />
     <Compile Include="TypeModel.cs" />
     <Compile Include="IgnoreContentTypeAttribute.cs" />
     <Compile Include="IgnorePropertyTypeAttribute.cs" />

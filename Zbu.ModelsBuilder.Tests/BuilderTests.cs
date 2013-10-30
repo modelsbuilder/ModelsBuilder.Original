@@ -34,7 +34,7 @@ namespace Zbu.ModelsBuilder.Tests
                 types = umbraco.GetContentTypes();
             }
 
-            var builder = new Builder();
+            var builder = new TextBuilder();
             var sb = new StringBuilder();
             builder.Prepare(types);
             foreach (var type in types)
@@ -91,7 +91,7 @@ namespace Zbu.ModelsBuilder.Tests.Models
                 types = umbraco.GetContentTypes();
             }
 
-            var builder = new Builder();
+            var builder = new TextBuilder();
             var sb = new StringBuilder();
             builder.Prepare(types);
             builder.Parse(code, types);
