@@ -35,10 +35,16 @@ namespace Zbu.ModelsBuilder.Umbraco
         private static Application _application;
         private global::Umbraco.Web.Standalone.StandaloneApplication _umbracoApplication;
 
+        private Application()
+        {
+            _standalone = false;
+        }
+
         private Application(string connectionString, string databaseProvider)
         {
             _connectionString = connectionString;
             _databaseProvider = databaseProvider;
+            _standalone = true;
         }
 
         private static string UmbracoVersion
@@ -47,8 +53,22 @@ namespace Zbu.ModelsBuilder.Umbraco
             get { return global::Umbraco.Core.Configuration.UmbracoVersion.Current.ToString(3); }
         }
 
+        private readonly bool _standalone;
         private readonly string _connectionString;
         private readonly string _databaseProvider;
+
+        public static Application GetApplication()
+        {
+            lock (LockO)
+            {
+                if (_application == null)
+                {
+                    _application = new Application();
+                    // do NOT start it!
+                }
+                return _application;
+            }
+        }
 
         public static Application GetApplication(string connectionString, string databaseProvider)
         {
@@ -124,7 +144,7 @@ namespace Zbu.ModelsBuilder.Umbraco
 
         public IList<TypeModel> GetContentTypes()
         {
-            if (_umbracoApplication == null)
+            if (_standalone && _umbracoApplication == null)
                 throw new InvalidOperationException("Application is not ready.");
 
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
@@ -198,6 +218,9 @@ namespace Zbu.ModelsBuilder.Umbraco
 
         public IList<TypeModel> GetMediaTypes()
         {
+            if (_standalone && _umbracoApplication == null)
+                throw new InvalidOperationException("Application is not ready.");
+
             throw new NotImplementedException();
         }
 
