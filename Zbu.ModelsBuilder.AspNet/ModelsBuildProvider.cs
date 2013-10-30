@@ -60,7 +60,7 @@ namespace Zbu.ModelsBuilder.AspNet
             // issue: will the application be started when we generated?
             // issue: I assume NOT because... bah ;->
 
-            // fixme - do we HAVE to use codedom
+            // fdo we HAVE to use codedom
             // or can we generate a cs file?
 
             if (global::Umbraco.Core.ApplicationContext.Current == null)
@@ -72,12 +72,10 @@ namespace Zbu.ModelsBuilder.AspNet
             var modelTypes = Umbraco.Application.GetApplication().GetContentTypes();
             _builder.Prepare(modelTypes);
 
-            // FIXME - where should the namespace come from?
-            // FIXME - where should the USING come from?
             // SHOULD be from the .models file? but THEN it should be a CS file?
             _builder.Namespace = "";
             _builder.Using.Add("");
-            // fixme - what about references? using those of the project?
+            // references?
 
             var path = Path.GetDirectoryName(filename) ?? "";
             foreach (var file in Directory.GetFiles(path, "*.cs"))

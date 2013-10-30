@@ -52,6 +52,9 @@
     <Compile Include="..\Zbu.ModelsBuilder\Properties\CommonInfo.cs">
       <Link>Properties\CommonInfo.cs</Link>
     </Compile>
+    <Compile Include="GenerateModelsDashboard.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Initializer.cs" />
     <Compile Include="ModelsBuilder.cs" />
     <Compile Include="ModelsBuildProvider.cs" />
@@ -66,6 +69,9 @@
       <Project>{998fb014-303a-4146-b3e4-b927bab0210f}</Project>
       <Name>Zbu.ModelsBuilder</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="GenerateModelsDashboard.ascx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

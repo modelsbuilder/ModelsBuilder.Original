@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web.Hosting;
 
 namespace Zbu.ModelsBuilder.AspNet
 {
     public class ModelsBuilder
     {
-        // fixme - how shall we handle namespaces?
-        // fixme - how shall we handle using?
-
         public void GenerateSourceFiles()
         {
             var appData = HostingEnvironment.MapPath("~/App_Data");
@@ -29,7 +23,7 @@ namespace Zbu.ModelsBuilder.AspNet
             var modelTypes = umbraco.GetContentTypes();
 
             var builder = new TextBuilder();
-            builder.Namespace = "wszDefaultNamespace"; // FIXME
+            builder.Namespace = "Umbraco.Web.PublishedContentModels"; // note - could be a config option
             builder.Prepare(modelTypes);
 
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.cs"))
