@@ -47,8 +47,6 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
 
                 var path = Path.GetDirectoryName(wszInputFilePath) ?? "";
                 
-                // fixme - clean this up
-                // fixme - currently throws, BAD INDEX in options
                 var options = VisualStudioHelper.GetOptions();
                 options.Validate();
 
@@ -61,7 +59,7 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                 IList<TypeModel> modelTypes;
                 using (var umbraco = Umbraco.Application.GetApplication(options.ConnectionString, options.DatabaseProvider))
                 {
-                    modelTypes = umbraco.GetContentTypes();
+                    modelTypes = umbraco.GetContentAndMediaTypes();
                 }
                 
                 VisualStudioHelper.ReportMessage("Found {0} content types in Umbraco.", modelTypes.Count);

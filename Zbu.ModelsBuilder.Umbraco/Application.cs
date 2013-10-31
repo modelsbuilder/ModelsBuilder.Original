@@ -142,14 +142,40 @@ namespace Zbu.ModelsBuilder.Umbraco
 
         #region Services
 
+        public IList<TypeModel> GetContentAndMediaTypes()
+        {
+            if (_standalone && _umbracoApplication == null)
+                throw new InvalidOperationException("Application is not ready.");
+
+            var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
+            var contentTypes = contentTypeService.GetAllContentTypes().Cast<IContentTypeBase>()
+                .Union(contentTypeService.GetAllMediaTypes().Cast<IContentTypeBase>())
+                .ToArray();
+            return GetTypes(contentTypes);
+        }
+
         public IList<TypeModel> GetContentTypes()
         {
             if (_standalone && _umbracoApplication == null)
                 throw new InvalidOperationException("Application is not ready.");
 
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
-            var contentTypes = contentTypeService.GetAllContentTypes().ToArray();
+            var contentTypes = contentTypeService.GetAllContentTypes().Cast<IContentTypeBase>().ToArray();
+            return GetTypes(contentTypes);
+        }
 
+        public IList<TypeModel> GetMediaTypes()
+        {
+            if (_standalone && _umbracoApplication == null)
+                throw new InvalidOperationException("Application is not ready.");
+
+            var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
+            var contentTypes = contentTypeService.GetAllMediaTypes().Cast<IContentTypeBase>().ToArray();
+            return GetTypes(contentTypes);
+        }
+
+        private static IList<TypeModel> GetTypes(IContentTypeBase[] contentTypes)
+        {
             var typeModels = new List<TypeModel>();
 
             // get the types and the properties
@@ -195,7 +221,15 @@ namespace Zbu.ModelsBuilder.Umbraco
                 var typeModel = typeModels.SingleOrDefault(x => x.Id == contentType.Id);
                 if (typeModel == null) throw new Exception();
 
-                foreach (var compositionType in contentType.ContentTypeComposition)
+                IEnumerable<IContentTypeComposition> compositionTypes;
+                var contentTypeAsMedia = contentType as IMediaType;
+                var contentTypeAsContent = contentType as IContentType;
+                if (contentTypeAsMedia != null) compositionTypes = contentTypeAsMedia.ContentTypeComposition;
+                else if (contentTypeAsContent != null) compositionTypes = contentTypeAsContent.ContentTypeComposition;
+
+                else throw new Exception("Panic: neither a content nor a media type.");
+
+                foreach (var compositionType in compositionTypes)
                 {
                     var compositionModel = typeModels.SingleOrDefault(x => x.Id == compositionType.Id);
                     if (compositionModel == null) throw new Exception();
@@ -214,14 +248,6 @@ namespace Zbu.ModelsBuilder.Umbraco
             }
 
             return typeModels;
-        }
-
-        public IList<TypeModel> GetMediaTypes()
-        {
-            if (_standalone && _umbracoApplication == null)
-                throw new InvalidOperationException("Application is not ready.");
-
-            throw new NotImplementedException();
         }
 
         #endregion

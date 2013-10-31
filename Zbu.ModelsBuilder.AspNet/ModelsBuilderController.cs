@@ -75,7 +75,7 @@ namespace Zbu.ModelsBuilder.AspNet
                 File.Delete(file);
 
             var umbraco = Application.GetApplication();
-            var modelTypes = umbraco.GetContentTypes();
+            var modelTypes = umbraco.GetContentAndMediaTypes();
 
             var builder = new TextBuilder();
             builder.Namespace = "Umbraco.Web.PublishedContentModels"; // note - could be a config option

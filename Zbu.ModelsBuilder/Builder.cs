@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Roslyn.Compilers.CSharp;
@@ -26,6 +27,11 @@ namespace Zbu.ModelsBuilder
 
         public void Prepare(IList<TypeModel> typeModels)
         {
+            // ensure we have no duplicates
+            var names = typeModels.Select(x => x.Name).Distinct();
+            if (names.Count() != typeModels.Count)
+                throw new InvalidOperationException("Duplicate type names have been found.");
+
             // discover interfaces that need to be declared / implemented
             foreach (var typeModel in typeModels)
             {
@@ -64,6 +70,9 @@ namespace Zbu.ModelsBuilder
                     if (type != null)
                         type.Name = contentName;
                 });
+
+            // at that point some types might have been removed / ignored, that we
+            // actually need - but we can't tell, because they may be implemented by the user
         }
 
         #endregion
