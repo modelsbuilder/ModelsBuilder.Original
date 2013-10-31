@@ -3,6 +3,7 @@ using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -72,6 +73,10 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
 
                 VisualStudioHelper.ReportMessage("Need to generate {0} files.", modelTypes.Count);
 
+                var inputFilename = Path.GetFileNameWithoutExtension(wszInputFilePath);
+                if (modelTypes.Any(x => x.Name.InvariantEquals(inputFilename)))
+                    throw new Exception("Name collision, there is a model named " + inputFilename);
+
                 foreach (var modelType in modelTypes)
                 {
                     var sb = new StringBuilder();
@@ -83,9 +88,12 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
 
                 VisualStudioHelper.ReportMessage("Generated {0} files.", modelTypes.Count);
 
-                var code = "// DONE -- WE NEED A SUMMARY OF SOME SORT"; // FIXME
+                var code = new StringBuilder();
+                builder.WriteHeader(code);
+                code.Append("// ZpqrtBnk Umbraco ModelsBuilder");
+                code.AppendFormat("// {0:yyyy-MM-ddTHH:mm:ssZ}", DateTime.UtcNow);
 
-                var data = Encoding.Default.GetBytes(code);
+                var data = Encoding.Default.GetBytes(code.ToString());
                 var ptr = Marshal.AllocCoTaskMem(data.Length);
                 Marshal.Copy(data, 0, ptr, data.Length);
                 pcbOutput = (uint)data.Length;
