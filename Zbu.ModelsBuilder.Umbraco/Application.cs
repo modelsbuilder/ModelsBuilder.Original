@@ -148,10 +148,10 @@ namespace Zbu.ModelsBuilder.Umbraco
                 throw new InvalidOperationException("Application is not ready.");
 
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
-            var contentTypes = contentTypeService.GetAllContentTypes().Cast<IContentTypeBase>()
-                .Union(contentTypeService.GetAllMediaTypes().Cast<IContentTypeBase>())
-                .ToArray();
-            return GetTypes(contentTypes);
+            var types = new List<TypeModel>();
+            types.AddRange(GetTypes(PublishedItemType.Content, contentTypeService.GetAllContentTypes().Cast<IContentTypeBase>().ToArray()));
+            types.AddRange(GetTypes(PublishedItemType.Media, contentTypeService.GetAllMediaTypes().Cast<IContentTypeBase>().ToArray()));
+            return types;
         }
 
         public IList<TypeModel> GetContentTypes()
@@ -161,7 +161,7 @@ namespace Zbu.ModelsBuilder.Umbraco
 
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             var contentTypes = contentTypeService.GetAllContentTypes().Cast<IContentTypeBase>().ToArray();
-            return GetTypes(contentTypes);
+            return GetTypes(PublishedItemType.Content, contentTypes);
         }
 
         public IList<TypeModel> GetMediaTypes()
@@ -171,10 +171,10 @@ namespace Zbu.ModelsBuilder.Umbraco
 
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             var contentTypes = contentTypeService.GetAllMediaTypes().Cast<IContentTypeBase>().ToArray();
-            return GetTypes(contentTypes);
+            return GetTypes(PublishedItemType.Media, contentTypes);
         }
 
-        private static IList<TypeModel> GetTypes(IContentTypeBase[] contentTypes)
+        private static IList<TypeModel> GetTypes(PublishedItemType itemType, IContentTypeBase[] contentTypes)
         {
             var typeModels = new List<TypeModel>();
 
@@ -191,7 +191,7 @@ namespace Zbu.ModelsBuilder.Umbraco
 
                 typeModels.Add(typeModel);
 
-                var publishedContentType = PublishedContentType.Get(PublishedItemType.Content, contentType.Alias);
+                var publishedContentType = PublishedContentType.Get(itemType, contentType.Alias);
 
                 foreach (var propertyType in contentType.PropertyTypes)
                 {
