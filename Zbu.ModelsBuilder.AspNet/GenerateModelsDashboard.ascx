@@ -13,6 +13,12 @@
 		    });
 		}
 
+		function nl2br(s) {
+		    s = s.replace(/\r/g, '');
+		    s = s.replace(/\n/g, '<br />');
+		    return s;
+		}
+
 		jQuery('#generateModels').click(function (event) {
 		    jQuery('#generateModelsPane').hide();
 		    jQuery('#generateModelsRun').show();
@@ -24,7 +30,7 @@
 		        }
 		        else {
 		            $('#generateModelsRunMessage').html('Failed. I\'m so sorry.');
-		            $('#generateModelsRunProgress').html(json.Message.replace('\r', '').replace('\n', '<br />'));
+		            $('#generateModelsRunProgress').html(nl2br(json.Message));
 		        }
 		    });
 
