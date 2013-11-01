@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<umbPackage>
+  <files>
+	<file>
+		<guid>BuildModels.ascx</guid>
+		<orgPath>/UserControls/Zbu/ModelsBuilder</orgPath>
+		<orgName>BuildModels.ascx</orgName>
+	</file>
+	<file>
+		<guid>Roslyn.Compilers.dll</guid>
+		<orgPath>/bin</orgPath>
+		<orgName>Roslyn.Compilers.dll</orgName>
+	</file>
+	<file>
+		<guid>Roslyn.Compilers.CSharp.dll</guid>
+		<orgPath>/bin</orgPath>
+		<orgName>Roslyn.Compilers.CSharp.dll</orgName>
+	</file>
+	<file>
+		<guid>Zbu.ModelsBuilder.dll</guid>
+		<orgPath>/bin</orgPath>
+		<orgName>Zbu.ModelsBuilder.dll</orgName>
+	</file>
+	<file>
+		<guid>Zbu.ModelsBuilder.Umbraco.dll</guid>
+		<orgPath>/bin</orgPath>
+		<orgName>Zbu.ModelsBuilder.Umbraco.dll</orgName>
+	</file>
+	<file>
+		<guid>Zbu.ModelsBuilder.AspNet.dll</guid>
+		<orgPath>/bin</orgPath>
+		<orgName>Zbu.ModelsBuilder.AspNet.dll</orgName>
+	</file>
+  </files>
+  <info>
+    <package>
+      <name>ZpqrtBnk Umbraco ModelsBuilder</name>
+      <version>FieldPackageVersion</version>
+      <license url="http://www.opensource.org/licenses/mit-license.php">MIT license</license>
+      <url>http://localhost/package</url>
+      <requirements>
+        <major>6</major>
+        <minor>2</minor>
+        <patch>0</patch>
+      </requirements>
+    </package>
+    <author>
+      <name>Pilotine - ZpqrtBnk</name>
+      <website>http://localhost/author</website>
+    </author>
+    <readme><![CDATA[ZpqrtBnk Umbraco Models Builder
+Copyright (C) Pilotine - ZpqrtBnk 2013
+Distributed under the MIT license
+
+An experimental tool that can generate a complete set of strongly-typed published content models for Umbraco 6.2+ to be used in the MVC views. Either from the Umbraco UI, from the command line, or from Visual Studio.
+
+DISCLAIMER: THIS CODE IS UNSTABLE AND FOR INFO ONLY !! IT RUNS ON A MODIFIED 6.2.0 UMBRACO SO IT WILL EVEN NOT COMPILE ON THE STOCK CODE FROM UMBRACO'S REPO
+
+But, time will come...]]></readme>
+  </info>
+  <DocumentTypes />
+  <Templates />
+  <Stylesheets />
+  <Macros />
+  <DictionaryItems />
+  <Languages />
+  <DataTypes />
+  <!--
+  <control>/usercontrols/loadAfterInstall.ascx</control>
+  -->
+  <control />
+  <Actions>
+    <Action runat="install" alias="add-dashboard" dashboardAlias="Zbu">
+      <section>
+        <areas>
+          <area>developer</area>
+        </areas>
+        <tab caption="Models Builder">
+          <control>/UserControls/Zbu/ModelsBuilder/BuildModels.ascx</control>
+        </tab>
+      </section>
+    </Action>
+  </Actions>
+</umbPackage>
