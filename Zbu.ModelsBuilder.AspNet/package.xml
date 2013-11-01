@@ -70,7 +70,7 @@ But, time will come...]]></readme>
   -->
   <control />
   <Actions>
-    <Action runat="install" alias="add-dashboard" dashboardAlias="Zbu">
+    <Action runat="install" alias="addDashboardSection" dashboardAlias="Zbu">
       <section>
         <areas>
           <area>developer</area>
