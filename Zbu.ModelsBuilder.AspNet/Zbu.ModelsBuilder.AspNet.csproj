@@ -98,7 +98,9 @@
     <Content Include="BuildModels.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="package.xml" />
+    <Content Include="package.xml">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -112,7 +114,6 @@
   -->
   <Target Name="AfterBuild" DependsOnTargets="Package">
   </Target>
-  
   <!-- PACKAGE -->
   <!-- SEE TOP OF FILE... TRYING TO FIX THE MESS BUT IT DOES NOT WORK
   <Target Name="BeforeResolveReferences">
@@ -123,14 +124,14 @@
   -->
   <Target Name="Package">
     <GetAssemblyIdentity AssemblyFiles="$(OutputPath)Zbu.ModelsBuilder.dll">
-	  <Output TaskParameter="Assemblies" ItemName="AssemblyInfos" />
-	</GetAssemblyIdentity>	
-	<Message Importance="High" Text="Packaging version %(AssemblyInfos.Version)" />
-	<RemoveDir Directories="$(ProjectDir)pkg\$(Configuration)" Condition="Exists('$(ProjectDir)pkg\$(Configuration)')" />
-	<MakeDir Directories="$(ProjectDir)pkg\$(Configuration)" />
-	<Copy SourceFiles="$(ProjectDir)package.xml" DestinationFolder="$(ProjectDir)pkg\$(Configuration)" />
-	<ManifestUpdate ManifestFile="$(ProjectDir)pkg\$(Configuration)\package.xml" WorkingDirectory="$(ProjectDir)pkg\$(Configuration)" PackageVersion="%(AssemblyInfos.Version)" />
-	<ItemGroup>
+      <Output TaskParameter="Assemblies" ItemName="AssemblyInfos" />
+    </GetAssemblyIdentity>
+    <Message Importance="High" Text="Packaging version %(AssemblyInfos.Version)" />
+    <RemoveDir Directories="$(ProjectDir)pkg\$(Configuration)" Condition="Exists('$(ProjectDir)pkg\$(Configuration)')" />
+    <MakeDir Directories="$(ProjectDir)pkg\$(Configuration)" />
+    <Copy SourceFiles="$(ProjectDir)package.xml" DestinationFolder="$(ProjectDir)pkg\$(Configuration)" />
+    <ManifestUpdate ManifestFile="$(ProjectDir)pkg\$(Configuration)\package.xml" WorkingDirectory="$(ProjectDir)pkg\$(Configuration)" PackageVersion="%(AssemblyInfos.Version)" />
+    <ItemGroup>
       <PackageFiles Include="$(ProjectDir)pkg\$(Configuration)\package.xml" />
       <PackageFiles Include="$(ProjectDir)BuildModels.ascx" />
       <PackageFiles Include="$(OutputPath)Roslyn.Compilers.dll" />
@@ -138,8 +139,8 @@
       <PackageFiles Include="$(OutputPath)Zbu.ModelsBuilder.dll" />
       <PackageFiles Include="$(OutputPath)Zbu.ModelsBuilder.Umbraco.dll" />
       <PackageFiles Include="$(OutputPath)Zbu.ModelsBuilder.AspNet.dll" />
-	</ItemGroup>
-	<Package ManifestFile="$(ProjectDir)pkg\$(Configuration)\package.xml" WorkingDirectory="$(ProjectDir)pkg\$(Configuration)" OutputDirectory="$(ProjectDir)pkg\$(Configuration)" Files="@(PackageFiles)" />
+    </ItemGroup>
+    <Package ManifestFile="$(ProjectDir)pkg\$(Configuration)\package.xml" WorkingDirectory="$(ProjectDir)pkg\$(Configuration)" OutputDirectory="$(ProjectDir)pkg\$(Configuration)" Files="@(PackageFiles)" />
     <Delete Files="$(ProjectDir)pkg\$(Configuration)\package.xml" />
   </Target>
 </Project>
