@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Zbu.ModelsBuilder
@@ -47,14 +48,14 @@ namespace Zbu.ModelsBuilder
                     type.BaseType == null ? "PublishedContent" : type.BaseType.Name);
 
                 // write the mixins
-                foreach (var mixinType in type.DeclaringInterfaces)
+                foreach (var mixinType in type.DeclaringInterfaces.OrderBy(x => x.Name))
                     sb.AppendFormat(", I{0}", mixinType.Name);
 
                 sb.Append("\n\t{\n");
 
                 // write the properties - only the local ones, we're an interface
                 var more = false;
-                foreach (var prop in type.Properties)
+                foreach (var prop in type.Properties.OrderBy(x => x.Name))
                 {
                     if (more) sb.Append("\n");
                     more = true;
@@ -77,7 +78,7 @@ namespace Zbu.ModelsBuilder
             // write the mixins, if any, as interfaces
             // only if not a mixin because otherwise the interface already has them
             if (type.IsMixin == false)
-                foreach (var mixinType in type.DeclaringInterfaces)
+                foreach (var mixinType in type.DeclaringInterfaces.OrderBy(x => x.Name))
                     sb.AppendFormat(", I{0}", mixinType.Name);
 
             // begin class body
@@ -97,12 +98,12 @@ namespace Zbu.ModelsBuilder
         void WriteContentTypeProperties(StringBuilder sb, TypeModel type)
         {
             // write the properties
-            foreach (var prop in type.Properties)
+            foreach (var prop in type.Properties.OrderBy(x => x.Name))
                 WriteProperty(sb, prop);
 
             // write the mixins properties
-            foreach (var mixinType in type.ImplementingInterfaces)
-                foreach (var prop in mixinType.Properties)
+            foreach (var mixinType in type.ImplementingInterfaces.OrderBy(x => x.Name))
+                foreach (var prop in mixinType.Properties.OrderBy(x => x.Name))
                     WriteProperty(sb, prop);
         }
 
@@ -132,7 +133,7 @@ namespace Zbu.ModelsBuilder
                 property.Name);
         }
 
-        void WriteClrType(StringBuilder sb, Type type)
+        internal void WriteClrType(StringBuilder sb, Type type)
         {
             var s = type.ToString();
 
@@ -167,6 +168,7 @@ namespace Zbu.ModelsBuilder
                 var p = s.LastIndexOf('.');
                 if (p > 0 && _typesUsing.Contains(s.Substring(0, p)))
                     s = s.Substring(p + 1);
+                s = s.Replace("+", "."); // nested types *after* using
             }
 
             sb.Append(s);

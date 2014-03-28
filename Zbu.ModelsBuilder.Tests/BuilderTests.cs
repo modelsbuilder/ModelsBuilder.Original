@@ -99,5 +99,34 @@ namespace Zbu.ModelsBuilder.Tests.Models
                 builder.Generate(sb, type);
             Console.WriteLine(sb.ToString());
         }
+
+        [TestCase("int", typeof (int))]
+        [TestCase("IEnumerable<int>", typeof(IEnumerable<int>))]
+        [TestCase("Zbu.ModelsBuilder.Tests.BuilderTestsClass1", typeof(BuilderTestsClass1))]
+        [TestCase("Zbu.ModelsBuilder.Tests.BuilderTests.Class1", typeof(Class1))]
+        public void WriteClrType(string expected, Type input)
+        {
+            var builder = new TextBuilder();
+            var sb = new StringBuilder();
+            builder.WriteClrType(sb, input);
+            Assert.AreEqual(expected, sb.ToString());
+        }
+
+        [TestCase("int", typeof(int))]
+        [TestCase("IEnumerable<int>", typeof(IEnumerable<int>))]
+        [TestCase("BuilderTestsClass1", typeof(BuilderTestsClass1))]
+        [TestCase("BuilderTests.Class1", typeof(Class1))]
+        public void WriteClrTypeUsing(string expected, Type input)
+        {
+            var builder = new TextBuilder();
+            builder.Using.Add("Zbu.ModelsBuilder.Tests");
+            var sb = new StringBuilder();
+            builder.WriteClrType(sb, input);
+            Assert.AreEqual(expected, sb.ToString());
+        }
+
+        public class Class1 { }
     }
+
+    class BuilderTestsClass1 {}
 }
