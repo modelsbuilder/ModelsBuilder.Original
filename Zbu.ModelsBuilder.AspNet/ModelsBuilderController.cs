@@ -32,7 +32,6 @@ namespace Zbu.ModelsBuilder.AspNet
             public string Message;
         }
 
-        // http://umbraco.local/Umbraco/Zbu/ModelsBuilderApi/BuildModels
         [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
         public HttpResponseMessage BuildModels()
         {
@@ -51,7 +50,10 @@ namespace Zbu.ModelsBuilder.AspNet
                     throw new Exception("Panic: appCode is null.");
 
                 GenerateModels(appData);
-                TouchModelsFile(appCode); // will recycle the app domain - but this request will end properly
+
+                var buildModels = ConfigurationManager.AppSettings["Zbu.ModelsBuilder.AspNet.BuildModels"] == "true";
+                if (buildModels)
+                    TouchModelsFile(appCode); // will recycle the app domain - but this request will end properly
 
                 var result = new BuildResult {Success = true};
                 return Request.CreateResponse(HttpStatusCode.OK, result, Configuration.Formatters.JsonFormatter);
@@ -77,8 +79,11 @@ namespace Zbu.ModelsBuilder.AspNet
             var umbraco = Application.GetApplication();
             var modelTypes = umbraco.GetContentAndMediaTypes();
 
+            var ns = ConfigurationManager.AppSettings["Zbu.ModelsBuilder.ModelsNamespace"];
+            if (string.IsNullOrWhiteSpace(ns)) ns = "Umbraco.Web.PublishedContentModels";
+
             var builder = new TextBuilder();
-            builder.Namespace = "Umbraco.Web.PublishedContentModels"; // note - could be a config option
+            builder.Namespace = ns;
             builder.Prepare(modelTypes);
 
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.cs"))
@@ -111,7 +116,7 @@ namespace Zbu.ModelsBuilder.AspNet
             // ok, I just want the route to my controller, statically, so I can have it in the dashboard
             // which is not part of the MVC world... been through MSDN & StackOverflow & such for too long
             // without finding the solution - so it's hard-coded here in all its dirtyness.
-            return "/Umbraco/Zbu/ModelsBuilderApi/BuildModels";
+            return "/Umbraco/BackOffice/Zbu/ModelsBuilderApi/BuildModels";
         }
     }
 }
