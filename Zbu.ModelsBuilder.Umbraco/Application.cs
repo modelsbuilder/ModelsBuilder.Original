@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Common;
+using System.IO;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -90,9 +92,9 @@ namespace Zbu.ModelsBuilder.Umbraco
 
         private void Start()
         {
-            if (!ConfigSystem.Installed)
+            if (!global::Umbraco.Web.Standalone.WriteableConfigSystem.Installed)
             {
-                ConfigSystem.Install();
+                global::Umbraco.Web.Standalone.WriteableConfigSystem.Install();
                 _installedConfigSystem = true;
             }
 
@@ -100,7 +102,56 @@ namespace Zbu.ModelsBuilder.Umbraco
             ConfigurationManager.ConnectionStrings.Add(cstr);
             ConfigurationManager.AppSettings.Add("umbracoConfigurationStatus", UmbracoVersion);
 
-            var app = global::Umbraco.Web.Standalone.StandaloneApplication.GetApplication(Environment.CurrentDirectory)
+            // ensure we know about mysql
+            // either it's already declared in DbProviderFactories config
+            // or we'll try to register it programmatically
+            if (_databaseProvider == "MySql.Data.MySqlClient")
+            {
+                ConfigureMySqlProvider();
+
+                // fixme - this works everywhere but from within VisualStudio
+                // fixme - and even with MySql.Data in the GAC?!
+                try
+                {
+                    var factory = DbProviderFactories.GetFactory("MySql.Data.MySqlClient");
+                }
+                catch (Exception e)
+                {                    
+                    throw new Exception("Failed to configure MySql provider.", e);
+                }
+            }
+
+            // we are standalone - we might be a Visual Studio custom tool or some sort of
+            // application that cannot write to its own directory, and must use an AppData dir.
+            var baseDirectory = Environment.CurrentDirectory;
+
+            var useAppData = ConfigurationManager.AppSettings["Zbu.ModelsBuilder.Umbraco.Application.UseLocalApplicationData"] == "true";
+
+            if (!useAppData)
+            {
+                try
+                {
+                    using (var fs = System.IO.File.Create(
+                        Path.Combine(baseDirectory, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose))
+                    {
+                    }
+                }
+                catch
+                {
+                    useAppData = true;
+                }
+            }
+
+            if (useAppData)
+            {
+                var appdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                var rootDir = Path.Combine(appdata, "Zbu.ModelsBuilder");
+                if (!Directory.Exists(rootDir))
+                    Directory.CreateDirectory(rootDir);
+                baseDirectory = rootDir;
+            }
+
+            var app = global::Umbraco.Web.Standalone.StandaloneApplication.GetApplication(baseDirectory)
                 .WithoutApplicationEventHandler<global::Umbraco.Web.Search.ExamineEvents>()
                 .WithApplicationEventHandler<AppHandler>();
 
@@ -111,7 +162,7 @@ namespace Zbu.ModelsBuilder.Umbraco
             catch
             {
                 if (_installedConfigSystem)
-                    ConfigSystem.Uninstall();
+                    global::Umbraco.Web.Standalone.WriteableConfigSystem.Uninstall();
                 _installedConfigSystem = false;                
                 throw;
             }
@@ -123,18 +174,53 @@ namespace Zbu.ModelsBuilder.Umbraco
         {
             if (_umbracoApplication != null)
             {
+                _umbracoApplication.Terminate();
+
                 if (_installedConfigSystem)
                 {
-                    ConfigSystem.Uninstall();
+                    global::Umbraco.Web.Standalone.WriteableConfigSystem.Uninstall();
                     _installedConfigSystem = false;
                 }
-
-                _umbracoApplication.Terminate();
             }
 
             lock (LockO)
             {
                 _application = null;
+            }
+        }
+
+        private void ConfigureMySqlProvider()
+        {
+            var section = ConfigurationManager.GetSection("system.data");
+            var dataset = section as System.Data.DataSet;
+            if (dataset == null)
+                throw new Exception("Failed to access system.data configuration section.");
+            System.Data.DataRowCollection dbProviderFactories = null;
+            foreach (System.Data.DataTable t in dataset.Tables)
+                if (t.TableName == "DbProviderFactories")
+                {
+                    dbProviderFactories = t.Rows;
+                    break;
+                }
+            if (dbProviderFactories == null)
+                throw new Exception("Failed to access system.data/DbProviderFactories.");
+            var exists = false;
+            foreach (System.Data.DataRow r in dbProviderFactories)
+                if (r["InvariantName"].ToString() == "MySql.Data.MySqlClient")
+                    exists = true;
+            if (!exists)
+            {
+                // <add name="MySQL Data Provider" 
+                //      invariant="MySql.Data.MySqlClient" 
+                //      description=".Net Framework Data Provider for MySQL" 
+                //      type="MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data, Version=6.6.5.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d" />
+                dbProviderFactories.Add("MySQL Data Provider",
+                    ".Net Framework Data Provider for MySQL",
+                    "MySql.Data.MySqlClient",
+                    "MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data, Version=6.6.5.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d");
+                    //"MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data");
+
+                dataset.AcceptChanges();
             }
         }
 
@@ -185,7 +271,7 @@ namespace Zbu.ModelsBuilder.Umbraco
                 {
                     Id = contentType.Id,
                     Alias = contentType.Alias,
-                    Name = contentType.Alias.ToCleanString(CleanStringType.PascalCase),
+                    Name = contentType.Alias.ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase),
                     BaseTypeId = contentType.ParentId
                 };
 
@@ -198,7 +284,7 @@ namespace Zbu.ModelsBuilder.Umbraco
                     var propertyModel = new PropertyModel
                     {
                         Alias = propertyType.Alias,
-                        Name = propertyType.Alias.ToCleanString(CleanStringType.PascalCase)
+                        Name = propertyType.Alias.ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase)
                     };
 
                     var publishedPropertyType = publishedContentType.GetPropertyType(propertyType.Alias);
