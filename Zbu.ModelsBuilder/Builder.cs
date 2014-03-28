@@ -61,8 +61,12 @@ namespace Zbu.ModelsBuilder
                 (contentName, propertyAlias) =>
                 {
                     var type = genTypes.SingleOrDefault(x => x.Name == contentName);
-                    if (type != null)
-                        type.Properties.RemoveAll(x => x.Alias == propertyAlias);
+                    if (type == null) return;
+
+                    var star = propertyAlias.EndsWith("*");
+                    if (star) propertyAlias = propertyAlias.Substring(0, propertyAlias.Length - 1);
+                    type.Properties.RemoveAll(x => 
+                        star ? x.Alias.StartsWith(propertyAlias) : x.Alias == propertyAlias);
                 },
                 (contentName, contentAlias) =>
                 {
