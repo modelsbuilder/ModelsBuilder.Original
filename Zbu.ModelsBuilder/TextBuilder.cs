@@ -83,6 +83,10 @@ namespace Zbu.ModelsBuilder
             // begin class body
             sb.Append("\n\t{\n");
 
+            // write the static stuff
+            sb.AppendFormat("\t\tpublic const string DocumentTypeAlias = \"{0}\";\n\n",
+                type.Alias);
+
             // write the ctor
             sb.AppendFormat("\t\tpublic {0}(IPublishedContent content)\n\t\t\t: base(content)\n\t\t{{ }}\n",
                 type.Name);
