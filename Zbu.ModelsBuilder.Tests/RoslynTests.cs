@@ -35,6 +35,22 @@ class SimpleClass
         }
 
         [Test]
+        public void ParseTest3()
+        {
+            const string code = @"
+class SimpleClass1 : BaseClass, ISomething, ISomethingElse
+{ 
+}
+class SimpleClass2
+{ 
+}";
+
+            var tree = SyntaxTree.ParseText(code);
+            var writer = new ConsoleDumpWalker();
+            writer.Visit(tree.GetRoot());
+        }
+
+        [Test]
         public void ParseTest2()
         {
             const string code = @"
@@ -161,6 +177,18 @@ namespace Umbrco.Web.Models.User
             var prepend = node.ChildNodes().Any() ? "[-]" : "[.]";
             var line = new string(' ', padding) + prepend + " " + node.GetType().ToString();
             Console.WriteLine(line);
+
+            var decl = node as ClassDeclarationSyntax;
+            if (decl != null && decl.BaseList != null)
+            {
+                Console.Write(new string(' ', padding + 4) + decl.Identifier);
+                foreach (var n in decl.BaseList.Types.OfType<IdentifierNameSyntax>())
+                {
+                    Console.Write(" " + n.Identifier);
+                }
+                Console.WriteLine();
+            }
+
             base.Visit(node);
         }
     }

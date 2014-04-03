@@ -16,15 +16,18 @@ namespace Zbu.ModelsBuilder
         private Action<string> _onIgnoreContentType;
         private Action<string, string> _onIgnorePropertyType;
         private Action<string, string> _onRenameContentType;
+        private Action<string, string> _onDefineModelBaseClass;
 
         public void Visit(SyntaxNode node,
             Action<string> onIgnoreContentType,
             Action<string, string> onIgnorePropertyType,
-            Action<string, string> onRenameContentType)
+            Action<string, string> onRenameContentType,
+            Action<string, string> onDefineModelBaseClass)
         {
             _onIgnoreContentType = onIgnoreContentType;
             _onIgnorePropertyType = onIgnorePropertyType;
             _onRenameContentType = onRenameContentType;
+            _onDefineModelBaseClass = onDefineModelBaseClass;
 
             base.Visit(node);
         }
@@ -52,6 +55,10 @@ namespace Zbu.ModelsBuilder
                         // fixme or maybe we should not rename on interfaces? name must be consistent with class?
                         //Console.WriteLine("Name {0} for ContentType {1}", className, node.Token.ValueText);
                         _onRenameContentType(className, node.Token.ValueText);
+                        break;
+                    case "ModelBaseClass":
+                        className = _classNames.Peek();
+                        _onDefineModelBaseClass(className, node.Token.ValueText);
                         break;
                 }
             }

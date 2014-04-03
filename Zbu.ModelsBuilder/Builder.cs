@@ -32,6 +32,10 @@ namespace Zbu.ModelsBuilder
             if (names.Count() != typeModels.Count)
                 throw new InvalidOperationException("Duplicate type names have been found.");
 
+            // ensure
+            if (typeModels.Any(x => x.BaseType != null && x.ModelBaseClassName != null))
+                throw new InvalidOperationException("Types with a base type and a base class name have been found.");
+
             // discover interfaces that need to be declared / implemented
             foreach (var typeModel in typeModels)
             {
@@ -60,6 +64,7 @@ namespace Zbu.ModelsBuilder
                 alias => genTypes.RemoveAll(x => x.Alias.InvariantEquals(alias)),
                 (contentName, propertyAlias) =>
                 {
+                    if (string.IsNullOrWhiteSpace(propertyAlias)) return;
                     var type = genTypes.SingleOrDefault(x => x.Name == contentName);
                     if (type == null) return;
 
@@ -70,9 +75,17 @@ namespace Zbu.ModelsBuilder
                 },
                 (contentName, contentAlias) =>
                 {
+                    if (string.IsNullOrWhiteSpace(contentName)) return;
                     var type = genTypes.SingleOrDefault(x => x.Alias.InvariantEquals(contentAlias));
                     if (type != null)
                         type.Name = contentName;
+                },
+                (contentName, modelBaseClassName) =>
+                {
+                    if (string.IsNullOrWhiteSpace(modelBaseClassName)) return;
+                    var type = genTypes.SingleOrDefault(x => x.Name == contentName);
+                    if (type == null) return;
+                    type.ModelBaseClassName = modelBaseClassName;
                 });
 
             // at that point some types might have been removed / ignored, that we

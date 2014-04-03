@@ -67,9 +67,8 @@ namespace Zbu.ModelsBuilder
 
             // write the class declaration
             sb.AppendFormat("\t// Content Type {0} with alias \"{1}\"\n", type.Id, type.Alias);
-            sb.AppendFormat("\tpublic partial class {0} : {1}",
-                type.Name,
-                type.BaseType == null ? "PublishedContentModel" : type.BaseType.Name);
+            var inherits = type.BaseType == null ? (type.ModelBaseClassName ?? "PublishedContentModel") : type.BaseType.Name;
+            sb.AppendFormat("\tpublic partial class {0} : {1}", type.Name, inherits);
 
             // if it's a missing it implements its own interface
             if (type.IsMixin)

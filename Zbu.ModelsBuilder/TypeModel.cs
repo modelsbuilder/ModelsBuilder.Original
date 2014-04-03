@@ -9,6 +9,7 @@ namespace Zbu.ModelsBuilder
         public string Name;
         public int BaseTypeId;
         public TypeModel BaseType;
+        public string ModelBaseClassName;
         public readonly List<PropertyModel> Properties = new List<PropertyModel>();
         public readonly List<TypeModel> MixinTypes = new List<TypeModel>();
         public readonly List<TypeModel> DeclaringInterfaces = new List<TypeModel>();
