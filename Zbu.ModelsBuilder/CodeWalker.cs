@@ -15,17 +15,20 @@ namespace Zbu.ModelsBuilder
 
         private Action<string> _onIgnoreContentType;
         private Action<string, string> _onIgnorePropertyType;
+        private Action<string, string, string> _onRenamePropertyType;
         private Action<string, string> _onRenameContentType;
         private Action<string, string> _onDefineModelBaseClass;
 
         public void Visit(SyntaxNode node,
             Action<string> onIgnoreContentType,
             Action<string, string> onIgnorePropertyType,
+            Action<string, string, string> onRenamePropertyType,
             Action<string, string> onRenameContentType,
             Action<string, string> onDefineModelBaseClass)
         {
             _onIgnoreContentType = onIgnoreContentType;
             _onIgnorePropertyType = onIgnorePropertyType;
+            _onRenamePropertyType = onRenamePropertyType;
             _onRenameContentType = onRenameContentType;
             _onDefineModelBaseClass = onDefineModelBaseClass;
 
@@ -69,6 +72,19 @@ namespace Zbu.ModelsBuilder
         {
             // assuming we don't nest attributes
             _attributeName = node.Name.ToString();
+
+            if (_attributeName == "RenamePropertyType")
+            {
+                var args = node.ArgumentList.Arguments;
+                var arg1 = args[0];
+                var arg2 = args[1];
+                // fixme - what about .NameColon and NameEquals... could the args be swapped?
+                var alias = (arg1.Expression as LiteralExpressionSyntax).Token.ValueText;
+                var name = (arg2.Expression as LiteralExpressionSyntax).Token.ValueText;
+                var className = _classNames.Peek();
+                _onRenamePropertyType(className, alias, name);
+            }
+
             base.VisitAttribute(node);
             _attributeName = null;
         }

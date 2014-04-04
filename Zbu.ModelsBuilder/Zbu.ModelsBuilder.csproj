@@ -66,6 +66,7 @@
     <Compile Include="Builder.cs" />
     <Compile Include="CodeDomBuilder.cs" />
     <Compile Include="CodeWalker.cs" />
+    <Compile Include="RenamePropertyTypeAttribute.cs" />
     <Compile Include="ModelPropertyAliasAttribute.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="ModelBaseClassAttribute.cs" />

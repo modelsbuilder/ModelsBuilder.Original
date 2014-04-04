@@ -64,8 +64,8 @@ namespace Zbu.ModelsBuilder
             var tree = SyntaxTree.ParseText(code);
             var writer = new CodeWalker();
             writer.Visit(tree.GetRoot(),
-                alias => genTypes.RemoveAll(x => x.Alias.InvariantEquals(alias)),
-                (contentName, propertyAlias) =>
+                onIgnoreContentType: alias => genTypes.RemoveAll(x => x.Alias.InvariantEquals(alias)),
+                onIgnorePropertyType: (contentName, propertyAlias) =>
                 {
                     if (string.IsNullOrWhiteSpace(propertyAlias)) return;
                     var type = genTypes.SingleOrDefault(x => x.Name == contentName);
@@ -76,14 +76,28 @@ namespace Zbu.ModelsBuilder
                     type.Properties.RemoveAll(x => 
                         star ? x.Alias.StartsWith(propertyAlias) : x.Alias == propertyAlias);
                 },
-                (contentName, contentAlias) =>
+                onRenamePropertyType: (contentName, propertyAlias, propertyName) =>
+                {
+                    if (string.IsNullOrWhiteSpace(contentName)) return;
+                    if (string.IsNullOrWhiteSpace(propertyAlias)) return;
+                    if (string.IsNullOrWhiteSpace(propertyName)) return;
+
+                    var type = genTypes.SingleOrDefault(x => x.Name == contentName);
+                    if (type == null) return;
+
+                    var property = type.Properties.SingleOrDefault(x => x.Alias == propertyAlias);
+                    if (property == null) return;
+
+                    property.Name = propertyName;
+                },
+                onRenameContentType: (contentName, contentAlias) =>
                 {
                     if (string.IsNullOrWhiteSpace(contentName)) return;
                     var type = genTypes.SingleOrDefault(x => x.Alias.InvariantEquals(contentAlias));
                     if (type != null)
                         type.Name = contentName;
                 },
-                (contentName, modelBaseClassName) =>
+                onDefineModelBaseClass: (contentName, modelBaseClassName) =>
                 {
                     if (string.IsNullOrWhiteSpace(modelBaseClassName)) return;
                     var type = genTypes.SingleOrDefault(x => x.Name == contentName);

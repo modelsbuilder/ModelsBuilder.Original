@@ -51,6 +51,21 @@ class SimpleClass2
         }
 
         [Test]
+        public void ParseTest4()
+        {
+            const string code = @"
+[SomeAttribute(""value1"", ""value2"")]
+[SomeOtherAttribute(Foo:""value1"", BaDang:""value2"")]
+class SimpleClass1
+{ 
+}";
+
+            var tree = SyntaxTree.ParseText(code);
+            var writer = new ConsoleDumpWalker();
+            writer.Visit(tree.GetRoot());
+        }
+
+        [Test]
         public void ParseTest2()
         {
             const string code = @"
@@ -178,15 +193,27 @@ namespace Umbrco.Web.Models.User
             var line = new string(' ', padding) + prepend + " " + node.GetType().ToString();
             Console.WriteLine(line);
 
-            var decl = node as ClassDeclarationSyntax;
-            if (decl != null && decl.BaseList != null)
+            //var decl = node as ClassDeclarationSyntax;
+            //if (decl != null && decl.BaseList != null)
+            //{
+            //    Console.Write(new string(' ', padding + 4) + decl.Identifier);
+            //    foreach (var n in decl.BaseList.Types.OfType<IdentifierNameSyntax>())
+            //    {
+            //        Console.Write(" " + n.Identifier);
+            //    }
+            //    Console.WriteLine();
+            //}
+
+            var attr = node as AttributeSyntax;
+            if (attr != null)
             {
-                Console.Write(new string(' ', padding + 4) + decl.Identifier);
-                foreach (var n in decl.BaseList.Types.OfType<IdentifierNameSyntax>())
+                Console.WriteLine(new string(' ', padding + 4) + "> " + attr.Name);
+                foreach (var arg in attr.ArgumentList.Arguments)
                 {
-                    Console.Write(" " + n.Identifier);
+                    var expr = arg.Expression as LiteralExpressionSyntax;
+                    //Console.WriteLine(new string(' ', padding + 4) + "> " + arg.NameColon + " " + arg.NameEquals);
+                    Console.WriteLine(new string(' ', padding + 4) + "> " + (expr == null ? null : expr.Token.Value));
                 }
-                Console.WriteLine();
             }
 
             base.Visit(node);

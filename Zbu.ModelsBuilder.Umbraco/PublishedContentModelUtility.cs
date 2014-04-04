@@ -45,7 +45,8 @@ namespace Zbu.ModelsBuilder.Umbraco
                 .SingleOrDefault();
 
             if (attr == null || string.IsNullOrWhiteSpace(attr.Alias))
-                throw new InvalidOperationException("Could not figure out property alias.");
+                throw new InvalidOperationException(
+                    string.Format("Could not figure out property alias for property \"{0}\".", expr.Member.Name));
 
             return contentType.GetPropertyType(attr.Alias);
         }
