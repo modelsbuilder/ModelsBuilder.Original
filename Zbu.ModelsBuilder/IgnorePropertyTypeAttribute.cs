@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Zbu.ModelsBuilder
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = true, Inherited = false)]
-    public class IgnorePropertyTypeAttribute : Attribute
+    public sealed class IgnorePropertyTypeAttribute : Attribute
     {
         public IgnorePropertyTypeAttribute(string alias)
         {}

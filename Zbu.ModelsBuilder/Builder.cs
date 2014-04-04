@@ -17,10 +17,13 @@ namespace Zbu.ModelsBuilder
         {
             "System",
             "System.Collections.Generic",
+            "System.Linq.Expressions",
             "System.Web",
             "Umbraco.Core.Models",
             "Umbraco.Core.Models.PublishedContent",
-            "Umbraco.Web"
+            "Umbraco.Web",
+            "Zbu.ModelsBuilder",
+            "Zbu.ModelsBuilder.Umbraco",
         };
 
         #region Prepare

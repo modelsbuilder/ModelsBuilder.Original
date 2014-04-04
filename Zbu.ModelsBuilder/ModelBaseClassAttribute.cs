@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Zbu.ModelsBuilder
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public class ModelBaseClassAttribute : Attribute
+    public sealed class ModelBaseClassAttribute : Attribute
     {
         public ModelBaseClassAttribute(string type)
         {}

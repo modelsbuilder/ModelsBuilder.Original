@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Zbu.ModelsBuilder
 {
@@ -15,6 +16,31 @@ namespace Zbu.ModelsBuilder
         public readonly List<TypeModel> DeclaringInterfaces = new List<TypeModel>();
         public readonly List<TypeModel> ImplementingInterfaces = new List<TypeModel>();
         public bool IsMixin;
+
+        public enum ItemTypes
+        {
+            Content,
+            Media
+        }
+
+        private ItemTypes _itemType;
+
+        public ItemTypes ItemType
+        {
+            get { return _itemType; }
+            set
+            {
+                switch (value)
+                {
+                    case ItemTypes.Content:
+                    case ItemTypes.Media:
+                        _itemType = value;
+                        break;
+                    default:
+                        throw new ArgumentException("value");
+                }
+            }
+        }
 
         public List<TypeModel> GetTypeTree()
         {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Zbu.ModelsBuilder
 {
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
-    public class IgnoreContentTypeAttribute : Attribute
+    public sealed class IgnoreContentTypeAttribute : Attribute
     {
         public IgnoreContentTypeAttribute(string alias)
         {}

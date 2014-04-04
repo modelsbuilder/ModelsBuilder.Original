@@ -83,13 +83,22 @@ namespace Zbu.ModelsBuilder
             // begin class body
             sb.Append("\n\t{\n");
 
-            // write the static stuff
-            sb.AppendFormat("\t\tpublic const string DocumentTypeAlias = \"{0}\";\n\n",
+            // write the constants
+            sb.AppendFormat("\t\tpublic const string ModelTypeAlias = \"{0}\";\n",
                 type.Alias);
+            sb.AppendFormat("\t\tpublic const PublishedItemType ModelItemType = PublishedItemType.{0};\n\n",
+                type.ItemType);
 
             // write the ctor
-            sb.AppendFormat("\t\tpublic {0}(IPublishedContent content)\n\t\t\t: base(content)\n\t\t{{ }}\n",
+            sb.AppendFormat("\t\tpublic {0}(IPublishedContent content)\n\t\t\t: base(content)\n\t\t{{ }}\n\n",
                 type.Name);
+
+            // write the static methods
+            sb.Append("\t\tpublic static PublishedContentType GetModelContentType()\n");
+            sb.Append("\t\t{\n\t\t\treturn PublishedContentType.Get(ModelItemType, ModelTypeAlias);\n\t\t}\n\n");
+            sb.AppendFormat("\t\tpublic static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<{0}, TValue>> selector)\n",
+                type.Name);
+            sb.Append("\t\t{\n\t\t\treturn PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);\n\t\t}\n");
 
             // write the properties
             WriteContentTypeProperties(sb, type);
@@ -113,6 +122,8 @@ namespace Zbu.ModelsBuilder
         void WriteProperty(StringBuilder sb, PropertyModel property)
         {
             sb.Append("\n");
+
+            sb.AppendFormat("\t\t[ModelPropertyAlias(\"{0}\")]\n", property.Alias);
 
             sb.Append("\t\tpublic ");
             WriteClrType(sb, property.ClrType);

@@ -275,6 +275,18 @@ namespace Zbu.ModelsBuilder.Umbraco
                     BaseTypeId = contentType.ParentId
                 };
 
+                switch (itemType)
+                {
+                    case PublishedItemType.Content:
+                        typeModel.ItemType = TypeModel.ItemTypes.Content;
+                        break;
+                    case PublishedItemType.Media:
+                        typeModel.ItemType = TypeModel.ItemTypes.Media;
+                        break;
+                    default:
+                        throw new InvalidOperationException("Only Content and Media PublishedItemType values are supported.");
+                }
+
                 typeModels.Add(typeModel);
 
                 var publishedContentType = PublishedContentType.Get(itemType, contentType.Alias);
