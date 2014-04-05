@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Zbu.ModelsBuilder
 {
-    class CodeWalker : SyntaxWalker
+    class CodeWalker : CSharpSyntaxWalker
     {
         private string _propertyName;
         private string _attributeName;

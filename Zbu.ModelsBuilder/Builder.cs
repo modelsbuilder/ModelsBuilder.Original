@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Zbu.ModelsBuilder
 {
@@ -61,7 +61,7 @@ namespace Zbu.ModelsBuilder
 
         public void Parse(string code, IList<TypeModel> genTypes)
         {
-            var tree = SyntaxTree.ParseText(code);
+            var tree = CSharpSyntaxTree.ParseText(code);
             var writer = new CodeWalker();
             writer.Visit(tree.GetRoot(),
                 onIgnoreContentType: alias => genTypes.RemoveAll(x => x.Alias.InvariantEquals(alias)),
