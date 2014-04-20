@@ -63,6 +63,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PublishedContentModelUtility.cs" />
     <Compile Include="PublishedPropertyTypeExtensions.cs" />
+    <Compile Include="RemoteApplication.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Zbu.ModelsBuilder\Zbu.ModelsBuilder.csproj">

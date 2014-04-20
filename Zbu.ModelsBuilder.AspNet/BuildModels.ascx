@@ -8,7 +8,7 @@
 
         function buildModelsOnServer(callback) {
             // encodeURIComponent(args)...
-            $.getJSON('<%=Zbu.ModelsBuilder.AspNet.ModelsBuilderApiController.GetBuildModelsUrl(Context)%>', function (json) {
+            $.getJSON('<%=Zbu.ModelsBuilder.AspNet.ModelsBuilderApiController.BuildModelsUrl%>', function (json) {
 		        callback(json);
 		    });
 		}

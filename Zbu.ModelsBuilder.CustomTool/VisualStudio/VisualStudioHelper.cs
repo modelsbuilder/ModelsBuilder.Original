@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,24 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
 {
     class VisualStudioHelper
     {
+        public static string GetProjectBin(string hint)
+        {
+            if (Path.IsPathRooted(hint)) return hint;
+
+            var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
+            var dteProjects = (Array)dte.ActiveSolutionProjects;
+            if (dteProjects.Length <= 0)
+                throw new Exception("Panic: no projets.");
+
+            var dteProject = (EnvDTE.Project)dteProjects.GetValue(0);
+
+            var proj = dteProject.FullName; // full path and name of the Project object's file
+            var opath = string.IsNullOrWhiteSpace(hint)
+                ? dteProject.ConfigurationManager.ActiveConfiguration.Properties.Item("OutputPath").Value.ToString()
+                : hint;
+            return Path.Combine(Path.GetDirectoryName(proj), opath);
+        }
+
         public static EnvDTE.ProjectItem GetSourceItem(string inputFilePath)
         {
             var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
@@ -169,6 +188,37 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
             ReportMessage(string.Format(format, args));
         }
 
+        private static IVsStatusbar StatusBar
+        {
+            get
+            {
+                var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
+                IServiceProvider serviceProvider = new ServiceProvider(dte as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
+                return serviceProvider.GetService(typeof(SVsStatusbar)) as IVsStatusbar;
+            }
+        }
+
+        public static void SetStatus(string msg)
+        {
+            // http://geekswithblogs.net/onlyutkarsh/archive/2013/08/11/using-visual-studio-status-bar-in-your-extensions.aspx
+            var bar = StatusBar;
+            int frozen;
+            bar.IsFrozen(out frozen);
+            if (frozen != 0) return;
+            bar.SetText("Dim da da...");
+            object icon = (short) Microsoft.VisualStudio.Shell.Interop.Constants.SBAI_Synch;
+            bar.Animation(1, ref icon);
+
+            // could we have also a "long running task" popup?
+        }
+
+        public static void ReleaseStatus()
+        {
+            var bar = StatusBar;
+            bar.FreezeOutput(0);
+            bar.Clear();
+        }
+
         public static string GetSolution()
         {
             var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
@@ -193,12 +243,20 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
 
             public string ConnectionString { get { return (string)_properties.Item("ConnectionString").Value; } }
             public string DatabaseProvider { get { return (string)_properties.Item("DatabaseProvider").Value; } }
+            public string BinaryDirectory { get { return (string)_properties.Item("BinaryDirectory").Value; } }
+            public string UmbracoUrl { get { return (string)_properties.Item("UmbracoUrl").Value; } }
+            public string UmbracoUser { get { return (string)_properties.Item("UmbracoUser").Value; } }
+            public string UmbracoPassword { get { return (string)_properties.Item("UmbracoPassword").Value; } }
 
             public void Validate()
             {
                 var valid = true;
                 valid &= !string.IsNullOrWhiteSpace(ConnectionString);
                 valid &= !string.IsNullOrWhiteSpace(DatabaseProvider);
+                valid &= !string.IsNullOrWhiteSpace(UmbracoUrl);
+                valid &= !string.IsNullOrWhiteSpace(UmbracoUser);
+                valid &= !string.IsNullOrWhiteSpace(UmbracoPassword);
+                // don't validate the binary directory
 
                 if (!valid)
                     throw new Exception("Invalid configuration.");

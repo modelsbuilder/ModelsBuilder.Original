@@ -2,15 +2,252 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
-using Roslyn.Compilers.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Zbu.ModelsBuilder.Tests
 {
+    public interface IRandom1
+    {}
+
+    public interface IRandom2 : IRandom1
+    {}
+
+    public class TestBuilder : Builder
+    { }
+
     [TestFixture]
     public class RoslynTests
     {
+        [Test]
+        public void SemTest1()
+        {
+            // http://social.msdn.microsoft.com/Forums/vstudio/en-US/64ee86b8-0fd7-457d-8428-a0f238133476/can-roslyn-tell-me-if-a-member-of-a-symbol-is-visible-from-a-position-in-a-document?forum=roslyn
+            const string code = @"
+using System; // required to properly define the attribute
+using Foo;
+using Zbu.ModelsBuilder.Tests;
+
+[assembly:AsmAttribute]
+
+class SimpleClass
+{ 
+    public void SimpleMethod()
+    { 
+        Console.WriteLine(""hop"");
+    }
+}
+interface IBase
+{}
+interface IInterface : IBase
+{}
+class AnotherClass : SimpleClass, IInterface
+{
+    class Nested
+    {}
+}
+// if using Foo then reports Foo.Hop
+// else just reports Foo which does not exist...
+class SoWhat : Hop
+{}
+[MyAttr]
+[SomeAttr(""blue"", Value=555)] // this is a named argument
+[SomeAttr(1234)]
+[NamedArgsAttribute(s2:""x"", s1:""y"")]
+class WithAttr
+{}
+class Random : IRandom2
+{}
+class SomeAttrAttribute:Attribute
+{
+    public SomeAttrAttribute(string s, int x = 55){}
+    public int Value { get; set; }
+}
+class NamedArgsAttribute:Attribute
+{
+    public NamedArgsAttribute(string s1 = ""a"", string s2 = ""b""){}
+}
+namespace Foo
+{
+    // reported as Foo.Hop
+    class Hop {}
+
+    class MyAttrAttribute // works
+    {}
+}";
+
+            // http://msdn.microsoft.com/en-gb/vstudio/hh500769.aspx
+            var tree = CSharpSyntaxTree.ParseText(code);
+            //var mscorlib = new AssemblyFileReference(typeof(object).Assembly.Location);
+            var mscorlib = new MetadataFileReference(typeof (object).Assembly.Location);
+
+            // YES! adding the reference and Random1 is found by compilation
+            // SO we can get rid of the OmitWhatever attribute!!!!
+            // provided that we load everything that's in BIN as references
+            // => the CodeInfos must be built on the SERVER and we send files to the SERVER.
+            var testslib = new MetadataFileReference(typeof (RoslynTests).Assembly.Location);
+
+            var compilation = CSharpCompilation.Create(
+                "MyCompilation",
+                syntaxTrees: new[] { tree },
+                references: new MetadataReference[] { mscorlib, testslib });
+            var model = compilation.GetSemanticModel(tree);
+
+            var diags = model.GetDiagnostics();
+            if (diags.Length > 0)
+            {
+                foreach (var diag in diags)
+                {
+                    Console.WriteLine(diag);
+                }                
+            }
+
+            //var writer = new ConsoleDumpWalker();
+            //writer.Visit(tree.GetRoot());
+
+            //var classDeclarations = tree.GetRoot().DescendantNodes(x => x is ClassDeclarationSyntax).OfType<ClassDeclarationSyntax>();
+            var classDeclarations = tree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>();
+            foreach (var classDeclaration in classDeclarations)
+            {
+                Console.WriteLine("class {0}", classDeclaration.Identifier.ValueText);
+                var symbol = model.GetDeclaredSymbol(classDeclaration);
+                //Console.WriteLine("symbol {0}", symbol.GetType());
+                //Console.WriteLine("class {0}", symbol.Name); // just the local name
+                var n = SymbolDisplay.ToDisplayString(symbol);
+                Console.WriteLine("class {0}", n);
+                Console.WriteLine("  : {0}", symbol.BaseType);
+                foreach (var i in symbol.Interfaces)
+                    Console.WriteLine("  : {0}", i.Name);
+                foreach (var i in symbol.AllInterfaces)
+                    Console.WriteLine("  + {0} {1}", i.Name, SymbolDisplay.ToDisplayString(i));
+
+                // note: should take care of "error types" => how can we know if there are errors?
+                foreach (var asym in symbol.GetAttributes())
+                {
+                    var t = asym.AttributeClass;
+                    Console.WriteLine("  ! {0}", t);
+                    if (t is IErrorTypeSymbol)
+                    {
+                        Console.WriteLine("  ERR");
+                    }
+                }
+            }
+
+            // OK but in our case, compilation of existing code would fail
+            // because we haven't generated the missing code already... and yet?
+
+            Console.WriteLine(model);
+        }
+
+        [Test]
+        public void SemTestMissingReference()
+        {
+            const string code = @"
+public class MyBuilder : Zbu.ModelsBuilder.Tests.TestBuilder
+{}
+";
+
+            var tree = CSharpSyntaxTree.ParseText(code);
+            var mscorlib = new MetadataFileReference(typeof(object).Assembly.Location);
+            var testslib = new MetadataFileReference(typeof(RoslynTests).Assembly.Location);
+
+            var compilation = CSharpCompilation.Create(
+                "MyCompilation",
+                syntaxTrees: new[] { tree },
+                references: new MetadataReference[] { mscorlib, testslib });
+            var model = compilation.GetSemanticModel(tree);
+
+            // CS0012: Zbu.ModelsBuilder.Builder is referenced in an assembly that is not referenced
+            var diags = model.GetDiagnostics();
+            if (diags.Length > 0)
+            {
+                foreach (var diag in diags)
+                {
+                    Console.WriteLine(diag);
+                }
+            }
+
+            Assert.AreEqual(1, diags.Length);
+            Assert.AreEqual("CS0012", diags[0].Id);
+        }
+
+        [Test]
+        public void SemTestWithReferences()
+        {
+            const string code = @"
+public class MyBuilder : Zbu.ModelsBuilder.Tests.TestBuilder
+{}
+";
+
+            var tree = CSharpSyntaxTree.ParseText(code);
+            var refs = AssemblyUtility.GetAllReferencedAssemblyLocations().Select(x => new MetadataFileReference(x));
+
+            var compilation = CSharpCompilation.Create(
+                "MyCompilation",
+                syntaxTrees: new[] { tree },
+                references: refs);
+            var model = compilation.GetSemanticModel(tree);
+
+            var diags = model.GetDiagnostics();
+            if (diags.Length > 0)
+            {
+                foreach (var diag in diags)
+                {
+                    Console.WriteLine(diag);
+                }
+            }
+
+            Assert.AreEqual(0, diags.Length);
+        }
+
+        [Test]
+        public void SemTestAssemblyAttributes()
+        {
+            const string code = @"
+using System;
+[assembly: Nevgyt(""yop"")]
+[assembly: Shmuit]
+
+class Shmuit:Attribute
+{}
+
+[Fooxy(""yop"")]
+class SimpleClass
+{ 
+    [Funky(""yop"")]
+    public void SimpleMethod()
+    { 
+        var list = new List<string>();
+        list.Add(""first"");
+        list.Add(""second"");
+        var result = from item in list where item == ""first"" select item;
+    }
+}";
+
+            var tree = CSharpSyntaxTree.ParseText(code);
+            var mscorlib = new MetadataFileReference(typeof(object).Assembly.Location);
+
+            var compilation = CSharpCompilation.Create(
+                "MyCompilation",
+                syntaxTrees: new[] { tree },
+                references: new MetadataReference[] { mscorlib });
+            var model = compilation.GetSemanticModel(tree);
+            foreach (var attrData in compilation.Assembly.GetAttributes())
+            {
+                var attrClassSymbol = attrData.AttributeClass;
+
+                // handle errors
+                if (attrClassSymbol is IErrorTypeSymbol) continue;
+                if (attrData.AttributeConstructor == null) continue;
+
+                var attrClassName = SymbolDisplay.ToDisplayString(attrClassSymbol);
+                Console.WriteLine(attrClassName);
+            }
+        }
+
         [Test]
         public void ParseTest1()
         {
@@ -29,38 +266,7 @@ class SimpleClass
     }
 }";
 
-            var tree = SyntaxTree.ParseText(code);
-            var writer = new ConsoleDumpWalker();
-            writer.Visit(tree.GetRoot());
-        }
-
-        [Test]
-        public void ParseTest3()
-        {
-            const string code = @"
-class SimpleClass1 : BaseClass, ISomething, ISomethingElse
-{ 
-}
-class SimpleClass2
-{ 
-}";
-
-            var tree = SyntaxTree.ParseText(code);
-            var writer = new ConsoleDumpWalker();
-            writer.Visit(tree.GetRoot());
-        }
-
-        [Test]
-        public void ParseTest4()
-        {
-            const string code = @"
-[SomeAttribute(""value1"", ""value2"")]
-[SomeOtherAttribute(Foo:""value1"", BaDang:""value2"")]
-class SimpleClass1
-{ 
-}";
-
-            var tree = SyntaxTree.ParseText(code);
+            var tree = CSharpSyntaxTree.ParseText(code);
             var writer = new ConsoleDumpWalker();
             writer.Visit(tree.GetRoot());
         }
@@ -105,13 +311,94 @@ namespace Umbrco.Web.Models.User
 }
 ";
 
-            var tree = SyntaxTree.ParseText(code);
+            var tree = CSharpSyntaxTree.ParseText(code);
             var writer = new TestWalker();
             writer.Visit(tree.GetRoot());
         }
+
+        [Test]
+        public void ParseTest3()
+        {
+            const string code = @"
+class SimpleClass1 : BaseClass, ISomething, ISomethingElse
+{ 
+}
+class SimpleClass2
+{ 
+}";
+
+            var tree = CSharpSyntaxTree.ParseText(code);
+            var writer = new ConsoleDumpWalker();
+            writer.Visit(tree.GetRoot());
+        }
+
+        [Test]
+        public void ParseTest4()
+        {
+            const string code = @"
+[SomeAttribute(""value1"", ""value2"")]
+[SomeOtherAttribute(Foo:""value1"", BaDang:""value2"")]
+class SimpleClass1
+{ 
+}";
+
+            var tree = CSharpSyntaxTree.ParseText(code);
+            var writer = new ConsoleDumpWalker();
+            writer.Visit(tree.GetRoot());
+        }
+
+        [Test]
+        public void ParseTest5()
+        {
+            const string code = @"
+
+
+[SomeAttribute(SimpleClass1.Const)]
+[SomethingElse(Foo.Blue|Foo.Red|Foo.Pink)]
+[SomethingElse(Foo.Blue)]
+class SimpleClass1
+{ 
+    public const string Const = ""const"";
+}";
+
+            var tree = CSharpSyntaxTree.ParseText(code);
+            var writer = new ConsoleDumpWalker();
+            writer.Visit(tree.GetRoot());
+        }
+
+        [Test]
+        public void ParseAndDetectErrors()
+        {
+            const string code = @"
+
+class MyClass
+{
+poo
+}";
+            var tree = CSharpSyntaxTree.ParseText(code);
+            var diags = tree.GetDiagnostics().ToArray();
+            Assert.AreEqual(1, diags.Length);
+            var diag = diags[0];
+            Assert.AreEqual("CS1519", diag.Id);
+        }
+
+        [Test]
+        public void ParseAndDetectNoError()
+        {
+            const string code = @"
+
+[Whatever]
+class MyClass
+{
+}";
+            var tree = CSharpSyntaxTree.ParseText(code);
+            var diags = tree.GetDiagnostics().ToArray();
+            Assert.AreEqual(0, diags.Length);
+            // unknown attribute is a semantic error
+        }
     }
 
-    class TestWalker : SyntaxWalker
+    class TestWalker : CSharpSyntaxWalker
     {
         private string _propertyName;
         private string _attributeName;
@@ -184,13 +471,23 @@ namespace Umbrco.Web.Models.User
         }
     }
 
-    class ConsoleDumpWalker : SyntaxWalker
+    class ConsoleDumpWalker : CSharpSyntaxWalker
     {
+        const string prefix = "Microsoft.CodeAnalysis.";
+
+        public override void VisitToken(SyntaxToken token)
+        {
+            Console.WriteLine("TK:" + token);
+            base.VisitToken(token);
+        }
+
         public override void Visit(SyntaxNode node)
         {
             var padding = node.Ancestors().Count();
             var prepend = node.ChildNodes().Any() ? "[-]" : "[.]";
-            var line = new string(' ', padding) + prepend + " " + node.GetType().ToString();
+            var nodetype = node.GetType().FullName;
+            if (nodetype.StartsWith(prefix)) nodetype = nodetype.Substring(prefix.Length);
+            var line = new string(' ', padding) + prepend + " " + nodetype;
             Console.WriteLine(line);
 
             //var decl = node as ClassDeclarationSyntax;
@@ -214,6 +511,20 @@ namespace Umbrco.Web.Models.User
                     //Console.WriteLine(new string(' ', padding + 4) + "> " + arg.NameColon + " " + arg.NameEquals);
                     Console.WriteLine(new string(' ', padding + 4) + "> " + (expr == null ? null : expr.Token.Value));
                 }
+            }
+            var attr2 = node as IdentifierNameSyntax;
+            if (attr2 != null)
+            {
+                Console.WriteLine(new string(' ', padding + 4) + "T " + attr2.Identifier.GetType());
+                Console.WriteLine(new string(' ', padding + 4) + "V " + attr2.Identifier);
+            }
+
+            var x = node as TypeSyntax;
+            if (x != null)
+            {
+                var xtype = x.GetType().FullName;
+                if (xtype.StartsWith(prefix)) xtype = nodetype.Substring(prefix.Length);
+                Console.WriteLine(new string(' ', padding + 4) + "> " + xtype);
             }
 
             base.Visit(node);

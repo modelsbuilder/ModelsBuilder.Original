@@ -29,14 +29,17 @@ namespace Zbu.ModelsBuilder.Tests
         public void Test()
         {
             IList<TypeModel> types;
-            using (var umbraco = Umbraco.Application.GetApplication(TestOptions.ConnectionString, TestOptions.DatabaseProvider))
-            {
-                types = umbraco.GetContentTypes();
-            }
+            // fixme - not - must plug into the web API
+            types = null;
+            //using (var umbraco = Umbraco.Application.GetApplication(TestOptions.ConnectionString, TestOptions.DatabaseProvider))
+            //{
+            //    types = umbraco.GetContentTypes();
+            //}
 
             var builder = new TextBuilder();
             var sb = new StringBuilder();
-            builder.Prepare(types);
+            var disco = new CodeDiscovery().Discover(new Dictionary<string, string>());
+            builder.Prepare(types, disco);
             foreach (var type in types)
                 builder.Generate(sb, type);
             Console.WriteLine(sb.ToString());
@@ -86,15 +89,17 @@ namespace Zbu.ModelsBuilder.Tests.Models
 ";
 
             IList<TypeModel> types;
-            using (var umbraco = Umbraco.Application.GetApplication(TestOptions.ConnectionString, TestOptions.DatabaseProvider))
-            {
-                types = umbraco.GetContentTypes();
-            }
+            // fixme - not - must plug into the web API
+            types = null;
+            //using (var umbraco = Umbraco.Application.GetApplication(TestOptions.ConnectionString, TestOptions.DatabaseProvider))
+            //{
+            //    types = umbraco.GetContentTypes();
+            //}
 
             var builder = new TextBuilder();
             var sb = new StringBuilder();
-            builder.Prepare(types);
-            builder.Parse(code, types);
+            var disco = new CodeDiscovery().Discover(new Dictionary<string, string> {{"code", code}});
+            builder.Prepare(types, disco);
             foreach (var type in types)
                 builder.Generate(sb, type);
             Console.WriteLine(sb.ToString());

@@ -34,6 +34,26 @@ namespace Zbu.ModelsBuilder.CustomTool
         [Description("The database provider.")]
         public string DatabaseProvider { get; set; }
 
+        [Category(OptionsCategory)]
+        [DisplayName("Bin directory")]
+        [Description("The directory containing the project's binaries. By default it is the project's OutputPath. Can be relative to project's root.")]
+        public string BinaryDirectory { get; set; }
+
+        [Category(OptionsCategory)]
+        [DisplayName("Umbraco Url")]
+        [Description("The base url of the Umbraco website.")]
+        public string UmbracoUrl { get; set; }
+
+        [Category(OptionsCategory)]
+        [DisplayName("Umbraco User")]
+        [Description("The user to connect to Umbraco (must be dev).")]
+        public string UmbracoUser { get; set; }
+
+        [Category(OptionsCategory)]
+        [DisplayName("Umbraco Password")]
+        [Description("The password to connecto to Umbraco.")]
+        public string UmbracoPassword { get; set; }
+        
         // by default "storage" is the registry
         // we want to write to our own settings file,
         // <solution>.sln.zbu.user
@@ -66,6 +86,18 @@ namespace Zbu.ModelsBuilder.CustomTool
             attr = config.Attributes["databaseProvider"];
             if (attr != null)
                 DatabaseProvider = attr.Value;
+            attr = config.Attributes["binaryDirectory"];
+            if (attr != null)
+                BinaryDirectory = attr.Value;
+            attr = config.Attributes["umbracoUrl"];
+            if (attr != null)
+                UmbracoUrl = attr.Value;
+            attr = config.Attributes["umbracoUser"];
+            if (attr != null)
+                UmbracoUser = attr.Value;
+            attr = config.Attributes["umbracoPassword"];
+            if (attr != null)
+                UmbracoPassword = attr.Value;
         }
 
         public override void SaveSettingsToStorage()
@@ -98,6 +130,10 @@ namespace Zbu.ModelsBuilder.CustomTool
             writer.WriteAttributeString("version", version);
             writer.WriteAttributeString("connectionString", ConnectionString);
             writer.WriteAttributeString("databaseProvider", DatabaseProvider);
+            writer.WriteAttributeString("binaryDirectory", BinaryDirectory);
+            writer.WriteAttributeString("umbracoUrl", UmbracoUrl);
+            writer.WriteAttributeString("umbracoUser", UmbracoUser);
+            writer.WriteAttributeString("umbracoPassword", UmbracoPassword);
             writer.WriteEndElement(); // modelsBuilder
             writer.WriteEndElement(); // zbu
             writer.WriteEndElement(); // configuration

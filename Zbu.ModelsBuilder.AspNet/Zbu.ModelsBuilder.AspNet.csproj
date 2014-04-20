@@ -61,6 +61,7 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml.Linq" />
@@ -80,6 +81,8 @@
       <Link>Properties\CommonInfo.cs</Link>
     </Compile>
     <Compile Include="Initializer.cs" />
+    <Compile Include="ModelsBuilderApi.cs" />
+    <Compile Include="ModelsBuilderAuthFilter.cs" />
     <Compile Include="ModelsBuilderController.cs" />
     <Compile Include="ModelsBuildProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -134,8 +137,9 @@
     <ItemGroup>
       <PackageFiles Include="$(ProjectDir)pkg\$(Configuration)\package.xml" />
       <PackageFiles Include="$(ProjectDir)BuildModels.ascx" />
-      <PackageFiles Include="$(OutputPath)Roslyn.Compilers.dll" />
-      <PackageFiles Include="$(OutputPath)Roslyn.Compilers.CSharp.dll" />
+      <PackageFiles Include="$(OutputPath)Microsoft.CodeAnalysis.dll" />
+      <PackageFiles Include="$(OutputPath)Microsoft.CodeAnalysis.CSharp.dll" />
+      <PackageFiles Include="$(OutputPath)System.Collections.Immutable.dll" />
       <PackageFiles Include="$(OutputPath)Zbu.ModelsBuilder.dll" />
       <PackageFiles Include="$(OutputPath)Zbu.ModelsBuilder.Umbraco.dll" />
       <PackageFiles Include="$(OutputPath)Zbu.ModelsBuilder.AspNet.dll" />

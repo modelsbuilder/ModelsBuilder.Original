@@ -11,7 +11,7 @@ namespace Zbu.ModelsBuilder
         {
             WriteHeader(sb);
 
-            foreach (var t in _typesUsing)
+            foreach (var t in TypesUsing)
                 sb.AppendFormat("using {0};\n", t);
 
             sb.Append("\n");
@@ -39,17 +39,26 @@ namespace Zbu.ModelsBuilder
 
         void WriteContentType(StringBuilder sb, TypeModel type)
         {
+            string sep;
+
             if (type.IsMixin)
             {
                 // write the interface declaration
                 sb.AppendFormat("\t// Mixin content Type {0} with alias \"{1}\"\n", type.Id, type.Alias);
-                sb.AppendFormat("\tpublic partial interface I{0} : I{1}",
-                    type.Name,
-                    type.BaseType == null ? "PublishedContent" : type.BaseType.Name);
+                sb.AppendFormat("\tpublic partial interface I{0}", type.Name);
+                var implements = type.BaseType == null || type.BaseType.IsRemoved
+                    ? (type.OmitBase ? null : "PublishedContent") 
+                    : type.BaseType.Name;
+                if (implements != null)
+                    sb.AppendFormat(" : I{0}", implements);
 
                 // write the mixins
+                sep = implements == null ? ":" : ",";
                 foreach (var mixinType in type.DeclaringInterfaces.OrderBy(x => x.Name))
-                    sb.AppendFormat(", I{0}", mixinType.Name);
+                {
+                    sb.AppendFormat("{0} I{1}", sep, mixinType.Name);
+                    sep = ",";
+                }
 
                 sb.Append("\n\t{\n");
 
@@ -67,18 +76,29 @@ namespace Zbu.ModelsBuilder
 
             // write the class declaration
             sb.AppendFormat("\t// Content Type {0} with alias \"{1}\"\n", type.Id, type.Alias);
-            var inherits = type.BaseType == null ? (type.ModelBaseClassName ?? "PublishedContentModel") : type.BaseType.Name;
-            sb.AppendFormat("\tpublic partial class {0} : {1}", type.Name, inherits);
+            sb.AppendFormat("\tpublic partial class {0}", type.Name);
+            var inherits = type.BaseType == null || type.BaseType.IsRemoved
+                ? (type.OmitBase ? null : "PublishedContentModel") 
+                : type.BaseType.Name;
+            if (inherits != null)
+                sb.AppendFormat(" : {0}", inherits);
 
-            // if it's a missing it implements its own interface
+            sep = inherits == null ? ":" : ",";
             if (type.IsMixin)
-                sb.AppendFormat(", I{0}", type.Name);
-
-            // write the mixins, if any, as interfaces
-            // only if not a mixin because otherwise the interface already has them
-            if (type.IsMixin == false)
+            {
+                // if it's a mixin it implements its own interface
+                sb.AppendFormat("{0} I{1}", sep, type.Name);
+            }
+            else
+            {
+                // write the mixins, if any, as interfaces
+                // only if not a mixin because otherwise the interface already has them already
                 foreach (var mixinType in type.DeclaringInterfaces.OrderBy(x => x.Name))
-                    sb.AppendFormat(", I{0}", mixinType.Name);
+                {
+                    sb.AppendFormat("{0} I{1}", sep, mixinType.Name);
+                    sep = ",";
+                }
+            }
 
             // begin class body
             sb.Append("\n\t{\n");
@@ -112,6 +132,10 @@ namespace Zbu.ModelsBuilder
             // write the properties
             foreach (var prop in type.Properties.OrderBy(x => x.Name))
                 WriteProperty(sb, prop);
+
+            // no need to write the parent properties since we inherit from the parent
+            // and the parent defines its own properties. need to write the mixins properties
+            // since the mixins are only interfaces and we have to provide an implementation.
 
             // write the mixins properties
             foreach (var mixinType in type.ImplementingInterfaces.OrderBy(x => x.Name))
@@ -180,7 +204,7 @@ namespace Zbu.ModelsBuilder
             else
             {
                 var p = s.LastIndexOf('.');
-                if (p > 0 && _typesUsing.Contains(s.Substring(0, p)))
+                if (p > 0 && TypesUsing.Contains(s.Substring(0, p)))
                     s = s.Substring(p + 1);
                 s = s.Replace("+", "."); // nested types *after* using
             }

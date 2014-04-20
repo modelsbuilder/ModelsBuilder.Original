@@ -13,16 +13,24 @@ using System.Web.Http;
 using System.Web.Http.Hosting;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.Security;
+using umbraco.BusinessLogic;
 using Umbraco.Core.IO;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Web.WebApi;
-using Zbu.ModelsBuilder.Umbraco;
+using Application = Zbu.ModelsBuilder.Umbraco.Application;
+using User = Umbraco.Core.Models.Membership.User;
 
 namespace Zbu.ModelsBuilder.AspNet
 {
+    // read http://umbraco.com/follow-us/blog-archive/2014/1/17/heads-up,-breaking-change-coming-in-702-and-62.aspx
+    // read http://our.umbraco.org/forum/developers/api-questions/43025-Web-API-authentication
+    // UmbracoAuthorizedApiController :: /Umbraco/BackOffice/Zbu/ModelsBuilderApi/GetTypeModels
+    // UmbracoApiController :: /Umbraco/Zbu/ModelsBuilderApi/GetTypeModels ??  UNLESS marked with isbackoffice
     [PluginController(ZbuArea)]
-    public class ModelsBuilderApiController : UmbracoAuthorizedApiController
+    [IsBackOffice] // because we want back-office users
+    public class ModelsBuilderApiController : UmbracoApiController //UmbracoAuthorizedApiController
     {
         public const string ZbuArea = "Zbu";
 
@@ -33,13 +41,19 @@ namespace Zbu.ModelsBuilder.AspNet
         }
 
         [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
+        [global::Umbraco.Web.WebApi.UmbracoAuthorize] // can use Umbraco's
         public HttpResponseMessage BuildModels()
         {
             try
             {
-                // fixme - ask Shannon, there has to be a better way to do this
-                if (UmbracoUser.Applications.All(x => x.alias != "developer"))
-                    throw new Exception("Panic: user has no access to the required application.");
+                // the UmbracoAuthorize attribute validates the current user
+                // the UmbracoAuthorizedApiController would in addition check for .Disabled and .NoConsole
+                // but to do it it relies on internal methods so we have to do it here explicitely
+                var user = umbraco.BusinessLogic.User.GetCurrent();
+                if (user.Disabled || user.NoConsole )
+                    return new HttpResponseMessage(HttpStatusCode.Unauthorized);
+                if (user.Applications.All(x => x.alias != "developer"))
+                    return new HttpResponseMessage(HttpStatusCode.Unauthorized);
 
                 var appData = HostingEnvironment.MapPath("~/App_Data");
                 if (appData == null)
@@ -67,6 +81,42 @@ namespace Zbu.ModelsBuilder.AspNet
             }
         }
 
+        //[System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
+        //[ModelsBuilderAuthFilter("developer")] // have to use our own, non-cookie-based, auth
+        //public HttpResponseMessage GetTypeModels()
+        //{
+        //    var umbraco = Application.GetApplication();
+        //    var modelTypes = umbraco.GetContentAndMediaTypes();
+
+        //    return Request.CreateResponse(HttpStatusCode.OK, modelTypes, Configuration.Formatters.JsonFormatter);
+        //}
+
+        [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
+        [ModelsBuilderAuthFilter("developer")] // have to use our own, non-cookie-based, auth
+        public HttpResponseMessage GetModels(IDictionary<string, string> ourFiles)
+        {
+            var umbraco = Application.GetApplication();
+            var modelTypes = umbraco.GetContentAndMediaTypes();
+
+            var modelsNamespace = ourFiles["__META__"];
+            ourFiles.Remove("__META__");
+
+            var builder = new TextBuilder();
+            builder.Namespace = modelsNamespace;
+            var disco = new CodeDiscovery().Discover(ourFiles);
+            builder.Prepare(modelTypes, disco);
+
+            var models = new Dictionary<string, string>();
+            foreach (var modelType in modelTypes)
+            {
+                var sb = new StringBuilder();
+                builder.Generate(sb, modelType);
+                models[modelType.Name] = sb.ToString();
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, models, Configuration.Formatters.JsonFormatter);
+        }
+
         private static void GenerateModels(string appData)
         {
             var modelsDirectory = Path.Combine(appData, "Models");
@@ -84,10 +134,9 @@ namespace Zbu.ModelsBuilder.AspNet
 
             var builder = new TextBuilder();
             builder.Namespace = ns;
-            builder.Prepare(modelTypes);
-
-            foreach (var file in Directory.GetFiles(modelsDirectory, "*.cs"))
-                builder.Parse(File.ReadAllText(file), modelTypes);
+            var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
+            var disco = new CodeDiscovery().Discover(ourFiles);
+            builder.Prepare(modelTypes, disco);
 
             foreach (var modelType in modelTypes)
             {
@@ -110,13 +159,12 @@ namespace Zbu.ModelsBuilder.AspNet
             File.WriteAllText(modelsFile, text);
         }
 
-        public static string GetBuildModelsUrl(HttpContext context)
-        {
-            // fixme - ask Shannon, there has to be a better way to do this
-            // ok, I just want the route to my controller, statically, so I can have it in the dashboard
-            // which is not part of the MVC world... been through MSDN & StackOverflow & such for too long
-            // without finding the solution - so it's hard-coded here in all its dirtyness.
-            return "/Umbraco/BackOffice/Zbu/ModelsBuilderApi/BuildModels";
-        }
+        // FIXME - what would be the proper way to get these urls without hard-coding them?
+        // ok, I just want the route to my controller, statically, so I can have it in the dashboard
+        // which is not part of the MVC world... been through MSDN & StackOverflow & such for too long
+        // without finding the solution - so it's hard-coded here in all its dirtyness.
+        public const string BuildModelsUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi/BuildModels";
+        public const string GetTypeModelsUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi/GetTypeModels";
+        public const string GetModelsUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi/GetModels";
     }
 }

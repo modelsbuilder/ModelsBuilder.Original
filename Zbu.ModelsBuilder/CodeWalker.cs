@@ -9,32 +9,82 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Zbu.ModelsBuilder
 {
+    // read http://social.msdn.microsoft.com/Forums/vstudio/en-US/64ee86b8-0fd7-457d-8428-a0f238133476/can-roslyn-tell-me-if-a-member-of-a-symbol-is-visible-from-a-position-in-a-document?forum=roslyn
+    // goes beyond syntax to figure out symbols, etc... must test...
+
     class CodeWalker : CSharpSyntaxWalker
     {
-        private string _propertyName;
+        //private string _propertyName;
         private string _attributeName;
         private readonly Stack<string> _classNames = new Stack<string>();
 
-        private Action<string> _onIgnoreContentType;
-        private Action<string, string> _onIgnorePropertyType;
-        private Action<string, string, string> _onRenamePropertyType;
-        private Action<string, string> _onRenameContentType;
-        private Action<string, string> _onDefineModelBaseClass;
-
-        public void Visit(SyntaxNode node,
-            Action<string> onIgnoreContentType,
-            Action<string, string> onIgnorePropertyType,
-            Action<string, string, string> onRenamePropertyType,
-            Action<string, string> onRenameContentType,
-            Action<string, string> onDefineModelBaseClass)
+        public class CodeWalkerState
         {
-            _onIgnoreContentType = onIgnoreContentType;
-            _onIgnorePropertyType = onIgnorePropertyType;
-            _onRenamePropertyType = onRenamePropertyType;
-            _onRenameContentType = onRenameContentType;
-            _onDefineModelBaseClass = onDefineModelBaseClass;
+            public readonly List<string> IgnoreContentTypes 
+                = new List<string>();
+            public readonly Dictionary<string, List<string>> IgnorePropertyTypes 
+                = new Dictionary<string, List<string>>(StringComparer.InvariantCultureIgnoreCase);
+            public readonly Dictionary<string, string> RenameContentTypes
+                = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+            public readonly Dictionary<string, Dictionary<string, string>> RenamePropertyTypes
+                = new Dictionary<string, Dictionary<string, string>>(StringComparer.InvariantCultureIgnoreCase);
+            public readonly List<string> OmitModelBases
+                = new List<string>();
+            public readonly Dictionary<string, string[]> BaseLists
+                = new Dictionary<string, string[]>();
 
-            base.Visit(node);
+            public void IgnoreContentType(string contentTypeNameOrAlias)
+            {
+                if (string.IsNullOrWhiteSpace(contentTypeNameOrAlias)) return;
+                IgnoreContentTypes.Add(contentTypeNameOrAlias.ToLowerInvariant());
+            }
+
+            public void RenameContentType(string contentTypeAlias, string contentTypeName)
+            {
+                if (string.IsNullOrWhiteSpace(contentTypeName)
+                    || string.IsNullOrWhiteSpace(contentTypeAlias)) return;
+                RenameContentTypes[contentTypeAlias] = contentTypeName;
+            }
+
+            public void IgnorePropertyType(string contentTypeName, string propertyTypeAlias)
+            {
+                if (string.IsNullOrWhiteSpace(contentTypeName)
+                    || string.IsNullOrWhiteSpace(propertyTypeAlias)) return;
+                List<string> ignores;
+                if (!IgnorePropertyTypes.TryGetValue(contentTypeName, out ignores))
+                    ignores = IgnorePropertyTypes[contentTypeName] = new List<string>();
+                ignores.Add(propertyTypeAlias.ToLowerInvariant());
+            }
+
+            public void RenamePropertyType(string contentTypeName, string propertyTypeAlias, string propertyTypeName)
+            {
+                if (string.IsNullOrWhiteSpace(contentTypeName)
+                    || string.IsNullOrWhiteSpace(propertyTypeAlias)
+                    || string.IsNullOrWhiteSpace(propertyTypeName)) return;
+                Dictionary<string, string> renames;
+                if (!RenamePropertyTypes.TryGetValue(contentTypeName, out renames))
+                    renames = RenamePropertyTypes[contentTypeName] = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+                renames[propertyTypeAlias] = propertyTypeName;
+            }
+
+            public void OmitModelBase(string contentTypeName)
+            {
+                OmitModelBases.Add(contentTypeName);
+            }
+
+            public void BaseList(string contentTypeName, string[] baseList)
+            {
+                if (string.IsNullOrWhiteSpace(contentTypeName)
+                    || baseList.Length == 0) return;
+                BaseLists[contentTypeName] = baseList;
+            }
+        }
+
+        private readonly CodeWalkerState _state;
+
+        public CodeWalker(CodeWalkerState state)
+        {
+            _state = state;
         }
 
         public override void VisitLiteralExpression(LiteralExpressionSyntax node)
@@ -42,28 +92,29 @@ namespace Zbu.ModelsBuilder
             if (_attributeName != null)
             {
                 string className;
+                string contentTypeAlias;
+                string contentTypeName;
+                string propertyTypeAlias;
+                // FIXME - should we check against attributes full type name?
                 switch (_attributeName)
                 {
-                        // fixme - attributes full type name?
                     case "IgnoreContentType":
-                        _onIgnoreContentType(node.Token.ValueText);
-                        //Console.WriteLine("Ignore ContentType {0}", node.Token.ValueText);
+                        contentTypeAlias = node.Token.ValueText;
+                        _state.IgnoreContentType(contentTypeAlias);
                         break;
                     case "IgnorePropertyType":
-                        className = _classNames.Peek();
-                        //Console.WriteLine("Ignore PropertyType {0}.{1}", className, node.Token.ValueText);
-                        _onIgnorePropertyType(className, node.Token.ValueText);
+                        contentTypeName = _classNames.Peek();
+                        propertyTypeAlias = node.Token.ValueText;
+                        _state.IgnorePropertyType(contentTypeName, propertyTypeAlias);
                         break;
                     case "PublishedContentModel":
-                        className = _classNames.Peek();
-                        // fixme should know if it's an interface AND then remove the IISomething?!
-                        // fixme or maybe we should not rename on interfaces? name must be consistent with class?
-                        //Console.WriteLine("Name {0} for ContentType {1}", className, node.Token.ValueText);
-                        _onRenameContentType(className, node.Token.ValueText);
+                        contentTypeName = _classNames.Peek();
+                        contentTypeAlias = node.Token.ValueText;
+                        _state.RenameContentType(contentTypeAlias, contentTypeName);
                         break;
-                    case "ModelBaseClass":
-                        className = _classNames.Peek();
-                        _onDefineModelBaseClass(className, node.Token.ValueText);
+                    case "OmitModelBase":
+                        contentTypeName = _classNames.Peek();
+                        _state.OmitModelBase(contentTypeName);
                         break;
                 }
             }
@@ -80,11 +131,11 @@ namespace Zbu.ModelsBuilder
                 var args = node.ArgumentList.Arguments;
                 var arg1 = args[0];
                 var arg2 = args[1];
-                // fixme - what about .NameColon and NameEquals... could the args be swapped?
-                var alias = (arg1.Expression as LiteralExpressionSyntax).Token.ValueText;
-                var name = (arg2.Expression as LiteralExpressionSyntax).Token.ValueText;
-                var className = _classNames.Peek();
-                _onRenamePropertyType(className, alias, name);
+                // FIXME - what about .NameColon and NameEquals... could the args be swapped?
+                var propertyTypeAlias = (arg1.Expression as LiteralExpressionSyntax).Token.ValueText;
+                var propertyTypeName = (arg2.Expression as LiteralExpressionSyntax).Token.ValueText;
+                var contentTypeName = _classNames.Peek();
+                _state.RenamePropertyType(contentTypeName, propertyTypeAlias, propertyTypeName);
             }
 
             base.VisitAttribute(node);
@@ -93,23 +144,51 @@ namespace Zbu.ModelsBuilder
 
         public override void VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
         {
-            _classNames.Push(node.Identifier.ToString());
+            string className;
+            _classNames.Push(className = node.Identifier.ValueText);
+
+            // fixme - disabled, we want to get rid of it - just build a version that's backward compatible
+            //if (node.BaseList != null)
+            //    _state.BaseList(className, node.BaseList.Types.Select(x =>
+            //    {
+            //        var identifier = x as IdentifierNameSyntax;
+            //        if (identifier == null)
+            //            throw new Exception(string.Format("Panic: unsupported {0} in BaseList.", x.GetType()));
+            //        return identifier.Identifier.ValueText;
+            //    }).ToArray());
+
             base.VisitInterfaceDeclaration(node);
             _classNames.Pop();
         }
 
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            _classNames.Push(node.Identifier.ToString());
+            string className;
+            _classNames.Push(className = node.Identifier.ValueText);
+
+            // fixme - disabled, we want to get rid of it - just build a version that's backward compatible
+            //if (node.BaseList != null)
+            //    _state.BaseList(className, node.BaseList.Types.Select(x =>
+            //    {
+            //        // fixme - should use .Kind instead?
+            //        var identifier = x as NameSyntax;
+            //        if (identifier == null)
+            //            throw new Exception(string.Format("Panic: unsupported {0} in BaseList.", x.GetType()));
+            //        if (identifier is SimpleNameSyntax) return ((SimpleNameSyntax) identifier).Identifier.ValueText;
+            //        //if (identifier is IdentifierNameSyntax) return ((IdentifierNameSyntax) identifier).Identifier.ValueText;
+            //        if (identifier is QualifiedNameSyntax) return ((QualifiedNameSyntax) identifier).ToString(); // FIXME
+            //        return identifier.ToString(); // fixme
+            //    }).ToArray());
+
             base.VisitClassDeclaration(node);
             _classNames.Pop();
         }
 
-        public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
-        {
-            _propertyName = node.Identifier.ToString();
-            base.VisitPropertyDeclaration(node);
-            _propertyName = null;
-        }
+        //public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+        //{
+        //    _propertyName = node.Identifier.ToString();
+        //    base.VisitPropertyDeclaration(node);
+        //    _propertyName = null;
+        //}
     }
 }

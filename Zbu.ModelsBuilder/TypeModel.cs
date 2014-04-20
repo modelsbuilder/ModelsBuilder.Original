@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Zbu.ModelsBuilder
 {
@@ -9,13 +10,15 @@ namespace Zbu.ModelsBuilder
         public string Alias;
         public string Name;
         public int BaseTypeId;
-        public TypeModel BaseType;
-        public string ModelBaseClassName;
-        public readonly List<PropertyModel> Properties = new List<PropertyModel>();
-        public readonly List<TypeModel> MixinTypes = new List<TypeModel>();
-        public readonly List<TypeModel> DeclaringInterfaces = new List<TypeModel>();
-        public readonly List<TypeModel> ImplementingInterfaces = new List<TypeModel>();
-        public bool IsMixin;
+        public TypeModel BaseType; // the parent type in Umbraco (type inherits its properties)
+        public bool OmitBase;
+        public readonly List<PropertyModel> Properties = new List<PropertyModel>(); // the local properties (not inherited)
+        public readonly List<TypeModel> MixinTypes = new List<TypeModel>(); // the mixin types in Umbraco (type inherits their properties)
+        public readonly List<TypeModel> DeclaringInterfaces = new List<TypeModel>(); // must declare it implements those mixins
+        public readonly List<TypeModel> ImplementingInterfaces = new List<TypeModel>(); // must implement properties for those mixins
+        public bool IsMixin; // whether the type is a mixin for another type
+        public bool IsParent; // whether the type is a parent for another type
+        public bool IsRemoved; // whether the type should be removed from generation
 
         public enum ItemTypes
         {
@@ -42,21 +45,14 @@ namespace Zbu.ModelsBuilder
             }
         }
 
-        public List<TypeModel> GetTypeTree()
+        internal static void CollectImplems(ICollection<TypeModel> types, TypeModel type)
         {
-            var tree = new List<TypeModel>();
-            GetTypeTree(tree, this);
-            return tree;
-        }
-
-        public static void GetTypeTree(ICollection<TypeModel> types, TypeModel type)
-        {
-            if (types.Contains(type) == false)
+            if (!type.IsRemoved && types.Contains(type) == false)
                 types.Add(type);
-            if (type.BaseType != null)
-                GetTypeTree(types, type.BaseType);
-            foreach (var mixin in type.MixinTypes)
-                GetTypeTree(types, mixin);
+            if (type.BaseType != null && !type.BaseType.IsRemoved)
+                CollectImplems(types, type.BaseType);
+            foreach (var mixin in type.MixinTypes.Where(x => !x.IsRemoved))
+                CollectImplems(types, mixin);
         }
     }
 }

@@ -7,12 +7,14 @@ using System.Threading.Tasks;
 
 namespace Zbu.ModelsBuilder
 {
+    // FIXME - do NOT use that one as it is OBSOLETE 
+
     public class CodeDomBuilder : Builder
     {
         public void Generate(CodeNamespace ns, TypeModel typeModel)
         {
-            // FIXME - what about USING?
-            // FIXME - what about references?
+            // what about USING?
+            // what about references?
 
             if (typeModel.IsMixin)
             {

@@ -11,9 +11,9 @@ namespace Zbu.ModelsBuilder
         public static readonly string Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
         public string Namespace { get; set; }
-        public IList<string> Using { get { return _typesUsing; } }
+        public IList<string> Using { get { return TypesUsing; } }
 
-        protected readonly IList<string> _typesUsing = new List<string>
+        protected readonly IList<string> TypesUsing = new List<string>
         {
             "System",
             "System.Collections.Generic",
@@ -28,85 +28,73 @@ namespace Zbu.ModelsBuilder
 
         #region Prepare
 
-        public void Prepare(IList<TypeModel> typeModels)
+        public void Prepare(IList<TypeModel> typeModels, DiscoveryResult disco)
         {
-            // ensure we have no duplicates
-            var names = typeModels.Select(x => x.Name).Distinct();
-            if (names.Count() != typeModels.Count)
-                throw new InvalidOperationException("Duplicate type names have been found.");
+            // fixme UNSAFE to remove, better mark as Removed - but then?!
 
-            // ensure
-            if (typeModels.Any(x => x.BaseType != null && x.ModelBaseClassName != null))
-                throw new InvalidOperationException("Types with a base type and a base class name have been found.");
+            typeModels.RemoveAll(typeModel => disco.IsContentIgnored(typeModel.Alias));
+
+            foreach (var typeModel in typeModels.Where(x => disco.HasContentBase(x.Alias)))
+                typeModel.OmitBase = true;
+
+            foreach (var typeModel in typeModels)
+                typeModel.Name = disco.ContentName(typeModel.Alias);
+
+            foreach (var typeModel in typeModels)
+            {
+                typeModel.Properties.RemoveAll(property => disco.IsPropertyIgnored(typeModel.Alias, property.Alias));
+
+                foreach (var property in typeModel.Properties)
+                    property.Name = disco.PropertyName(typeModel.Alias, property.Alias);
+            }
+
+
+            // ensure we have no duplicates type names
+            foreach (var xx in typeModels.GroupBy(x => x.Name).Where(x => x.Count() > 1))
+                throw new InvalidOperationException(string.Format("Type name \"{0}\" is used for types with alias {1}. Should be used for one type only.", 
+                    xx.Key, 
+                    string.Join(", ", xx.Select(x => "\"" + x.Alias + "\""))));
+
+            // ensure we have no duplicates property names
+            foreach (var typeModel in typeModels)
+                foreach (var xx in typeModel.Properties.GroupBy(x => x.Name).Where(x => x.Count() > 1))
+                    throw new InvalidOperationException(string.Format("Property name \"{0}\" in type with alias \"{1}\" is used for properties with alias {2}. Should be used for one property only.",
+                        xx.Key, typeModel.Alias,
+                        string.Join(", ", xx.Select(x => "\"" + x.Alias + "\""))));
+
+            // ensure we have no collision between base types
+            foreach (var xx in typeModels.Where(x => x.BaseType != null && x.OmitBase))
+                throw new InvalidOperationException(string.Format("Type alias \"{0}\" has a more than one parent class.",
+                    xx.Alias));
 
             // discover interfaces that need to be declared / implemented
             foreach (var typeModel in typeModels)
             {
-                var parentTree = typeModel.BaseType == null
-                    ? new List<TypeModel>()
-                    : typeModel.BaseType.GetTypeTree();
+                // collect all the (non-removed) types implemented at parent level
+                // ie the parent content types and the mixins content types, recursively
+                var parentImplems = new List<TypeModel>();
+                if (typeModel.BaseType != null && !typeModel.BaseType.IsRemoved)
+                    TypeModel.CollectImplems(parentImplems, typeModel.BaseType);
 
-                typeModel.DeclaringInterfaces.AddRange(typeModel.MixinTypes.Except(parentTree));
+                // interfaces we must declare we implement (initially empty)
+                // ie this type's mixins, except those that have been removed,
+                // and except those that are already declared at the parent level
+                // in other words, DeclaringInterfaces is "local mixins"
+                var declaring = typeModel.MixinTypes
+                    .Where(x => !x.IsRemoved)
+                    .Except(parentImplems);
+                typeModel.DeclaringInterfaces.AddRange(declaring);
 
-                var recursiveInterfaces = new List<TypeModel>();
+                // interfaces we must actually implement (initially empty)
+                // if we declare we implement a mixin interface, we must actually implement
+                // its properties, all recursively (ie if the mixin interface implements...)
+                // so, starting with local mixins, we collect all the (non-removed) types above them
+                var mixinImplems = new List<TypeModel>();
                 foreach (var i in typeModel.DeclaringInterfaces)
-                    TypeModel.GetTypeTree(recursiveInterfaces, i);
-                typeModel.ImplementingInterfaces.AddRange(recursiveInterfaces.Except(parentTree));
+                    TypeModel.CollectImplems(mixinImplems, i);
+                // and then we remove from that list anything that is already declared at the parent level
+                typeModel.ImplementingInterfaces.AddRange(mixinImplems.Except(parentImplems));
             }
-        }
-
-        #endregion
-
-        #region Parse
-
-        public void Parse(string code, IList<TypeModel> genTypes)
-        {
-            var tree = CSharpSyntaxTree.ParseText(code);
-            var writer = new CodeWalker();
-            writer.Visit(tree.GetRoot(),
-                onIgnoreContentType: alias => genTypes.RemoveAll(x => x.Alias.InvariantEquals(alias)),
-                onIgnorePropertyType: (contentName, propertyAlias) =>
-                {
-                    if (string.IsNullOrWhiteSpace(propertyAlias)) return;
-                    var type = genTypes.SingleOrDefault(x => x.Name == contentName);
-                    if (type == null) return;
-
-                    var star = propertyAlias.EndsWith("*");
-                    if (star) propertyAlias = propertyAlias.Substring(0, propertyAlias.Length - 1);
-                    type.Properties.RemoveAll(x => 
-                        star ? x.Alias.StartsWith(propertyAlias) : x.Alias == propertyAlias);
-                },
-                onRenamePropertyType: (contentName, propertyAlias, propertyName) =>
-                {
-                    if (string.IsNullOrWhiteSpace(contentName)) return;
-                    if (string.IsNullOrWhiteSpace(propertyAlias)) return;
-                    if (string.IsNullOrWhiteSpace(propertyName)) return;
-
-                    var type = genTypes.SingleOrDefault(x => x.Name == contentName);
-                    if (type == null) return;
-
-                    var property = type.Properties.SingleOrDefault(x => x.Alias == propertyAlias);
-                    if (property == null) return;
-
-                    property.Name = propertyName;
-                },
-                onRenameContentType: (contentName, contentAlias) =>
-                {
-                    if (string.IsNullOrWhiteSpace(contentName)) return;
-                    var type = genTypes.SingleOrDefault(x => x.Alias.InvariantEquals(contentAlias));
-                    if (type != null)
-                        type.Name = contentName;
-                },
-                onDefineModelBaseClass: (contentName, modelBaseClassName) =>
-                {
-                    if (string.IsNullOrWhiteSpace(modelBaseClassName)) return;
-                    var type = genTypes.SingleOrDefault(x => x.Name == contentName);
-                    if (type == null) return;
-                    type.ModelBaseClassName = modelBaseClassName;
-                });
-
-            // at that point some types might have been removed / ignored, that we
-            // actually need - but we can't tell, because they may be implemented by the user
         }
 
         #endregion

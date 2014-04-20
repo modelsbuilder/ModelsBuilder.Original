@@ -19,38 +19,40 @@ namespace Zbu.ModelsBuilder.Console
 
         private static void GenerateModels()
         {
-            const string modelsDirectory = "Models";
-            if (!Directory.Exists(modelsDirectory))
-                Directory.CreateDirectory(modelsDirectory);
+            // FIXME this is not the right way to do it
+            // must plug into the web API instead
 
-            foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
-                File.Delete(file);
+            //const string modelsDirectory = "Models";
+            //if (!Directory.Exists(modelsDirectory))
+            //    Directory.CreateDirectory(modelsDirectory);
 
-            var cstr = ConfigurationManager.ConnectionStrings["umbracoDbDSN"];
+            //foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
+            //    File.Delete(file);
 
-            IList<TypeModel> modelTypes;
-            using (var umbraco = Application.GetApplication(cstr.ConnectionString, cstr.ProviderName))
-            {
-                modelTypes = umbraco.GetContentAndMediaTypes();
-            }
+            //var cstr = ConfigurationManager.ConnectionStrings["umbracoDbDSN"];
 
-            var ns = ConfigurationManager.AppSettings["Zbu.ModelsBuilder.ModelsNamespace"];
-            if (string.IsNullOrWhiteSpace(ns)) ns = "Umbraco.Web.PublishedContentModels";
+            //IList<TypeModel> modelTypes;
+            //using (var umbraco = Application.GetApplication(cstr.ConnectionString, cstr.ProviderName))
+            //{
+            //    modelTypes = umbraco.GetContentAndMediaTypes();
+            //}
 
-            var builder = new TextBuilder();
-            builder.Namespace = ns;
-            builder.Prepare(modelTypes);
+            //var ns = ConfigurationManager.AppSettings["Zbu.ModelsBuilder.ModelsNamespace"];
+            //if (string.IsNullOrWhiteSpace(ns)) ns = "Umbraco.Web.PublishedContentModels";
 
-            foreach (var file in Directory.GetFiles(modelsDirectory, "*.cs"))
-                builder.Parse(File.ReadAllText(file), modelTypes);
+            //var builder = new TextBuilder();
+            //builder.Namespace = ns;
+            //var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
+            //var disco = new CodeDiscovery().Discover(ourFiles);
+            //builder.Prepare(modelTypes, disco);
 
-            foreach (var modelType in modelTypes)
-            {
-                var sb = new StringBuilder();
-                builder.Generate(sb, modelType);
-                var filename = Path.Combine(modelsDirectory, modelType.Name + ".generated.cs");
-                File.WriteAllText(filename, sb.ToString());
-            }
+            //foreach (var modelType in modelTypes)
+            //{
+            //    var sb = new StringBuilder();
+            //    builder.Generate(sb, modelType);
+            //    var filename = Path.Combine(modelsDirectory, modelType.Name + ".generated.cs");
+            //    File.WriteAllText(filename, sb.ToString());
+            //}
         }
     }
 }
