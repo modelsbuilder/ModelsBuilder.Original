@@ -26,6 +26,59 @@ namespace Zbu.ModelsBuilder.Tests
         }
 
         [Test]
+        public void Test0()
+        {
+            // Umbraco returns nice, pascal-cased names
+
+            var tm = new TypeModel
+            {
+                Id = 1234,
+                Alias = "product",
+                Name = "Product",
+                BaseTypeId = 0,
+                BaseType = null,
+                ItemType = TypeModel.ItemTypes.Content,
+            };
+            tm.Properties.Add(new PropertyModel
+            {
+                Alias = "productName",
+                Name = "ProductName",
+                ClrType = typeof(string),
+            });
+            tm.Properties.Add(new PropertyModel
+            {
+                Alias = "productPrice",
+                Name = "ProductPrice",
+                ClrType = typeof(int),
+            });
+
+            var types = new[] {tm};
+
+            var code = new Dictionary<string, string>
+            {
+                {"product", @"
+using Zbu.ModelsBuilder;
+[RenamePropertyType(""productPrice"", ""Price"")]
+public partial class Product
+{}
+"}
+            };
+
+            // fixme - at the moment fails to parse the attribute
+            // fixme - should this be an error actually? and WHY does it fail?
+
+            var builder = new TextBuilder(types);
+            var sb = new StringBuilder();
+            var disco = new CodeDiscovery().Discover(code);
+            builder.Prepare(disco);
+            foreach (var type in builder.GetModelsToGenerate())
+                builder.Generate(sb, type);
+
+            Console.WriteLine(sb.ToString());
+
+        }
+
+        [Test]
         public void Test()
         {
             IList<TypeModel> types;
@@ -36,11 +89,11 @@ namespace Zbu.ModelsBuilder.Tests
             //    types = umbraco.GetContentTypes();
             //}
 
-            var builder = new TextBuilder();
+            var builder = new TextBuilder(types);
             var sb = new StringBuilder();
             var disco = new CodeDiscovery().Discover(new Dictionary<string, string>());
-            builder.Prepare(types, disco);
-            foreach (var type in types)
+            builder.Prepare(disco);
+            foreach (var type in builder.GetModelsToGenerate())
                 builder.Generate(sb, type);
             Console.WriteLine(sb.ToString());
         }
@@ -96,11 +149,11 @@ namespace Zbu.ModelsBuilder.Tests.Models
             //    types = umbraco.GetContentTypes();
             //}
 
-            var builder = new TextBuilder();
+            var builder = new TextBuilder(types);
             var sb = new StringBuilder();
             var disco = new CodeDiscovery().Discover(new Dictionary<string, string> {{"code", code}});
-            builder.Prepare(types, disco);
-            foreach (var type in types)
+            builder.Prepare(disco);
+            foreach (var type in builder.GetModelsToGenerate())
                 builder.Generate(sb, type);
             Console.WriteLine(sb.ToString());
         }
@@ -111,7 +164,7 @@ namespace Zbu.ModelsBuilder.Tests.Models
         [TestCase("Zbu.ModelsBuilder.Tests.BuilderTests.Class1", typeof(Class1))]
         public void WriteClrType(string expected, Type input)
         {
-            var builder = new TextBuilder();
+            var builder = new TextBuilder(new TypeModel[] {});
             var sb = new StringBuilder();
             builder.WriteClrType(sb, input);
             Assert.AreEqual(expected, sb.ToString());
@@ -123,7 +176,7 @@ namespace Zbu.ModelsBuilder.Tests.Models
         [TestCase("BuilderTests.Class1", typeof(Class1))]
         public void WriteClrTypeUsing(string expected, Type input)
         {
-            var builder = new TextBuilder();
+            var builder = new TextBuilder(new TypeModel[] { });
             builder.Using.Add("Zbu.ModelsBuilder.Tests");
             var sb = new StringBuilder();
             builder.WriteClrType(sb, input);

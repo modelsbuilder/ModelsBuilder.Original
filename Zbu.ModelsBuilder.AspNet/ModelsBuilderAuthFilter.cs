@@ -6,6 +6,7 @@ using System.Text;
 using System.Web.Http.Controllers;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 
 namespace Zbu.ModelsBuilder.AspNet
@@ -60,7 +61,8 @@ namespace Zbu.ModelsBuilder.AspNet
             var username = credentials[0];
             var password = credentials[1];
 
-            var provider = Membership.Providers[umbraco.UmbracoSettings.DefaultBackofficeProvider];
+            var providerKey = UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider;
+            var provider = Membership.Providers[providerKey];
             if (provider == null || !provider.ValidateUser(username, password))
                 return null;
             var user = ApplicationContext.Current.Services.UserService.GetByUsername(username);

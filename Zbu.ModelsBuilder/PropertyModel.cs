@@ -7,5 +7,7 @@ namespace Zbu.ModelsBuilder
         public string Alias;
         public string Name;
         public Type ClrType;
+
+        public bool IsRemoved;
     }
 }

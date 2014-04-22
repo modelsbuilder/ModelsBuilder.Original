@@ -38,11 +38,11 @@ namespace Zbu.ModelsBuilder.Umbraco
         //private bool _installedConfigSystem;
         private static readonly object LockO = new object();
         private static Application _application;
-        private global::Umbraco.Web.Standalone.StandaloneApplication _umbracoApplication;
+        //private global::Umbraco.Web.Standalone.StandaloneApplication _umbracoApplication;
 
         private Application()
         {
-            _standalone = false;
+            //_standalone = false;
         }
 
         //private Application(string connectionString, string databaseProvider, bool useLocalApplicationData)
@@ -59,7 +59,7 @@ namespace Zbu.ModelsBuilder.Umbraco
         //    get { return global::Umbraco.Core.Configuration.UmbracoVersion.Current.ToString(3); }
         //}
 
-        private readonly bool _standalone;
+        //private readonly bool _standalone;
         //private readonly string _connectionString;
         //private readonly string _databaseProvider;
         //private readonly bool _useLocalApplicationData;
@@ -243,8 +243,8 @@ namespace Zbu.ModelsBuilder.Umbraco
 
         public IList<TypeModel> GetContentAndMediaTypes()
         {
-            if (_standalone && _umbracoApplication == null)
-                throw new InvalidOperationException("Application is not ready.");
+            //if (_standalone && _umbracoApplication == null)
+            //    throw new InvalidOperationException("Application is not ready.");
 
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             var types = new List<TypeModel>();
@@ -255,8 +255,8 @@ namespace Zbu.ModelsBuilder.Umbraco
 
         public IList<TypeModel> GetContentTypes()
         {
-            if (_standalone && _umbracoApplication == null)
-                throw new InvalidOperationException("Application is not ready.");
+            //if (_standalone && _umbracoApplication == null)
+            //    throw new InvalidOperationException("Application is not ready.");
 
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             var contentTypes = contentTypeService.GetAllContentTypes().Cast<IContentTypeBase>().ToArray();
@@ -265,8 +265,8 @@ namespace Zbu.ModelsBuilder.Umbraco
 
         public IList<TypeModel> GetMediaTypes()
         {
-            if (_standalone && _umbracoApplication == null)
-                throw new InvalidOperationException("Application is not ready.");
+            //if (_standalone && _umbracoApplication == null)
+            //    throw new InvalidOperationException("Application is not ready.");
 
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             var contentTypes = contentTypeService.GetAllMediaTypes().Cast<IContentTypeBase>().ToArray();

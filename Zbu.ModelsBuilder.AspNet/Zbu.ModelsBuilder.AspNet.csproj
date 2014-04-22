@@ -7,6 +7,8 @@
 	AND IN ADDITION MSBUILD DOES NOT SEEM TO FIND THE DEPENDENT ZIPLIB IF IT IS NOT IN THE SAME DIRECTORY...
     <MSBuildUmbracoTasksPath>$(SolutionDir)\packages\MSBuild.Umbraco.Tasks.1.0\lib</MSBuildUmbracoTasksPath>
 	-->
+    <!-- AND I HAVE TO INITIALIZE SolutionDir HERE BECAUSE OTHERWISE NUGET CANT BUILD THE PKG -->
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <MSBuildUmbracoTasksPath>$(SolutionDir)\lib</MSBuildUmbracoTasksPath>
   </PropertyGroup>
   <Import Project="$(MSBuildUmbracoTasksPath)\MSBuild.Umbraco.Tasks.targets" />
@@ -22,6 +24,9 @@
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <!--
+    <BuildPackage>true</BuildPackage>
+	-->
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,19 +46,24 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="businesslogic, Version=1.0.5051.28196, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="businesslogic, Version=1.0.5212.27026, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\src\src\Umbraco.Web.UI\bin\businesslogic.dll</HintPath>
+      <HintPath>..\umbraco\businesslogic.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="interfaces">
-      <HintPath>..\..\..\src\src\Umbraco.Web.UI\bin\interfaces.dll</HintPath>
+    <Reference Include="interfaces, Version=1.0.5189.32661, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\umbraco\interfaces.dll</HintPath>
     </Reference>
     <Reference Include="MSBuild.Umbraco.Tasks">
       <HintPath>..\packages\MSBuild.Umbraco.Tasks.1.0\lib\MSBuild.Umbraco.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\umbraco\lib-7.1.2\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -69,11 +79,13 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="umbraco">
-      <HintPath>..\..\..\src\src\Umbraco.Web.UI\bin\umbraco.dll</HintPath>
+    <Reference Include="umbraco, Version=1.0.5212.27029, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\umbraco\umbraco.dll</HintPath>
     </Reference>
-    <Reference Include="Umbraco.Core">
-      <HintPath>..\..\..\src\src\Umbraco.Web.UI\bin\Umbraco.Core.dll</HintPath>
+    <Reference Include="Umbraco.Core, Version=1.0.5212.27025, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\umbraco\Umbraco.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -98,24 +110,32 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="BuildModels.ascx">
+    <Content Include="UserControls\Zbu\ModelsBuilder\BuildModels.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="package.xml">
+    <Content Include="UserControls\Zbu\ModelsBuilder\logo32x32.png" />
+    <None Include="build\NuSpecs\Zbu.ModelsBuilder.AspNet.nuspec" />
+    <None Include="package.xml">
       <SubType>Designer</SubType>
-    </Content>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them. For more information, see <span class="skimlinks-unlinked">http://go.microsoft.com/fwlink/?LinkID=322105</span>. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
   -->
-  <Target Name="AfterBuild" DependsOnTargets="Package">
+  <Target Name="AfterBuild" DependsOnTargets="UmbracoPackage;NuGetPackage">
   </Target>
   <!-- PACKAGE -->
   <!-- SEE TOP OF FILE... TRYING TO FIX THE MESS BUT IT DOES NOT WORK
@@ -125,26 +145,52 @@
     </CreateProperty>
   </Target>
   -->
-  <Target Name="Package">
+  <Target Name="UmbracoPackage">
     <GetAssemblyIdentity AssemblyFiles="$(OutputPath)Zbu.ModelsBuilder.dll">
       <Output TaskParameter="Assemblies" ItemName="AssemblyInfos" />
     </GetAssemblyIdentity>
-    <Message Importance="High" Text="Packaging version %(AssemblyInfos.Version)" />
-    <RemoveDir Directories="$(ProjectDir)pkg\$(Configuration)" Condition="Exists('$(ProjectDir)pkg\$(Configuration)')" />
-    <MakeDir Directories="$(ProjectDir)pkg\$(Configuration)" />
-    <Copy SourceFiles="$(ProjectDir)package.xml" DestinationFolder="$(ProjectDir)pkg\$(Configuration)" />
-    <ManifestUpdate ManifestFile="$(ProjectDir)pkg\$(Configuration)\package.xml" WorkingDirectory="$(ProjectDir)pkg\$(Configuration)" PackageVersion="%(AssemblyInfos.Version)" />
+    <Message Importance="High" Text="Packaging version %(AssemblyInfos.Version) into Umbraco package" />
+    <RemoveDir Directories="$(ProjectDir)pkg" Condition="Exists('$(ProjectDir)pkg')" />
+    <MakeDir Directories="$(ProjectDir)pkg" />
+    <Copy SourceFiles="$(ProjectDir)package.xml" DestinationFolder="$(ProjectDir)pkg" />
+    <ManifestUpdate ManifestFile="$(ProjectDir)pkg\package.xml" WorkingDirectory="$(ProjectDir)pkg" PackageVersion="%(AssemblyInfos.Version)" />
     <ItemGroup>
-      <PackageFiles Include="$(ProjectDir)pkg\$(Configuration)\package.xml" />
-      <PackageFiles Include="$(ProjectDir)BuildModels.ascx" />
+      <PackageFiles Include="$(ProjectDir)pkg\package.xml" />
+      <PackageFiles Include="$(ProjectDir)UserControls\Zbu\ModelsBuilder\BuildModels.ascx" />
+      <PackageFiles Include="$(ProjectDir)UserControls\Zbu\ModelsBuilder\logo32x32.png" />
       <PackageFiles Include="$(OutputPath)Microsoft.CodeAnalysis.dll" />
       <PackageFiles Include="$(OutputPath)Microsoft.CodeAnalysis.CSharp.dll" />
       <PackageFiles Include="$(OutputPath)System.Collections.Immutable.dll" />
       <PackageFiles Include="$(OutputPath)Zbu.ModelsBuilder.dll" />
       <PackageFiles Include="$(OutputPath)Zbu.ModelsBuilder.Umbraco.dll" />
       <PackageFiles Include="$(OutputPath)Zbu.ModelsBuilder.AspNet.dll" />
+      <PackageFiles Include="$(OutputPath)System.Reflection.Metadata.dll" />
     </ItemGroup>
-    <Package ManifestFile="$(ProjectDir)pkg\$(Configuration)\package.xml" WorkingDirectory="$(ProjectDir)pkg\$(Configuration)" OutputDirectory="$(ProjectDir)pkg\$(Configuration)" Files="@(PackageFiles)" />
-    <Delete Files="$(ProjectDir)pkg\$(Configuration)\package.xml" />
+    <Package ManifestFile="$(ProjectDir)pkg\package.xml" WorkingDirectory="$(ProjectDir)pkg" OutputDirectory="$(ProjectDir)pkg" Files="@(PackageFiles)" />
+    <ItemGroup>
+      <PackageFilesToCopy Include="$(ProjectDir)pkg\*.zip" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PackageFilesToCopy)" DestinationFolder="$(SolutionDir)build\$(Configuration)" />
+    <RemoveDir Directories="$(ProjectDir)pkg" />
+  </Target>
+  <!-- auto by NuGet: DependsOnTargets="BuildPackage" -->
+  <Target Name="NuGetPackage">
+    <GetAssemblyIdentity AssemblyFiles="$(OutputPath)Zbu.ModelsBuilder.dll">
+      <Output TaskParameter="Assemblies" ItemName="AssemblyInfos" />
+    </GetAssemblyIdentity>
+    <Message Importance="High" Text="Packaging version %(AssemblyInfos.Version) into NuGet package" />
+    <ItemGroup>
+      <NuGetFilesToDelete Include="$(ProjectDir)build\Packages\*.nupkg" />
+    </ItemGroup>
+    <Delete Files="@(NuGetFilesToDelete)" />
+    <PropertyGroup>
+      <!-- -symbols -->
+      <NuGetBuildCommand>$(NuGetCommand) pack "$(ProjectDir)build\NuSpecs\Zbu.ModelsBuilder.AspNet.nuspec" -Version "%(AssemblyInfos.Version)-pre" -Properties "Configuration=$(Configuration);Platform=$(Platform)" $(NonInteractiveSwitch) -OutputDirectory "$(ProjectDir)build\Packages"</NuGetBuildCommand>
+    </PropertyGroup>
+    <Exec Command="$(NuGetBuildCommand)" LogStandardErrorAsError="true" />
+    <ItemGroup>
+      <NuGetFilesToCopy Include="$(ProjectDir)build\Packages\*.nupkg" />
+    </ItemGroup>
+    <Copy SourceFiles="@(NuGetFilesToCopy)" DestinationFolder="$(SolutionDir)build\$(Configuration)" />
   </Target>
 </Project>

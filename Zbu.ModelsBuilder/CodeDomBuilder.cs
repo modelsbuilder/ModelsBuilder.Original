@@ -11,6 +11,10 @@ namespace Zbu.ModelsBuilder
 
     public class CodeDomBuilder : Builder
     {
+        public CodeDomBuilder(IList<TypeModel> typeModels)
+            : base(typeModels)
+        { }
+
         public void Generate(CodeNamespace ns, TypeModel typeModel)
         {
             // what about USING?

@@ -241,9 +241,9 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
                 _properties = properties;
             }
 
-            public string ConnectionString { get { return (string)_properties.Item("ConnectionString").Value; } }
-            public string DatabaseProvider { get { return (string)_properties.Item("DatabaseProvider").Value; } }
-            public string BinaryDirectory { get { return (string)_properties.Item("BinaryDirectory").Value; } }
+            //public string ConnectionString { get { return (string)_properties.Item("ConnectionString").Value; } }
+            //public string DatabaseProvider { get { return (string)_properties.Item("DatabaseProvider").Value; } }
+            //public string BinaryDirectory { get { return (string)_properties.Item("BinaryDirectory").Value; } }
             public string UmbracoUrl { get { return (string)_properties.Item("UmbracoUrl").Value; } }
             public string UmbracoUser { get { return (string)_properties.Item("UmbracoUser").Value; } }
             public string UmbracoPassword { get { return (string)_properties.Item("UmbracoPassword").Value; } }
@@ -251,8 +251,8 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
             public void Validate()
             {
                 var valid = true;
-                valid &= !string.IsNullOrWhiteSpace(ConnectionString);
-                valid &= !string.IsNullOrWhiteSpace(DatabaseProvider);
+                //valid &= !string.IsNullOrWhiteSpace(ConnectionString);
+                //valid &= !string.IsNullOrWhiteSpace(DatabaseProvider);
                 valid &= !string.IsNullOrWhiteSpace(UmbracoUrl);
                 valid &= !string.IsNullOrWhiteSpace(UmbracoUser);
                 valid &= !string.IsNullOrWhiteSpace(UmbracoPassword);

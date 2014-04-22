@@ -6,3 +6,5 @@ pkg
 packages
 refs
 *.snk
+/build/Debug
+/build/Release

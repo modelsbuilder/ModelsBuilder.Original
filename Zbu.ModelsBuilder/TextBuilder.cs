@@ -7,6 +7,10 @@ namespace Zbu.ModelsBuilder
 {
     public class TextBuilder : Builder
     {
+        public TextBuilder(IList<TypeModel> typeModels)
+            : base(typeModels)
+        { }
+
         public void Generate(StringBuilder sb, TypeModel typeModel)
         {
             WriteHeader(sb);
@@ -46,7 +50,7 @@ namespace Zbu.ModelsBuilder
                 // write the interface declaration
                 sb.AppendFormat("\t// Mixin content Type {0} with alias \"{1}\"\n", type.Id, type.Alias);
                 sb.AppendFormat("\tpublic partial interface I{0}", type.Name);
-                var implements = type.BaseType == null || type.BaseType.IsRemoved
+                var implements = type.BaseType == null || type.BaseType.IsContentIgnored
                     ? (type.OmitBase ? null : "PublishedContent") 
                     : type.BaseType.Name;
                 if (implements != null)
@@ -77,7 +81,7 @@ namespace Zbu.ModelsBuilder
             // write the class declaration
             sb.AppendFormat("\t// Content Type {0} with alias \"{1}\"\n", type.Id, type.Alias);
             sb.AppendFormat("\tpublic partial class {0}", type.Name);
-            var inherits = type.BaseType == null || type.BaseType.IsRemoved
+            var inherits = type.BaseType == null || type.BaseType.IsContentIgnored
                 ? (type.OmitBase ? null : "PublishedContentModel") 
                 : type.BaseType.Name;
             if (inherits != null)
@@ -104,9 +108,10 @@ namespace Zbu.ModelsBuilder
             sb.Append("\n\t{\n");
 
             // write the constants
-            sb.AppendFormat("\t\tpublic const string ModelTypeAlias = \"{0}\";\n",
+            // as 'new' since parent has its own
+            sb.AppendFormat("\t\tpublic new const string ModelTypeAlias = \"{0}\";\n",
                 type.Alias);
-            sb.AppendFormat("\t\tpublic const PublishedItemType ModelItemType = PublishedItemType.{0};\n\n",
+            sb.AppendFormat("\t\tpublic new const PublishedItemType ModelItemType = PublishedItemType.{0};\n\n",
                 type.ItemType);
 
             // write the ctor
@@ -114,7 +119,8 @@ namespace Zbu.ModelsBuilder
                 type.Name);
 
             // write the static methods
-            sb.Append("\t\tpublic static PublishedContentType GetModelContentType()\n");
+            // as 'new' since parent has its own
+            sb.Append("\t\tpublic new static PublishedContentType GetModelContentType()\n");
             sb.Append("\t\t{\n\t\t\treturn PublishedContentType.Get(ModelItemType, ModelTypeAlias);\n\t\t}\n\n");
             sb.AppendFormat("\t\tpublic static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<{0}, TValue>> selector)\n",
                 type.Name);

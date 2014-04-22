@@ -91,27 +91,27 @@ namespace Zbu.ModelsBuilder.AspNet
         //    return Request.CreateResponse(HttpStatusCode.OK, modelTypes, Configuration.Formatters.JsonFormatter);
         //}
 
-        [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
+        [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
         [ModelsBuilderAuthFilter("developer")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage GetModels(IDictionary<string, string> ourFiles)
         {
             var umbraco = Application.GetApplication();
-            var modelTypes = umbraco.GetContentAndMediaTypes();
+            var typeModels = umbraco.GetContentAndMediaTypes();
 
             var modelsNamespace = ourFiles["__META__"];
             ourFiles.Remove("__META__");
 
-            var builder = new TextBuilder();
+            var builder = new TextBuilder(typeModels);
             builder.Namespace = modelsNamespace;
             var disco = new CodeDiscovery().Discover(ourFiles);
-            builder.Prepare(modelTypes, disco);
+            builder.Prepare(disco);
 
             var models = new Dictionary<string, string>();
-            foreach (var modelType in modelTypes)
+            foreach (var typeModel in builder.GetModelsToGenerate())
             {
                 var sb = new StringBuilder();
-                builder.Generate(sb, modelType);
-                models[modelType.Name] = sb.ToString();
+                builder.Generate(sb, typeModel);
+                models[typeModel.Name] = sb.ToString();
             }
 
             return Request.CreateResponse(HttpStatusCode.OK, models, Configuration.Formatters.JsonFormatter);
@@ -127,22 +127,22 @@ namespace Zbu.ModelsBuilder.AspNet
                 File.Delete(file);
 
             var umbraco = Application.GetApplication();
-            var modelTypes = umbraco.GetContentAndMediaTypes();
+            var typeModels = umbraco.GetContentAndMediaTypes();
 
             var ns = ConfigurationManager.AppSettings["Zbu.ModelsBuilder.ModelsNamespace"];
             if (string.IsNullOrWhiteSpace(ns)) ns = "Umbraco.Web.PublishedContentModels";
 
-            var builder = new TextBuilder();
+            var builder = new TextBuilder(typeModels);
             builder.Namespace = ns;
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
             var disco = new CodeDiscovery().Discover(ourFiles);
-            builder.Prepare(modelTypes, disco);
+            builder.Prepare(disco);
 
-            foreach (var modelType in modelTypes)
+            foreach (var typeModel in builder.GetModelsToGenerate())
             {
                 var sb = new StringBuilder();
-                builder.Generate(sb, modelType);
-                var filename = Path.Combine(modelsDirectory, modelType.Name + ".generated.cs");
+                builder.Generate(sb, typeModel);
+                var filename = Path.Combine(modelsDirectory, typeModel.Name + ".generated.cs");
                 File.WriteAllText(filename, sb.ToString());
             }
         }

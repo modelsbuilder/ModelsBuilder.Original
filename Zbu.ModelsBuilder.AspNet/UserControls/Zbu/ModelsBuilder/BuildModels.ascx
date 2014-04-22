@@ -1,7 +1,19 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" %>
-<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
-<umb:CssInclude runat="server" FilePath="propertypane/style.css" PathNameAlias="UmbracoClient" />
+<script runat="server">
+    protected override void OnLoad(EventArgs e)
+    {
+        // <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+        // <umb:CssInclude runat="server" FilePath="propertypane/style.css" PathNameAlias="UmbracoClient" />
+
+        var ver = Umbraco.Core.Configuration.UmbracoVersion.Current;
+        if (ver.Major >= 7) return;
+        var css = new ClientDependency.Core.Controls.CssInclude();
+        css.FilePath = "propertypane/style.css";
+        css.PathNameAlias = "UmbracoClient";
+        Page.Controls.Add(css);
+    }
+</script>
 
 <script type="text/javascript">
     jQuery(document).ready(function () {
@@ -45,9 +57,12 @@
 		<div class="propertyItem">
 			<div class="dashboardWrapper">
 				<h2>Generate Models</h2>
-				<img class="dashboardIcon" alt="Umbraco" src="./dashboard/images/logo32x32.png">
+				<img class="dashboardIcon" alt="Umbraco" src="/UserControls/Zbu/ModelsBuilder/logo32x32.png">
 				<div id="generateModelsPane" style="min-height: 240px;">
-					<p>Click to generate models. Beware! It will restart the application.</p>
+					<p>Click to generate models. 
+                        <%=ConfigurationManager.AppSettings["Zbu.ModelsBuilder.AspNet.BuildModels"] == "true" 
+                            ? "Beware! It will restart the application." : "" %>
+                        </p>
 					<p>
 						<button id="generateModels">Generate</button>
 					</p>

@@ -6,17 +6,32 @@
 		<orgPath>/UserControls/Zbu/ModelsBuilder</orgPath>
 		<orgName>BuildModels.ascx</orgName>
 	</file>
-	<file>
-		<guid>Roslyn.Compilers.dll</guid>
+    <file>
+      <guid>logo32x32.png</guid>
+      <orgPath>/UserControls/Zbu/ModelsBuilder</orgPath>
+      <orgName>logo32x32.png</orgName>
+    </file>
+    <file>
+		<guid>Microsoft.CodeAnalysis.dll</guid>
 		<orgPath>/bin</orgPath>
-		<orgName>Roslyn.Compilers.dll</orgName>
+		<orgName>Microsoft.CodeAnalysis.dll</orgName>
 	</file>
 	<file>
-		<guid>Roslyn.Compilers.CSharp.dll</guid>
+		<guid>Microsoft.CodeAnalysis.CSharp.dll</guid>
 		<orgPath>/bin</orgPath>
-		<orgName>Roslyn.Compilers.CSharp.dll</orgName>
+		<orgName>Microsoft.CodeAnalysis.CSharp.dll</orgName>
 	</file>
-	<file>
+  <file>
+    <guid>System.Collections.Immutable.dll</guid>
+    <orgPath>/bin</orgPath>
+    <orgName>System.Collections.Immutable.dll</orgName>
+  </file>
+  <file>
+    <guid>System.Reflection.Metadata.dll</guid>
+    <orgPath>/bin</orgPath>
+    <orgName>System.Reflection.Metadata.dll</orgName>
+  </file>
+    <file>
 		<guid>Zbu.ModelsBuilder.dll</guid>
 		<orgPath>/bin</orgPath>
 		<orgName>Zbu.ModelsBuilder.dll</orgName>
@@ -80,5 +95,6 @@ But, time will come...]]></readme>
         </tab>
       </section>
     </Action>
+    <Action runat="install" undo="true" alias="Zbu.ModelsBuilder.Umbraco.PackageActions.Configure" />
   </Actions>
 </umbPackage>

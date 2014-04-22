@@ -25,6 +25,12 @@ namespace Zbu.ModelsBuilder
     // but... I'm not even sure it makes sense
     // if we don't want it... we don't want it.
 
+    // about ignoring
+    // - content (don't generate the content, use as mixin)
+    // - mixin (don't generate the interface, use the properties)
+    // - mixin properties (generate the interface, not the properties)
+    // - mixin: local only or children too...
+
     /// <summary>
     /// Indicates that no model should be generated for a specified content type alias.
     /// </summary>
@@ -32,7 +38,7 @@ namespace Zbu.ModelsBuilder
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
     public sealed class IgnoreContentTypeAttribute : Attribute
     {
-        public IgnoreContentTypeAttribute(string alias)
+        public IgnoreContentTypeAttribute(string alias /*, bool ignoreContent = true, bool ignoreMixin = true, bool ignoreMixinProperties = true*/)
         {}
     }
 }

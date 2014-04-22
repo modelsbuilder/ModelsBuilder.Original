@@ -64,7 +64,6 @@
     <Compile Include="Builder.cs" />
     <Compile Include="CodeDomBuilder.cs" />
     <Compile Include="CodeDiscovery.cs" />
-    <Compile Include="CodeWalker.cs" />
     <Compile Include="DiscoveryResult.cs" />
     <Compile Include="RenamePropertyTypeAttribute.cs" />
     <Compile Include="ModelPropertyAliasAttribute.cs" />

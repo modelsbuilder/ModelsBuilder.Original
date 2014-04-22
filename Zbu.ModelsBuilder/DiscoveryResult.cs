@@ -10,8 +10,14 @@ namespace Zbu.ModelsBuilder
         // content "name" is the complete name eg Foo.Bar.Name
         // property "name" is just the local name
 
+        // see notes in IgnoreContentTypeAttribute
+
         private readonly HashSet<string> _ignoredContent 
-            = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);  
+            = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+        //private readonly HashSet<string> _ignoredMixin
+        //    = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+        //private readonly HashSet<string> _ignoredMixinProperties
+        //    = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         private readonly Dictionary<string, string> _renamedContent 
             = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
         private readonly Dictionary<string, HashSet<string>> _ignoredProperty
@@ -26,9 +32,15 @@ namespace Zbu.ModelsBuilder
         #region Declare
 
         // content with that alias should not be generated
-        public void SetIgnoredContent(string contentAlias)
+        // alias can end with a * (wildcard)
+        public void SetIgnoredContent(string contentAlias /*, bool ignoreContent, bool ignoreMixin, bool ignoreMixinProperties*/)
         {
-            _ignoredContent.Add(contentAlias);
+            //if (ignoreContent)
+                _ignoredContent.Add(contentAlias);
+            //if (ignoreMixin)
+            //    _ignoredMixin.Add(contentAlias);
+            //if (ignoreMixinProperties)
+            //    _ignoredMixinProperties.Add(contentAlias);
         }
 
         // content with that alias should be generated with a different name
@@ -40,6 +52,7 @@ namespace Zbu.ModelsBuilder
         // property with that alias should not be generated
         // applies to content name and any content that implements it
         // here, contentName may be an interface
+        // alias can end with a * (wildcard)
         public void SetIgnoredProperty(string contentName, string propertyAlias)
         {
             HashSet<string> ignores;
@@ -62,7 +75,8 @@ namespace Zbu.ModelsBuilder
         // content with that name has a base class so no need to generate one
         public void SetContentBaseClass(string contentName, string baseName)
         {
-            _contentBase[contentName] = baseName;
+            if (baseName != "object")
+                _contentBase[contentName] = baseName;
         }
 
         // content with that name implements the interfaces
@@ -77,48 +91,66 @@ namespace Zbu.ModelsBuilder
 
         public bool IsContentIgnored(string contentAlias)
         {
-            return _ignoredContent.Contains(contentAlias);
+            return IsContentOrMixinIgnored(contentAlias, _ignoredContent);
         }
 
-        public bool HasContentBase(string contentAlias)
+        //public bool IsMixinIgnored(string contentAlias)
+        //{
+        //    return IsContentOrMixinIgnored(contentAlias, _ignoredMixin);
+        //}
+        
+        //public bool IsMixinPropertiesIgnored(string contentAlias)
+        //{
+        //    return IsContentOrMixinIgnored(contentAlias, _ignoredMixinProperties);
+        //}
+
+        private static bool IsContentOrMixinIgnored(string contentAlias, HashSet<string> ignored)
         {
-            var contentName = ContentName(contentAlias);
+            if (ignored.Contains(contentAlias)) return true;
+            return ignored
+                .Where(x => x.EndsWith("*"))
+                .Select(x => x.Substring(0, x.Length - 1))
+                .Any(x => contentAlias.StartsWith(x, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        public bool HasContentBase(string contentName)
+        {
             return _contentBase.ContainsKey(contentName);
+        }
+
+        public bool IsContentRenamed(string contentAlias)
+        {
+            return _renamedContent.ContainsKey(contentAlias);
         }
 
         public string ContentName(string contentAlias)
         {
             string name;
-            return (_renamedContent.TryGetValue(contentAlias, out name)) ? name : contentAlias;
+            return (_renamedContent.TryGetValue(contentAlias, out name)) ? name : null;
         }
 
-        public bool IsPropertyIgnored(string contentAlias, string propertyAlias)
-        {
-            var contentName = ContentName(contentAlias);
-            return IsPropertyIgnoredByName(contentName, propertyAlias);
-        }
-
-        private bool IsPropertyIgnoredByName(string contentName, string propertyAlias)
+        public bool IsPropertyIgnored(string contentName, string propertyAlias)
         {
             HashSet<string> ignores;
-            if (_ignoredProperty.TryGetValue(contentName, out ignores)
-                && ignores.Contains(propertyAlias)) return true;
+            if (_ignoredProperty.TryGetValue(contentName, out ignores))
+            {
+                if (ignores.Contains(propertyAlias)) return true;
+                if (ignores
+                        .Where(x => x.EndsWith("*"))
+                        .Select(x => x.Substring(0, x.Length - 1))
+                        .Any(x => propertyAlias.StartsWith(x, StringComparison.InvariantCultureIgnoreCase)))
+                    return true;
+            }
             string baseName;
             if (_contentBase.TryGetValue(contentName, out baseName)
-                && IsPropertyIgnoredByName(baseName, propertyAlias)) return true;
+                && IsPropertyIgnored(baseName, propertyAlias)) return true;
             string[] interfaceNames;
             if (_contentInterfaces.TryGetValue(contentName, out interfaceNames)
-                && interfaceNames.Any(interfaceName => IsPropertyIgnoredByName(interfaceName, propertyAlias))) return true;
+                && interfaceNames.Any(interfaceName => IsPropertyIgnored(interfaceName, propertyAlias))) return true;
             return false;
         }
 
-        public string PropertyName(string contentAlias, string propertyAlias)
-        {
-            var contentName = ContentName(contentAlias);
-            return PropertyNameByName(contentName, propertyAlias) ?? propertyAlias;
-        }
-
-        public string PropertyNameByName(string contentName, string propertyAlias)
+        public string PropertyName(string contentName, string propertyAlias)
         {
             Dictionary<string, string> renames;
             string name;
@@ -126,11 +158,11 @@ namespace Zbu.ModelsBuilder
                 && renames.TryGetValue(propertyAlias, out name)) return name;
             string baseName;
             if (_contentBase.TryGetValue(contentName, out baseName)
-                && null != (name = PropertyNameByName(baseName, propertyAlias))) return name;
+                && null != (name = PropertyName(baseName, propertyAlias))) return name;
             string[] interfaceNames;
             if (_contentInterfaces.TryGetValue(contentName, out interfaceNames)
                 && null != (name = interfaceNames
-                    .Select(interfaceName => PropertyNameByName(interfaceName, propertyAlias))
+                    .Select(interfaceName => PropertyName(interfaceName, propertyAlias))
                     .FirstOrDefault(x => x != null))) return name;
             return null;
         }

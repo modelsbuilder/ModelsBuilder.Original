@@ -23,11 +23,25 @@ namespace Zbu.ModelsBuilder.Tests
         [Test]
         public void GetModels()
         {
-            const string text1 = @"";
-            const string text2 = @"";
+            const string text1 = @"
+using Zbu.ModelsBuilder;
+
+namespace Zbu.Demo3.Core.Models
+{
+    [RenamePropertyType(""issued"", ""DateIssued"")]
+    public partial class NewsItem
+    {
+    }
+}
+";
+            const string text2 = @"
+using Zbu.ModelsBuilder;
+
+[assembly:IgnoreContentType(""product"")]
+";
 
             //var api = new ModelsBuilderApi("http://umbraco.local", "user", "password");
-            var api = new ModelsBuilderApi("http://w310.eurovia.com", "admin", "minda");
+            var api = new ModelsBuilderApi("http://demo3.umbraco.local", "stephane@umbraco.dk", "sgay");
             var ourFiles = new Dictionary<string, string>
             {
                 {"file1", text1},

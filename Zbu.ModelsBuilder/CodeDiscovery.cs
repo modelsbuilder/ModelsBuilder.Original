@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -26,11 +22,16 @@ namespace Zbu.ModelsBuilder
                 return tree;
             }).ToArray();
 
-            var refs = AssemblyUtility.GetAllReferencedAssemblyLocations().Select(x => new MetadataFileReference(x));
+            // adding everything is going to cause issues with dynamic assemblies
+            // so we would want to filter them anyway... but we don't need them really
+            //var refs = AssemblyUtility.GetAllReferencedAssemblyLocations().Select(x => new MetadataFileReference(x));
+            // though that one is not ok either since we want our own reference
+            //var refs = Enumerable.Empty<MetadataReference>();
+            var refs = new MetadataReference[] {new MetadataFileReference(typeof(IgnoreContentTypeAttribute).Assembly.Location),};
             var compilation = CSharpCompilation.Create(
                 "Zbu.ModelsBuilder.Generated",
-                syntaxTrees: trees,
-                references: refs);
+                /*syntaxTrees:*/ trees,
+                /*references:*/ refs);
 
             var disco = new DiscoveryResult();
             foreach (var tree in trees)
@@ -39,7 +40,7 @@ namespace Zbu.ModelsBuilder
             return disco;
         }
 
-        private void Discover(DiscoveryResult disco, CSharpCompilation compilation, SyntaxTree tree)
+        private static void Discover(DiscoveryResult disco, CSharpCompilation compilation, SyntaxTree tree)
         {
             var model = compilation.GetSemanticModel(tree);
 
@@ -86,13 +87,17 @@ namespace Zbu.ModelsBuilder
                 {
                     case "Zbu.ModelsBuilder.IgnoreContentTypeAttribute":
                         var contentAliasToIgnore = (string)attrData.ConstructorArguments[0].Value;
-                        disco.SetIgnoredContent(contentAliasToIgnore);
+                        // see notes in IgnoreContentTypeAttribute
+                        //var ignoreContent = (bool)attrData.ConstructorArguments[1].Value;
+                        //var ignoreMixin = (bool)attrData.ConstructorArguments[1].Value;
+                        //var ignoreMixinProperties = (bool)attrData.ConstructorArguments[1].Value;
+                        disco.SetIgnoredContent(contentAliasToIgnore /*, ignoreContent, ignoreMixin, ignoreMixinProperties*/);
                         break;
                 }
             }
         }
 
-        private void DiscoverSymbols(DiscoveryResult disco, ISymbol symbol)
+        private static void DiscoverSymbols(DiscoveryResult disco, ISymbol symbol)
         {
             foreach (var attrData in symbol.GetAttributes())
             {

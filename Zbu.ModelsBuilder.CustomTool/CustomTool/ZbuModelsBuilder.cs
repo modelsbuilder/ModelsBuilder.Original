@@ -188,10 +188,10 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                     VisualStudioHelper.AddGeneratedItem(vsitem, filename);
                 }
 
-                // FIXME - are we sure we want to do this?
+                // we need to generate something
                 var code = new StringBuilder();
-                new TextBuilder().WriteHeader(code);
-                code.Append("// ZpqrtBnk Umbraco ModelsBuilder");
+                new TextBuilder(new TypeModel[] { }).WriteHeader(code);
+                code.Append("// ZpqrtBnk Umbraco ModelsBuilder\n");
                 code.AppendFormat("// {0:yyyy-MM-ddTHH:mm:ssZ}", DateTime.UtcNow);
 
                 var data = Encoding.Default.GetBytes(code.ToString());

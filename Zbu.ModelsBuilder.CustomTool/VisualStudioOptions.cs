@@ -24,20 +24,20 @@ namespace Zbu.ModelsBuilder.CustomTool
         public const string OptionsCategory = "Zbu";
         public const string OptionsPageName = "ModelsBuilder Options";
 
-        [Category(OptionsCategory)]
-        [DisplayName("Connection string")]
-        [Description("The database connection string.")]
-        public string ConnectionString { get; set; }
+        //[Category(OptionsCategory)]
+        //[DisplayName("Connection string")]
+        //[Description("The database connection string.")]
+        //public string ConnectionString { get; set; }
 
-        [Category(OptionsCategory)]
-        [DisplayName("Database provider")]
-        [Description("The database provider.")]
-        public string DatabaseProvider { get; set; }
+        //[Category(OptionsCategory)]
+        //[DisplayName("Database provider")]
+        //[Description("The database provider.")]
+        //public string DatabaseProvider { get; set; }
 
-        [Category(OptionsCategory)]
-        [DisplayName("Bin directory")]
-        [Description("The directory containing the project's binaries. By default it is the project's OutputPath. Can be relative to project's root.")]
-        public string BinaryDirectory { get; set; }
+        //[Category(OptionsCategory)]
+        //[DisplayName("Bin directory")]
+        //[Description("The directory containing the project's binaries. By default it is the project's OutputPath. Can be relative to project's root.")]
+        //public string BinaryDirectory { get; set; }
 
         [Category(OptionsCategory)]
         [DisplayName("Umbraco Url")]
@@ -60,12 +60,23 @@ namespace Zbu.ModelsBuilder.CustomTool
         // and yes - we should prob. use true config sections,
         // not parse XML...
 
+        private string OptionsFileName
+        {
+            get
+            {
+                var solution = VisualStudioHelper.GetSolution();
+                if (solution.EndsWith(".sln")) 
+                    solution = solution.Substring(0, solution.Length - ".sln".Length);
+                var filename = solution + ".ZbuModelsBuilder.user";
+                return filename;
+            }
+        }
+
         public override void LoadSettingsFromStorage()
         {
             //base.LoadSettingsFromStorage();
 
-            var solution = VisualStudioHelper.GetSolution();
-            var filename = solution + ".zbu.user";
+            var filename = OptionsFileName;
             if (!File.Exists(filename)) return;
 
             var text = File.ReadAllText(filename);
@@ -80,15 +91,15 @@ namespace Zbu.ModelsBuilder.CustomTool
             var version = attr.Value;
 
             // we're not version-dependent at the moment
-            attr = config.Attributes["connectionString"];
-            if (attr != null)
-                ConnectionString = attr.Value;
-            attr = config.Attributes["databaseProvider"];
-            if (attr != null)
-                DatabaseProvider = attr.Value;
-            attr = config.Attributes["binaryDirectory"];
-            if (attr != null)
-                BinaryDirectory = attr.Value;
+            //attr = config.Attributes["connectionString"];
+            //if (attr != null)
+            //    ConnectionString = attr.Value;
+            //attr = config.Attributes["databaseProvider"];
+            //if (attr != null)
+            //    DatabaseProvider = attr.Value;
+            //attr = config.Attributes["binaryDirectory"];
+            //if (attr != null)
+            //    BinaryDirectory = attr.Value;
             attr = config.Attributes["umbracoUrl"];
             if (attr != null)
                 UmbracoUrl = attr.Value;
@@ -104,8 +115,7 @@ namespace Zbu.ModelsBuilder.CustomTool
         {
             //base.SaveSettingsToStorage();
 
-            var solution = VisualStudioHelper.GetSolution();
-            var filename = solution + ".zbu.user";
+            var filename = OptionsFileName;
 
             if (File.Exists(filename))
                 File.Delete(filename);
@@ -128,9 +138,9 @@ namespace Zbu.ModelsBuilder.CustomTool
             writer.WriteStartElement("zbu");
             writer.WriteStartElement("modelsBuilder");
             writer.WriteAttributeString("version", version);
-            writer.WriteAttributeString("connectionString", ConnectionString);
-            writer.WriteAttributeString("databaseProvider", DatabaseProvider);
-            writer.WriteAttributeString("binaryDirectory", BinaryDirectory);
+            //writer.WriteAttributeString("connectionString", ConnectionString);
+            //writer.WriteAttributeString("databaseProvider", DatabaseProvider);
+            //writer.WriteAttributeString("binaryDirectory", BinaryDirectory);
             writer.WriteAttributeString("umbracoUrl", UmbracoUrl);
             writer.WriteAttributeString("umbracoUser", UmbracoUser);
             writer.WriteAttributeString("umbracoPassword", UmbracoPassword);
