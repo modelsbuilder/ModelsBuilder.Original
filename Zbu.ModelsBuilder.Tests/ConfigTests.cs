@@ -61,6 +61,7 @@ namespace Zbu.ModelsBuilder.Tests
         }
 
         [Test]
+        [Ignore("Cannot work if MySql provider is installed machine-wide.")]
         public void TestDbProvider()
         {
             var section = ConfigurationManager.GetSection("system.data");
@@ -90,7 +91,7 @@ namespace Zbu.ModelsBuilder.Tests
                 Console.WriteLine("  = {0}", r[3]);
                 Console.WriteLine("--");
             }
-            Assert.IsFalse(exists);
+            Assert.IsFalse(exists, "Test expects MySql provider to NOT exist yet.");
 
             // <add name="MySQL Data Provider" 
             //      invariant="MySql.Data.MySqlClient" 

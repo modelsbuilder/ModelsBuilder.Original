@@ -31,7 +31,7 @@ namespace Zbu.ModelsBuilder.Tests.Models
     {
         // but don't include that property because I'm doing it
         // must do it because the legacy converter can't tell the type of the property
-        [IgnorePropertyType("alternativeText")]
+        [RenamePropertyType("alternativeText")]
         //public AlternateText AlternativeText { get { return this.GetPropertyValue<AlternateText>("alternativeText"); } }
         public string AlternativeText { get { return this.GetPropertyValue<string>("alternativeText"); } } // fixme
     }

@@ -35,6 +35,7 @@ namespace Zbu.ModelsBuilder
     /// Indicates that no model should be generated for a specified content type alias.
     /// </summary>
     /// <remarks>When a content type is ignored, its descendants are also ignored.</remarks>
+    /// <remarks>Supports trailing wildcard eg "foo*".</remarks>
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = false)]
     public sealed class IgnoreContentTypeAttribute : Attribute
     {

@@ -40,6 +40,10 @@ namespace Zbu.ModelsBuilder.AspNet
             public string Message;
         }
 
+        // invoked by the dashboard
+        // requires that the user is logged into the backoffice
+        // and has access to the developer section
+        //
         [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
         [global::Umbraco.Web.WebApi.UmbracoAuthorize] // can use Umbraco's
         public HttpResponseMessage BuildModels()
@@ -81,6 +85,12 @@ namespace Zbu.ModelsBuilder.AspNet
             }
         }
 
+        // invoked by the API
+        // DISABLED - works but useless, because if we return type models that
+        // reference some Clr types that exist only on the server and not in the
+        // remove app, then what can we do with them? Better do everything on
+        // the server.
+        //
         //[System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
         //[ModelsBuilderAuthFilter("developer")] // have to use our own, non-cookie-based, auth
         //public HttpResponseMessage GetTypeModels()
@@ -91,6 +101,10 @@ namespace Zbu.ModelsBuilder.AspNet
         //    return Request.CreateResponse(HttpStatusCode.OK, modelTypes, Configuration.Formatters.JsonFormatter);
         //}
 
+        // invoked by the API
+        // wich should log the user in using basic auth
+        // and then the user must have access to the developer section
+        //
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
         [ModelsBuilderAuthFilter("developer")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage GetModels(IDictionary<string, string> ourFiles)

@@ -1,0 +1,21 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Zbu.ModelsBuilder
+{
+    /// <summary>
+    /// Indicates a model name for a specified content alias.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
+    public sealed class RenameContentTypeAttribute : Attribute
+    {
+        public RenameContentTypeAttribute(string alias, string name)
+        {}
+
+        public RenameContentTypeAttribute(string alias)
+        { }
+    }
+}

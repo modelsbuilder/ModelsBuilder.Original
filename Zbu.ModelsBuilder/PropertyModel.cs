@@ -8,6 +8,6 @@ namespace Zbu.ModelsBuilder
         public string Name;
         public Type ClrType;
 
-        public bool IsRemoved;
+        public bool IsIgnored;
     }
 }

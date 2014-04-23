@@ -12,6 +12,9 @@ namespace Zbu.ModelsBuilder
 
         private readonly IList<TypeModel> _typeModels;
 
+        // for unit tests
+        internal IList<TypeModel> TypeModels { get { return _typeModels; } } 
+
         public string Namespace { get; set; }
         public IList<string> Using { get { return TypesUsing; } }
 
@@ -38,18 +41,21 @@ namespace Zbu.ModelsBuilder
             // mark IsContentIgnored models that we discovered should be ignored
             // then propagate / ignore children of ignored contents
             // ignore content = don't generate a class for it, don't generate children
-            foreach (var typeModel in _typeModels.Where(x => disco.IsContentIgnored(x.Alias)))
+            foreach (var typeModel in _typeModels.Where(x => disco.IsIgnored(x.Alias)))
                 typeModel.IsContentIgnored = true;
-            foreach (var typeModel in _typeModels.Where(x => x.EnumerateBaseTypes().Any(xx => x.IsContentIgnored)))
+            foreach (var typeModel in _typeModels.Where(x => !x.IsContentIgnored && x.EnumerateBaseTypes().Any(xx => xx.IsContentIgnored)))
                 typeModel.IsContentIgnored = true;
 
             // handle model renames
             foreach (var typeModel in _typeModels.Where(x => disco.IsContentRenamed(x.Alias)))
+            {
                 typeModel.Name = disco.ContentName(typeModel.Alias);
+                typeModel.IsRenamed = true;
+            }
 
             // mark OmitBase models that we discovered already have a base class
             foreach (var typeModel in _typeModels.Where(x => disco.HasContentBase(disco.ContentName(x.Alias) ?? x.Name)))
-                typeModel.OmitBase = true;
+                typeModel.HasBase = true;
 
             foreach (var typeModel in _typeModels)
             {
@@ -59,7 +65,7 @@ namespace Zbu.ModelsBuilder
                 foreach (var property in typeModel.Properties
                     .Where(property => tm.EnumerateBaseTypes(true).Any(x => disco.IsPropertyIgnored(disco.ContentName(x.Alias) ?? x.Name, property.Alias))))
                 {
-                    property.IsRemoved = true;
+                    property.IsIgnored = true;
                 }
 
                 // handle property renames
@@ -75,13 +81,13 @@ namespace Zbu.ModelsBuilder
 
             // ensure we have no duplicates property names
             foreach (var typeModel in _typeModels.Where(x => !x.IsContentIgnored))
-                foreach (var xx in typeModel.Properties.Where(x => !x.IsRemoved).GroupBy(x => x.Name).Where(x => x.Count() > 1))
+                foreach (var xx in typeModel.Properties.Where(x => !x.IsIgnored).GroupBy(x => x.Name).Where(x => x.Count() > 1))
                     throw new InvalidOperationException(string.Format("Property name \"{0}\" in type with alias \"{1}\" is used for properties with alias {2}. Should be used for one property only.",
                         xx.Key, typeModel.Alias,
                         string.Join(", ", xx.Select(x => "\"" + x.Alias + "\""))));
 
             // ensure we have no collision between base types
-            foreach (var xx in _typeModels.Where(x => !x.IsContentIgnored).Where(x => x.BaseType != null && x.OmitBase))
+            foreach (var xx in _typeModels.Where(x => !x.IsContentIgnored).Where(x => x.BaseType != null && x.HasBase))
                 throw new InvalidOperationException(string.Format("Type alias \"{0}\" has a more than one parent class.",
                     xx.Alias));
 

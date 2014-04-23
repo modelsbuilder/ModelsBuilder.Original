@@ -12,6 +12,7 @@ namespace Zbu.ModelsBuilder.Tests
     public class ApiTests
     {
         [Test]
+        [Ignore("That API has been disabled.")]
         public void GetTypeModels()
         {
             // note - works only if the website does not reference types that are not
@@ -21,6 +22,7 @@ namespace Zbu.ModelsBuilder.Tests
         }
 
         [Test]
+        [Ignore("Requires a proper endpoint.")]
         public void GetModels()
         {
             const string text1 = @"
@@ -40,8 +42,7 @@ using Zbu.ModelsBuilder;
 [assembly:IgnoreContentType(""product"")]
 ";
 
-            //var api = new ModelsBuilderApi("http://umbraco.local", "user", "password");
-            var api = new ModelsBuilderApi("http://demo3.umbraco.local", "stephane@umbraco.dk", "sgay");
+            var api = new ModelsBuilderApi("http://umbraco.local", "user", "password");
             var ourFiles = new Dictionary<string, string>
             {
                 {"file1", text1},

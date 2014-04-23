@@ -17,7 +17,8 @@ namespace Zbu.ModelsBuilder
         public readonly List<TypeModel> DeclaringInterfaces = new List<TypeModel>(); // must declare it implements those mixins
         public readonly List<TypeModel> ImplementingInterfaces = new List<TypeModel>(); // must implement properties for those mixins
 
-        public bool OmitBase;
+        public bool HasBase;
+        public bool IsRenamed;
         public bool IsMixin; // whether the type is a mixin for another type
         public bool IsParent; // whether the type is a parent for another type
         public bool IsContentIgnored; // whether the type should be removed from generation

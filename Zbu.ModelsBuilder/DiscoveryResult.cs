@@ -89,7 +89,7 @@ namespace Zbu.ModelsBuilder
 
         #region Query
 
-        public bool IsContentIgnored(string contentAlias)
+        public bool IsIgnored(string contentAlias)
         {
             return IsContentOrMixinIgnored(contentAlias, _ignoredContent);
         }

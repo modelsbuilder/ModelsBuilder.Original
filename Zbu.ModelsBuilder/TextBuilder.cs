@@ -51,7 +51,7 @@ namespace Zbu.ModelsBuilder
                 sb.AppendFormat("\t// Mixin content Type {0} with alias \"{1}\"\n", type.Id, type.Alias);
                 sb.AppendFormat("\tpublic partial interface I{0}", type.Name);
                 var implements = type.BaseType == null || type.BaseType.IsContentIgnored
-                    ? (type.OmitBase ? null : "PublishedContent") 
+                    ? (type.HasBase ? null : "PublishedContent") 
                     : type.BaseType.Name;
                 if (implements != null)
                     sb.AppendFormat(" : I{0}", implements);
@@ -79,10 +79,12 @@ namespace Zbu.ModelsBuilder
             }
 
             // write the class declaration
+            if (type.IsRenamed)
             sb.AppendFormat("\t// Content Type {0} with alias \"{1}\"\n", type.Id, type.Alias);
+            sb.AppendFormat("\t[PublishedContentModel(\"{0}\")]\n", type.Alias);
             sb.AppendFormat("\tpublic partial class {0}", type.Name);
             var inherits = type.BaseType == null || type.BaseType.IsContentIgnored
-                ? (type.OmitBase ? null : "PublishedContentModel") 
+                ? (type.HasBase ? null : "PublishedContentModel") 
                 : type.BaseType.Name;
             if (inherits != null)
                 sb.AppendFormat(" : {0}", inherits);
