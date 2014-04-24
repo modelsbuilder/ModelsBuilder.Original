@@ -75,7 +75,7 @@ namespace Zbu.ModelsBuilder
         // content with that name has a base class so no need to generate one
         public void SetContentBaseClass(string contentName, string baseName)
         {
-            if (baseName != "object")
+            if (baseName.ToLowerInvariant() != "object")
                 _contentBase[contentName] = baseName;
         }
 
