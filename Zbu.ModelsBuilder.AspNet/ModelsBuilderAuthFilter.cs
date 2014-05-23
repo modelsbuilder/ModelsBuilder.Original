@@ -61,7 +61,11 @@ namespace Zbu.ModelsBuilder.AspNet
             var username = credentials[0];
             var password = credentials[1];
 
+#if UMBRACO_6
+            var providerKey = umbraco.UmbracoSettings.DefaultBackofficeProvider;
+#else
             var providerKey = UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider;
+#endif
             var provider = Membership.Providers[providerKey];
             if (provider == null || !provider.ValidateUser(username, password))
                 return null;
