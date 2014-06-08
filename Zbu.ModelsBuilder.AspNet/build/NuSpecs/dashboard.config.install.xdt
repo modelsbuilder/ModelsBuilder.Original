@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<dashBoard xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <section alias="ZbuModelsBuilder" xdt:Transform="InsertIfMissing" xdt:Locator="Match(alias)">
+    <areas>
+      <area>developer</area>
+    </areas>
+    <tab caption="ModelsBuilder">
+      <control>
+        /UserControls/Zbu/ModelsBuilder/BuildModels.ascx
+      </control>
+    </tab>
+  </section>
+</dashBoard>

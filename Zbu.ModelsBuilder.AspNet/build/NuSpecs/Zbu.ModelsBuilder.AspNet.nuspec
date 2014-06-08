@@ -28,5 +28,12 @@
     <!--
 		<file src="tools\install.ps1" target="tools\install.ps1" />
 		-->
-	</files>
+    
+    <!-- transforms -->
+    <file src="web.config.install.xdt" target="content" />
+    <file src="web.config.uninstall.xdt" target="content" />
+    <file src="dashboard.config.install.xdt" target="content\config" />
+    <file src="dashboard.config.uninstall.xdt" target="content\config" />
+
+  </files>
 </package>
