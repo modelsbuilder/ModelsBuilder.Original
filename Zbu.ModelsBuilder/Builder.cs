@@ -11,6 +11,7 @@ namespace Zbu.ModelsBuilder
         public static readonly string Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
         private readonly IList<TypeModel> _typeModels;
+        protected DiscoveryResult Disco { get; private set; }
 
         // for unit tests
         internal IList<TypeModel> TypeModels { get { return _typeModels; } } 
@@ -38,6 +39,8 @@ namespace Zbu.ModelsBuilder
 
         public void Prepare(DiscoveryResult disco)
         {
+            Disco = disco;
+
             // mark IsContentIgnored models that we discovered should be ignored
             // then propagate / ignore children of ignored contents
             // ignore content = don't generate a class for it, don't generate children
@@ -74,6 +77,7 @@ namespace Zbu.ModelsBuilder
             }
 
             // ensure we have no duplicates type names
+            // fixme - indicate the media/content/member thing
             foreach (var xx in _typeModels.Where(x => !x.IsContentIgnored).GroupBy(x => x.Name).Where(x => x.Count() > 1))
                 throw new InvalidOperationException(string.Format("Type name \"{0}\" is used for types with alias {1}. Should be used for one type only.", 
                     xx.Key, 
@@ -118,6 +122,13 @@ namespace Zbu.ModelsBuilder
                     TypeModel.CollectImplems(mixinImplems, i);
                 // and then we remove from that list anything that is already declared at the parent level
                 typeModel.ImplementingInterfaces.AddRange(mixinImplems.Except(parentImplems));
+            }
+
+            // register using types
+            foreach (var usingNamespace in disco.GetUsingNamespaces())
+            {
+                if (!TypesUsing.Contains(usingNamespace))
+                    TypesUsing.Add(usingNamespace);
             }
         }
 

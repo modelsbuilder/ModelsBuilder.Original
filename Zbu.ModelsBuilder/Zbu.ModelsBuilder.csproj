@@ -82,6 +82,9 @@
     <Compile Include="Builder.cs" />
     <Compile Include="CodeDomBuilder.cs" />
     <Compile Include="CodeDiscovery.cs" />
+    <Compile Include="ModelsUsingAttribute.cs" />
+    <Compile Include="ModelsBaseClassAttribute.cs" />
+    <Compile Include="ModelsNamespaceAttribute.cs" />
     <Compile Include="RenameContentTypeAttribute.cs" />
     <Compile Include="DiscoveryResult.cs" />
     <Compile Include="RenamePropertyTypeAttribute.cs" />

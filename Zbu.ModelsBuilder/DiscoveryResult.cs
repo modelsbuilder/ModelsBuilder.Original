@@ -28,6 +28,11 @@ namespace Zbu.ModelsBuilder
             = new Dictionary<string, string>();
         private readonly Dictionary<string, string[]> _contentInterfaces 
             = new Dictionary<string, string[]>();
+        private readonly List<string> _usingNamespaces
+            = new List<string>();
+
+        private string _modelsBaseClassName;
+        private string _modelsNamespace;
 
         #region Declare
 
@@ -83,6 +88,21 @@ namespace Zbu.ModelsBuilder
         public void SetContentInterfaces(string contentName, IEnumerable<string> interfaceNames)
         {
             _contentInterfaces[contentName] = interfaceNames.ToArray();
+        }
+
+        public void SetModelsBaseClassName(string modelsBaseClassName)
+        {
+            _modelsBaseClassName = modelsBaseClassName;
+        }
+
+        public void SetModelsNamespace(string modelsNamespace)
+        {
+            _modelsNamespace = modelsNamespace;
+        }
+
+        public void SetUsingNamespace(string usingNamespace)
+        {
+            _usingNamespaces.Add(usingNamespace);
         }
 
         #endregion
@@ -165,6 +185,21 @@ namespace Zbu.ModelsBuilder
                     .Select(interfaceName => PropertyName(interfaceName, propertyAlias))
                     .FirstOrDefault(x => x != null))) return name;
             return null;
+        }
+
+        public string GetModelsBaseClassName(string modelsBaseClassName)
+        {
+            return _modelsBaseClassName ?? modelsBaseClassName;
+        }
+
+        public string GetModelsNamespace(string modelsNamespace)
+        {
+            return string.IsNullOrWhiteSpace(_modelsNamespace) ? modelsNamespace : _modelsNamespace;
+        }
+
+        public IEnumerable<string> GetUsingNamespaces()
+        {
+            return _usingNamespaces;
         }
 
         #endregion

@@ -26,6 +26,80 @@ namespace Zbu.ModelsBuilder.Tests
         }
 
         [Test]
+        public void ModelsBaseClassAttribute()
+        {
+            var code = new Dictionary<string, string>
+            {
+                {"assembly", @"
+using Zbu.ModelsBuilder;
+using Dang;
+[assembly:ModelsBaseClass(typeof(Whatever))]
+namespace Dang
+{
+public class Whatever
+{}
+}
+"}
+            };
+
+            var disco = new CodeDiscovery().Discover(code);
+            
+            Assert.AreEqual("Dang.Whatever", disco.GetModelsBaseClassName("Otherwise"));
+        }
+
+        [Test]
+        public void ModelsNamespaceAttribute()
+        {
+            var code = new Dictionary<string, string>
+            {
+                {"assembly", @"
+using Zbu.ModelsBuilder;
+[assembly:ModelsNamespace(""Foo.Bar.Nil"")]
+"}
+            };
+
+            var disco = new CodeDiscovery().Discover(code);
+
+            Assert.AreEqual("Foo.Bar.Nil", disco.GetModelsNamespace("Otherwise"));
+        }
+
+        [Test]
+        public void ModelsUsingAttribute()
+        {
+            // Umbraco returns nice, pascal-cased names
+
+            var type1 = new TypeModel
+            {
+                Id = 1,
+                Alias = "type1",
+                Name = "Type1",
+                BaseTypeId = 0,
+                BaseType = null,
+                ItemType = TypeModel.ItemTypes.Content,
+            };
+
+            var types = new[] { type1 };
+
+            var code = new Dictionary<string, string>
+            {
+                {"assembly", @"
+using Zbu.ModelsBuilder;
+[assembly:ModelsUsing(""Foo.Bar.Nil"")]
+"}
+            };
+
+            var builder = new TextBuilder(types);
+            var disco = new CodeDiscovery().Discover(code);
+
+            var count = builder.Using.Count;
+
+            builder.Prepare(disco);
+
+            Assert.AreEqual(count + 1, builder.Using.Count);
+            Assert.IsTrue(builder.Using.Contains("Foo.Bar.Nil"));
+        }
+
+        [Test]
         public void ContentTypeIgnore()
         {
             // Umbraco returns nice, pascal-cased names

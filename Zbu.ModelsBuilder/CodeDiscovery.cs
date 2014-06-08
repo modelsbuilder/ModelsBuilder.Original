@@ -209,6 +209,23 @@ namespace Zbu.ModelsBuilder
                         var contentRenamed = (string)attrData.ConstructorArguments[1].Value;
                         disco.SetRenamedContent(contentAliasToRename, contentRenamed);
                         break;
+
+                    case "Zbu.ModelsBuilder.ModelsBaseClassAttribute":
+                        var modelsBaseClass = (INamedTypeSymbol) attrData.ConstructorArguments[0].Value;
+                        if (modelsBaseClass is IErrorTypeSymbol)
+                            throw new Exception(string.Format("Invalid base class type \"{0}\".", modelsBaseClass.Name));
+                        disco.SetModelsBaseClassName(SymbolDisplay.ToDisplayString(modelsBaseClass));
+                        break;
+
+                    case "Zbu.ModelsBuilder.ModelsNamespaceAttribute":
+                        var modelsNamespace= (string) attrData.ConstructorArguments[0].Value;
+                        disco.SetModelsNamespace(modelsNamespace);
+                        break;
+
+                    case "Zbu.ModelsBuilder.ModelsUsingAttribute":
+                        var usingNamespace = (string)attrData.ConstructorArguments[0].Value;
+                        disco.SetUsingNamespace(usingNamespace);
+                        break;
                 }
             }
         }

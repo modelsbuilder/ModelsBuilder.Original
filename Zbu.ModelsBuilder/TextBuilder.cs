@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Zbu.ModelsBuilder
@@ -19,7 +20,7 @@ namespace Zbu.ModelsBuilder
                 sb.AppendFormat("using {0};\n", t);
 
             sb.Append("\n");
-            sb.AppendFormat("namespace {0}\n", Namespace);
+            sb.AppendFormat("namespace {0}\n", Disco.GetModelsNamespace(Namespace));
             sb.Append("{\n");
 
             WriteContentType(sb, typeModel);
@@ -84,7 +85,7 @@ namespace Zbu.ModelsBuilder
             sb.AppendFormat("\t[PublishedContentModel(\"{0}\")]\n", type.Alias);
             sb.AppendFormat("\tpublic partial class {0}", type.Name);
             var inherits = type.BaseType == null || type.BaseType.IsContentIgnored
-                ? (type.HasBase ? null : "PublishedContentModel") 
+                ? (type.HasBase ? null : Disco.GetModelsBaseClassName("PublishedContentModel"))
                 : type.BaseType.Name;
             if (inherits != null)
                 sb.AppendFormat(" : {0}", inherits);
