@@ -26,7 +26,8 @@ namespace Zbu.ModelsBuilder
         public enum ItemTypes
         {
             Content,
-            Media
+            Media,
+            Member
         }
 
         private ItemTypes _itemType;

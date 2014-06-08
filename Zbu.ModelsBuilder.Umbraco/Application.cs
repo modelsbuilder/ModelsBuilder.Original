@@ -241,15 +241,22 @@ namespace Zbu.ModelsBuilder.Umbraco
 
         #region Services
 
+        // fixme - support the member types too
+
         public IList<TypeModel> GetContentAndMediaTypes()
         {
             //if (_standalone && _umbracoApplication == null)
             //    throw new InvalidOperationException("Application is not ready.");
 
-            var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             var types = new List<TypeModel>();
+            
+            var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             types.AddRange(GetTypes(PublishedItemType.Content, contentTypeService.GetAllContentTypes().Cast<IContentTypeBase>().ToArray()));
             types.AddRange(GetTypes(PublishedItemType.Media, contentTypeService.GetAllMediaTypes().Cast<IContentTypeBase>().ToArray()));
+
+            var memberTypeService = ApplicationContext.Current.Services.MemberTypeService;
+            types.AddRange(GetTypes(PublishedItemType.Member, memberTypeService.GetAll().Cast<IContentTypeBase>().ToArray()));
+            
             return types;
         }
 
@@ -271,6 +278,16 @@ namespace Zbu.ModelsBuilder.Umbraco
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             var contentTypes = contentTypeService.GetAllMediaTypes().Cast<IContentTypeBase>().ToArray();
             return GetTypes(PublishedItemType.Media, contentTypes);
+        }
+
+        public IList<TypeModel> GetMemberTypes()
+        {
+            //if (_standalone && _umbracoApplication == null)
+            //    throw new InvalidOperationException("Application is not ready.");
+
+            var memberTypeService = ApplicationContext.Current.Services.MemberTypeService;
+            var memberTypes = memberTypeService.GetAll().Cast<IContentTypeBase>().ToArray();
+            return GetTypes(PublishedItemType.Member, memberTypes);
         }
 
         private static IList<TypeModel> GetTypes(PublishedItemType itemType, IContentTypeBase[] contentTypes)
@@ -296,8 +313,11 @@ namespace Zbu.ModelsBuilder.Umbraco
                     case PublishedItemType.Media:
                         typeModel.ItemType = TypeModel.ItemTypes.Media;
                         break;
+                    case PublishedItemType.Member:
+                        typeModel.ItemType = TypeModel.ItemTypes.Member;
+                        break;
                     default:
-                        throw new InvalidOperationException("Only Content and Media PublishedItemType values are supported.");
+                        throw new InvalidOperationException(string.Format("Unsupported PublishedItemType \"{0}\".", itemType));
                 }
 
                 typeModels.Add(typeModel);
