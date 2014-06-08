@@ -356,9 +356,11 @@ namespace Zbu.ModelsBuilder.Umbraco
                 IEnumerable<IContentTypeComposition> compositionTypes;
                 var contentTypeAsMedia = contentType as IMediaType;
                 var contentTypeAsContent = contentType as IContentType;
+                var contentTypeAsMember = contentType as IMemberType;
                 if (contentTypeAsMedia != null) compositionTypes = contentTypeAsMedia.ContentTypeComposition;
                 else if (contentTypeAsContent != null) compositionTypes = contentTypeAsContent.ContentTypeComposition;
-                else throw new Exception("Panic: neither a content nor a media type.");
+                else if (contentTypeAsMember != null) compositionTypes = contentTypeAsMember.ContentTypeComposition;
+                else throw new Exception(string.Format("Panic: unsupported type \"{0}\".", contentType.GetType().FullName));
 
                 foreach (var compositionType in compositionTypes)
                 {

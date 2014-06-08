@@ -139,7 +139,7 @@ namespace Zbu.ModelsBuilder
         void WriteContentTypeProperties(StringBuilder sb, TypeModel type)
         {
             // write the properties
-            foreach (var prop in type.Properties.OrderBy(x => x.Name))
+            foreach (var prop in type.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.Name))
                 WriteProperty(sb, prop);
 
             // no need to write the parent properties since we inherit from the parent
@@ -148,7 +148,7 @@ namespace Zbu.ModelsBuilder
 
             // write the mixins properties
             foreach (var mixinType in type.ImplementingInterfaces.OrderBy(x => x.Name))
-                foreach (var prop in mixinType.Properties.OrderBy(x => x.Name))
+                foreach (var prop in mixinType.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.Name))
                     WriteProperty(sb, prop);
         }
 

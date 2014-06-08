@@ -41,6 +41,7 @@ namespace Zbu.ModelsBuilder
                 {
                     case ItemTypes.Content:
                     case ItemTypes.Media:
+                    case ItemTypes.Member:
                         _itemType = value;
                         break;
                     default:

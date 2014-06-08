@@ -80,7 +80,15 @@ namespace Zbu.ModelsBuilder.AspNet
 
                 ourFiles["__META__"] = modelsNamespace;
                 var result = client.PostAsync(url + ModelsBuilderApiController.GetModelsUrl, ourFiles, new JsonMediaTypeFormatter()).Result;
-                result.EnsureSuccessStatusCode();
+
+                // this is not providing enough details in case of an error - do our own reporting
+                //result.EnsureSuccessStatusCode();
+                if (!result.IsSuccessStatusCode)
+                {
+                    var text = result.Content.ReadAsStringAsync().Result;
+                    throw new Exception(string.Format("Response status code does not indicate success ({0})\n{1}",
+                        result.StatusCode, text));
+                }
 
                 var formatters = new MediaTypeFormatter[] { new JsonMediaTypeFormatter() };
                 var genFiles = result.Content.ReadAsAsync<IDictionary<string, string>>(formatters).Result;

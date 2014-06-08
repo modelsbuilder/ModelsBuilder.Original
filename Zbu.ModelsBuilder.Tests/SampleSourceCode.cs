@@ -12,12 +12,12 @@ namespace Zbu.ModelsBuilder.Tests.Models
 
     // create a mixin for MixinTest but with a different class name
     // don't do it on the interfaces - will be automatic
-    [PublishedContentModel("MixinTest")]
+    [ImplementContentType("MixinTest")]
     public partial class MixinTestRenamed
     { }
 
     // create a model for bbb but with a different class name
-    [PublishedContentModel("bbb")]
+    [ImplementContentType("bbb")]
     public partial class SpecialBbb
     { }
 
@@ -31,7 +31,7 @@ namespace Zbu.ModelsBuilder.Tests.Models
     {
         // but don't include that property because I'm doing it
         // must do it because the legacy converter can't tell the type of the property
-        [RenamePropertyType("alternativeText")]
+        [ImplementPropertyType("alternativeText")]
         //public AlternateText AlternativeText { get { return this.GetPropertyValue<AlternateText>("alternativeText"); } }
         public string AlternativeText { get { return this.GetPropertyValue<string>("alternativeText"); } } // fixme
     }

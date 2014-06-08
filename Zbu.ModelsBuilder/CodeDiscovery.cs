@@ -136,8 +136,6 @@ namespace Zbu.ModelsBuilder
                         disco.SetIgnoredProperty(symbol.Name /*SymbolDisplay.ToDisplayString(symbol)*/, propertyAliasToIgnore);
                         break;
                     case "Zbu.ModelsBuilder.RenamePropertyTypeAttribute":
-                        if (attrData.ConstructorArguments.Length != 2)
-                            throw new Exception("Invalid RenamePropertyTypeAttribute usage.");
                         var propertyAliasToRename = (string)attrData.ConstructorArguments[0].Value;
                         var propertyRenamed = (string)attrData.ConstructorArguments[1].Value;
                         disco.SetRenamedProperty(symbol.Name /*SymbolDisplay.ToDisplayString(symbol)*/, propertyAliasToRename, propertyRenamed);
@@ -147,9 +145,7 @@ namespace Zbu.ModelsBuilder
                     //    var contentAliasToRename = (string)attrData.ConstructorArguments[0].Value;
                     //    disco.SetRenamedContent(contentAliasToRename, symbol.Name /*SymbolDisplay.ToDisplayString(symbol)*/);
                     //    break;
-                    case "Zbu.ModelsBuilder.RenameContentTypeAttribute":
-                        if (attrData.ConstructorArguments.Length != 1)
-                            throw new Exception("Invalid RenameContentTypeAttribute usage.");
+                    case "Zbu.ModelsBuilder.ImplementContentTypeAttribute":
                         var contentAliasToRename = (string)attrData.ConstructorArguments[0].Value;
                         disco.SetRenamedContent(contentAliasToRename, symbol.Name /*SymbolDisplay.ToDisplayString(symbol)*/);
                         break;
@@ -170,11 +166,9 @@ namespace Zbu.ModelsBuilder
                 var attrClassName = SymbolDisplay.ToDisplayString(attrClassSymbol);
                 switch (attrClassName)
                 {
-                    case "Zbu.ModelsBuilder.RenamePropertyTypeAttribute":
-                        if (attrData.ConstructorArguments.Length != 1)
-                            throw new Exception("Invalid RenamePropertyTypeAttribute usage.");
-                        var propertyAliasToRename = (string)attrData.ConstructorArguments[0].Value;
-                        disco.SetRenamedProperty(classSymbol.Name /*SymbolDisplay.ToDisplayString(classSymbol)*/, propertyAliasToRename, symbol.Name);
+                    case "Zbu.ModelsBuilder.ImplementPropertyTypeAttribute":
+                        var propertyAliasToIgnore = (string)attrData.ConstructorArguments[0].Value;
+                        disco.SetIgnoredProperty(classSymbol.Name /*SymbolDisplay.ToDisplayString(classSymbol)*/, propertyAliasToIgnore);
                         break;
                 }
             }
@@ -203,8 +197,6 @@ namespace Zbu.ModelsBuilder
                         break;
 
                     case "Zbu.ModelsBuilder.RenameContentTypeAttribute":
-                        if (attrData.ConstructorArguments.Length != 2)
-                            throw new Exception("Invalid RenamePropertyTypeAttribute usage.");
                         var contentAliasToRename = (string) attrData.ConstructorArguments[0].Value;
                         var contentRenamed = (string)attrData.ConstructorArguments[1].Value;
                         disco.SetRenamedContent(contentAliasToRename, contentRenamed);

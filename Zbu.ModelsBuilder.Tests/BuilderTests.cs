@@ -385,7 +385,7 @@ using Zbu.ModelsBuilder;
 using Zbu.ModelsBuilder;
 namespace Models
 {
-    [RenameContentType(""type1"")]
+    [ImplementContentType(""type1"")]
     public partial class Renamed1
     {}
 }
@@ -710,7 +710,7 @@ namespace Models
 {
     public partial class Type1
     {
-        [RenamePropertyType(""prop1"")]
+        [ImplementPropertyType(""prop1"")]
         public string Renamed1 { get { return """"; } }
     }
 }
@@ -722,10 +722,10 @@ namespace Models
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 
-            Assert.AreEqual("Renamed1", disco.PropertyName("Type1", "prop1"));
+            Assert.IsTrue(disco.IsPropertyIgnored("Type1", "prop1"));
 
             Assert.AreEqual(1, btypes.Count);
-            Assert.IsTrue(btypes[0].Properties[0].Name == "Renamed1");
+            Assert.IsTrue(btypes[0].Properties[0].IsIgnored);
         }
 
         [Test]
@@ -759,7 +759,7 @@ namespace Models
 {
     public class Type2
     {
-        [RenamePropertyType(""prop1"")]
+        [ImplementPropertyType(""prop1"")]
         public string Renamed1 { get { return """"; } }
     }
 
@@ -775,10 +775,10 @@ namespace Models
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 
-            Assert.AreEqual("Renamed1", disco.PropertyName("Type1", "prop1"));
+            Assert.IsTrue(disco.IsPropertyIgnored("Type1", "prop1"));
 
             Assert.AreEqual(1, btypes.Count);
-            Assert.IsTrue(btypes[0].Properties[0].Name == "Renamed1");
+            Assert.IsTrue(btypes[0].Properties[0].IsIgnored);
         }
 
         [Test]
