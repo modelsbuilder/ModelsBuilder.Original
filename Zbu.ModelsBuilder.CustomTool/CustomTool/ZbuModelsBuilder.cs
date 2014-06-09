@@ -146,6 +146,7 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                     .ToDictionary(x => x, File.ReadAllText);
                 //var codeInfos = CodeInfos.ParseFiles(Directory.GetFiles(path, "*.cs").Where(x => !x.EndsWith(".generated.cs")));
                 var api = new AspNet.ModelsBuilderApi(options.UmbracoUrl, options.UmbracoUser, options.UmbracoPassword);
+                api.ValidateClientVersion(); // so we get a meaningful error message first
                 var genFiles = api.GetModels(ourFiles, wszDefaultNamespace);
 
                 /*

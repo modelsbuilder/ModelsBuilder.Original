@@ -13,9 +13,9 @@ namespace Zbu.ModelsBuilder.AspNet
 {
     public class ModelsBuilderApi
     {
-        private string _url;
-        private string _user;
-        private string _password;
+        private readonly string _url;
+        private readonly string _user;
+        private readonly string _password;
 
         public ModelsBuilderApi(string url, string user, string password)
         {
@@ -24,50 +24,20 @@ namespace Zbu.ModelsBuilder.AspNet
             _password = password;
         }
 
-        public IList<TypeModel> GetTypeModels()
+        public static void EnsureSuccess(HttpResponseMessage result)
         {
-            // FIXME - add proxys support
+            if (result.IsSuccessStatusCode) return;
 
-            var hch = new HttpClientHandler();
-            //hch.Credentials = new NetworkCredential(user, password);
-
-            //var cookies = new CookieContainer();
-            //hch.CookieContainer = cookies;
-            //hch.UseCookies = true;
-
-            //hch.Proxy = new WebProxy("path.to.proxy", 8888);
-            //hch.UseProxy = true;
-
-            using (var client = new HttpClient(hch))
-            {
-                var url = _url;
-                client.BaseAddress = new Uri(url);
-                if (url.EndsWith("/")) url = url.Substring(0, url.Length - 1);
-
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                    Convert.ToBase64String(Encoding.UTF8.GetBytes(_user + ':' + _password)));
-
-                var result = client.GetAsync(url + ModelsBuilderApiController.GetTypeModelsUrl).Result;
-                result.EnsureSuccessStatusCode();
-
-                var formatters = new MediaTypeFormatter[] { new JsonMediaTypeFormatter() };
-                return result.Content.ReadAsAsync<IList<TypeModel>>(formatters).Result;
-            }
+            var text = result.Content.ReadAsStringAsync().Result;
+            throw new Exception(string.Format("Response status code does not indicate success ({0})\n{1}",
+                result.StatusCode, text));
         }
 
-        public IDictionary<string, string> GetModels(IDictionary<string, string> ourFiles, string modelsNamespace)
+        public void ValidateClientVersion()
         {
             // FIXME - add proxys support
 
             var hch = new HttpClientHandler();
-            //hch.Credentials = new NetworkCredential(user, password);
-
-            //var cookies = new CookieContainer();
-            //hch.CookieContainer = cookies;
-            //hch.UseCookies = true;
-
-            //hch.Proxy = new WebProxy("path.to.proxy", 8888);
-            //hch.UseProxy = true;
 
             using (var client = new HttpClient(hch))
             {
@@ -78,17 +48,81 @@ namespace Zbu.ModelsBuilder.AspNet
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
                     Convert.ToBase64String(Encoding.UTF8.GetBytes(_user + ':' + _password)));
 
-                ourFiles["__META__"] = modelsNamespace;
-                var result = client.PostAsync(url + ModelsBuilderApiController.GetModelsUrl, ourFiles, new JsonMediaTypeFormatter()).Result;
+                var clientVersion = typeof(TypeModel).Assembly.GetName().Version;
+                var result = client.PostAsync(url + ModelsBuilderApiController.ValidateClientVersionUrl, clientVersion, new JsonMediaTypeFormatter()).Result;
 
                 // this is not providing enough details in case of an error - do our own reporting
                 //result.EnsureSuccessStatusCode();
-                if (!result.IsSuccessStatusCode)
+                EnsureSuccess(result);
+            }
+        }
+
+        //public IList<TypeModel> GetTypeModels()
+        //{
+        //    // FIXME - add proxys support
+
+        //    var hch = new HttpClientHandler();
+        //    //hch.Credentials = new NetworkCredential(user, password);
+
+        //    //var cookies = new CookieContainer();
+        //    //hch.CookieContainer = cookies;
+        //    //hch.UseCookies = true;
+
+        //    //hch.Proxy = new WebProxy("path.to.proxy", 8888);
+        //    //hch.UseProxy = true;
+
+        //    using (var client = new HttpClient(hch))
+        //    {
+        //        var url = _url;
+        //        client.BaseAddress = new Uri(url);
+        //        if (url.EndsWith("/")) url = url.Substring(0, url.Length - 1);
+
+        //        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+        //            Convert.ToBase64String(Encoding.UTF8.GetBytes(_user + ':' + _password)));
+
+        //        var result = client.GetAsync(url + ModelsBuilderApiController.GetTypeModelsUrl).Result;
+        //        result.EnsureSuccessStatusCode();
+
+        //        var formatters = new MediaTypeFormatter[] { new JsonMediaTypeFormatter() };
+        //        return result.Content.ReadAsAsync<IList<TypeModel>>(formatters).Result;
+        //    }
+        //}
+
+        public IDictionary<string, string> GetModels(Dictionary<string, string> ourFiles, string modelsNamespace)
+        {
+            // FIXME - add proxys support
+
+            var hch = new HttpClientHandler();
+            //hch.Credentials = new NetworkCredential(user, password);
+
+            //var cookies = new CookieContainer();
+            //hch.CookieContainer = cookies;
+            //hch.UseCookies = true;
+
+            //hch.Proxy = new WebProxy("path.to.proxy", 8888);
+            //hch.UseProxy = true;
+
+            using (var client = new HttpClient(hch))
+            {
+                var url = _url;
+                client.BaseAddress = new Uri(url);
+                if (url.EndsWith("/")) url = url.Substring(0, url.Length - 1);
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+                    Convert.ToBase64String(Encoding.UTF8.GetBytes(_user + ':' + _password)));
+
+                var data = new ModelsBuilderApiController.GetModelsData
                 {
-                    var text = result.Content.ReadAsStringAsync().Result;
-                    throw new Exception(string.Format("Response status code does not indicate success ({0})\n{1}",
-                        result.StatusCode, text));
-                }
+                    Namespace = modelsNamespace,
+                    ClientVersion = typeof (TypeModel).Assembly.GetName().Version,
+                    Files = ourFiles
+                };
+
+                var result = client.PostAsync(url + ModelsBuilderApiController.GetModelsUrl, data, new JsonMediaTypeFormatter()).Result;
+
+                // this is not providing enough details in case of an error - do our own reporting
+                //result.EnsureSuccessStatusCode();
+                EnsureSuccess(result);
 
                 var formatters = new MediaTypeFormatter[] { new JsonMediaTypeFormatter() };
                 var genFiles = result.Content.ReadAsAsync<IDictionary<string, string>>(formatters).Result;

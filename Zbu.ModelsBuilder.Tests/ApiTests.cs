@@ -11,15 +11,15 @@ namespace Zbu.ModelsBuilder.Tests
     [TestFixture]
     public class ApiTests
     {
-        [Test]
-        [Ignore("That API has been disabled.")]
-        public void GetTypeModels()
-        {
-            // note - works only if the website does not reference types that are not
-            // referenced by the current test project!
-            var api = new ModelsBuilderApi("http://umbraco.local", "user", "password");
-            var res = api.GetTypeModels();
-        }
+        //[Test]
+        //[Ignore("That API has been disabled.")]
+        //public void GetTypeModels()
+        //{
+        //    // note - works only if the website does not reference types that are not
+        //    // referenced by the current test project!
+        //    var api = new ModelsBuilderApi("http://umbraco.local", "user", "password");
+        //    var res = api.GetTypeModels();
+        //}
 
         [Test]
         [Ignore("Requires a proper endpoint.")]

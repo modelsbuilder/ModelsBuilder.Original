@@ -34,10 +34,36 @@ namespace Zbu.ModelsBuilder.AspNet
     {
         public const string ZbuArea = "Zbu";
 
+        private static readonly Version ServerVersion = typeof(TypeModel).Assembly.GetName().Version;
+        private static readonly Version MinClientVersion = ServerVersion;
+        private static readonly Version MaxClientVersion = ServerVersion;
+
+        private static void AcceptClientVersion(Version clientVersion)
+        {
+            if (clientVersion < MinClientVersion || clientVersion > MaxClientVersion)
+                throw new Exception(string.Format("Client version ({0}) is not compatible with server version({1}).",
+                    clientVersion, ServerVersion));
+        }
+
         public class BuildResult
         {
             public bool Success;
             public string Message;
+        }
+
+        public class GetModelsData
+        {
+            public Version ClientVersion { get; set; }
+            public string Namespace { get; set; }
+            public IDictionary<string, string> Files { get; set; }
+        }
+
+        [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
+        [ModelsBuilderAuthFilter("developer")] // have to use our own, non-cookie-based, auth
+        public HttpResponseMessage ValidateClientVersion(Version clientVersion)
+        {
+            AcceptClientVersion(clientVersion); // or throw
+            return Request.CreateResponse(HttpStatusCode.OK, "OK", Configuration.Formatters.JsonFormatter);
         }
 
         // invoked by the dashboard
@@ -107,17 +133,16 @@ namespace Zbu.ModelsBuilder.AspNet
         //
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
         [ModelsBuilderAuthFilter("developer")] // have to use our own, non-cookie-based, auth
-        public HttpResponseMessage GetModels(IDictionary<string, string> ourFiles)
+        public HttpResponseMessage GetModels(GetModelsData data)
         {
+            AcceptClientVersion(data.ClientVersion); // or throw
+
             var umbraco = Application.GetApplication();
             var typeModels = umbraco.GetContentAndMediaTypes();
 
-            var modelsNamespace = ourFiles["__META__"];
-            ourFiles.Remove("__META__");
-
             var builder = new TextBuilder(typeModels);
-            builder.Namespace = modelsNamespace;
-            var disco = new CodeDiscovery().Discover(ourFiles);
+            builder.Namespace = data.Namespace;
+            var disco = new CodeDiscovery().Discover(data.Files);
             builder.Prepare(disco);
 
             var models = new Dictionary<string, string>();
@@ -177,8 +202,9 @@ namespace Zbu.ModelsBuilder.AspNet
         // ok, I just want the route to my controller, statically, so I can have it in the dashboard
         // which is not part of the MVC world... been through MSDN & StackOverflow & such for too long
         // without finding the solution - so it's hard-coded here in all its dirtyness.
+        public const string ValidateClientVersionUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi/ValidateClientVersion";
         public const string BuildModelsUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi/BuildModels";
-        public const string GetTypeModelsUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi/GetTypeModels";
+        //public const string GetTypeModelsUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi/GetTypeModels";
         public const string GetModelsUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi/GetModels";
     }
 }

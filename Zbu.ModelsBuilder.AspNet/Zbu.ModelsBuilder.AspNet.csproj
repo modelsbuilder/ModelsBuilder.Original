@@ -113,7 +113,7 @@
     <Compile Include="Initializer.cs" />
     <Compile Include="ModelsBuilderApi.cs" />
     <Compile Include="ModelsBuilderAuthFilter.cs" />
-    <Compile Include="ModelsBuilderController.cs" />
+    <Compile Include="ModelsBuilderApiController.cs" />
     <Compile Include="ModelsBuildProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
