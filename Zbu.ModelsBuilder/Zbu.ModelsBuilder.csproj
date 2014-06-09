@@ -95,6 +95,7 @@
     <Compile Include="PropertyModel.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="TextBuilder.cs" />
+    <Compile Include="TypeExtensions.cs" />
     <Compile Include="TypeModel.cs" />
     <Compile Include="IgnoreContentTypeAttribute.cs" />
     <Compile Include="IgnorePropertyTypeAttribute.cs" />

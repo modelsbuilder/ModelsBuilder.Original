@@ -78,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application.cs" />
+    <Compile Include="ConfigurePublishedContentModelFactory.cs" />
     <Compile Include="PackageActions\Configure.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PublishedContentModelUtility.cs" />
