@@ -1,17 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 
-namespace Zbu.ModelsBuilder
+namespace Zbu.ModelsBuilder.Build
 {
+    /// <summary>
+    /// Implements a builder that works by writing text.
+    /// </summary>
     public class TextBuilder : Builder
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TextBuilder"/> class with a list of models to generate.
+        /// </summary>
+        /// <param name="typeModels">The list of models to generate.</param>
         public TextBuilder(IList<TypeModel> typeModels)
             : base(typeModels)
         { }
 
+        /// <summary>
+        /// Outputs a generated model to a string builder.
+        /// </summary>
+        /// <param name="sb">The string builder.</param>
+        /// <param name="typeModel">The model to generate.</param>
         public void Generate(StringBuilder sb, TypeModel typeModel)
         {
             WriteHeader(sb);
@@ -28,6 +39,10 @@ namespace Zbu.ModelsBuilder
             sb.Append("}\n");
         }
 
+        /// <summary>
+        /// Outputs an "auto-generated" header to a string builder.
+        /// </summary>
+        /// <param name="sb">The string builder.</param>
         public void WriteHeader(StringBuilder sb)
         {
             sb.Append("//------------------------------------------------------------------------------\n");
@@ -42,7 +57,7 @@ namespace Zbu.ModelsBuilder
             sb.Append("\n");
         }
 
-        void WriteContentType(StringBuilder sb, TypeModel type)
+        private void WriteContentType(StringBuilder sb, TypeModel type)
         {
             string sep;
 
@@ -136,7 +151,7 @@ namespace Zbu.ModelsBuilder
             sb.Append("\t}\n");
         }
 
-        void WriteContentTypeProperties(StringBuilder sb, TypeModel type)
+        private void WriteContentTypeProperties(StringBuilder sb, TypeModel type)
         {
             // write the properties
             foreach (var prop in type.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.Name))
@@ -152,7 +167,7 @@ namespace Zbu.ModelsBuilder
                     WriteProperty(sb, prop);
         }
 
-        void WriteProperty(StringBuilder sb, PropertyModel property)
+        private void WriteProperty(StringBuilder sb, PropertyModel property)
         {
             sb.Append("\n");
 
@@ -172,7 +187,7 @@ namespace Zbu.ModelsBuilder
                 property.Alias);
         }
 
-        void WriteInterfaceProperty(StringBuilder sb, PropertyModel property)
+        private void WriteInterfaceProperty(StringBuilder sb, PropertyModel property)
         {
             sb.Append("\t\t");
             WriteClrType(sb, property.ClrType);
@@ -180,6 +195,7 @@ namespace Zbu.ModelsBuilder
                 property.Name);
         }
 
+        // internal for unit tests
         internal void WriteClrType(StringBuilder sb, Type type)
         {
             var s = type.ToString();
@@ -203,7 +219,7 @@ namespace Zbu.ModelsBuilder
             }
         }
 
-        void WriteNonGenericClrType(StringBuilder sb, string s)
+        private void WriteNonGenericClrType(StringBuilder sb, string s)
         {
             var ls = s.ToLowerInvariant();
             if (_typesMap.ContainsKey(ls))

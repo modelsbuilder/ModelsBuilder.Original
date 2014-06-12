@@ -19,6 +19,7 @@ using Umbraco.Core.IO;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Web.WebApi;
+using Zbu.ModelsBuilder.Build;
 using Application = Zbu.ModelsBuilder.Umbraco.Application;
 using User = Umbraco.Core.Models.Membership.User;
 
@@ -34,15 +35,16 @@ namespace Zbu.ModelsBuilder.AspNet
     {
         public const string ZbuArea = "Zbu";
 
-        private static readonly Version ServerVersion = typeof(TypeModel).Assembly.GetName().Version;
-        private static readonly Version MinClientVersion = ServerVersion;
-        private static readonly Version MaxClientVersion = ServerVersion;
+        private static readonly Version MinClientVersion = Builder.Version;
+        private static readonly Version MaxClientVersion = Builder.Version;
 
         private static void AcceptClientVersion(Version clientVersion)
         {
+            var serverVersion = Builder.Version;
+
             if (clientVersion < MinClientVersion || clientVersion > MaxClientVersion)
                 throw new Exception(string.Format("Client version ({0}) is not compatible with server version({1}).",
-                    clientVersion, ServerVersion));
+                    clientVersion, serverVersion));
         }
 
         public class BuildResult
@@ -142,7 +144,7 @@ namespace Zbu.ModelsBuilder.AspNet
 
             var builder = new TextBuilder(typeModels);
             builder.Namespace = data.Namespace;
-            var disco = new CodeDiscovery().Discover(data.Files);
+            var disco = new CodeParser().Parse(data.Files);
             builder.Prepare(disco);
 
             var models = new Dictionary<string, string>();
@@ -174,7 +176,7 @@ namespace Zbu.ModelsBuilder.AspNet
             var builder = new TextBuilder(typeModels);
             builder.Namespace = ns;
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
-            var disco = new CodeDiscovery().Discover(ourFiles);
+            var disco = new CodeParser().Parse(ourFiles);
             builder.Prepare(disco);
 
             foreach (var typeModel in builder.GetModelsToGenerate())
@@ -202,9 +204,10 @@ namespace Zbu.ModelsBuilder.AspNet
         // ok, I just want the route to my controller, statically, so I can have it in the dashboard
         // which is not part of the MVC world... been through MSDN & StackOverflow & such for too long
         // without finding the solution - so it's hard-coded here in all its dirtyness.
-        public const string ValidateClientVersionUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi/ValidateClientVersion";
-        public const string BuildModelsUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi/BuildModels";
+        private const string ControllerUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi";
+        public const string ValidateClientVersionUrl = ControllerUrl + "/ValidateClientVersion";
+        public const string BuildModelsUrl = ControllerUrl + "/BuildModels";
         //public const string GetTypeModelsUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi/GetTypeModels";
-        public const string GetModelsUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi/GetModels";
+        public const string GetModelsUrl = ControllerUrl + "/GetModels";
     }
 }

@@ -6,11 +6,21 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Zbu.ModelsBuilder
+namespace Zbu.ModelsBuilder.Build
 {
-    public class CodeDiscovery
+    /// <summary>
+    /// Implements code parsing.
+    /// </summary>
+    /// <remarks>Parses user's code and look for generator's instructions.</remarks>
+    public class CodeParser
     {
-        public DiscoveryResult Discover(IDictionary<string, string> files)
+        /// <summary>
+        /// Parses a set of file.
+        /// </summary>
+        /// <param name="files">A set of (filename,content) representing content to parse.</param>
+        /// <returns>A FIXME discovered in the files.</returns>
+        /// <remarks>The set of files is a dictionary of </remarks>
+        public DiscoveryResult Parse(IDictionary<string, string> files)
         {
             var options = new CSharpParseOptions();
             var trees = files.Select(x =>
@@ -41,7 +51,7 @@ namespace Zbu.ModelsBuilder
 
             var disco = new DiscoveryResult();
             foreach (var tree in trees)
-                Discover(disco, compilation, tree);
+                Parse(disco, compilation, tree);
 
             return disco;
         }
@@ -80,7 +90,7 @@ namespace Zbu.ModelsBuilder
             }
         }
 
-        private static void Discover(DiscoveryResult disco, CSharpCompilation compilation, SyntaxTree tree)
+        private static void Parse(DiscoveryResult disco, CSharpCompilation compilation, SyntaxTree tree)
         {
             var model = compilation.GetSemanticModel(tree);
 
@@ -90,7 +100,7 @@ namespace Zbu.ModelsBuilder
             var classDecls = tree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>();
             foreach (var classSymbol in classDecls.Select(x => model.GetDeclaredSymbol(x)))
             {
-                DiscoverClassSymbols(disco, classSymbol);
+                ParseClassSymbols(disco, classSymbol);
 
                 var baseClassSymbol = classSymbol.BaseType;
                 if (baseClassSymbol != null)
@@ -102,23 +112,23 @@ namespace Zbu.ModelsBuilder
                     interfaceSymbols.Select(x => x.Name)); //SymbolDisplay.ToDisplayString(x)));
 
                 foreach (var propertySymbol in classSymbol.GetMembers().Where(x => x is IPropertySymbol))
-                    DiscoverPropertySymbols(disco, classSymbol, propertySymbol);
+                    ParsePropertySymbols(disco, classSymbol, propertySymbol);
             }
 
             var interfaceDecls = tree.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>();
             foreach (var interfaceSymbol in interfaceDecls.Select(x => model.GetDeclaredSymbol(x)))
             {
-                DiscoverClassSymbols(disco, interfaceSymbol);
+                ParseClassSymbols(disco, interfaceSymbol);
 
                 var interfaceSymbols = interfaceSymbol.Interfaces;
                 disco.SetContentInterfaces(interfaceSymbol.Name, //SymbolDisplay.ToDisplayString(interfaceSymbol),
                     interfaceSymbols.Select(x => x.Name)); // SymbolDisplay.ToDisplayString(x)));
             }
 
-            DiscoverAssemblySymbols(disco, compilation.Assembly);
+            ParseAssemblySymbols(disco, compilation.Assembly);
         }
 
-        private static void DiscoverClassSymbols(DiscoveryResult disco, ISymbol symbol)
+        private static void ParseClassSymbols(DiscoveryResult disco, ISymbol symbol)
         {
             foreach (var attrData in symbol.GetAttributes())
             {
@@ -153,7 +163,7 @@ namespace Zbu.ModelsBuilder
             }
         }
 
-        private static void DiscoverPropertySymbols(DiscoveryResult disco, ISymbol classSymbol, ISymbol symbol)
+        private static void ParsePropertySymbols(DiscoveryResult disco, ISymbol classSymbol, ISymbol symbol)
         {
             foreach (var attrData in symbol.GetAttributes())
             {
@@ -174,7 +184,7 @@ namespace Zbu.ModelsBuilder
             }
         }
 
-        private static void DiscoverAssemblySymbols(DiscoveryResult disco, ISymbol symbol)
+        private static void ParseAssemblySymbols(DiscoveryResult disco, ISymbol symbol)
         {
             foreach (var attrData in symbol.GetAttributes())
             {

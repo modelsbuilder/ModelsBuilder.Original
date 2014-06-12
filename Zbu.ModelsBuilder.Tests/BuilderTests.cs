@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Zbu.ModelsBuilder;
+using Zbu.ModelsBuilder.Build;
 
 namespace Zbu.ModelsBuilder.Tests
 {
@@ -42,7 +43,7 @@ public class Whatever
 "}
             };
 
-            var disco = new CodeDiscovery().Discover(code);
+            var disco = new CodeParser().Parse(code);
             
             Assert.AreEqual("Dang.Whatever", disco.GetModelsBaseClassName("Otherwise"));
         }
@@ -58,7 +59,7 @@ using Zbu.ModelsBuilder;
 "}
             };
 
-            var disco = new CodeDiscovery().Discover(code);
+            var disco = new CodeParser().Parse(code);
 
             Assert.AreEqual("Foo.Bar.Nil", disco.GetModelsNamespace("Otherwise"));
         }
@@ -89,7 +90,7 @@ using Zbu.ModelsBuilder;
             };
 
             var builder = new TextBuilder(types);
-            var disco = new CodeDiscovery().Discover(code);
+            var disco = new CodeParser().Parse(code);
 
             var count = builder.Using.Count;
 
@@ -125,7 +126,7 @@ using Zbu.ModelsBuilder;
             };
 
             var builder = new TextBuilder(types);
-            var disco = new CodeDiscovery().Discover(code);
+            var disco = new CodeParser().Parse(code);
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 
@@ -181,7 +182,7 @@ using Zbu.ModelsBuilder;
             };
 
             var builder = new TextBuilder(types);
-            var disco = new CodeDiscovery().Discover(code);
+            var disco = new CodeParser().Parse(code);
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 
@@ -231,7 +232,7 @@ using Zbu.ModelsBuilder;
             };
 
             var builder = new TextBuilder(types);
-            var disco = new CodeDiscovery().Discover(code);
+            var disco = new CodeParser().Parse(code);
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 
@@ -282,7 +283,7 @@ using Zbu.ModelsBuilder;
             };
 
             var builder = new TextBuilder(types);
-            var disco = new CodeDiscovery().Discover(code);
+            var disco = new CodeParser().Parse(code);
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 
@@ -334,7 +335,7 @@ using Zbu.ModelsBuilder;
             };
 
             var builder = new TextBuilder(types);
-            var disco = new CodeDiscovery().Discover(code);
+            var disco = new CodeParser().Parse(code);
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 
@@ -393,7 +394,7 @@ namespace Models
             };
 
             var builder = new TextBuilder(types);
-            var disco = new CodeDiscovery().Discover(code);
+            var disco = new CodeParser().Parse(code);
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 
@@ -449,7 +450,7 @@ namespace Models
             };
 
             var builder = new TextBuilder(types);
-            var disco = new CodeDiscovery().Discover(code);
+            var disco = new CodeParser().Parse(code);
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 
@@ -509,7 +510,7 @@ namespace Models
             };
 
             var builder = new TextBuilder(types);
-            var disco = new CodeDiscovery().Discover(code);
+            var disco = new CodeParser().Parse(code);
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 
@@ -565,7 +566,7 @@ namespace Models
             };
 
             var builder = new TextBuilder(types);
-            var disco = new CodeDiscovery().Discover(code);
+            var disco = new CodeParser().Parse(code);
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 
@@ -614,7 +615,7 @@ namespace Models
             };
 
             var builder = new TextBuilder(types);
-            var disco = new CodeDiscovery().Discover(code);
+            var disco = new CodeParser().Parse(code);
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 
@@ -668,7 +669,7 @@ namespace Models
             };
 
             var builder = new TextBuilder(types);
-            var disco = new CodeDiscovery().Discover(code);
+            var disco = new CodeParser().Parse(code);
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 
@@ -718,7 +719,7 @@ namespace Models
             };
 
             var builder = new TextBuilder(types);
-            var disco = new CodeDiscovery().Discover(code);
+            var disco = new CodeParser().Parse(code);
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 
@@ -771,7 +772,7 @@ namespace Models
             };
 
             var builder = new TextBuilder(types);
-            var disco = new CodeDiscovery().Discover(code);
+            var disco = new CodeParser().Parse(code);
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 
@@ -809,7 +810,7 @@ namespace Models
             };
 
             var builder = new TextBuilder(types);
-            var disco = new CodeDiscovery().Discover(code);
+            var disco = new CodeParser().Parse(code);
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 

@@ -11,6 +11,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Strings;
+using Zbu.ModelsBuilder.Build;
 
 namespace Zbu.ModelsBuilder.Umbraco
 {

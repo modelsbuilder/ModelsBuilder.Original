@@ -2,23 +2,30 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Microsoft.CodeAnalysis.CSharp;
 
-namespace Zbu.ModelsBuilder
+namespace Zbu.ModelsBuilder.Build
 {
+    // NOTE
+    // The idea was to have different types of builder, because I wanted to experiment with
+    // building code with CodeDom. Turns out more complicated than I thought and maybe not
+    // worth it at the moment, to we're using TextBuilder and its Generate method is specific.
+    //
+    // Keeping the code as-is for the time being...
+
+    /// <summary>
+    /// Provides a base class for all builders.
+    /// </summary>
     public abstract class Builder
     {
-        public static readonly string Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        /// <summary>
+        /// Gets the assembly version of the builder, ie the ModelsBuilder version.
+        /// </summary>
+        public static readonly Version Version = Assembly.GetExecutingAssembly().GetName().Version;
 
         private readonly IList<TypeModel> _typeModels;
         protected DiscoveryResult Disco { get; private set; }
 
-        // for unit tests
-        internal IList<TypeModel> TypeModels { get { return _typeModels; } } 
-
-        public string Namespace { get; set; }
-        public IList<string> Using { get { return TypesUsing; } }
-
+        // the list of assemblies that will be 'using' by default
         protected readonly IList<string> TypesUsing = new List<string>
         {
             "System",
@@ -32,11 +39,48 @@ namespace Zbu.ModelsBuilder
             "Zbu.ModelsBuilder.Umbraco",
         };
 
+        /// <summary>
+        /// Gets or sets a value indicating the namespace to use for the models.
+        /// </summary>
+        public string Namespace { get; set; }
+
+        /// <summary>
+        /// Gets the list of assemblies to add to the set of 'using' assemblies in each model file.
+        /// </summary>
+        public IList<string> Using { get { return TypesUsing; } }
+
+        /// <summary>
+        /// Gets the list of models to generate.
+        /// </summary>
+        /// <returns>The models to generate, ie those that are not ignored.</returns>
+        public IEnumerable<TypeModel> GetModelsToGenerate()
+        {
+            return _typeModels.Where(x => !x.IsContentIgnored);
+        }
+
+        /// <summary>
+        /// Gets the list of all models.
+        /// </summary>
+        /// <remarks>Includes those that are ignored.</remarks>
+        internal IList<TypeModel> TypeModels { get { return _typeModels; } }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Builder"/> class with a list of models to generate.
+        /// </summary>
+        /// <param name="typeModels">The list of models to generate.</param>
         protected Builder(IList<TypeModel> typeModels)
         {
             _typeModels = typeModels;
         }
 
+        /// <summary>
+        /// Prepares generation by processing the result of existing code discovery.
+        /// </summary>
+        /// <param name="disco">The code discovery result.</param>
+        /// <remarks>
+        ///     Preparation includes figuring out from the existing code which models or properties should
+        ///     be ignored or renamed, etc. -- anything that comes from the attributes in the existing code.
+        /// </remarks>
         public void Prepare(DiscoveryResult disco)
         {
             Disco = disco;
@@ -77,11 +121,10 @@ namespace Zbu.ModelsBuilder
             }
 
             // ensure we have no duplicates type names
-            // fixme - indicate the media/content/member thing
             foreach (var xx in _typeModels.Where(x => !x.IsContentIgnored).GroupBy(x => x.Name).Where(x => x.Count() > 1))
-                throw new InvalidOperationException(string.Format("Type name \"{0}\" is used for types with alias {1}. Should be used for one type only.", 
+                throw new InvalidOperationException(string.Format("Type name \"{0}\" is used for {1}. Should be used for one type only.", 
                     xx.Key, 
-                    string.Join(", ", xx.Select(x => "\"" + x.Alias + "\""))));
+                    string.Join(", ", xx.Select(x => x.ItemType + ":\"" + x.Alias + "\""))));
 
             // ensure we have no duplicates property names
             foreach (var typeModel in _typeModels.Where(x => !x.IsContentIgnored))
@@ -130,11 +173,6 @@ namespace Zbu.ModelsBuilder
                 if (!TypesUsing.Contains(usingNamespace))
                     TypesUsing.Add(usingNamespace);
             }
-        }
-
-        public IEnumerable<TypeModel> GetModelsToGenerate()
-        {
-            return _typeModels.Where(x => !x.IsContentIgnored);
         }
     }
 }

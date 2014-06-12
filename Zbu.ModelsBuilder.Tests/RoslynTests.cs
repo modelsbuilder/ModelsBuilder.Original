@@ -7,6 +7,7 @@ using NUnit.Framework;
 using NUnit.Framework.Constraints;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Zbu.ModelsBuilder.Build;
 
 namespace Zbu.ModelsBuilder.Tests
 {

@@ -79,24 +79,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyUtility.cs" />
-    <Compile Include="Builder.cs" />
-    <Compile Include="CodeDomBuilder.cs" />
-    <Compile Include="CodeDiscovery.cs" />
+    <Compile Include="Build\Builder.cs" />
+    <Compile Include="Build\CodeDomBuilder.cs" />
+    <Compile Include="Build\CodeParser.cs" />
     <Compile Include="ImplementPropertyTypeAttribute.cs" />
     <Compile Include="ImplementContentTypeAttribute.cs" />
     <Compile Include="ModelsUsingAttribute.cs" />
     <Compile Include="ModelsBaseClassAttribute.cs" />
     <Compile Include="ModelsNamespaceAttribute.cs" />
     <Compile Include="RenameContentTypeAttribute.cs" />
-    <Compile Include="DiscoveryResult.cs" />
+    <Compile Include="Build\DiscoveryResult.cs" />
     <Compile Include="RenamePropertyTypeAttribute.cs" />
     <Compile Include="ModelPropertyAliasAttribute.cs" />
     <Compile Include="EnumerableExtensions.cs" />
-    <Compile Include="PropertyModel.cs" />
+    <Compile Include="Build\PropertyModel.cs" />
     <Compile Include="StringExtensions.cs" />
-    <Compile Include="TextBuilder.cs" />
+    <Compile Include="Build\TextBuilder.cs" />
     <Compile Include="TypeExtensions.cs" />
-    <Compile Include="TypeModel.cs" />
+    <Compile Include="Build\TypeModel.cs" />
     <Compile Include="IgnoreContentTypeAttribute.cs" />
     <Compile Include="IgnorePropertyTypeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using Microsoft.VisualStudio.Shell.Interop;
+using Zbu.ModelsBuilder.Build;
 using Zbu.ModelsBuilder.CustomTool.VisualStudio;
 
 namespace Zbu.ModelsBuilder.CustomTool.CustomTool

@@ -2,8 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Zbu.ModelsBuilder
+namespace Zbu.ModelsBuilder.Build
 {
+    // FIXME - it is actually BuildInstructions of some sort...
+
+    /// <summary>
+    /// Contains the result of a code discovery.
+    /// </summary>
     public class DiscoveryResult
     {
         // "alias" is the umbraco alias

@@ -1,20 +1,30 @@
-﻿using System;
-using System.CodeDom;
+﻿using System.CodeDom;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Zbu.ModelsBuilder
+namespace Zbu.ModelsBuilder.Build
 {
-    // FIXME - do NOT use that one as it is OBSOLETE 
+    // NOTE
+    // See nodes in Builder.cs class - that one does not work, is not complete,
+    // and was just some sort of experiment...
 
+    /// <summary>
+    /// Implements a builder that works by using CodeDom
+    /// </summary>
     public class CodeDomBuilder : Builder
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CodeDomBuilder"/> class with a list of models to generate.
+        /// </summary>
+        /// <param name="typeModels">The list of models to generate.</param>
         public CodeDomBuilder(IList<TypeModel> typeModels)
             : base(typeModels)
         { }
 
+        /// <summary>
+        /// Outputs a generated model to a code namespace.
+        /// </summary>
+        /// <param name="ns">The code namespace.</param>
+        /// <param name="typeModel">The model to generate.</param>
         public void Generate(CodeNamespace ns, TypeModel typeModel)
         {
             // what about USING?
@@ -97,6 +107,5 @@ namespace Zbu.ModelsBuilder
                 c.Members.Add(p);
             }
         }
-
     }
 }
