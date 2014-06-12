@@ -38,7 +38,7 @@ namespace Zbu.ModelsBuilder.AspNet
         private const string ControllerUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi";
 
         // indicate which versions of the client API are supported by this server's API.
-        private static readonly Version MinClientVersion = Builder.Version;
+        private static readonly Version MinClientVersion = new Version(1, 7, 0, 0);
         private static readonly Version MaxClientVersion = Builder.Version;
 
         #region Models
@@ -133,7 +133,7 @@ namespace Zbu.ModelsBuilder.AspNet
                 return checkResult.Result;
 
             var umbraco = Application.GetApplication();
-            var typeModels = umbraco.GetContentAndMediaTypes();
+            var typeModels = umbraco.GetAllTypes();
 
             var builder = new TextBuilder(typeModels);
             builder.Namespace = data.Namespace;
@@ -183,7 +183,7 @@ namespace Zbu.ModelsBuilder.AspNet
                 File.Delete(file);
 
             var umbraco = Application.GetApplication();
-            var typeModels = umbraco.GetContentAndMediaTypes();
+            var typeModels = umbraco.GetAllTypes();
 
             var ns = Config.ModelsNamespace;
             if (string.IsNullOrWhiteSpace(ns)) ns = "Umbraco.Web.PublishedContentModels";
