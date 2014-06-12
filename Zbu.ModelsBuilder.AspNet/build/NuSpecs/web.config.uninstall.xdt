@@ -5,7 +5,16 @@
 		  <assemblies>
   			<add assembly="System.Runtime, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" 
            xdt:Transform="Remove" xdt:Locator="Match(assembly)"/>
-		  </assemblies>
+        <add assembly="Zbu.ModelsBuilder"
+          xdt:Transform="Remove" xdt:Locator="Match(assembly)" />
+      </assemblies>
+      <buildProviders>
+        <remove extension=".cshtml"
+          xdt:Transform="Remove" /> <!-- FIXME must indicate which to remove?! -->
+        <!-- xdt:Locator="XPath(./next-sibling [@extension='.cshtml' and @type='Zbu.ModelsBuilder.AspNet.RazorBuildProvider, Zbu.ModelsBuilder.AspNet']" -->
+        <add extension=".cshtml" type="Zbu.ModelsBuilder.AspNet.RazorBuildProvider, Zbu.ModelsBuilder.AspNet"
+          xdt:Transform="Remove" xdt:Locator="Match(extension,type)"/>
+      </buildProviders>
 		</compilation>
 	</system.web>
 </configuration>

@@ -11,6 +11,16 @@ using Zbu.ModelsBuilder.Configuration;
 
 namespace Zbu.ModelsBuilder.AspNet
 {
+    /*
+        <remove extension=".models"/>
+        <add extension=".models" type="Zbu.ModelsBuilder.AspNet.ModelsBuildProvider, Zbu.ModelsBuilder.AspNet"/>
+    */
+
+    // NOTE
+    // This build provider is NOT installed in web.config as shown above
+    // It is installed at runtime by the Initializer class, if required (depends on config)
+
+    [BuildProviderAppliesTo(BuildProviderAppliesTo.Code)]
     public class ModelsBuildProvider : BuildProvider
     {
         // see http://msdn.microsoft.com/en-us/library/system.web.compilation.assemblybuilder.createcodefile%28v=vs.90%29.ASPX
@@ -43,7 +53,7 @@ namespace Zbu.ModelsBuilder.AspNet
                 throw new Exception("Could not find ~/App_Data.");
             var modelsDirectory = Path.Combine(appData, "Models");
             if (!Directory.Exists(modelsDirectory))
-                Directory.CreateDirectory(modelsDirectory);
+                return;
 
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.cs"))
             {

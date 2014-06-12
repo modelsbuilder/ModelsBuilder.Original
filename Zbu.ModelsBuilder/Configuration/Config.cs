@@ -13,6 +13,8 @@ namespace Zbu.ModelsBuilder.Configuration
         // fixme - the UmbracoPackage should add the .models BuildProvider
         // fixme - we should have our own config section
         // fixme - should ask questions when installing?
+        // fixme - should check that the config actually makes sense?
+        //         can't enable both AppCode and Live models?
 
         /// <summary>
         /// Gets a value indicating whether "App_Code models" are enabled. 
