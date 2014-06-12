@@ -242,9 +242,7 @@ namespace Zbu.ModelsBuilder.Umbraco
 
         #region Services
 
-        // fixme - support the member types too
-
-        public IList<TypeModel> GetContentAndMediaTypes()
+        public IList<TypeModel> GetAllTypes()
         {
             //if (_standalone && _umbracoApplication == null)
             //    throw new InvalidOperationException("Application is not ready.");

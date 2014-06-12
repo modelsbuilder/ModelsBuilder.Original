@@ -9,7 +9,7 @@
           xdt:Transform="Insert" xdt:Locator="Match(assembly)" />
 		  </assemblies>
       <buildProviders>
-        <add extension=".models" type="Zbu.ModelsBuilder.AspNet.ModelsBuilderProvider, Zbu.ModelsBuilder.AspNet"
+        <add extension=".models" type="Zbu.ModelsBuilder.AspNet.ModelsBuildProvider, Zbu.ModelsBuilder.AspNet"
           xdt:Transform="Insert" />
         <!-- Insert actually appends to these two will go to the bottom of the list & replace the .cshtml provider -->
         <remove extension=".cshtml"
