@@ -7,13 +7,6 @@
         // <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
         // <umb:CssInclude runat="server" FilePath="propertypane/style.css" PathNameAlias="UmbracoClient" />
 
-        var ver = Umbraco.Core.Configuration.UmbracoVersion.Current;
-        if (ver.Major >= 7) return;
-        var css = new ClientDependency.Core.Controls.CssInclude();
-        css.FilePath = "propertypane/style.css";
-        css.PathNameAlias = "UmbracoClient";
-        Page.Controls.Add(css);
-
         phGenerate.Visible = Config.EnableAppDataModels;
         phGenerateWarning.Visible = Config.EnableAppCodeModels;
 
@@ -26,6 +19,18 @@
         if (Config.EnablePublishedContentModelsFactory) sb.Append(" +EnablePublishedContentModelsFactory");
         sb.AppendFormat("<br />Config.ModelsNameSpace: \"{0}\"", Config.ModelsNamespace);
         txtReport.Text = sb.ToString();
+
+        var ver = Umbraco.Core.Configuration.UmbracoVersion.Current;        
+        if (ver.Major == 6)
+            Umbraco6();
+    }
+
+    private void Umbraco6()
+    {
+        var css = new ClientDependency.Core.Controls.CssInclude();
+        css.FilePath = "propertypane/style.css";
+        css.PathNameAlias = "UmbracoClient";
+        Page.Controls.Add(css);
     }
 </script>
 
@@ -76,18 +81,20 @@
                     <asp:Literal runat="server" ID="txtReport" />
                 </div>
                 <asp:PlaceHolder runat="server" ID="phGenerate">
-				    <div id="generateModelsPane" style="min-height: 240px; margin-top: 24px;">
-					    <p>Click button to generate models.</p>
-                        <asp:PlaceHolder runat="server" ID="phGenerateWarning">
-                            <p style="color:red;">Beware! This will restart the application.</p>
-                        </asp:PlaceHolder>
-						<p><button id="generateModels">Generate</button></p>
-				    </div>
-				    <div style="display:none;min-height: 240px;" id="generateModelsRun">
-					    <span id="generateModelsRunMessage">Please wait...</span>
-					    <br />&nbsp;<br />
-					    <span id="generateModelsRunProgress" style="color:#999999;"/>
-				    </div>
+                    <div style="margin-top: 24px;">
+				        <div id="generateModelsPane" style="min-height: 240px;">
+					        <p>Click button to generate models.</p>
+                            <asp:PlaceHolder runat="server" ID="phGenerateWarning">
+                                <p style="color:red;">Beware! This will restart the application.</p>
+                            </asp:PlaceHolder>
+						    <p><button id="generateModels">Generate</button></p>
+				        </div>
+				        <div style="display:none;min-height: 240px;" id="generateModelsRun">
+					        <span id="generateModelsRunMessage">Please wait...</span>
+					        <br />&nbsp;<br />
+					        <span id="generateModelsRunProgress" style="color:#999999;"/>
+				        </div>
+                    </div>
                 </asp:PlaceHolder>
 			</div>
 		</div>
