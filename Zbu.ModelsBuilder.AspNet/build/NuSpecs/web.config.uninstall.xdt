@@ -9,6 +9,8 @@
           xdt:Transform="Remove" xdt:Locator="Match(assembly)" />
       </assemblies>
       <buildProviders>
+        <add extension=".models" type="Zbu.ModelsBuilder.AspNet.ModelsBuildProvider, Zbu.ModelsBuilder.AspNet"
+          xdt:Transform="Insert" />
         <remove extension=".cshtml"
           xdt:Transform="Remove" /> <!-- FIXME must indicate which to remove?! -->
         <!-- xdt:Locator="XPath(./next-sibling [@extension='.cshtml' and @type='Zbu.ModelsBuilder.AspNet.RazorBuildProvider, Zbu.ModelsBuilder.AspNet']" -->
