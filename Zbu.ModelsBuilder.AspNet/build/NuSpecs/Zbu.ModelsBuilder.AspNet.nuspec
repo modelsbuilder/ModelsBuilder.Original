@@ -12,12 +12,11 @@
 		<copyright>Copyright © Pilotine - ZpqrtBnk 2013-2014</copyright>
 		<dependencies>
 			<dependency id="Microsoft.CodeAnalysis.CSharp" version="0.6.4033103-beta" />
-		</dependencies>
+      <dependency id="Zbu.ModelsBuilder.Umbraco" version="$version$" />
+    </dependencies>
 	</metadata>
 	<files>
     <!-- our dlls -->
-    <file src="..\..\bin\Release\Zbu.ModelsBuilder.dll" target="lib\Zbu.ModelsBuilder.dll" />
-    <file src="..\..\bin\Release\Zbu.ModelsBuilder.Umbraco.dll" target="lib\Zbu.ModelsBuilder.Umbraco.dll" />
     <file src="..\..\bin\Release\Zbu.ModelsBuilder.AspNet.dll" target="lib\Zbu.ModelsBuilder.AspNet.dll" />
 
     <!-- content for the dashboard -->

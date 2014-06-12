@@ -2,6 +2,11 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <!-- see notes in AspNet csproj -->
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <MSBuildUmbracoTasksPath>$(SolutionDir)\lib</MSBuildUmbracoTasksPath>
+  </PropertyGroup>
+  <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{BA9B7672-C446-4001-BB64-2B6ABE7A42F2}</ProjectGuid>
@@ -92,14 +97,36 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="build\NuSpecs\Zbu.ModelsBuilder.Umbraco.nuspec" />
     <None Include="Key.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
   -->
+  <Target Name="AfterBuild" DependsOnTargets="NuGetPackage">
+  </Target>
+  <!-- auto by NuGet: DependsOnTargets="BuildPackage" -->
+  <Target Name="NuGetPackage">
+    <GetAssemblyIdentity AssemblyFiles="$(OutputPath)Zbu.ModelsBuilder.dll">
+      <Output TaskParameter="Assemblies" ItemName="AssemblyInfos" />
+    </GetAssemblyIdentity>
+    <Message Importance="High" Text="Packaging version %(AssemblyInfos.Version) into NuGet package" />
+    <ItemGroup>
+      <NuGetFilesToDelete Include="$(ProjectDir)build\Packages\*.nupkg" />
+    </ItemGroup>
+    <Delete Files="@(NuGetFilesToDelete)" />
+    <PropertyGroup>
+      <!-- -symbols -->
+      <NuGetBuildCommand>$(NuGetCommand) pack "$(ProjectDir)build\NuSpecs\Zbu.ModelsBuilder.Umbraco.nuspec" -Version "%(AssemblyInfos.Version)-pre" -Properties "Configuration=$(Configuration);Platform=$(Platform)" $(NonInteractiveSwitch) -OutputDirectory "$(ProjectDir)build\Packages"</NuGetBuildCommand>
+    </PropertyGroup>
+    <Exec Command="$(NuGetBuildCommand)" LogStandardErrorAsError="true" />
+    <ItemGroup>
+      <NuGetFilesToCopy Include="$(ProjectDir)build\Packages\*.nupkg" />
+    </ItemGroup>
+    <Copy SourceFiles="@(NuGetFilesToCopy)" DestinationFolder="$(SolutionDir)build\$(Configuration)" />
+  </Target>
 </Project>
