@@ -134,6 +134,10 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="UserControls\Zbu\ModelsBuilder\logo32x32.png" />
+    <None Include="build\NuSpecs\dashboard.config.install.xdt" />
+    <None Include="build\NuSpecs\dashboard.config.uninstall.xdt" />
+    <None Include="build\NuSpecs\web.config.install.xdt" />
+    <None Include="build\NuSpecs\web.config.uninstall.xdt" />
     <None Include="build\NuSpecs\Zbu.ModelsBuilder.AspNet.nuspec">
       <SubType>Designer</SubType>
     </None>

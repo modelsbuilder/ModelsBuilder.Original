@@ -22,13 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zbu.ModelsBuilder.Console",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{C7535949-9EEE-4711-8351-0CA8EB32DBE6}"
 	ProjectSection(SolutionItems) = preProject
-		Zbu.ModelsBuilder.AspNet\build\NuSpecs\dashboard.config.install.xdt = Zbu.ModelsBuilder.AspNet\build\NuSpecs\dashboard.config.install.xdt
-		Zbu.ModelsBuilder.AspNet\build\NuSpecs\dashboard.config.uninstall.xdt = Zbu.ModelsBuilder.AspNet\build\NuSpecs\dashboard.config.uninstall.xdt
 		license.txt = license.txt
 		readme.md = readme.md
-		Zbu.ModelsBuilder.AspNet\build\NuSpecs\web.config.install.xdt = Zbu.ModelsBuilder.AspNet\build\NuSpecs\web.config.install.xdt
-		Zbu.ModelsBuilder.AspNet\build\NuSpecs\web.config.uninstall.xdt = Zbu.ModelsBuilder.AspNet\build\NuSpecs\web.config.uninstall.xdt
-		Zbu.ModelsBuilder.AspNet\build\NuSpecs\Zbu.ModelsBuilder.AspNet.nuspec = Zbu.ModelsBuilder.AspNet\build\NuSpecs\Zbu.ModelsBuilder.AspNet.nuspec
 	EndProjectSection
 EndProject
 Global
