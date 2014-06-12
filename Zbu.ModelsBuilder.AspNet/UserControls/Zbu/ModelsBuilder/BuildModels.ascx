@@ -1,4 +1,5 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" %>
+<%@ Import Namespace="Zbu.ModelsBuilder.Configuration" %>
 
 <script runat="server">
     protected override void OnLoad(EventArgs e)
@@ -12,6 +13,19 @@
         css.FilePath = "propertypane/style.css";
         css.PathNameAlias = "UmbracoClient";
         Page.Controls.Add(css);
+
+        phGenerate.Visible = Config.EnableAppDataModels;
+        phGenerateWarning.Visible = Config.EnableAppCodeModels;
+
+        var sb = new StringBuilder();
+        sb.Append("Config: ");
+        if (Config.EnableApi) sb.Append(" +EnableApi");
+        if (Config.EnableAppDataModels) sb.Append(" +EnableAppDataModels");
+        if (Config.EnableAppCodeModels) sb.Append(" +EnableAppCodeModels");
+        if (Config.EnableLiveModels) sb.Append(" +EnableLiveModels");
+        if (Config.EnablePublishedContentModelsFactory) sb.Append(" +EnablePublishedContentModelsFactory");
+        sb.AppendFormat("<br />Config.ModelsNameSpace: \"{0}\"", Config.ModelsNamespace);
+        txtReport.Text = sb.ToString();
     }
 </script>
 
@@ -56,22 +70,25 @@
 	<div>
 		<div class="propertyItem">
 			<div class="dashboardWrapper">
-				<h2>Generate Models</h2>
+				<h2>Zbu.ModelsBuilder</h2>
 				<img class="dashboardIcon" alt="Umbraco" src="/UserControls/Zbu/ModelsBuilder/logo32x32.png">
-				<div id="generateModelsPane" style="min-height: 240px;">
-					<p>Click to generate models. 
-                        <%=ConfigurationManager.AppSettings["Zbu.ModelsBuilder.AspNet.BuildModels"] == "true" 
-                            ? "Beware! It will restart the application." : "" %>
-                        </p>
-					<p>
-						<button id="generateModels">Generate</button>
-					</p>
-				</div>
-				<div style="display:none;min-height: 240px;" id="generateModelsRun">
-					<span id="generateModelsRunMessage">Please wait...</span>
-					<br />&nbsp;<br />
-					<span id="generateModelsRunProgress" style="color:#999999;"/>
-				</div>
+                <div style="margin-top: 24px;">
+                    <asp:Literal runat="server" ID="txtReport" />
+                </div>
+                <asp:PlaceHolder runat="server" ID="phGenerate">
+				    <div id="generateModelsPane" style="min-height: 240px; margin-top: 24px;">
+					    <p>Click button to generate models.</p>
+                        <asp:PlaceHolder runat="server" ID="phGenerateWarning">
+                            <p style="color:red;">Beware! This will restart the application.</p>
+                        </asp:PlaceHolder>
+						<p><button id="generateModels">Generate</button></p>
+				    </div>
+				    <div style="display:none;min-height: 240px;" id="generateModelsRun">
+					    <span id="generateModelsRunMessage">Please wait...</span>
+					    <br />&nbsp;<br />
+					    <span id="generateModelsRunProgress" style="color:#999999;"/>
+				    </div>
+                </asp:PlaceHolder>
 			</div>
 		</div>
 	</div>

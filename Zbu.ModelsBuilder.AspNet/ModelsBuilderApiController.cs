@@ -20,6 +20,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Web.WebApi;
 using Zbu.ModelsBuilder.Build;
+using Zbu.ModelsBuilder.Configuration;
 using Application = Zbu.ModelsBuilder.Umbraco.Application;
 using User = Umbraco.Core.Models.Membership.User;
 
@@ -34,18 +35,13 @@ namespace Zbu.ModelsBuilder.AspNet
     public class ModelsBuilderApiController : UmbracoApiController //UmbracoAuthorizedApiController
     {
         public const string ZbuArea = "Zbu";
+        private const string ControllerUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi";
 
+        // indicate which versions of the client API are supported by this server's API.
         private static readonly Version MinClientVersion = Builder.Version;
         private static readonly Version MaxClientVersion = Builder.Version;
 
-        private static void AcceptClientVersion(Version clientVersion)
-        {
-            var serverVersion = Builder.Version;
-
-            if (clientVersion < MinClientVersion || clientVersion > MaxClientVersion)
-                throw new Exception(string.Format("Client version ({0}) is not compatible with server version({1}).",
-                    clientVersion, serverVersion));
-        }
+        #region Models
 
         public class BuildResult
         {
@@ -60,18 +56,28 @@ namespace Zbu.ModelsBuilder.AspNet
             public IDictionary<string, string> Files { get; set; }
         }
 
+        #endregion
+
+        #region Actions
+
+        // invoked by the API
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
         [ModelsBuilderAuthFilter("developer")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage ValidateClientVersion(Version clientVersion)
         {
-            AcceptClientVersion(clientVersion); // or throw
-            return Request.CreateResponse(HttpStatusCode.OK, "OK", Configuration.Formatters.JsonFormatter);
+            if (!Config.EnableApi)
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "API is not enabled.");
+
+            var checkResult = CheckVersion(clientVersion);
+            return (checkResult.Success
+                ? Request.CreateResponse(HttpStatusCode.OK, "OK", Configuration.Formatters.JsonFormatter)
+                : checkResult.Result);
         }
 
+        public const string ValidateClientVersionUrl = ControllerUrl + "/ValidateClientVersion";
+
         // invoked by the dashboard
-        // requires that the user is logged into the backoffice
-        // and has access to the developer section
-        //
+        // requires that the user is logged into the backoffice and has access to the developer section
         [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
         [global::Umbraco.Web.WebApi.UmbracoAuthorize] // can use Umbraco's
         public HttpResponseMessage BuildModels()
@@ -97,8 +103,7 @@ namespace Zbu.ModelsBuilder.AspNet
 
                 GenerateModels(appData);
 
-                var buildModels = ConfigurationManager.AppSettings["Zbu.ModelsBuilder.AspNet.BuildModels"] == "true";
-                if (buildModels)
+                if (Config.EnableAppCodeModels)
                     TouchModelsFile(appCode); // will recycle the app domain - but this request will end properly
 
                 var result = new BuildResult {Success = true};
@@ -113,31 +118,19 @@ namespace Zbu.ModelsBuilder.AspNet
             }
         }
 
-        // invoked by the API
-        // DISABLED - works but useless, because if we return type models that
-        // reference some Clr types that exist only on the server and not in the
-        // remove app, then what can we do with them? Better do everything on
-        // the server.
-        //
-        //[System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
-        //[ModelsBuilderAuthFilter("developer")] // have to use our own, non-cookie-based, auth
-        //public HttpResponseMessage GetTypeModels()
-        //{
-        //    var umbraco = Application.GetApplication();
-        //    var modelTypes = umbraco.GetContentAndMediaTypes();
-
-        //    return Request.CreateResponse(HttpStatusCode.OK, modelTypes, Configuration.Formatters.JsonFormatter);
-        //}
+        public const string BuildModelsUrl = ControllerUrl + "/BuildModels";
 
         // invoked by the API
-        // wich should log the user in using basic auth
-        // and then the user must have access to the developer section
-        //
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
         [ModelsBuilderAuthFilter("developer")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage GetModels(GetModelsData data)
         {
-            AcceptClientVersion(data.ClientVersion); // or throw
+            if (!Config.EnableApi)
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "API is not enabled.");
+
+            var checkResult = CheckVersion(data.ClientVersion);
+            if (!checkResult.Success)
+                return checkResult.Result;
 
             var umbraco = Application.GetApplication();
             var typeModels = umbraco.GetContentAndMediaTypes();
@@ -158,6 +151,28 @@ namespace Zbu.ModelsBuilder.AspNet
             return Request.CreateResponse(HttpStatusCode.OK, models, Configuration.Formatters.JsonFormatter);
         }
 
+        public const string GetModelsUrl = ControllerUrl + "/GetModels";
+
+        // invoked by the API
+        // DISABLED - works but useless, because if we return type models that
+        // reference some Clr types that exist only on the server and not in the
+        // remove app, then what can we do with them? Better do everything on
+        // the server.
+        //
+        //[System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
+        //[ModelsBuilderAuthFilter("developer")] // have to use our own, non-cookie-based, auth
+        //public HttpResponseMessage GetTypeModels()
+        //{
+        //    var umbraco = Application.GetApplication();
+        //    var modelTypes = umbraco.GetContentAndMediaTypes();
+
+        //    return Request.CreateResponse(HttpStatusCode.OK, modelTypes, Configuration.Formatters.JsonFormatter);
+        //}
+        //
+        //public const string GetTypeModelsUrl = ControllerUrl + "/GetTypeModels";
+
+        #endregion
+
         private static void GenerateModels(string appData)
         {
             var modelsDirectory = Path.Combine(appData, "Models");
@@ -170,7 +185,7 @@ namespace Zbu.ModelsBuilder.AspNet
             var umbraco = Application.GetApplication();
             var typeModels = umbraco.GetContentAndMediaTypes();
 
-            var ns = ConfigurationManager.AppSettings["Zbu.ModelsBuilder.ModelsNamespace"];
+            var ns = Config.ModelsNamespace;
             if (string.IsNullOrWhiteSpace(ns)) ns = "Umbraco.Web.PublishedContentModels";
 
             var builder = new TextBuilder(typeModels);
@@ -200,14 +215,14 @@ namespace Zbu.ModelsBuilder.AspNet
             File.WriteAllText(modelsFile, text);
         }
 
-        // FIXME - what would be the proper way to get these urls without hard-coding them?
-        // ok, I just want the route to my controller, statically, so I can have it in the dashboard
-        // which is not part of the MVC world... been through MSDN & StackOverflow & such for too long
-        // without finding the solution - so it's hard-coded here in all its dirtyness.
-        private const string ControllerUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi";
-        public const string ValidateClientVersionUrl = ControllerUrl + "/ValidateClientVersion";
-        public const string BuildModelsUrl = ControllerUrl + "/BuildModels";
-        //public const string GetTypeModelsUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi/GetTypeModels";
-        public const string GetModelsUrl = ControllerUrl + "/GetModels";
+        private Attempt<HttpResponseMessage> CheckVersion(Version clientVersion)
+        {
+            var serverVersion = Builder.Version;
+            var isOk = clientVersion >= MinClientVersion && clientVersion <= MaxClientVersion;
+            var response = isOk ? null : Request.CreateResponse(HttpStatusCode.Forbidden, string.Format(
+                "API version conflict: client version ({0}) is not compatible with server version({1}).",
+                clientVersion, serverVersion));
+            return Attempt<HttpResponseMessage>.SucceedIf(isOk, response);
+        }
     }
 }

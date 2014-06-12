@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
+using Zbu.ModelsBuilder.Configuration;
 
 namespace Zbu.ModelsBuilder.Umbraco
 {
@@ -13,7 +8,8 @@ namespace Zbu.ModelsBuilder.Umbraco
     {
         protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
-            if (ConfigurationManager.AppSettings["Zbu.ModelsBuilder.AspNet.ConfigureFactoryResolver"] == "false") return;
+            if (!Config.EnablePublishedContentModelsFactory)
+                return;
 
             var types = PluginManager.Current.ResolveTypes<PublishedContentModel>();
             var factory = new PublishedContentModelFactory(types);

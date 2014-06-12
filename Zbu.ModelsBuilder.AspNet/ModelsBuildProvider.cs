@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Compilation;
 using System.Web.Hosting;
+using Zbu.ModelsBuilder.Configuration;
 
 namespace Zbu.ModelsBuilder.AspNet
 {
@@ -32,12 +33,17 @@ namespace Zbu.ModelsBuilder.AspNet
         {
             // issue: I can't put my files into App_Code or they'll get... compiled... too soon?
 
+            if (!Config.EnableAppCodeModels)
+                throw new Exception("Building models from App_Code is not enabled, yet a .models file was found in App_Code.");
+
             var appData = HostingEnvironment.MapPath("~/App_Data");
             if (appData == null)
-                throw new Exception("Panic: appData is null.");
+                throw new Exception("Could not map path ~/App_Data.");
+            if (!Directory.Exists(appData))
+                throw new Exception("Could not find ~/App_Data.");
             var modelsDirectory = Path.Combine(appData, "Models");
             if (!Directory.Exists(modelsDirectory))
-                return;
+                Directory.CreateDirectory(modelsDirectory);
 
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.cs"))
             {
