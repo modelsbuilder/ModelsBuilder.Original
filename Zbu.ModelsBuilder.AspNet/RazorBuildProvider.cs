@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Web.Compilation;
 using System.Web.Hosting;
+using Zbu.ModelsBuilder.Build;
 using Zbu.ModelsBuilder.Configuration;
+using Zbu.ModelsBuilder.Umbraco;
 
 namespace Zbu.ModelsBuilder.AspNet
 {
@@ -19,6 +24,10 @@ namespace Zbu.ModelsBuilder.AspNet
     [BuildProviderAppliesTo(BuildProviderAppliesTo.Web | BuildProviderAppliesTo.Code)]
     public class RazorBuildProvider : System.Web.WebPages.Razor.RazorBuildProvider
     {
+        private static readonly object LockO = new object();
+        private static bool _triedToGetModelsAssemblyAlready;
+        private static Assembly _modelsAssembly;
+
         public override void GenerateCode(AssemblyBuilder assemblyBuilder)
         {
             // if live models are enabled, compile & add assembly
@@ -30,38 +39,70 @@ namespace Zbu.ModelsBuilder.AspNet
 
         private static void AddModelsAssemblyReference(AssemblyBuilder assemblyBuilder)
         {
+            lock (LockO)
+            {
+                if (_modelsAssembly == null && !_triedToGetModelsAssemblyAlready)
+                    _modelsAssembly = GetModelsAssembly();
+                _triedToGetModelsAssemblyAlready = true;
+            }
+            if (_modelsAssembly != null)
+                assemblyBuilder.AddAssemblyReference(_modelsAssembly);
+        }
+
+        private static Assembly GetModelsAssembly()
+        {
             // ensure we have a proper App_Data directory
             var appData = HostingEnvironment.MapPath("~/App_Data");
-            if (appData == null || !Directory.Exists(appData)) return;
+            if (appData == null || !Directory.Exists(appData)) return null;
 
-            // FIXME - but obviously we'd want to cache the assembly
-            // FIXME - and have an event trigger when anything changes
+            //// ensure we have a models directory and it's not empty
+            //var modelsDirectory = Path.Combine(appData, "Models");
+            //if (!Directory.Exists(modelsDirectory)) return null;
+            //var files = Directory.GetFiles(modelsDirectory, "*.cs");
+            //if (files.Length == 0) return null;
 
-            // ensure we have a models directory and it's not empty
-            var modelsDirectory = Path.Combine(appData, "Models");
-            if (!Directory.Exists(modelsDirectory)) return;
-            var files = Directory.GetFiles(modelsDirectory, "*.cs");
-            if (files.Length == 0) return;
+            //// concatenate all code files into one
+            //var code = new StringBuilder();
+            //foreach (var file in files)
+            //{
+            //    code.AppendFormat("// FILE: {0}\n\n", file);
+            //    var text = File.ReadAllText(file);
+            //    code.Append(text);
+            //    code.Append("\n\n");
+            //}
 
-            // concatenate all code files into one
+            var umbraco = Application.GetApplication();
+            var typeModels = umbraco.GetAllTypes();
+
+            var ns = Config.ModelsNamespace;
+            if (string.IsNullOrWhiteSpace(ns)) ns = "Umbraco.Web.PublishedContentModels";
+
+            var builder = new TextBuilder(typeModels);
+            builder.Namespace = ns;
+            var disco = new CodeParser().Parse(new Dictionary<string, string>());
+            builder.Prepare(disco);
+
             var code = new StringBuilder();
-            foreach (var file in files)
-            {
-                code.AppendFormat("// FILE: {0}\n\n", file);
-                var text = File.ReadAllText(file);
-                code.Append(text);
-                code.Append("\n\n");
-            }
+            builder.Generate(code, builder.GetModelsToGenerate());
+
+            // NOTE
+            // would be interesting to figure out whether we can compile that code
+            // using Roslyn...
 
             // write the code to a temp file
-            var temp = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".cs");
+            // cannot be in Path.GetTempPath() because GetCompiledAssembly wants code in the website
+            //var temp = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".cs");
+            //var virttemp = "~/App_Data/Models/tmp." + Guid.NewGuid() + ".cs";
+            var virttemp = "~/App_Data/tmp." + Guid.NewGuid() + ".cs";
+            var temp = HostingEnvironment.MapPath(virttemp);
+            if (temp == null)
+                throw new Exception("Failed to map temp file.");
             File.WriteAllText(temp, code.ToString());
 
             try
             {
-                // get the compiled assembly and add as a reference
-                var assembly = BuildManager.GetCompiledAssembly(temp);
-                assemblyBuilder.AddAssemblyReference(assembly);
+                // get the compiled assembly
+                return BuildManager.GetCompiledAssembly(virttemp);
             }
             finally
             {

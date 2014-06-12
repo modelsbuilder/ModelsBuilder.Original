@@ -40,6 +40,31 @@ namespace Zbu.ModelsBuilder.Build
         }
 
         /// <summary>
+        /// Outputs generated models to a string builder.
+        /// </summary>
+        /// <param name="sb">The string builder.</param>
+        /// <param name="typeModels">The models to generate.</param>
+        public void Generate(StringBuilder sb, IEnumerable<TypeModel> typeModels)
+        {
+            WriteHeader(sb);
+
+            foreach (var t in TypesUsing)
+                sb.AppendFormat("using {0};\n", t);
+
+            sb.Append("\n");
+            sb.AppendFormat("namespace {0}\n", Disco.GetModelsNamespace(Namespace));
+            sb.Append("{\n");
+
+            foreach (var typeModel in typeModels)
+            {
+                WriteContentType(sb, typeModel);
+                sb.Append("\n");
+            }
+
+            sb.Append("}\n");
+        }
+
+        /// <summary>
         /// Outputs an "auto-generated" header to a string builder.
         /// </summary>
         /// <param name="sb">The string builder.</param>
