@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Configuration;
 
 namespace Zbu.ModelsBuilder.Configuration
 {
     public static class Config
     {
-        // fixme - the NuGet package should add the .models BuildProvider
-        // fixme - the UmbracoPackage should add the .models BuildProvider
+        // fixme - the UmbracoPackage should run the NuGet Transform on the Web.Config file?
         // fixme - we should have our own config section
         // fixme - should ask questions when installing?
-        // fixme - should check that the config actually makes sense?
-        //         can't enable both AppCode and Live models?
+        // fixme - should check that the config actually makes sense eg can't enable both AppCode and Live models?
 
         /// <summary>
         /// Gets a value indicating whether "App_Code models" are enabled. 
@@ -47,10 +40,6 @@ namespace Zbu.ModelsBuilder.Configuration
             get { return ConfigurationManager.AppSettings["Zbu.ModelsBuilder.EnableAppDataModels"] == "true"
                 || EnableAppCodeModels; }
         }
-
-        // fixme - requires the Razor custom engine...
-        // fixme - this does not work "out of the box" at the moment
-        // fixme - must document this...
 
         /// <summary>
         /// Gets a value indicating whether "live models" are enabled.
