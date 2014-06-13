@@ -130,9 +130,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="UserControls\Zbu\ModelsBuilder\BuildModels.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="UserControls\Zbu\ModelsBuilder\BuildModels.ascx" />
     <Content Include="UserControls\Zbu\ModelsBuilder\logo32x32.png" />
     <None Include="build\NuSpecs\dashboard.config.install.xdt" />
     <None Include="build\NuSpecs\dashboard.config.uninstall.xdt" />
@@ -201,17 +199,29 @@
   </Target>
   <!-- auto by NuGet: DependsOnTargets="BuildPackage" -->
   <Target Name="NuGetPackage">
+    <!-- get the assembly version -->
     <GetAssemblyIdentity AssemblyFiles="$(OutputPath)Zbu.ModelsBuilder.dll">
       <Output TaskParameter="Assemblies" ItemName="AssemblyInfos" />
     </GetAssemblyIdentity>
-    <Message Importance="High" Text="Packaging version %(AssemblyInfos.Version) into NuGet package" />
+    <!-- dunno how to get the assembly informational version -->
+    <ReadLinesFromFile File="$(SolutionDir)Zbu.ModelsBuilder\Properties\CommonInfo.cs">
+      <Output TaskParameter="Lines" ItemName="CommonInfosLines" />
+    </ReadLinesFromFile>
+    <PropertyGroup>
+      <Pattern>(?&lt;=\[assembly: AssemblyInformationalVersion\(").*(?="\)\])</Pattern>
+      <In>@(CommonInfosLines)</In>
+      <PackageVersion>$([System.Text.RegularExpressions.Regex]::Match($(In), $(Pattern)))</PackageVersion>
+    </PropertyGroup>
+    <!-- remove existing packages -->
+    <Message Importance="High" Text="Packaging version %(AssemblyInfos.Version) into NuGet package $(PackageVersion)" />
     <ItemGroup>
       <NuGetFilesToDelete Include="$(ProjectDir)build\Packages\*.nupkg" />
     </ItemGroup>
     <Delete Files="@(NuGetFilesToDelete)" />
+    <!-- then pack and copy package -->
     <PropertyGroup>
       <!-- -symbols -->
-      <NuGetBuildCommand>$(NuGetCommand) pack "$(ProjectDir)build\NuSpecs\Zbu.ModelsBuilder.AspNet.nuspec" -Version "%(AssemblyInfos.Version)-pre" -Properties "Configuration=$(Configuration);Platform=$(Platform)" $(NonInteractiveSwitch) -OutputDirectory "$(ProjectDir)build\Packages"</NuGetBuildCommand>
+      <NuGetBuildCommand>$(NuGetCommand) pack "$(ProjectDir)build\NuSpecs\Zbu.ModelsBuilder.AspNet.nuspec" -Version "$(PackageVersion)" -Properties "Configuration=$(Configuration);Platform=$(Platform)" $(NonInteractiveSwitch) -OutputDirectory "$(ProjectDir)build\Packages"</NuGetBuildCommand>
     </PropertyGroup>
     <Exec Command="$(NuGetBuildCommand)" LogStandardErrorAsError="true" />
     <ItemGroup>

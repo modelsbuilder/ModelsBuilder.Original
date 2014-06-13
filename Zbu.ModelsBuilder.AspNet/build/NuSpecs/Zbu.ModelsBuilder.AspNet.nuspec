@@ -2,13 +2,12 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata minClientVersion="2.8.1">
 		<id>Zbu.ModelsBuilder.AspNet</id>
-		<!-- set -pre to indicate it's pre-release -->
-		<version>$version$-pre</version>
-		<title>ZpqrtBnk Umbraco ModelsBuilder ASP.NET Integration</title>
+		<version>$version$</version>
+		<title>ZpqrtBnk Umbraco ModelsBuilder Site Integration</title>
 		<authors>Pilotine - ZpqrtBnk</authors>
 		<owners>Pilotine - ZpqrtBnk</owners>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<description>ZpqrtBnk Umbraco ASP.NET tool for generating strongly typed IPublishedContent models.</description>
+		<description>ZpqrtBnk Umbraco ModelsBuilder Site Integration.</description>
 		<copyright>Copyright © Pilotine - ZpqrtBnk 2013-2014</copyright>
 		<dependencies>
 			<dependency id="Microsoft.CodeAnalysis.CSharp" version="0.6.4033103-beta" />

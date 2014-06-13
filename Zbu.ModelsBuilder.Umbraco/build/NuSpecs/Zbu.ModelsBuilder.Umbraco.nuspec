@@ -2,8 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata minClientVersion="2.8.1">
 		<id>Zbu.ModelsBuilder.Umbraco</id>
-		<!-- set -pre to indicate it's pre-release -->
-		<version>$version$-pre</version>
+		<version>$version$</version>
 		<title>ZpqrtBnk Umbraco ModelsBuilder Libraries</title>
 		<authors>Pilotine - ZpqrtBnk</authors>
 		<owners>Pilotine - ZpqrtBnk</owners>

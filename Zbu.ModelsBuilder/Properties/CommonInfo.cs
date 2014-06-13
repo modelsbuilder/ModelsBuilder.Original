@@ -10,5 +10,20 @@ using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
 
-[assembly: AssemblyVersion("1.8.0.0")]
-[assembly: AssemblyFileVersion("1.8.0.0")]
+// versionning
+// nuget/semver: major.minor.patch [-xxx]
+// assembly: major.minor.patch.build
+// nuget sorts the -xxx alphabetically
+
+// nuget            assembly
+// 1.8.0-alpha001   1.8.0.0
+// 1.8.0-alpha002   1.8.0.1
+// 1.8.0-alpha      1.8.0.2
+// 1.8.0            1.8.0.3
+
+// Assembly
+[assembly: AssemblyVersion("2.0.0.0")]
+[assembly: AssemblyFileVersion("2.0.0.0")]
+
+// NuGet Package
+[assembly: AssemblyInformationalVersion("2.0.0-alpha000")]
