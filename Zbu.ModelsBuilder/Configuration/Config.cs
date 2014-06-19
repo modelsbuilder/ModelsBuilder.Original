@@ -1,13 +1,31 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 
 namespace Zbu.ModelsBuilder.Configuration
 {
     public static class Config
     {
-        // fixme - the UmbracoPackage should run the NuGet Transform on the Web.Config file?
-        // fixme - we should have our own config section
-        // fixme - should ask questions when installing?
-        // fixme - should check that the config actually makes sense eg can't enable both AppCode and Live models?
+        static Config()
+        {
+            // for the time being config is stored in web.config appSettings
+            // and is static ie requires the app to be restarted for changes to be detected
+
+            const string prefix = "Zbu.ModelsBuilder.";
+            EnableAppCodeModels = ConfigurationManager.AppSettings[prefix + "CreateAppCodeModelsFile"] == "true";
+            EnableAppDataModels = ConfigurationManager.AppSettings[prefix + "EnableAppDataModels"] == "true";
+            EnableLiveModels = ConfigurationManager.AppSettings[prefix + "EnableLiveModels"] == "true";
+            EnableApi = ConfigurationManager.AppSettings[prefix + "EnableApi"] != "false";
+            ModelsNamespace = ConfigurationManager.AppSettings[prefix + "ModelsNamespace"];
+            EnablePublishedContentModelsFactory = ConfigurationManager.AppSettings[prefix + "EnablePublishedContentModelsFactory"] != "false";
+
+            var count =
+                (EnableAppCodeModels ? 1 : 0)
+                + (EnableAppDataModels ? 1 : 0)
+                + (EnableLiveModels ? 1 : 0);
+
+            if (count > 1)
+                throw new Exception("Configuration error: you can enable only one of AppCode, AppData or Live models at a time.");
+        }
 
         /// <summary>
         /// Gets a value indicating whether "App_Code models" are enabled. 
@@ -16,15 +34,13 @@ namespace Zbu.ModelsBuilder.Configuration
         ///     <para>Indicates whether a "build.models" file should be created in App_Code and associated
         ///     to a build provider so that models created in App_Data are automatically included in the site
         ///     build and made available to the view.</para>
+        ///     <para>When "App_Code models" is enabled, the dashboard shows the "generate" button so that
+        ///     models can be generated in App_Data/Models.</para>
         ///     <para>Default value is <c>false</c> because once enabled, Umbraco will restart anytime models
         ///     are re-generated from the dashboard. This is probably what you want to do, but we're forcing
         ///     you to make a concious decision at the moment.</para>
-        ///     <para>Enabling "App_Code models" models also enables "App_Data models".</para>
         /// </remarks>
-        public static bool EnableAppCodeModels
-        {
-            get { return ConfigurationManager.AppSettings["Zbu.ModelsBuilder.CreateAppCodeModelsFile"] == "true"; }
-        }
+        public static bool EnableAppCodeModels { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether "App_Data models" are enabled.
@@ -35,11 +51,7 @@ namespace Zbu.ModelsBuilder.Configuration
         ///     models can be generated in App_Data/Models. Whether they will be just sitting there or loaded
         ///     and compiled depends on EnableAppCoreModels.</para>
         /// </remarks>
-        public static bool EnableAppDataModels
-        {
-            get { return ConfigurationManager.AppSettings["Zbu.ModelsBuilder.EnableAppDataModels"] == "true"
-                || EnableAppCodeModels; }
-        }
+        public static bool EnableAppDataModels { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether "live models" are enabled.
@@ -52,10 +64,7 @@ namespace Zbu.ModelsBuilder.Configuration
         ///     <para>Default value is <c>false</c>.</para>
         ///     <para>Enabling "live" models also enables "App_Data models".</para>
         /// </remarks>
-        public static bool EnableLiveModels
-        {
-            get { return ConfigurationManager.AppSettings["Zbu.ModelsBuilder.EnableLiveModels"] == "true"; }
-        }
+        public static bool EnableLiveModels { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether to enable the API.
@@ -65,28 +74,19 @@ namespace Zbu.ModelsBuilder.Configuration
         ///     <para>The API is used by the Visual Studio extension and the console tool to talk to Umbraco
         ///     and retrieve the content types. It needs to be enabled so the extension & tool can work.</para>
         /// </remarks>
-        public static bool EnableApi
-        {
-            get { return ConfigurationManager.AppSettings["Zbu.ModelsBuilder.EnableApi"] != "false"; }
-        }
+        public static bool EnableApi { get; private set; }
 
         /// <summary>
         /// Gets the models namespace.
         /// </summary>
         /// <remarks>No default value. That value could be overriden by other (attribute in user's code...).</remarks>
-        public static string ModelsNamespace
-        {
-            get { return ConfigurationManager.AppSettings["Zbu.ModelsBuilder.ModelsNamespace"]; }
-        }
+        public static string ModelsNamespace { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether we should enable the models factory.
         /// </summary>
         /// <remarks>Default value is <c>true</c> because no factory is enabled by default in Umbraco.</remarks>
-        public static bool EnablePublishedContentModelsFactory
-        {
-            get { return ConfigurationManager.AppSettings["Zbu.ModelsBuilder.EnablePublishedContentModelsFactory"] != "false"; }
-        }
+        public static bool EnablePublishedContentModelsFactory { get; private set; }
 
     }
 }

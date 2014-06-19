@@ -7,7 +7,7 @@
         // <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
         // <umb:CssInclude runat="server" FilePath="propertypane/style.css" PathNameAlias="UmbracoClient" />
 
-        phGenerate.Visible = Config.EnableAppDataModels;
+        phGenerate.Visible = Config.EnableAppDataModels || Config.EnableAppCodeModels;
         phGenerateWarning.Visible = Config.EnableAppCodeModels;
 
         var sb = new StringBuilder();
