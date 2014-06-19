@@ -17,7 +17,7 @@ namespace Zbu.ModelsBuilder.Build
         /// </summary>
         /// <param name="typeModels">The list of models to generate.</param>
         public CodeDomBuilder(IList<TypeModel> typeModels)
-            : base(typeModels)
+            : base(typeModels, null)
         { }
 
         /// <summary>

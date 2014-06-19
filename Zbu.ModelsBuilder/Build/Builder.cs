@@ -23,7 +23,7 @@ namespace Zbu.ModelsBuilder.Build
         public static readonly Version Version = Assembly.GetExecutingAssembly().GetName().Version;
 
         private readonly IList<TypeModel> _typeModels;
-        protected DiscoveryResult Disco { get; private set; }
+        protected ParseResult ParseResult { get; private set; }
 
         // the list of assemblies that will be 'using' by default
         protected readonly IList<string> TypesUsing = new List<string>
@@ -42,7 +42,8 @@ namespace Zbu.ModelsBuilder.Build
         /// <summary>
         /// Gets or sets a value indicating the namespace to use for the models.
         /// </summary>
-        public string Namespace { get; set; }
+        /// <remarks>May be overriden by code attributes.</remarks>
+        public string ModelsNamespace { get; set; }
 
         /// <summary>
         /// Gets the list of assemblies to add to the set of 'using' assemblies in each model file.
@@ -65,43 +66,68 @@ namespace Zbu.ModelsBuilder.Build
         internal IList<TypeModel> TypeModels { get { return _typeModels; } }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Builder"/> class with a list of models to generate.
+        /// Initializes a new instance of the <see cref="Builder"/> class with a list of models to generate
+        /// and the result of code parsing.
         /// </summary>
         /// <param name="typeModels">The list of models to generate.</param>
-        protected Builder(IList<TypeModel> typeModels)
+        /// <param name="parseResult">The result of code parsing.</param>
+        protected Builder(IList<TypeModel> typeModels, ParseResult parseResult)
         {
+            if (typeModels == null)
+                throw new ArgumentNullException("typeModels");
+            if (parseResult == null)
+                throw new ArgumentNullException("parseResult");
+
             _typeModels = typeModels;
+            ParseResult = parseResult;
+
+            Prepare();
         }
 
         /// <summary>
-        /// Prepares generation by processing the result of existing code discovery.
+        /// Initializes a new instance of the <see cref="Builder"/> class with a list of models to generate,
+        /// the result of code parsing, and a models namespace.
         /// </summary>
-        /// <param name="disco">The code discovery result.</param>
+        /// <param name="typeModels">The list of models to generate.</param>
+        /// <param name="parseResult">The result of code parsing.</param>
+        /// <param name="modelsNamespace">The models namespace.</param>
+        protected Builder(IList<TypeModel> typeModels, ParseResult parseResult, string modelsNamespace)
+            : this(typeModels, parseResult)
+        {
+            // can be null or empty, we'll manage
+            ModelsNamespace = modelsNamespace;
+        }
+
+        // for unit tests only
+        protected Builder()
+        { }
+
+        /// <summary>
+        /// Prepares generation by processing the result of code parsing.
+        /// </summary>
         /// <remarks>
         ///     Preparation includes figuring out from the existing code which models or properties should
         ///     be ignored or renamed, etc. -- anything that comes from the attributes in the existing code.
         /// </remarks>
-        public void Prepare(DiscoveryResult disco)
+        private void Prepare()
         {
-            Disco = disco;
-
             // mark IsContentIgnored models that we discovered should be ignored
             // then propagate / ignore children of ignored contents
             // ignore content = don't generate a class for it, don't generate children
-            foreach (var typeModel in _typeModels.Where(x => disco.IsIgnored(x.Alias)))
+            foreach (var typeModel in _typeModels.Where(x => ParseResult.IsIgnored(x.Alias)))
                 typeModel.IsContentIgnored = true;
             foreach (var typeModel in _typeModels.Where(x => !x.IsContentIgnored && x.EnumerateBaseTypes().Any(xx => xx.IsContentIgnored)))
                 typeModel.IsContentIgnored = true;
 
             // handle model renames
-            foreach (var typeModel in _typeModels.Where(x => disco.IsContentRenamed(x.Alias)))
+            foreach (var typeModel in _typeModels.Where(x => ParseResult.IsContentRenamed(x.Alias)))
             {
-                typeModel.ClrName = disco.ContentClrName(typeModel.Alias);
+                typeModel.ClrName = ParseResult.ContentClrName(typeModel.Alias);
                 typeModel.IsRenamed = true;
             }
 
             // mark OmitBase models that we discovered already have a base class
-            foreach (var typeModel in _typeModels.Where(x => disco.HasContentBase(disco.ContentClrName(x.Alias) ?? x.ClrName)))
+            foreach (var typeModel in _typeModels.Where(x => ParseResult.HasContentBase(ParseResult.ContentClrName(x.Alias) ?? x.ClrName)))
                 typeModel.HasBase = true;
 
             foreach (var typeModel in _typeModels)
@@ -110,14 +136,14 @@ namespace Zbu.ModelsBuilder.Build
                 // ie is marked as ignored on type, or on any parent type
                 var tm = typeModel;
                 foreach (var property in typeModel.Properties
-                    .Where(property => tm.EnumerateBaseTypes(true).Any(x => disco.IsPropertyIgnored(disco.ContentClrName(x.Alias) ?? x.ClrName, property.Alias))))
+                    .Where(property => tm.EnumerateBaseTypes(true).Any(x => ParseResult.IsPropertyIgnored(ParseResult.ContentClrName(x.Alias) ?? x.ClrName, property.Alias))))
                 {
                     property.IsIgnored = true;
                 }
 
                 // handle property renames
                 foreach (var property in typeModel.Properties)
-                    property.ClrName = disco.PropertyClrName(disco.ContentClrName(typeModel.Alias) ?? typeModel.ClrName, property.Alias) ?? property.ClrName;
+                    property.ClrName = ParseResult.PropertyClrName(ParseResult.ContentClrName(typeModel.Alias) ?? typeModel.ClrName, property.Alias) ?? property.ClrName;
             }
 
             // ensure we have no duplicates type names
@@ -168,11 +194,35 @@ namespace Zbu.ModelsBuilder.Build
             }
 
             // register using types
-            foreach (var usingNamespace in disco.GetUsingNamespaces())
+            foreach (var usingNamespace in ParseResult.UsingNamespaces)
             {
                 if (!TypesUsing.Contains(usingNamespace))
                     TypesUsing.Add(usingNamespace);
             }
+        }
+
+        protected string GetModelsNamespace()
+        {
+            // code attribute overrides everything
+            if (ParseResult.HasModelsNamespace)
+                return ParseResult.ModelsNamespace;
+
+            // if builder was initialized with a namespace, use that one
+            if (!string.IsNullOrWhiteSpace(ModelsNamespace))
+                return ModelsNamespace;
+
+            // default
+            return "Umbraco.Web.PublishedContentModels";
+        }
+
+        protected string GetModelsBaseClassName()
+        {
+            // code attribute overrides everything
+            if (ParseResult.HasModelsBaseClassName)
+                return ParseResult.ModelsBaseClassName;
+
+            // default
+            return "PublishedContentModel";
         }
     }
 }

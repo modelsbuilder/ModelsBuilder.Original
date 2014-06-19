@@ -135,10 +135,8 @@ namespace Zbu.ModelsBuilder.AspNet
             var umbraco = Application.GetApplication();
             var typeModels = umbraco.GetAllTypes();
 
-            var builder = new TextBuilder(typeModels);
-            builder.Namespace = data.Namespace;
-            var disco = new CodeParser().Parse(data.Files);
-            builder.Prepare(disco);
+            var parseResult = new CodeParser().Parse(data.Files);
+            var builder = new TextBuilder(typeModels, parseResult, data.Namespace);
 
             var models = new Dictionary<string, string>();
             foreach (var typeModel in builder.GetModelsToGenerate())
@@ -185,14 +183,9 @@ namespace Zbu.ModelsBuilder.AspNet
             var umbraco = Application.GetApplication();
             var typeModels = umbraco.GetAllTypes();
 
-            var ns = Config.ModelsNamespace;
-            if (string.IsNullOrWhiteSpace(ns)) ns = "Umbraco.Web.PublishedContentModels";
-
-            var builder = new TextBuilder(typeModels);
-            builder.Namespace = ns;
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
-            var disco = new CodeParser().Parse(ourFiles);
-            builder.Prepare(disco);
+            var parseResult = new CodeParser().Parse(ourFiles);
+            var builder = new TextBuilder(typeModels, parseResult, Config.ModelsNamespace);
 
             foreach (var typeModel in builder.GetModelsToGenerate())
             {

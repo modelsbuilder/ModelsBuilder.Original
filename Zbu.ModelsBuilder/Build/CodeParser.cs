@@ -20,7 +20,7 @@ namespace Zbu.ModelsBuilder.Build
         /// <param name="files">A set of (filename,content) representing content to parse.</param>
         /// <returns>A FIXME discovered in the files.</returns>
         /// <remarks>The set of files is a dictionary of </remarks>
-        public DiscoveryResult Parse(IDictionary<string, string> files)
+        public ParseResult Parse(IDictionary<string, string> files)
         {
             var options = new CSharpParseOptions();
             var trees = files.Select(x =>
@@ -49,7 +49,7 @@ namespace Zbu.ModelsBuilder.Build
                 /*syntaxTrees:*/ trees,
                 /*references:*/ refs);
 
-            var disco = new DiscoveryResult();
+            var disco = new ParseResult();
             foreach (var tree in trees)
                 Parse(disco, compilation, tree);
 
@@ -90,7 +90,7 @@ namespace Zbu.ModelsBuilder.Build
             }
         }
 
-        private static void Parse(DiscoveryResult disco, CSharpCompilation compilation, SyntaxTree tree)
+        private static void Parse(ParseResult disco, CSharpCompilation compilation, SyntaxTree tree)
         {
             var model = compilation.GetSemanticModel(tree);
 
@@ -128,7 +128,7 @@ namespace Zbu.ModelsBuilder.Build
             ParseAssemblySymbols(disco, compilation.Assembly);
         }
 
-        private static void ParseClassSymbols(DiscoveryResult disco, ISymbol symbol)
+        private static void ParseClassSymbols(ParseResult disco, ISymbol symbol)
         {
             foreach (var attrData in symbol.GetAttributes())
             {
@@ -163,7 +163,7 @@ namespace Zbu.ModelsBuilder.Build
             }
         }
 
-        private static void ParsePropertySymbols(DiscoveryResult disco, ISymbol classSymbol, ISymbol symbol)
+        private static void ParsePropertySymbols(ParseResult disco, ISymbol classSymbol, ISymbol symbol)
         {
             foreach (var attrData in symbol.GetAttributes())
             {
@@ -184,7 +184,7 @@ namespace Zbu.ModelsBuilder.Build
             }
         }
 
-        private static void ParseAssemblySymbols(DiscoveryResult disco, ISymbol symbol)
+        private static void ParseAssemblySymbols(ParseResult disco, ISymbol symbol)
         {
             foreach (var attrData in symbol.GetAttributes())
             {

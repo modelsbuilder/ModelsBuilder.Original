@@ -19,8 +19,8 @@ namespace Zbu.ModelsBuilder.Tests
 
     public class TestBuilder : Builder
     {
-        public TestBuilder(IList<TypeModel> typeModels)
-            : base(typeModels)
+        public TestBuilder(IList<TypeModel> typeModels, ParseResult parseResult)
+            : base(typeModels, parseResult)
         { }
     }
 

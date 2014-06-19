@@ -4,12 +4,10 @@ using System.Linq;
 
 namespace Zbu.ModelsBuilder.Build
 {
-    // FIXME - it is actually BuildInstructions of some sort...
-
     /// <summary>
-    /// Contains the result of a code discovery.
+    /// Contains the result of a code parsing.
     /// </summary>
-    public class DiscoveryResult
+    public class ParseResult
     {
         // "alias" is the umbraco alias
         // content "name" is the complete name eg Foo.Bar.Name
@@ -35,9 +33,6 @@ namespace Zbu.ModelsBuilder.Build
             = new Dictionary<string, string[]>();
         private readonly List<string> _usingNamespaces
             = new List<string>();
-
-        private string _modelsBaseClassName;
-        private string _modelsNamespace;
 
         #region Declare
 
@@ -97,12 +92,12 @@ namespace Zbu.ModelsBuilder.Build
 
         public void SetModelsBaseClassName(string modelsBaseClassName)
         {
-            _modelsBaseClassName = modelsBaseClassName;
+            ModelsBaseClassName = modelsBaseClassName;
         }
 
         public void SetModelsNamespace(string modelsNamespace)
         {
-            _modelsNamespace = modelsNamespace;
+            ModelsNamespace = modelsNamespace;
         }
 
         public void SetUsingNamespace(string usingNamespace)
@@ -192,19 +187,23 @@ namespace Zbu.ModelsBuilder.Build
             return null;
         }
 
-        public string GetModelsBaseClassName(string modelsBaseClassName)
+        public bool HasModelsBaseClassName
         {
-            return _modelsBaseClassName ?? modelsBaseClassName;
+            get { return !string.IsNullOrWhiteSpace(ModelsBaseClassName); }
         }
 
-        public string GetModelsNamespace(string modelsNamespace)
+        public string ModelsBaseClassName { get; private set; }
+
+        public bool HasModelsNamespace
         {
-            return string.IsNullOrWhiteSpace(_modelsNamespace) ? modelsNamespace : _modelsNamespace;
+            get { return !string.IsNullOrWhiteSpace(ModelsNamespace); }
         }
 
-        public IEnumerable<string> GetUsingNamespaces()
+        public string ModelsNamespace { get; private set; }
+
+        public IEnumerable<string> UsingNamespaces
         {
-            return _usingNamespaces;
+            get { return _usingNamespaces; }
         }
 
         #endregion

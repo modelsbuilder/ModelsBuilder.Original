@@ -43,9 +43,10 @@ public class Whatever
 "}
             };
 
-            var disco = new CodeParser().Parse(code);
+            var parseResult = new CodeParser().Parse(code);
             
-            Assert.AreEqual("Dang.Whatever", disco.GetModelsBaseClassName("Otherwise"));
+            Assert.IsTrue(parseResult.HasModelsBaseClassName);
+            Assert.AreEqual("Dang.Whatever", parseResult.ModelsBaseClassName);
         }
 
         [Test]
@@ -59,9 +60,10 @@ using Zbu.ModelsBuilder;
 "}
             };
 
-            var disco = new CodeParser().Parse(code);
+            var parseResult = new CodeParser().Parse(code);
 
-            Assert.AreEqual("Foo.Bar.Nil", disco.GetModelsNamespace("Otherwise"));
+            Assert.IsTrue(parseResult.HasModelsNamespace);
+            Assert.AreEqual("Foo.Bar.Nil", parseResult.ModelsNamespace);
         }
 
         [Test]
@@ -81,7 +83,14 @@ using Zbu.ModelsBuilder;
 
             var types = new[] { type1 };
 
-            var code = new Dictionary<string, string>
+            var code1 = new Dictionary<string, string>
+            {
+                {"assembly", @"
+using Zbu.ModelsBuilder;
+"}
+            };
+
+            var code2 = new Dictionary<string, string>
             {
                 {"assembly", @"
 using Zbu.ModelsBuilder;
@@ -89,12 +98,12 @@ using Zbu.ModelsBuilder;
 "}
             };
 
-            var builder = new TextBuilder(types);
-            var disco = new CodeParser().Parse(code);
-
+            var parseResult = new CodeParser().Parse(code1);
+            var builder = new TextBuilder(types, parseResult);
             var count = builder.Using.Count;
 
-            builder.Prepare(disco);
+            parseResult = new CodeParser().Parse(code2);
+            builder = new TextBuilder(types, parseResult);
 
             Assert.AreEqual(count + 1, builder.Using.Count);
             Assert.IsTrue(builder.Using.Contains("Foo.Bar.Nil"));
@@ -125,12 +134,11 @@ using Zbu.ModelsBuilder;
 "}
             };
 
-            var builder = new TextBuilder(types);
-            var disco = new CodeParser().Parse(code);
-            builder.Prepare(disco);
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
-            Assert.IsTrue(disco.IsIgnored("type1"));
+            Assert.IsTrue(parseResult.IsIgnored("type1"));
 
             Assert.AreEqual(1, btypes.Count);
             Assert.IsTrue(btypes[0].IsContentIgnored);
@@ -181,14 +189,13 @@ using Zbu.ModelsBuilder;
 "}
             };
 
-            var builder = new TextBuilder(types);
-            var disco = new CodeParser().Parse(code);
-            builder.Prepare(disco);
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
-            Assert.IsTrue(disco.IsIgnored("type1"));
-            Assert.IsTrue(disco.IsIgnored("type2"));
-            Assert.IsFalse(disco.IsIgnored("ttype3"));
+            Assert.IsTrue(parseResult.IsIgnored("type1"));
+            Assert.IsTrue(parseResult.IsIgnored("type2"));
+            Assert.IsFalse(parseResult.IsIgnored("ttype3"));
 
             Assert.AreEqual(3, btypes.Count);
             Assert.IsTrue(btypes[0].IsContentIgnored);
@@ -231,13 +238,12 @@ using Zbu.ModelsBuilder;
 "}
             };
 
-            var builder = new TextBuilder(types);
-            var disco = new CodeParser().Parse(code);
-            builder.Prepare(disco);
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
-            Assert.IsTrue(disco.IsIgnored("type1"));
-            Assert.IsFalse(disco.IsIgnored("type2"));
+            Assert.IsTrue(parseResult.IsIgnored("type1"));
+            Assert.IsFalse(parseResult.IsIgnored("type2"));
 
             Assert.AreEqual(2, btypes.Count);
             Assert.AreEqual("type1", btypes[0].Alias);
@@ -282,13 +288,12 @@ using Zbu.ModelsBuilder;
 "}
             };
 
-            var builder = new TextBuilder(types);
-            var disco = new CodeParser().Parse(code);
-            builder.Prepare(disco);
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
-            Assert.IsTrue(disco.IsIgnored("type1"));
-            Assert.IsFalse(disco.IsIgnored("type2"));
+            Assert.IsTrue(parseResult.IsIgnored("type1"));
+            Assert.IsFalse(parseResult.IsIgnored("type2"));
 
             Assert.AreEqual(2, btypes.Count);
             Assert.AreEqual("type1", btypes[0].Alias);
@@ -334,17 +339,16 @@ using Zbu.ModelsBuilder;
 "}
             };
 
-            var builder = new TextBuilder(types);
-            var disco = new CodeParser().Parse(code);
-            builder.Prepare(disco);
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
-            Assert.IsFalse(disco.IsIgnored("type1"));
-            Assert.IsFalse(disco.IsIgnored("type2"));
-            Assert.IsTrue(disco.IsContentRenamed("type1"));
-            Assert.IsFalse(disco.IsContentRenamed("type2"));
-            Assert.AreEqual("Renamed1", disco.ContentClrName("type1"));
-            Assert.IsNull(disco.ContentClrName("type2"));
+            Assert.IsFalse(parseResult.IsIgnored("type1"));
+            Assert.IsFalse(parseResult.IsIgnored("type2"));
+            Assert.IsTrue(parseResult.IsContentRenamed("type1"));
+            Assert.IsFalse(parseResult.IsContentRenamed("type2"));
+            Assert.AreEqual("Renamed1", parseResult.ContentClrName("type1"));
+            Assert.IsNull(parseResult.ContentClrName("type2"));
 
             Assert.AreEqual(2, btypes.Count);
             Assert.IsFalse(btypes[0].IsContentIgnored);
@@ -393,17 +397,16 @@ namespace Models
 "}
             };
 
-            var builder = new TextBuilder(types);
-            var disco = new CodeParser().Parse(code);
-            builder.Prepare(disco);
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
-            Assert.IsFalse(disco.IsIgnored("type1"));
-            Assert.IsFalse(disco.IsIgnored("type2"));
-            Assert.IsTrue(disco.IsContentRenamed("type1"));
-            Assert.IsFalse(disco.IsContentRenamed("type2"));
-            Assert.AreEqual("Renamed1", disco.ContentClrName("type1"));
-            Assert.IsNull(disco.ContentClrName("type2"));
+            Assert.IsFalse(parseResult.IsIgnored("type1"));
+            Assert.IsFalse(parseResult.IsIgnored("type2"));
+            Assert.IsTrue(parseResult.IsContentRenamed("type1"));
+            Assert.IsFalse(parseResult.IsContentRenamed("type2"));
+            Assert.AreEqual("Renamed1", parseResult.ContentClrName("type1"));
+            Assert.IsNull(parseResult.ContentClrName("type2"));
 
             Assert.AreEqual(2, btypes.Count);
             Assert.IsFalse(btypes[0].IsContentIgnored);
@@ -449,12 +452,11 @@ namespace Models
 "}
             };
 
-            var builder = new TextBuilder(types);
-            var disco = new CodeParser().Parse(code);
-            builder.Prepare(disco);
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
-            Assert.IsTrue(disco.IsPropertyIgnored("Type1", "prop1"));
+            Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
 
             Assert.AreEqual(1, btypes.Count);
             Assert.IsTrue(btypes[0].Properties[0].IsIgnored);
@@ -509,14 +511,13 @@ namespace Models
 "}
             };
 
-            var builder = new TextBuilder(types);
-            var disco = new CodeParser().Parse(code);
-            builder.Prepare(disco);
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
-            Assert.IsTrue(disco.IsPropertyIgnored("Type1", "prop1"));
-            Assert.IsTrue(disco.IsPropertyIgnored("Type1", "prop2"));
-            Assert.IsFalse(disco.IsPropertyIgnored("Type1", "pprop3"));
+            Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
+            Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop2"));
+            Assert.IsFalse(parseResult.IsPropertyIgnored("Type1", "pprop3"));
 
             Assert.AreEqual(1, btypes.Count);
             Assert.IsTrue(btypes[0].Properties[0].IsIgnored);
@@ -565,12 +566,11 @@ namespace Models
 "}
             };
 
-            var builder = new TextBuilder(types);
-            var disco = new CodeParser().Parse(code);
-            builder.Prepare(disco);
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
-            Assert.IsTrue(disco.IsPropertyIgnored("Type1", "prop1"));
+            Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
 
             Assert.AreEqual(1, btypes.Count);
             Assert.IsTrue(btypes[0].Properties[0].IsIgnored);
@@ -614,13 +614,12 @@ namespace Models
 "}
             };
 
-            var builder = new TextBuilder(types);
-            var disco = new CodeParser().Parse(code);
-            builder.Prepare(disco);
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
-            Assert.AreEqual("Renamed1", disco.PropertyClrName("Type1", "prop1"));
-            Assert.AreEqual("Renamed2", disco.PropertyClrName("Type1", "prop2"));
+            Assert.AreEqual("Renamed1", parseResult.PropertyClrName("Type1", "prop1"));
+            Assert.AreEqual("Renamed2", parseResult.PropertyClrName("Type1", "prop2"));
 
             Assert.AreEqual(1, btypes.Count);
             Assert.IsTrue(btypes[0].Properties[0].ClrName == "Renamed1");
@@ -668,13 +667,12 @@ namespace Models
 "}
             };
 
-            var builder = new TextBuilder(types);
-            var disco = new CodeParser().Parse(code);
-            builder.Prepare(disco);
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
-            Assert.AreEqual("Renamed1", disco.PropertyClrName("Type1", "prop1"));
-            Assert.AreEqual("Renamed2", disco.PropertyClrName("Type1", "prop2"));
+            Assert.AreEqual("Renamed1", parseResult.PropertyClrName("Type1", "prop1"));
+            Assert.AreEqual("Renamed2", parseResult.PropertyClrName("Type1", "prop2"));
 
             Assert.AreEqual(1, btypes.Count);
             Assert.IsTrue(btypes[0].Properties[0].ClrName == "Renamed1");
@@ -718,12 +716,11 @@ namespace Models
 "}
             };
 
-            var builder = new TextBuilder(types);
-            var disco = new CodeParser().Parse(code);
-            builder.Prepare(disco);
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
-            Assert.IsTrue(disco.IsPropertyIgnored("Type1", "prop1"));
+            Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
 
             Assert.AreEqual(1, btypes.Count);
             Assert.IsTrue(btypes[0].Properties[0].IsIgnored);
@@ -771,12 +768,11 @@ namespace Models
 "}
             };
 
-            var builder = new TextBuilder(types);
-            var disco = new CodeParser().Parse(code);
-            builder.Prepare(disco);
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
-            Assert.IsTrue(disco.IsPropertyIgnored("Type1", "prop1"));
+            Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
 
             Assert.AreEqual(1, btypes.Count);
             Assert.IsTrue(btypes[0].Properties[0].IsIgnored);
@@ -809,16 +805,15 @@ namespace Models
             {
             };
 
-            var builder = new TextBuilder(types);
-            var disco = new CodeParser().Parse(code);
-            builder.Prepare(disco);
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
             var sb = new StringBuilder();
             builder.Generate(sb, builder.GetModelsToGenerate().First());
             var gen = sb.ToString();
 
-            var version = typeof (BuilderTests).Assembly.GetName().Version;
+            var version = typeof (Builder).Assembly.GetName().Version;
             var expected = @"//------------------------------------------------------------------------------
 // <auto-generated>
 //   This code was generated by a tool.
@@ -839,7 +834,7 @@ using Umbraco.Web;
 using Zbu.ModelsBuilder;
 using Zbu.ModelsBuilder.Umbraco;
 
-namespace 
+namespace Umbraco.Web.PublishedContentModels
 {
 	[PublishedContentModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
@@ -868,10 +863,9 @@ namespace
 		}
 	}
 }
-".Replace("\r", "");
-
+";
             Console.WriteLine(gen);
-            Assert.AreEqual(expected, gen);
+            Assert.AreEqual(expected.Replace("\r", ""), gen);
         }
 
         [TestCase("int", typeof (int))]
@@ -880,7 +874,7 @@ namespace
         [TestCase("Zbu.ModelsBuilder.Tests.BuilderTests.Class1", typeof(Class1))]
         public void WriteClrType(string expected, Type input)
         {
-            var builder = new TextBuilder(new TypeModel[] {});
+            var builder = new TextBuilder();
             var sb = new StringBuilder();
             builder.WriteClrType(sb, input);
             Assert.AreEqual(expected, sb.ToString());
@@ -892,7 +886,7 @@ namespace
         [TestCase("BuilderTests.Class1", typeof(Class1))]
         public void WriteClrTypeUsing(string expected, Type input)
         {
-            var builder = new TextBuilder(new TypeModel[] { });
+            var builder = new TextBuilder();
             builder.Using.Add("Zbu.ModelsBuilder.Tests");
             var sb = new StringBuilder();
             builder.WriteClrType(sb, input);

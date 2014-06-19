@@ -192,7 +192,7 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
 
                 // we need to generate something
                 var code = new StringBuilder();
-                new TextBuilder(new TypeModel[] { }).WriteHeader(code);
+                TextBuilder.WriteHeader(code);
                 code.Append("// ZpqrtBnk Umbraco ModelsBuilder\n");
                 code.AppendFormat("// {0:yyyy-MM-ddTHH:mm:ssZ}", DateTime.UtcNow);
 

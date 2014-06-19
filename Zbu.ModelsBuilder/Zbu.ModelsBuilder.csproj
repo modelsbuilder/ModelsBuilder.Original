@@ -89,7 +89,7 @@
     <Compile Include="ModelsBaseClassAttribute.cs" />
     <Compile Include="ModelsNamespaceAttribute.cs" />
     <Compile Include="RenameContentTypeAttribute.cs" />
-    <Compile Include="Build\DiscoveryResult.cs" />
+    <Compile Include="Build\ParseResult.cs" />
     <Compile Include="RenamePropertyTypeAttribute.cs" />
     <Compile Include="ModelPropertyAliasAttribute.cs" />
     <Compile Include="EnumerableExtensions.cs" />

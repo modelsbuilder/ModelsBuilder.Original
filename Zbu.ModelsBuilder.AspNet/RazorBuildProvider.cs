@@ -74,13 +74,8 @@ namespace Zbu.ModelsBuilder.AspNet
             var umbraco = Application.GetApplication();
             var typeModels = umbraco.GetAllTypes();
 
-            var ns = Config.ModelsNamespace;
-            if (string.IsNullOrWhiteSpace(ns)) ns = "Umbraco.Web.PublishedContentModels";
-
-            var builder = new TextBuilder(typeModels);
-            builder.Namespace = ns;
-            var disco = new CodeParser().Parse(new Dictionary<string, string>());
-            builder.Prepare(disco);
+            var parseResult = new CodeParser().Parse(new Dictionary<string, string>());
+            var builder = new TextBuilder(typeModels, parseResult, Config.ModelsNamespace);
 
             var code = new StringBuilder();
             builder.Generate(code, builder.GetModelsToGenerate());
