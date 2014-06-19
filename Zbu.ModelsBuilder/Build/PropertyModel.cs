@@ -15,8 +15,18 @@ namespace Zbu.ModelsBuilder.Build
         /// <summary>
         /// Gets the name of the property.
         /// </summary>
-        /// <remarks>This is just the local name eg "Price".</remarks>
         public string Name;
+
+        /// <summary>
+        /// Gets the description of the property.
+        /// </summary>
+        public string Description;
+
+        /// <summary>
+        /// Gets the clr name of the property.
+        /// </summary>
+        /// <remarks>This is just the local name eg "Price".</remarks>
+        public string ClrName;
 
         /// <summary>
         /// Gets the CLR type of the property values.

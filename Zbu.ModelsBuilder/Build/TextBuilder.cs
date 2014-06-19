@@ -90,18 +90,18 @@ namespace Zbu.ModelsBuilder.Build
             {
                 // write the interface declaration
                 sb.AppendFormat("\t// Mixin content Type {0} with alias \"{1}\"\n", type.Id, type.Alias);
-                sb.AppendFormat("\tpublic partial interface I{0}", type.Name);
+                sb.AppendFormat("\tpublic partial interface I{0}", type.ClrName);
                 var implements = type.BaseType == null || type.BaseType.IsContentIgnored
                     ? (type.HasBase ? null : "PublishedContent") 
-                    : type.BaseType.Name;
+                    : type.BaseType.ClrName;
                 if (implements != null)
                     sb.AppendFormat(" : I{0}", implements);
 
                 // write the mixins
                 sep = implements == null ? ":" : ",";
-                foreach (var mixinType in type.DeclaringInterfaces.OrderBy(x => x.Name))
+                foreach (var mixinType in type.DeclaringInterfaces.OrderBy(x => x.ClrName))
                 {
-                    sb.AppendFormat("{0} I{1}", sep, mixinType.Name);
+                    sb.AppendFormat("{0} I{1}", sep, mixinType.ClrName);
                     sep = ",";
                 }
 
@@ -109,7 +109,7 @@ namespace Zbu.ModelsBuilder.Build
 
                 // write the properties - only the local ones, we're an interface
                 var more = false;
-                foreach (var prop in type.Properties.OrderBy(x => x.Name))
+                foreach (var prop in type.Properties.OrderBy(x => x.ClrName))
                 {
                     if (more) sb.Append("\n");
                     more = true;
@@ -121,12 +121,12 @@ namespace Zbu.ModelsBuilder.Build
 
             // write the class declaration
             if (type.IsRenamed)
-            sb.AppendFormat("\t// Content Type {0} with alias \"{1}\"\n", type.Id, type.Alias);
+                sb.AppendFormat("\t// Content Type {0} with alias \"{1}\"\n", type.Id, type.Alias);
             sb.AppendFormat("\t[PublishedContentModel(\"{0}\")]\n", type.Alias);
-            sb.AppendFormat("\tpublic partial class {0}", type.Name);
+            sb.AppendFormat("\tpublic partial class {0}", type.ClrName);
             var inherits = type.BaseType == null || type.BaseType.IsContentIgnored
                 ? (type.HasBase ? null : Disco.GetModelsBaseClassName("PublishedContentModel"))
-                : type.BaseType.Name;
+                : type.BaseType.ClrName;
             if (inherits != null)
                 sb.AppendFormat(" : {0}", inherits);
 
@@ -134,15 +134,15 @@ namespace Zbu.ModelsBuilder.Build
             if (type.IsMixin)
             {
                 // if it's a mixin it implements its own interface
-                sb.AppendFormat("{0} I{1}", sep, type.Name);
+                sb.AppendFormat("{0} I{1}", sep, type.ClrName);
             }
             else
             {
                 // write the mixins, if any, as interfaces
                 // only if not a mixin because otherwise the interface already has them already
-                foreach (var mixinType in type.DeclaringInterfaces.OrderBy(x => x.Name))
+                foreach (var mixinType in type.DeclaringInterfaces.OrderBy(x => x.ClrName))
                 {
-                    sb.AppendFormat("{0} I{1}", sep, mixinType.Name);
+                    sb.AppendFormat("{0} I{1}", sep, mixinType.ClrName);
                     sep = ",";
                 }
             }
@@ -159,14 +159,14 @@ namespace Zbu.ModelsBuilder.Build
 
             // write the ctor
             sb.AppendFormat("\t\tpublic {0}(IPublishedContent content)\n\t\t\t: base(content)\n\t\t{{ }}\n\n",
-                type.Name);
+                type.ClrName);
 
             // write the static methods
             // as 'new' since parent has its own
             sb.Append("\t\tpublic new static PublishedContentType GetModelContentType()\n");
             sb.Append("\t\t{\n\t\t\treturn PublishedContentType.Get(ModelItemType, ModelTypeAlias);\n\t\t}\n\n");
             sb.AppendFormat("\t\tpublic static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<{0}, TValue>> selector)\n",
-                type.Name);
+                type.ClrName);
             sb.Append("\t\t{\n\t\t\treturn PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);\n\t\t}\n");
 
             // write the properties
@@ -179,7 +179,7 @@ namespace Zbu.ModelsBuilder.Build
         private void WriteContentTypeProperties(StringBuilder sb, TypeModel type)
         {
             // write the properties
-            foreach (var prop in type.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.Name))
+            foreach (var prop in type.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
                 WriteProperty(sb, prop);
 
             // no need to write the parent properties since we inherit from the parent
@@ -187,8 +187,8 @@ namespace Zbu.ModelsBuilder.Build
             // since the mixins are only interfaces and we have to provide an implementation.
 
             // write the mixins properties
-            foreach (var mixinType in type.ImplementingInterfaces.OrderBy(x => x.Name))
-                foreach (var prop in mixinType.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.Name))
+            foreach (var mixinType in type.ImplementingInterfaces.OrderBy(x => x.ClrName))
+                foreach (var prop in mixinType.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
                     WriteProperty(sb, prop);
         }
 
@@ -201,7 +201,7 @@ namespace Zbu.ModelsBuilder.Build
             sb.Append("\t\tpublic ");
             WriteClrType(sb, property.ClrType);
             sb.AppendFormat(" {0}\n\t\t{{\n\t\t\tget {{ return this.GetPropertyValue",
-                property.Name);
+                property.ClrName);
             if (property.ClrType != typeof(object))
             {
                 sb.Append("<");
@@ -217,7 +217,7 @@ namespace Zbu.ModelsBuilder.Build
             sb.Append("\t\t");
             WriteClrType(sb, property.ClrType);
             sb.AppendFormat(" {0} {{ get; }}\n",
-                property.Name);
+                property.ClrName);
         }
 
         // internal for unit tests

@@ -20,10 +20,20 @@ namespace Zbu.ModelsBuilder.Build
         public string Alias;
 
         /// <summary>
-        /// Gets the name of the model.
+        /// Gets the name of the content type.
+        /// </summary>
+        public string Name;
+
+        /// <summary>
+        /// Gets the description of the content type.
+        /// </summary>
+        public string Description;
+
+        /// <summary>
+        /// Gets the clr name of the model.
         /// </summary>
         /// <remarks>This is the complete name eg "Foo.Bar.MyContent".</remarks>
-        public string Name;
+        public string ClrName;
 
         /// <summary>
         /// Gets the unique identifier of the base content type.

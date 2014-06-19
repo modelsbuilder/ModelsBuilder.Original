@@ -145,7 +145,7 @@ namespace Zbu.ModelsBuilder.AspNet
             {
                 var sb = new StringBuilder();
                 builder.Generate(sb, typeModel);
-                models[typeModel.Name] = sb.ToString();
+                models[typeModel.ClrName] = sb.ToString();
             }
 
             return Request.CreateResponse(HttpStatusCode.OK, models, Configuration.Formatters.JsonFormatter);
@@ -198,7 +198,7 @@ namespace Zbu.ModelsBuilder.AspNet
             {
                 var sb = new StringBuilder();
                 builder.Generate(sb, typeModel);
-                var filename = Path.Combine(modelsDirectory, typeModel.Name + ".generated.cs");
+                var filename = Path.Combine(modelsDirectory, typeModel.ClrName + ".generated.cs");
                 File.WriteAllText(filename, sb.ToString());
             }
         }

@@ -96,12 +96,12 @@ namespace Zbu.ModelsBuilder.Build
             // handle model renames
             foreach (var typeModel in _typeModels.Where(x => disco.IsContentRenamed(x.Alias)))
             {
-                typeModel.Name = disco.ContentName(typeModel.Alias);
+                typeModel.ClrName = disco.ContentClrName(typeModel.Alias);
                 typeModel.IsRenamed = true;
             }
 
             // mark OmitBase models that we discovered already have a base class
-            foreach (var typeModel in _typeModels.Where(x => disco.HasContentBase(disco.ContentName(x.Alias) ?? x.Name)))
+            foreach (var typeModel in _typeModels.Where(x => disco.HasContentBase(disco.ContentClrName(x.Alias) ?? x.ClrName)))
                 typeModel.HasBase = true;
 
             foreach (var typeModel in _typeModels)
@@ -110,25 +110,25 @@ namespace Zbu.ModelsBuilder.Build
                 // ie is marked as ignored on type, or on any parent type
                 var tm = typeModel;
                 foreach (var property in typeModel.Properties
-                    .Where(property => tm.EnumerateBaseTypes(true).Any(x => disco.IsPropertyIgnored(disco.ContentName(x.Alias) ?? x.Name, property.Alias))))
+                    .Where(property => tm.EnumerateBaseTypes(true).Any(x => disco.IsPropertyIgnored(disco.ContentClrName(x.Alias) ?? x.ClrName, property.Alias))))
                 {
                     property.IsIgnored = true;
                 }
 
                 // handle property renames
                 foreach (var property in typeModel.Properties)
-                    property.Name = disco.PropertyName(disco.ContentName(typeModel.Alias) ?? typeModel.Name, property.Alias) ?? property.Name;
+                    property.ClrName = disco.PropertyClrName(disco.ContentClrName(typeModel.Alias) ?? typeModel.ClrName, property.Alias) ?? property.ClrName;
             }
 
             // ensure we have no duplicates type names
-            foreach (var xx in _typeModels.Where(x => !x.IsContentIgnored).GroupBy(x => x.Name).Where(x => x.Count() > 1))
+            foreach (var xx in _typeModels.Where(x => !x.IsContentIgnored).GroupBy(x => x.ClrName).Where(x => x.Count() > 1))
                 throw new InvalidOperationException(string.Format("Type name \"{0}\" is used for {1}. Should be used for one type only.", 
                     xx.Key, 
                     string.Join(", ", xx.Select(x => x.ItemType + ":\"" + x.Alias + "\""))));
 
             // ensure we have no duplicates property names
             foreach (var typeModel in _typeModels.Where(x => !x.IsContentIgnored))
-                foreach (var xx in typeModel.Properties.Where(x => !x.IsIgnored).GroupBy(x => x.Name).Where(x => x.Count() > 1))
+                foreach (var xx in typeModel.Properties.Where(x => !x.IsIgnored).GroupBy(x => x.ClrName).Where(x => x.Count() > 1))
                     throw new InvalidOperationException(string.Format("Property name \"{0}\" in type with alias \"{1}\" is used for properties with alias {2}. Should be used for one property only.",
                         xx.Key, typeModel.Alias,
                         string.Join(", ", xx.Select(x => "\"" + x.Alias + "\""))));

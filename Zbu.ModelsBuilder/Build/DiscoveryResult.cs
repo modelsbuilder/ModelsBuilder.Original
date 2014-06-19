@@ -148,7 +148,7 @@ namespace Zbu.ModelsBuilder.Build
             return _renamedContent.ContainsKey(contentAlias);
         }
 
-        public string ContentName(string contentAlias)
+        public string ContentClrName(string contentAlias)
         {
             string name;
             return (_renamedContent.TryGetValue(contentAlias, out name)) ? name : null;
@@ -175,7 +175,7 @@ namespace Zbu.ModelsBuilder.Build
             return false;
         }
 
-        public string PropertyName(string contentName, string propertyAlias)
+        public string PropertyClrName(string contentName, string propertyAlias)
         {
             Dictionary<string, string> renames;
             string name;
@@ -183,11 +183,11 @@ namespace Zbu.ModelsBuilder.Build
                 && renames.TryGetValue(propertyAlias, out name)) return name;
             string baseName;
             if (_contentBase.TryGetValue(contentName, out baseName)
-                && null != (name = PropertyName(baseName, propertyAlias))) return name;
+                && null != (name = PropertyClrName(baseName, propertyAlias))) return name;
             string[] interfaceNames;
             if (_contentInterfaces.TryGetValue(contentName, out interfaceNames)
                 && null != (name = interfaceNames
-                    .Select(interfaceName => PropertyName(interfaceName, propertyAlias))
+                    .Select(interfaceName => PropertyClrName(interfaceName, propertyAlias))
                     .FirstOrDefault(x => x != null))) return name;
             return null;
         }

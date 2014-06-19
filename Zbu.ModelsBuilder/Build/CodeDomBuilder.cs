@@ -32,16 +32,16 @@ namespace Zbu.ModelsBuilder.Build
 
             if (typeModel.IsMixin)
             {
-                var i = new CodeTypeDeclaration("I" + typeModel.Name)
+                var i = new CodeTypeDeclaration("I" + typeModel.ClrName)
                 {
                     IsInterface = true,
                     IsPartial = true,
                     Attributes = MemberAttributes.Public
                 };
-                i.BaseTypes.Add(typeModel.BaseType == null ? "IPublishedContent" : "I" + typeModel.BaseType.Name);
+                i.BaseTypes.Add(typeModel.BaseType == null ? "IPublishedContent" : "I" + typeModel.BaseType.ClrName);
 
                 foreach (var mixinType in typeModel.DeclaringInterfaces)
-                    i.BaseTypes.Add(mixinType.Name);
+                    i.BaseTypes.Add(mixinType.ClrName);
 
                 i.Comments.Add(new CodeCommentStatement(
                     string.Format("Mixin content Type {0} with alias \"{1}\"", typeModel.Id, typeModel.Alias)));
@@ -49,7 +49,7 @@ namespace Zbu.ModelsBuilder.Build
                 foreach (var propertyModel in typeModel.Properties)
                 {
                     var p = new CodeMemberProperty();
-                    p.Name = propertyModel.Name;
+                    p.Name = propertyModel.ClrName;
                     p.Type = new CodeTypeReference(propertyModel.ClrType);
                     p.Attributes = MemberAttributes.Public;
                     p.HasGet = true;
@@ -58,27 +58,27 @@ namespace Zbu.ModelsBuilder.Build
                 }
             }
 
-            var c = new CodeTypeDeclaration(typeModel.Name)
+            var c = new CodeTypeDeclaration(typeModel.ClrName)
             {
                 IsClass = true,
                 IsPartial = true,
                 Attributes = MemberAttributes.Public
             };
 
-            c.BaseTypes.Add(typeModel.BaseType == null ? "PublishedContentModel" : typeModel.BaseType.Name);
+            c.BaseTypes.Add(typeModel.BaseType == null ? "PublishedContentModel" : typeModel.BaseType.ClrName);
 
             // if it's a missing it implements its own interface
             if (typeModel.IsMixin)
-                c.BaseTypes.Add("I" + typeModel.Name);
+                c.BaseTypes.Add("I" + typeModel.ClrName);
 
             // write the mixins, if any, as interfaces
             // only if not a mixin because otherwise the interface already has them
             if (typeModel.IsMixin == false)
                 foreach (var mixinType in typeModel.DeclaringInterfaces)
-                    c.BaseTypes.Add("I" + mixinType.Name);
+                    c.BaseTypes.Add("I" + mixinType.ClrName);
 
             foreach (var mixin in typeModel.MixinTypes)
-                c.BaseTypes.Add("I" + mixin.Name);
+                c.BaseTypes.Add("I" + mixin.ClrName);
 
             c.Comments.Add(new CodeCommentStatement(
                 string.Format("Content Type {0} with alias \"{1}\"", typeModel.Id, typeModel.Alias)));
@@ -86,7 +86,7 @@ namespace Zbu.ModelsBuilder.Build
             foreach (var propertyModel in typeModel.Properties)
             {
                 var p = new CodeMemberProperty();
-                p.Name = propertyModel.Name;
+                p.Name = propertyModel.ClrName;
                 p.Type = new CodeTypeReference(propertyModel.ClrType);
                 p.Attributes = MemberAttributes.Public;
                 p.HasGet = true;

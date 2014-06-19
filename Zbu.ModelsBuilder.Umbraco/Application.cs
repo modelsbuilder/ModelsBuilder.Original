@@ -300,8 +300,11 @@ namespace Zbu.ModelsBuilder.Umbraco
                 {
                     Id = contentType.Id,
                     Alias = contentType.Alias,
-                    Name = contentType.Alias.ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase),
-                    BaseTypeId = contentType.ParentId
+                    ClrName = contentType.Alias.ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase),
+                    BaseTypeId = contentType.ParentId,
+
+                    Name = contentType.Name,
+                    Description = contentType.Description
                 };
 
                 switch (itemType)
@@ -328,7 +331,10 @@ namespace Zbu.ModelsBuilder.Umbraco
                     var propertyModel = new PropertyModel
                     {
                         Alias = propertyType.Alias,
-                        Name = propertyType.Alias.ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase)
+                        ClrName = propertyType.Alias.ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase),
+
+                        Name = propertyType.Name,
+                        Description = propertyType.Description
                     };
 
                     var publishedPropertyType = publishedContentType.GetPropertyType(propertyType.Alias);

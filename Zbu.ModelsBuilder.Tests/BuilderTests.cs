@@ -73,7 +73,7 @@ using Zbu.ModelsBuilder;
             {
                 Id = 1,
                 Alias = "type1",
-                Name = "Type1",
+                ClrName = "Type1",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -109,7 +109,7 @@ using Zbu.ModelsBuilder;
             {
                 Id = 1,
                 Alias = "type1",
-                Name = "Type1",
+                ClrName = "Type1",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -145,7 +145,7 @@ using Zbu.ModelsBuilder;
             {
                 Id = 1,
                 Alias = "type1",
-                Name = "Type1",
+                ClrName = "Type1",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -155,7 +155,7 @@ using Zbu.ModelsBuilder;
             {
                 Id = 2,
                 Alias = "type2",
-                Name = "Type2",
+                ClrName = "Type2",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -165,7 +165,7 @@ using Zbu.ModelsBuilder;
             {
                 Id = 3,
                 Alias = "ttype3",
-                Name = "Ttype3",
+                ClrName = "Ttype3",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -205,7 +205,7 @@ using Zbu.ModelsBuilder;
             {
                 Id = 1,
                 Alias = "type1",
-                Name = "Type1",
+                ClrName = "Type1",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -215,7 +215,7 @@ using Zbu.ModelsBuilder;
             {
                 Id = 2,
                 Alias = "type2",
-                Name = "Type2",
+                ClrName = "Type2",
                 BaseTypeId = 1,
                 BaseType = type1,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -255,7 +255,7 @@ using Zbu.ModelsBuilder;
             {
                 Id = 1,
                 Alias = "type1",
-                Name = "Type1",
+                ClrName = "Type1",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -265,7 +265,7 @@ using Zbu.ModelsBuilder;
             {
                 Id = 2,
                 Alias = "type2",
-                Name = "Type2",
+                ClrName = "Type2",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -308,7 +308,7 @@ using Zbu.ModelsBuilder;
             {
                 Id = 1,
                 Alias = "type1",
-                Name = "Type1",
+                ClrName = "Type1",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -318,7 +318,7 @@ using Zbu.ModelsBuilder;
             {
                 Id = 2,
                 Alias = "type2",
-                Name = "Type2",
+                ClrName = "Type2",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -343,14 +343,14 @@ using Zbu.ModelsBuilder;
             Assert.IsFalse(disco.IsIgnored("type2"));
             Assert.IsTrue(disco.IsContentRenamed("type1"));
             Assert.IsFalse(disco.IsContentRenamed("type2"));
-            Assert.AreEqual("Renamed1", disco.ContentName("type1"));
-            Assert.IsNull(disco.ContentName("type2"));
+            Assert.AreEqual("Renamed1", disco.ContentClrName("type1"));
+            Assert.IsNull(disco.ContentClrName("type2"));
 
             Assert.AreEqual(2, btypes.Count);
             Assert.IsFalse(btypes[0].IsContentIgnored);
             Assert.IsFalse(btypes[1].IsContentIgnored);
-            Assert.AreEqual("Renamed1", btypes[0].Name);
-            Assert.AreEqual("Type2", btypes[1].Name);
+            Assert.AreEqual("Renamed1", btypes[0].ClrName);
+            Assert.AreEqual("Type2", btypes[1].ClrName);
         }
         
         [Test]
@@ -362,7 +362,7 @@ using Zbu.ModelsBuilder;
             {
                 Id = 1,
                 Alias = "type1",
-                Name = "Type1",
+                ClrName = "Type1",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -372,7 +372,7 @@ using Zbu.ModelsBuilder;
             {
                 Id = 2,
                 Alias = "type2",
-                Name = "Type2",
+                ClrName = "Type2",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -402,14 +402,14 @@ namespace Models
             Assert.IsFalse(disco.IsIgnored("type2"));
             Assert.IsTrue(disco.IsContentRenamed("type1"));
             Assert.IsFalse(disco.IsContentRenamed("type2"));
-            Assert.AreEqual("Renamed1", disco.ContentName("type1"));
-            Assert.IsNull(disco.ContentName("type2"));
+            Assert.AreEqual("Renamed1", disco.ContentClrName("type1"));
+            Assert.IsNull(disco.ContentClrName("type2"));
 
             Assert.AreEqual(2, btypes.Count);
             Assert.IsFalse(btypes[0].IsContentIgnored);
             Assert.IsFalse(btypes[1].IsContentIgnored);
-            Assert.AreEqual("Renamed1", btypes[0].Name);
-            Assert.AreEqual("Type2", btypes[1].Name);
+            Assert.AreEqual("Renamed1", btypes[0].ClrName);
+            Assert.AreEqual("Type2", btypes[1].ClrName);
         }
 
         [Test]
@@ -421,7 +421,7 @@ namespace Models
             {
                 Id = 1,
                 Alias = "type1",
-                Name = "Type1",
+                ClrName = "Type1",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -429,7 +429,7 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                Name = "Prop1",
+                ClrName = "Prop1",
                 ClrType = typeof(string),
             });
 
@@ -469,7 +469,7 @@ namespace Models
             {
                 Id = 1,
                 Alias = "type1",
-                Name = "Type1",
+                ClrName = "Type1",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -477,19 +477,19 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                Name = "Prop1",
+                ClrName = "Prop1",
                 ClrType = typeof(string),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop2",
-                Name = "Prop2",
+                ClrName = "Prop2",
                 ClrType = typeof(string),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "pprop3",
-                Name = "Pprop3",
+                ClrName = "Pprop3",
                 ClrType = typeof(string),
             });
 
@@ -533,7 +533,7 @@ namespace Models
             {
                 Id = 1,
                 Alias = "type1",
-                Name = "Type1",
+                ClrName = "Type1",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -541,7 +541,7 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                Name = "Prop1",
+                ClrName = "Prop1",
                 ClrType = typeof(string),
             });
 
@@ -585,7 +585,7 @@ namespace Models
             {
                 Id = 1,
                 Alias = "type1",
-                Name = "Type1",
+                ClrName = "Type1",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -593,7 +593,7 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                Name = "Prop1",
+                ClrName = "Prop1",
                 ClrType = typeof(string),
             });
 
@@ -619,11 +619,11 @@ namespace Models
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 
-            Assert.AreEqual("Renamed1", disco.PropertyName("Type1", "prop1"));
-            Assert.AreEqual("Renamed2", disco.PropertyName("Type1", "prop2"));
+            Assert.AreEqual("Renamed1", disco.PropertyClrName("Type1", "prop1"));
+            Assert.AreEqual("Renamed2", disco.PropertyClrName("Type1", "prop2"));
 
             Assert.AreEqual(1, btypes.Count);
-            Assert.IsTrue(btypes[0].Properties[0].Name == "Renamed1");
+            Assert.IsTrue(btypes[0].Properties[0].ClrName == "Renamed1");
         }
 
         [Test]
@@ -635,7 +635,7 @@ namespace Models
             {
                 Id = 1,
                 Alias = "type1",
-                Name = "Type1",
+                ClrName = "Type1",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -643,7 +643,7 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                Name = "Prop1",
+                ClrName = "Prop1",
                 ClrType = typeof(string),
             });
 
@@ -673,11 +673,11 @@ namespace Models
             builder.Prepare(disco);
             var btypes = builder.TypeModels;
 
-            Assert.AreEqual("Renamed1", disco.PropertyName("Type1", "prop1"));
-            Assert.AreEqual("Renamed2", disco.PropertyName("Type1", "prop2"));
+            Assert.AreEqual("Renamed1", disco.PropertyClrName("Type1", "prop1"));
+            Assert.AreEqual("Renamed2", disco.PropertyClrName("Type1", "prop2"));
 
             Assert.AreEqual(1, btypes.Count);
-            Assert.IsTrue(btypes[0].Properties[0].Name == "Renamed1");
+            Assert.IsTrue(btypes[0].Properties[0].ClrName == "Renamed1");
         }
 
         [Test]
@@ -689,7 +689,7 @@ namespace Models
             {
                 Id = 1,
                 Alias = "type1",
-                Name = "Type1",
+                ClrName = "Type1",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -697,7 +697,7 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                Name = "Prop1",
+                ClrName = "Prop1",
                 ClrType = typeof(string),
             });
 
@@ -738,7 +738,7 @@ namespace Models
             {
                 Id = 1,
                 Alias = "type1",
-                Name = "Type1",
+                ClrName = "Type1",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -746,7 +746,7 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                Name = "Prop1",
+                ClrName = "Prop1",
                 ClrType = typeof(string),
             });
 
@@ -791,7 +791,7 @@ namespace Models
             {
                 Id = 1,
                 Alias = "type1",
-                Name = "Type1",
+                ClrName = "Type1",
                 BaseTypeId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -799,7 +799,7 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                Name = "Prop1",
+                ClrName = "Prop1",
                 ClrType = typeof(string),
             });
 
