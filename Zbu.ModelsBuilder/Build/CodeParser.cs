@@ -18,8 +18,8 @@ namespace Zbu.ModelsBuilder.Build
         /// Parses a set of file.
         /// </summary>
         /// <param name="files">A set of (filename,content) representing content to parse.</param>
-        /// <returns>A FIXME discovered in the files.</returns>
-        /// <remarks>The set of files is a dictionary of </remarks>
+        /// <returns>The result of the code parsing.</returns>
+        /// <remarks>The set of files is a dictionary of name, content.</remarks>
         public ParseResult Parse(IDictionary<string, string> files)
         {
             var options = new CSharpParseOptions();

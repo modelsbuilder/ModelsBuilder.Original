@@ -34,6 +34,8 @@ namespace Zbu.ModelsBuilder.Build
         private readonly List<string> _usingNamespaces
             = new List<string>();
 
+        public static readonly ParseResult Empty = new ParseResult();
+
         #region Declare
 
         // content with that alias should not be generated

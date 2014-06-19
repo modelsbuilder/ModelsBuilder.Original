@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Web.Compilation;
 using System.Web.Hosting;
+using Umbraco.Web.Cache;
 using Zbu.ModelsBuilder.Build;
 using Zbu.ModelsBuilder.Configuration;
 using Zbu.ModelsBuilder.Umbraco;
@@ -26,6 +27,7 @@ namespace Zbu.ModelsBuilder.AspNet
     {
         private static readonly object LockO = new object();
         private static bool _triedToGetModelsAssemblyAlready;
+        private static bool _initialized;
         private static Assembly _modelsAssembly;
 
         public override void GenerateCode(AssemblyBuilder assemblyBuilder)
@@ -37,13 +39,36 @@ namespace Zbu.ModelsBuilder.AspNet
             base.GenerateCode(assemblyBuilder);
         }
 
+        private static void Initialize()
+        {
+            // anything changes, and we want to re-generate models.
+            ContentTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModelsAssembly();
+            DataTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModelsAssembly();
+
+            _initialized = true;
+        }
+
+        private static void ResetModelsAssembly()
+        {
+            lock (LockO)
+            {
+                _modelsAssembly = null;
+                _triedToGetModelsAssemblyAlready = false;
+            }
+        }
+
         private static void AddModelsAssemblyReference(AssemblyBuilder assemblyBuilder)
         {
             lock (LockO)
             {
+                if (!_initialized)
+                    Initialize();
+
                 if (_modelsAssembly == null && !_triedToGetModelsAssemblyAlready)
+                {
                     _modelsAssembly = GetModelsAssembly();
-                _triedToGetModelsAssemblyAlready = true;
+                    _triedToGetModelsAssemblyAlready = true;
+                }
             }
             if (_modelsAssembly != null)
                 assemblyBuilder.AddAssemblyReference(_modelsAssembly);
@@ -55,27 +80,10 @@ namespace Zbu.ModelsBuilder.AspNet
             var appData = HostingEnvironment.MapPath("~/App_Data");
             if (appData == null || !Directory.Exists(appData)) return null;
 
-            //// ensure we have a models directory and it's not empty
-            //var modelsDirectory = Path.Combine(appData, "Models");
-            //if (!Directory.Exists(modelsDirectory)) return null;
-            //var files = Directory.GetFiles(modelsDirectory, "*.cs");
-            //if (files.Length == 0) return null;
-
-            //// concatenate all code files into one
-            //var code = new StringBuilder();
-            //foreach (var file in files)
-            //{
-            //    code.AppendFormat("// FILE: {0}\n\n", file);
-            //    var text = File.ReadAllText(file);
-            //    code.Append(text);
-            //    code.Append("\n\n");
-            //}
-
             var umbraco = Application.GetApplication();
             var typeModels = umbraco.GetAllTypes();
 
-            var parseResult = new CodeParser().Parse(new Dictionary<string, string>());
-            var builder = new TextBuilder(typeModels, parseResult, Config.ModelsNamespace);
+            var builder = new TextBuilder(typeModels, ParseResult.Empty, Config.ModelsNamespace);
 
             var code = new StringBuilder();
             builder.Generate(code, builder.GetModelsToGenerate());
