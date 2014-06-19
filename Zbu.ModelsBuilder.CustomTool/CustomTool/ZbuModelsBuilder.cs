@@ -17,14 +17,14 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
     [ComVisible(true)]
     public abstract class ZbuModelsBuilder : IVsSingleFileGenerator
     {
-        private readonly CodeDomProvider _codeDomProvider;
-        private readonly TypeAttributes? _classAccessibility;
+        //private readonly CodeDomProvider _codeDomProvider;
+        //private readonly TypeAttributes? _classAccessibility;
 
-        protected ZbuModelsBuilder(CodeDomProvider codeDomProvider, TypeAttributes? classAccessibility = null)
-        {
-            this._codeDomProvider = codeDomProvider;
-            this._classAccessibility = classAccessibility;
-        }
+        //protected ZbuModelsBuilder(CodeDomProvider codeDomProvider, TypeAttributes? classAccessibility = null*)
+        //{
+        //    this._codeDomProvider = codeDomProvider;
+        //    this._classAccessibility = classAccessibility;
+        //}
 
         #region IVsSingleFileGenerator Members
 
@@ -42,6 +42,7 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                 // though that only happens if you explicitely set it to whitespaces
                 // otherwise VisualStudio will use the default one... so it will work
                 // if the namespace is left empty in VS.
+                // fixme we should guess it from current location!
                 if (string.IsNullOrWhiteSpace(wszDefaultNamespace))
                     throw new Exception("No namespace.");
 
@@ -52,102 +53,13 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                 var options = VisualStudioHelper.GetOptions();
                 options.Validate();
 
-                // that whole block tries to run the standalone application
-                // but it's a dead-end: what if we want the global.asax to register
-                // some property converters and we want to have them detected?!
-
-                /*
-                // get umbraco root directory in ApplicationData
-                // because the RemoteApplication runs in ApplicationData
-                // this creates the directory if required
-                var umbracoRoot = Umbraco.Application.GetLocalApplicationDataRootDirectory();
-
-                // recreate the bin directory
-                // fixme - once we've crashed we cannot delete the dll files
-                // fixme - thought that using a domain would precisely prevent this?
-                // fixme - or should we just run from where we are but shadow-copy dlls?
-                var umbracoBin = Path.Combine(umbracoRoot, "bin");
-                if (Directory.Exists(umbracoBin))
-                    Directory.Delete(umbracoBin, true);
-                Directory.CreateDirectory(umbracoBin);
-
-                // copy the local dlls
-                var projectBin = VisualStudioHelper.GetProjectBin(options.BinaryDirectory);
-                VisualStudioHelper.ReportMessage("Copy dlls from {0} into {1}.", projectBin, umbracoBin);
-                foreach (var file in Directory.GetFiles(projectBin, "*.dll", SearchOption.TopDirectoryOnly))
-                {
-                    var filename = Path.GetFileName(file);
-                    VisualStudioHelper.ReportMessage("Copy {0}.", filename);
-                    File.Copy(file, Path.Combine(umbracoBin, filename));
-                }
-
-                // copy our dlls
-                // fixme - overriding, is this a good idea?
-                // CodeBase looks like file:\C:\Users\JohnDoe\AppData\Local\Microsoft\VisualStudio\11.0\Extensions\4mtv4yyr.bgy\Zbu.ModelsBuilder.dll
-                var localBin = new Uri(Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase)).LocalPath;
-                VisualStudioHelper.ReportMessage("Copy Zbu.ModelsBuilder dlls from {0} into {1}.", localBin, umbracoBin);
-                foreach (var filename in new[] {"Zbu.ModelsBuilder.dll", "Zbu.ModelsBuilder.Umbraco.dll"})
-                {
-                    var file = Path.Combine(localBin, filename);
-                    VisualStudioHelper.ReportMessage("Copy {0}.", filename);
-                    File.Copy(file, Path.Combine(umbracoBin, filename), true);
-                }
-
-                // create a new app domain for Umbraco
-                var domainSetup = new AppDomainSetup
-                {
-                    ApplicationName = "Zbu.ModelsBuilder.CustomTool",
-                    ApplicationBase = umbracoRoot,
-                    PrivateBinPath = umbracoBin,
-                    // read http://msdn.microsoft.com/it-it/library/43wc4hhs.aspx
-                    // read http://connect.microsoft.com/VisualStudio/feedback/details/536783/vsip-assembly-file-handles-not-being-released-after-appdomain-unload
-                    // we want to be able to delete the dlls once the domain has been unloaded
-                    LoaderOptimization = LoaderOptimization.MultiDomainHost
-                };
-                VisualStudioHelper.ReportMessage("Create AppDomain and connect to Umbraco.");
-                AppDomain domain = null;
-                IList<TypeModel> modelTypes;
-                try
-                {
-                    domain = AppDomain.CreateDomain("Zbu.ModelsBuilder.CustomTool", null, domainSetup);
-
-                    // instanciate the RemoteApplication and retrieve the model types
-                    // because it runs in the domain and with all files copied, Umbraco's plugin
-                    // manager should detect and load all our files, property converters, etc
-                    var assemblyFile = Path.Combine(umbracoBin, "Zbu.ModelsBuilder.Umbraco.dll");
-                    var remote = domain.CreateInstanceFromAndUnwrap(assemblyFile, "Zbu.ModelsBuilder.Umbraco.RemoteApplication") as Umbraco.RemoteApplication;
-                    modelTypes = remote.GetContentAndMediaTypes(options.ConnectionString, options.DatabaseProvider);
-                }
-                finally
-                {
-                    if (domain != null)
-                        try
-                        {
-                            // kill the domain
-                            AppDomain.Unload(domain);
-                        }
-// ReSharper disable once EmptyGeneralCatchClause
-                        catch {} // I know what you think
-                }
-                */
-
-                // so let's start from scratch by hitting Umbraco via a WebApi
-                // FIXME - cleanup all this if it works
-                // but a TypeModel reference the CLR type of the property
-                // so the API wants to deserialize that type => must know about it
-                // so we still have the issue that those types are not referenced
-                // and so... we still need the whole AppDomain stuff unless we get
-                // everything generated on Umbraco's side (by passing the parsed
-                // stuff out there?)
-                //var modelTypes = AspNet.ModelsBuilderApi.GetTypeModels(options.UmbracoUrl, options.UmbracoUser, options.UmbracoPassword);
+                var api = new AspNet.ModelsBuilderApi(options.UmbracoUrl, options.UmbracoUser, options.UmbracoPassword);
+                api.ValidateClientVersion(); // so we get a meaningful error message first
 
                 // exclude .generated.cs files but don't delete them now, should anything go wrong
                 var ourFiles = Directory.GetFiles(path, "*.cs")
                     .Where(x => !x.EndsWith(".generated.cs"))
                     .ToDictionary(x => x, File.ReadAllText);
-                //var codeInfos = CodeInfos.ParseFiles(Directory.GetFiles(path, "*.cs").Where(x => !x.EndsWith(".generated.cs")));
-                var api = new AspNet.ModelsBuilderApi(options.UmbracoUrl, options.UmbracoUser, options.UmbracoPassword);
-                api.ValidateClientVersion(); // so we get a meaningful error message first
                 var genFiles = api.GetModels(ourFiles, wszDefaultNamespace);
 
                 /*
@@ -159,29 +71,6 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
 
                 foreach (var file in Directory.GetFiles(path, "*.generated.cs"))
                     File.Delete(file);
-
-                /*
-                var builder = new TextBuilder();
-                builder.Namespace = wszDefaultNamespace;
-                builder.Prepare(modelTypes, CodeInfos.ParseFiles(Directory.GetFiles(path, "*.cs")));
-
-                VisualStudioHelper.ReportMessage("Need to generate {0} files.", modelTypes.Count);
-
-                var inputFilename = Path.GetFileNameWithoutExtension(wszInputFilePath);
-                if (modelTypes.Any(x => x.Name.InvariantEquals(inputFilename)))
-                    throw new Exception("Name collision, there is a model named " + inputFilename);
-
-                foreach (var modelType in modelTypes)
-                {
-                    var sb = new StringBuilder();
-                    builder.Generate(sb, modelType);
-                    var filename = Path.Combine(path, modelType.Name + ".generated.cs");
-                    File.WriteAllText(filename, sb.ToString());
-                    VisualStudioHelper.AddGeneratedItem(vsitem, filename);
-                }
-
-                VisualStudioHelper.ReportMessage("Generated {0} files.", modelTypes.Count);
-                */
 
                 foreach (var file in genFiles)
                 {
@@ -230,7 +119,6 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                         VisualStudioHelper.ReportMessage(aggrInner.StackTrace);
                     }
 
-                //MessageBox.Show(e.Message, "Unable to generate code");
                 throw;
             }
 

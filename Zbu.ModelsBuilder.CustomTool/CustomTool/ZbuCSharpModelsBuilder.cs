@@ -8,7 +8,7 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
     public class ZbuCSharpModelsBuilder : ZbuModelsBuilder
     {
         public ZbuCSharpModelsBuilder()
-            : base(new CSharpCodeProvider())
+            //: base(new CSharpCodeProvider())
         {
         }
 
