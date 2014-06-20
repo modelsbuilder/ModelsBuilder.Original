@@ -210,9 +210,19 @@
   <Target Name="AfterBuild" DependsOnTargets="CopyVsix">
   </Target>
   <Target Name="CopyVsix">
+    <!-- get the assembly version -->
     <GetAssemblyIdentity AssemblyFiles="$(OutputPath)Zbu.ModelsBuilder.dll">
       <Output TaskParameter="Assemblies" ItemName="AssemblyInfos" />
     </GetAssemblyIdentity>
-    <Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\Zbu.ModelsBuilder.CustomTool.vsix" DestinationFiles="$(SolutionDir)build\$(Configuration)\Zbu.ModelsBuilder.CustomTool-%(AssemblyInfos.Version).vsix" />
+    <!-- dunno how to get the assembly informational version -->
+    <ReadLinesFromFile File="$(SolutionDir)Zbu.ModelsBuilder\Properties\CommonInfo.cs">
+      <Output TaskParameter="Lines" ItemName="CommonInfosLines" />
+    </ReadLinesFromFile>
+    <PropertyGroup>
+	  <Pattern>(?&lt;=\[assembly: AssemblyInformationalVersion\(").*(?="\)\])</Pattern>
+      <In>@(CommonInfosLines)</In>
+      <PackageVersion>$([System.Text.RegularExpressions.Regex]::Match($(In), $(Pattern)))</PackageVersion>
+    </PropertyGroup>
+    <Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\Zbu.ModelsBuilder.CustomTool.vsix" DestinationFiles="$(SolutionDir)build\$(Configuration)\Zbu.ModelsBuilder.CustomTool-$(PackageVersion).vsix" />
   </Target>
 </Project>
