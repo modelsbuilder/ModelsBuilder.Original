@@ -1,28 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using System.Web.Hosting;
-using System.Web.Http;
-using System.Web.Http.Hosting;
-using System.Web.Mvc;
-using System.Web.Routing;
-using System.Web.Security;
-using umbraco.BusinessLogic;
-using Umbraco.Core.IO;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Web.WebApi;
 using Zbu.ModelsBuilder.Build;
 using Zbu.ModelsBuilder.Configuration;
 using Application = Zbu.ModelsBuilder.Umbraco.Application;
-using User = Umbraco.Core.Models.Membership.User;
 
 namespace Zbu.ModelsBuilder.AspNet
 {
@@ -87,10 +76,16 @@ namespace Zbu.ModelsBuilder.AspNet
                 // the UmbracoAuthorize attribute validates the current user
                 // the UmbracoAuthorizedApiController would in addition check for .Disabled and .NoConsole
                 // but to do it it relies on internal methods so we have to do it here explicitely
-                var user = umbraco.BusinessLogic.User.GetCurrent();
-                if (user.Disabled || user.NoConsole )
+
+                // was doing it using legacy User class, now using new API class
+
+                //var user = umbraco.BusinessLogic.User.GetCurrent();
+                var user = UmbracoContext.Security.CurrentUser;
+                //if (user.Disabled || user.NoConsole)
+                if (!user.IsApproved && user.IsLockedOut)
                     return new HttpResponseMessage(HttpStatusCode.Unauthorized);
-                if (user.Applications.All(x => x.alias != "developer"))
+                //if (user.Applications.All(x => x.alias != "developer"))
+                if (!user.AllowedSections.Contains("developer"))
                     return new HttpResponseMessage(HttpStatusCode.Unauthorized);
 
                 var appData = HostingEnvironment.MapPath("~/App_Data");
