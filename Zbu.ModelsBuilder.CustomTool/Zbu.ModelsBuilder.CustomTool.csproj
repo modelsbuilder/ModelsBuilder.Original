@@ -170,6 +170,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -219,7 +220,7 @@
       <Output TaskParameter="Lines" ItemName="CommonInfosLines" />
     </ReadLinesFromFile>
     <PropertyGroup>
-	  <Pattern>(?&lt;=\[assembly: AssemblyInformationalVersion\(").*(?="\)\])</Pattern>
+      <Pattern>(?&lt;=\[assembly: AssemblyInformationalVersion\(").*(?="\)\])</Pattern>
       <In>@(CommonInfosLines)</In>
       <PackageVersion>$([System.Text.RegularExpressions.Regex]::Match($(In), $(Pattern)))</PackageVersion>
     </PropertyGroup>

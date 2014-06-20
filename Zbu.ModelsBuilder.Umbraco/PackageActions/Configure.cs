@@ -8,7 +8,9 @@ namespace Zbu.ModelsBuilder.Umbraco.PackageActions
 {
     // see also http://our.umbraco.org/forum/umbraco-7/developing-umbraco-7-packages/46885-How-can-I-run-code-on-package-uninstall
     // see also http://packageactioncontrib.codeplex.com
-    // what happens when we save web.config?
+
+    // kept here for reference
+    // not used anymore, we now use Configure2 which runs NuGet transforms
 
     public class Configure : IPackageAction
     {

@@ -134,6 +134,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="UserControls\Zbu\ModelsBuilder\logo32x32.png" />
+    <None Include="app.config" />
     <None Include="build\NuSpecs\dashboard.config.install.xdt" />
     <None Include="build\NuSpecs\dashboard.config.uninstall.xdt" />
     <None Include="build\NuSpecs\web.config.install.xdt" />
@@ -201,6 +202,11 @@
       <PackageFiles Include="$(OutputPath)Zbu.ModelsBuilder.Umbraco.dll" />
       <PackageFiles Include="$(OutputPath)Zbu.ModelsBuilder.AspNet.dll" />
       <PackageFiles Include="$(OutputPath)System.Reflection.Metadata.dll" />
+      <PackageFiles Include="$(OutputPath)Microsoft.Web.XmlTransform.dll" />
+      <PackageFiles Include="$(ProjectDir)build\NuSpecs\web.config.install.xdt" />
+      <PackageFiles Include="$(ProjectDir)build\NuSpecs\web.config.uninstall.xdt" />
+      <PackageFiles Include="$(ProjectDir)build\NuSpecs\dashboard.config.install.xdt" />
+      <PackageFiles Include="$(ProjectDir)build\NuSpecs\dashboard.config.uninstall.xdt" />
     </ItemGroup>
     <Package ManifestFile="$(ProjectDir)pkg\package.xml" WorkingDirectory="$(ProjectDir)pkg" OutputDirectory="$(ProjectDir)pkg" Files="@(PackageFiles)" />
     <ItemGroup>

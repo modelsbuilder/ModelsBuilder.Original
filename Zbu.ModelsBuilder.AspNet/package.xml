@@ -1,51 +1,77 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
   <files>
-	<file>
-		<guid>BuildModels.ascx</guid>
-		<orgPath>/UserControls/Zbu/ModelsBuilder</orgPath>
-		<orgName>BuildModels.ascx</orgName>
-	</file>
+	  <file>
+		  <guid>BuildModels.ascx</guid>
+		  <orgPath>/UserControls/Zbu/ModelsBuilder</orgPath>
+		  <orgName>BuildModels.ascx</orgName>
+	  </file>
     <file>
       <guid>logo32x32.png</guid>
       <orgPath>/UserControls/Zbu/ModelsBuilder</orgPath>
       <orgName>logo32x32.png</orgName>
     </file>
     <file>
-		<guid>Microsoft.CodeAnalysis.dll</guid>
-		<orgPath>/bin</orgPath>
-		<orgName>Microsoft.CodeAnalysis.dll</orgName>
-	</file>
-	<file>
-		<guid>Microsoft.CodeAnalysis.CSharp.dll</guid>
-		<orgPath>/bin</orgPath>
-		<orgName>Microsoft.CodeAnalysis.CSharp.dll</orgName>
-	</file>
-  <file>
-    <guid>System.Collections.Immutable.dll</guid>
-    <orgPath>/bin</orgPath>
-    <orgName>System.Collections.Immutable.dll</orgName>
-  </file>
-  <file>
-    <guid>System.Reflection.Metadata.dll</guid>
-    <orgPath>/bin</orgPath>
-    <orgName>System.Reflection.Metadata.dll</orgName>
-  </file>
+		  <guid>Microsoft.CodeAnalysis.dll</guid>
+		  <orgPath>/bin</orgPath>
+		  <orgName>Microsoft.CodeAnalysis.dll</orgName>
+	  </file>
+	  <file>
+		  <guid>Microsoft.CodeAnalysis.CSharp.dll</guid>
+		  <orgPath>/bin</orgPath>
+		  <orgName>Microsoft.CodeAnalysis.CSharp.dll</orgName>
+	  </file>
     <file>
-		<guid>Zbu.ModelsBuilder.dll</guid>
-		<orgPath>/bin</orgPath>
-		<orgName>Zbu.ModelsBuilder.dll</orgName>
-	</file>
-	<file>
-		<guid>Zbu.ModelsBuilder.Umbraco.dll</guid>
-		<orgPath>/bin</orgPath>
-		<orgName>Zbu.ModelsBuilder.Umbraco.dll</orgName>
-	</file>
-	<file>
-		<guid>Zbu.ModelsBuilder.AspNet.dll</guid>
-		<orgPath>/bin</orgPath>
-		<orgName>Zbu.ModelsBuilder.AspNet.dll</orgName>
-	</file>
+      <guid>System.Collections.Immutable.dll</guid>
+      <orgPath>/bin</orgPath>
+      <orgName>System.Collections.Immutable.dll</orgName>
+    </file>
+    <file>
+      <guid>System.Reflection.Metadata.dll</guid>
+      <orgPath>/bin</orgPath>
+      <orgName>System.Reflection.Metadata.dll</orgName>
+    </file>
+    <file>
+      <guid>Microsoft.Web.XmlTransform.dll</guid>
+      <orgPath>/bin</orgPath>
+      <orgName>Microsoft.Web.XmlTransform.dll</orgName>
+    </file>
+    <file>
+		  <guid>Zbu.ModelsBuilder.dll</guid>
+		  <orgPath>/bin</orgPath>
+		  <orgName>Zbu.ModelsBuilder.dll</orgName>
+	  </file>
+	  <file>
+		  <guid>Zbu.ModelsBuilder.Umbraco.dll</guid>
+		  <orgPath>/bin</orgPath>
+		  <orgName>Zbu.ModelsBuilder.Umbraco.dll</orgName>
+	  </file>
+	  <file>
+		  <guid>Zbu.ModelsBuilder.AspNet.dll</guid>
+		  <orgPath>/bin</orgPath>
+		  <orgName>Zbu.ModelsBuilder.AspNet.dll</orgName>
+	  </file>
+    <!-- these files are NOT required to run, just to configure -->
+    <file>
+      <guid>web.config.install.xdt</guid>
+      <orgPath>/App_Plugins/Zbu.ModelsBuilder/package</orgPath>
+      <orgName>web.config.install.xdt</orgName>
+    </file>
+    <file>
+      <guid>web.config.uninstall.xdt</guid>
+      <orgPath>/App_Plugins/Zbu.ModelsBuilder/package</orgPath>
+      <orgName>web.config.uninstall.xdt</orgName>
+    </file>
+    <file>
+      <guid>dashboard.config.install.xdt</guid>
+      <orgPath>/App_Plugins/Zbu.ModelsBuilder/package</orgPath>
+      <orgName>dashboard.config.install.xdt</orgName>
+    </file>
+    <file>
+      <guid>dashboard.config.uninstall.xdt</guid>
+      <orgPath>/App_Plugins/Zbu.ModelsBuilder/package</orgPath>
+      <orgName>dashboard.config.uninstall.xdt</orgName>
+    </file>
   </files>
   <info>
     <package>
@@ -54,14 +80,14 @@
       <license url="http://www.opensource.org/licenses/mit-license.php">MIT license</license>
       <url>http://localhost/package</url>
       <requirements>
-        <major>6</major>
-        <minor>2</minor>
-        <patch>0</patch>
+        <major>4</major>
+        <minor>1</minor>
+        <patch>4</patch>
       </requirements>
     </package>
     <author>
       <name>Pilotine - ZpqrtBnk</name>
-      <website>http://localhost/author</website>
+      <website>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</website>
     </author>
     <readme><![CDATA[ZpqrtBnk Umbraco Models Builder
 Copyright (C) Pilotine - ZpqrtBnk 2013-2014
@@ -69,7 +95,7 @@ Distributed under the MIT license
 
 An experimental tool that can generate a complete set of strongly-typed published content models for Umbraco 6.2+ to be used in the MVC views. Either from the Umbraco UI, from the command line, or from Visual Studio.
 
-DISCLAIMER: THIS CODE IS UNSTABLE AND FOR INFO ONLY !! IT RUNS ON A MODIFIED 6.2.0 UMBRACO SO IT WILL EVEN NOT COMPILE ON THE STOCK CODE FROM UMBRACO'S REPO
+DISCLAIMER: THIS CODE IS BETA-CODE. USE AT YOUR OWN RISKS.
 
 But, time will come...]]></readme>
   </info>
@@ -85,6 +111,7 @@ But, time will come...]]></readme>
   -->
   <control />
   <Actions>
+    <!--
     <Action runat="install" alias="addDashboardSection" dashboardAlias="Zbu">
       <section>
         <areas>
@@ -95,6 +122,7 @@ But, time will come...]]></readme>
         </tab>
       </section>
     </Action>
-    <Action runat="install" undo="true" alias="Zbu.ModelsBuilder.Umbraco.PackageActions.Configure" />
+    -->
+    <Action runat="install" undo="true" alias="Zbu.ModelsBuilder.Umbraco.PackageActions.Configure2" />
   </Actions>
 </umbPackage>
