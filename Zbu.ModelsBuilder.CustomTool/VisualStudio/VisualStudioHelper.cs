@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Xml;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -206,7 +200,7 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
             bar.IsFrozen(out frozen);
             if (frozen != 0) return;
             bar.SetText("Dim da da...");
-            object icon = (short) Microsoft.VisualStudio.Shell.Interop.Constants.SBAI_Synch;
+            object icon = (short) Constants.SBAI_Synch;
             bar.Animation(1, ref icon);
 
             // could we have also a "long running task" popup?
@@ -228,7 +222,7 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
         public static Options GetOptions()
         {
             var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
-            var properties = dte.get_Properties(VisualStudioOptions.OptionsCategory, VisualStudioOptions.OptionsPageName);
+            var properties = dte.Properties[VisualStudioOptions.OptionsCategory, VisualStudioOptions.OptionsPageName];
             return new Options(properties);
         }
 
@@ -262,5 +256,73 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
                     throw new Exception("Invalid configuration.");
             }
         }
+
+        public static void PumpAction(string title, string text, Action action)
+        {
+            // see http://stackoverflow.com/questions/13457948/how-to-display-waiting-popup-from-visual-studio-extension
+
+            var pump = new CommonMessagePump
+            {
+                AllowCancel = false,
+                EnableRealProgress = false,
+                WaitTitle = title,
+                WaitText = text
+            };
+
+            //var task = PumpActionStaTask(action);
+            var task = System.Threading.Tasks.Task.Run(action);
+
+            // ignore exit code - we can't cancel, anything - have to wait to the task anyway...
+            pump.ModalWaitForHandles(((IAsyncResult)task).AsyncWaitHandle);
+
+            task.Wait();
+
+            // this is debugging code...
+            // details go to the output window anyway
+
+            //try
+            //{
+            //    task.Wait();
+            //}
+            //catch (Exception e)
+            //{
+            //    // COM exception while GenerateRaw tries to log an error to VisualStudio
+            //    // wtf is that?!
+
+            //    MessageBox.Show(e.Message, "Error");
+
+            //    var aggr = e as AggregateException;
+            //    if (aggr != null)
+            //        foreach (var aggrInner in aggr.Flatten().InnerExceptions)
+            //        {
+            //            var message = string.Format("AggregateInner: {0}: {1}\r\n{2}", aggrInner.GetType().Name, aggrInner.Message,
+            //                aggrInner.StackTrace);
+            //            MessageBox.Show(message, "Error");
+            //        }
+
+            //    throw;
+            //}
+        }
+
+        // no used
+        //private static System.Threading.Tasks.Task PumpActionStaTask(Action action)
+        //{
+        //    var tcs = new TaskCompletionSource<bool>();
+        //    var thread = new Thread(() =>
+        //    {
+        //        try
+        //        {
+        //            action();
+        //            tcs.SetResult(true); // anything, really
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            tcs.SetException(e);
+        //        }
+        //    });
+        //    thread.SetApartmentState(ApartmentState.STA);
+        //    thread.Start();
+        //    return tcs.Task;
+        //}
     }
 }

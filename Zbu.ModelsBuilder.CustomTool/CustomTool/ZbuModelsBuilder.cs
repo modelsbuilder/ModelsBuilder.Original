@@ -1,13 +1,8 @@
 ﻿using System;
-using System.CodeDom.Compiler;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows.Forms;
 using Microsoft.VisualStudio.Shell.Interop;
 using Zbu.ModelsBuilder.Build;
 using Zbu.ModelsBuilder.CustomTool.VisualStudio;
@@ -37,6 +32,58 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                                     out uint pcbOutput,
                                     IVsGeneratorProgress pGenerateProgress)
         {
+            return GenerateWithPump(wszInputFilePath,
+                //bstrInputFileContents,
+                wszDefaultNamespace,
+                rgbOutputFileContents,
+                out pcbOutput,
+                pGenerateProgress);
+        }
+
+        // wraps GenerateRaw in a message pump so that Visual Studio
+        // will display the nice "waiting" modal window...
+        private static int GenerateWithPump(string wszInputFilePath,
+                                     //string bstrInputFileContents,
+                                     string wszDefaultNamespace,
+                                     IntPtr[] rgbOutputFileContents,
+                                     out uint pcbOutput,
+                                     IVsGeneratorProgress pGenerateProgress)
+        {
+            uint pcbOutput2 = 0;
+            var rc = 0;
+            string errMsg = null;
+
+            VisualStudioHelper.PumpAction("Generating models...", "Please wait while Zbu.ModelsBuilder generates models.", () =>
+            {
+                rc = GenerateRaw(wszInputFilePath,
+                //bstrInputFileContents,
+                wszDefaultNamespace,
+                rgbOutputFileContents,
+                out pcbOutput2,
+                //pGenerateProgress,
+                out errMsg);
+            });
+
+            // get value back
+            pcbOutput = pcbOutput2;
+
+            // handle error here - cannot do it in PumpAction - ComObject exception
+            if (errMsg != null)
+                VisualStudioHelper.ReportError(pGenerateProgress, errMsg);
+
+            return rc;
+        }
+
+        private static int GenerateRaw(string wszInputFilePath,
+                                //string bstrInputFileContents,
+                                string wszDefaultNamespace,
+                                IntPtr[] rgbOutputFileContents,
+                                out uint pcbOutput,
+                                //IVsGeneratorProgress pGenerateProgress,
+                                out string errMsg)
+        {
+            errMsg = null;
+
             try
             {
                 // though that only happens if you explicitely set it to whitespaces
@@ -48,7 +95,7 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                 VisualStudioHelper.ReportMessage("Starting {0}.", DateTime.Now);
 
                 var path = Path.GetDirectoryName(wszInputFilePath) ?? "";
-                
+
                 var options = VisualStudioHelper.GetOptions();
                 options.Validate();
 
@@ -96,7 +143,9 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
             {
                 var message = string.Format("ZbuModelsBuilder failed to generate code: {0}: {1}",
                     e.GetType().Name, e.Message);
-                VisualStudioHelper.ReportError(pGenerateProgress, message);
+                errMsg = message;
+                //cannot do this within a running Task - ComObject exception
+                //VisualStudioHelper.ReportError(pGenerateProgress, message);
                 VisualStudioHelper.ReportMessage(message);
                 VisualStudioHelper.ReportMessage(e.StackTrace);
 
