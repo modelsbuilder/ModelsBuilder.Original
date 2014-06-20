@@ -10,10 +10,11 @@
       </assemblies>
       <buildProviders>
         <add extension=".models" type="Zbu.ModelsBuilder.AspNet.ModelsBuildProvider, Zbu.ModelsBuilder.AspNet"
-          xdt:Transform="Insert" />
-        <remove extension=".cshtml"
-          xdt:Transform="Remove" /> <!-- FIXME must indicate which to remove?! -->
-        <!-- xdt:Locator="XPath(./next-sibling [@extension='.cshtml' and @type='Zbu.ModelsBuilder.AspNet.RazorBuildProvider, Zbu.ModelsBuilder.AspNet']" -->
+          xdt:Transform="Remove" />
+        <!-- remove our own remove, ie one having first following sibling being our own add -->
+        <remove
+          xdt:Transform="Remove"
+          xdt:Locator="Condition(@extension='.cshtml' and (following-sibling::add [position()=1 and @extension='.cshtml' and @type='Zbu.ModelsBuilder.AspNet.RazorBuildProvider, Zbu.ModelsBuilder.AspNet']))"/>
         <add extension=".cshtml" type="Zbu.ModelsBuilder.AspNet.RazorBuildProvider, Zbu.ModelsBuilder.AspNet"
           xdt:Transform="Remove" xdt:Locator="Match(extension,type)"/>
       </buildProviders>
