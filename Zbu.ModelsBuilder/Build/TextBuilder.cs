@@ -108,7 +108,7 @@ namespace Zbu.ModelsBuilder.Build
                 // write the interface declaration
                 sb.AppendFormat("\t// Mixin content Type {0} with alias \"{1}\"\n", type.Id, type.Alias);
                 if (!string.IsNullOrWhiteSpace(type.Name))
-                    sb.AppendFormat("\t/// <summary>{0}</summary>", XmlCommentString(type.Name));
+                    sb.AppendFormat("\t/// <summary>{0}</summary>\n", XmlCommentString(type.Name));
                 sb.AppendFormat("\tpublic partial interface I{0}", type.ClrName);
                 var implements = type.BaseType == null || type.BaseType.IsContentIgnored
                     ? (type.HasBase ? null : "PublishedContent") 
@@ -142,7 +142,7 @@ namespace Zbu.ModelsBuilder.Build
             if (type.IsRenamed)
                 sb.AppendFormat("\t// Content Type {0} with alias \"{1}\"\n", type.Id, type.Alias);
             if (!string.IsNullOrWhiteSpace(type.Name))
-                sb.AppendFormat("\t/// <summary>{0}</summary>", XmlCommentString(type.Name));
+                sb.AppendFormat("\t/// <summary>{0}</summary>\n", XmlCommentString(type.Name));
             sb.AppendFormat("\t[PublishedContentModel(\"{0}\")]\n", type.Alias);
             sb.AppendFormat("\tpublic partial class {0}", type.ClrName);
             var inherits = type.BaseType == null || type.BaseType.IsContentIgnored
@@ -176,9 +176,9 @@ namespace Zbu.ModelsBuilder.Build
             sb.Append("#pragma warning disable 0109 // new is redundant\n");
             sb.AppendFormat("\t\tpublic new const string ModelTypeAlias = \"{0}\";\n",
                 type.Alias);
-            sb.AppendFormat("\t\tpublic new const PublishedItemType ModelItemType = PublishedItemType.{0};\n\n",
+            sb.AppendFormat("\t\tpublic new const PublishedItemType ModelItemType = PublishedItemType.{0};\n",
                 type.ItemType);
-            sb.Append("#pragma warning restore 0109\n");
+            sb.Append("#pragma warning restore 0109\n\n");
 
             // write the ctor
             sb.AppendFormat("\t\tpublic {0}(IPublishedContent content)\n\t\t\t: base(content)\n\t\t{{ }}\n\n",
@@ -188,11 +188,11 @@ namespace Zbu.ModelsBuilder.Build
             // as 'new' since parent has its own - or maybe not - disable warning
             sb.Append("#pragma warning disable 0109 // new is redundant\n");
             sb.Append("\t\tpublic new static PublishedContentType GetModelContentType()\n");
-            sb.Append("\t\t{\n\t\t\treturn PublishedContentType.Get(ModelItemType, ModelTypeAlias);\n\t\t}\n\n");
+            sb.Append("\t\t{\n\t\t\treturn PublishedContentType.Get(ModelItemType, ModelTypeAlias);\n\t\t}\n");
+            sb.Append("#pragma warning restore 0109\n\n");
             sb.AppendFormat("\t\tpublic static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<{0}, TValue>> selector)\n",
                 type.ClrName);
-            sb.Append("\t\t{\n\t\t\treturn PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);\n\t\t}\n");
-            sb.Append("#pragma warning restore 0109\n");
+            sb.Append("\t\t{\n\t\t\treturn PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);\n\t\t}\n\n");
 
             // write the properties
             WriteContentTypeProperties(sb, type);
@@ -222,7 +222,7 @@ namespace Zbu.ModelsBuilder.Build
             sb.Append("\n");
 
             if (!string.IsNullOrWhiteSpace(property.Name))
-                sb.AppendFormat("\t\t/// <summary>{0}</summary>", XmlCommentString(property.Name));
+                sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString(property.Name));
 
             sb.AppendFormat("\t\t[ModelPropertyAlias(\"{0}\")]\n", property.Alias);
 
