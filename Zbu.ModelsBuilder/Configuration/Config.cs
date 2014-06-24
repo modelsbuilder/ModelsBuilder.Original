@@ -11,7 +11,7 @@ namespace Zbu.ModelsBuilder.Configuration
             // and is static ie requires the app to be restarted for changes to be detected
 
             const string prefix = "Zbu.ModelsBuilder.";
-            EnableAppCodeModels = ConfigurationManager.AppSettings[prefix + "CreateAppCodeModelsFile"] == "true";
+            EnableAppCodeModels = ConfigurationManager.AppSettings[prefix + "EnableAppCodeModels"] == "true";
             EnableAppDataModels = ConfigurationManager.AppSettings[prefix + "EnableAppDataModels"] == "true";
             EnableLiveModels = ConfigurationManager.AppSettings[prefix + "EnableLiveModels"] == "true";
             EnableApi = ConfigurationManager.AppSettings[prefix + "EnableApi"] != "false";
