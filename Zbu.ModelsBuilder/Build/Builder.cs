@@ -201,7 +201,7 @@ namespace Zbu.ModelsBuilder.Build
             }
         }
 
-        protected string GetModelsNamespace()
+        public string GetModelsNamespace()
         {
             // code attribute overrides everything
             if (ParseResult.HasModelsNamespace)

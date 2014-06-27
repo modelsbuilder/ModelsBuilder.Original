@@ -32,8 +32,8 @@ namespace Zbu.ModelsBuilder.AspNet
 
         public override void GenerateCode(AssemblyBuilder assemblyBuilder)
         {
-            // if live models are enabled, compile & add assembly
-            if (Config.EnableLiveModels)
+            // if pure live models are enabled, compile & add assembly
+            if (Config.EnablePureLiveModels)
                 AddModelsAssemblyReference(assemblyBuilder);
 
             base.GenerateCode(assemblyBuilder);
@@ -88,10 +88,14 @@ namespace Zbu.ModelsBuilder.AspNet
             var code = new StringBuilder();
             builder.Generate(code, builder.GetModelsToGenerate());
 
-            // NOTE
-            // would be interesting to figure out whether we can compile that code
-            // using Roslyn...
+            // use the Roslyn compiler!
+            var compiler = new Compiler();
+            foreach (var asm in BuildManager.GetReferencedAssemblies().Cast<Assembly>())
+                compiler.ReferencedAssemblies.Add(asm);
+            return compiler.Compile(builder.GetModelsNamespace(), code.ToString());
 
+            // use the BuildManager compiler...
+            /*
             // write the code to a temp file
             // cannot be in Path.GetTempPath() because GetCompiledAssembly wants code in the website
             //var temp = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".cs");
@@ -112,6 +116,7 @@ namespace Zbu.ModelsBuilder.AspNet
                 // make sure whatever happens we properly delete the temp file
                 File.Delete(temp);
             }
+            */
         }
     }
 }

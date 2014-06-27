@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
+using System.Web.Compilation;
 using System.Web.Hosting;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
@@ -88,6 +90,9 @@ namespace Zbu.ModelsBuilder.AspNet
                 if (!user.AllowedSections.Contains("developer"))
                     return new HttpResponseMessage(HttpStatusCode.Unauthorized);
 
+                if (!Config.EnableAppDataModels && !Config.EnableAppCodeModels && !Config.EnableLiveModels)
+                    return Request.CreateResponse(HttpStatusCode.Forbidden, "Models generation is not enabled.");
+
                 var appData = HostingEnvironment.MapPath("~/App_Data");
                 if (appData == null)
                     throw new Exception("Panic: appData is null.");
@@ -96,10 +101,16 @@ namespace Zbu.ModelsBuilder.AspNet
                 if (appCode == null)
                     throw new Exception("Panic: appCode is null.");
 
-                GenerateModels(appData);
+                var bin = HostingEnvironment.MapPath("~/bin");
+                if (bin== null)
+                    throw new Exception("Panic: bin is null.");
 
+                // EnableDllModels will recycle the app domain - but this request will end properly
+                GenerateModels(appData, Config.EnableDllModels ? bin : null);
+
+                // will recycle the app domain - but this request will end properly
                 if (Config.EnableAppCodeModels)
-                    TouchModelsFile(appCode); // will recycle the app domain - but this request will end properly
+                    TouchModelsFile(appCode);
 
                 var result = new BuildResult {Success = true};
                 return Request.CreateResponse(HttpStatusCode.OK, result, Configuration.Formatters.JsonFormatter);
@@ -166,7 +177,7 @@ namespace Zbu.ModelsBuilder.AspNet
 
         #endregion
 
-        private static void GenerateModels(string appData)
+        private static void GenerateModels(string appData, string bin)
         {
             var modelsDirectory = Path.Combine(appData, "Models");
             if (!Directory.Exists(modelsDirectory))
@@ -188,6 +199,17 @@ namespace Zbu.ModelsBuilder.AspNet
                 builder.Generate(sb, typeModel);
                 var filename = Path.Combine(modelsDirectory, typeModel.ClrName + ".generated.cs");
                 File.WriteAllText(filename, sb.ToString());
+            }
+
+            if (bin != null)
+            {
+                foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
+                    ourFiles[file] = File.ReadAllText(file);
+                var compiler = new Compiler();
+                // using BuildManager references
+                foreach (var asm in BuildManager.GetReferencedAssemblies().Cast<Assembly>())
+                    compiler.ReferencedAssemblies.Add(asm);
+                compiler.Compile(bin, builder.GetModelsNamespace(), ourFiles);
             }
         }
 

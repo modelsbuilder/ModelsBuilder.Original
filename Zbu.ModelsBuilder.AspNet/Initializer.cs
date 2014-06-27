@@ -17,15 +17,12 @@ namespace Zbu.ModelsBuilder.AspNet
     {
         public static void Initialize()
         {
-            if (Config.EnableAppCodeModels && Config.EnableLiveModels)
-                throw new Exception("Invalid configuration, both AppCodeModels and LiveModels are enabled.");
-
             // registers the models build provider
             if (Config.EnableAppCodeModels)
                 BuildProvider.RegisterBuildProvider(".models", typeof(ModelsBuildProvider));
 
             // register the razor build provider for live models
-            if (Config.EnableLiveModels)
+            if (Config.EnablePureLiveModels)
             {
                 // NOTE
                 // what's in the Web.Config will come _after_ what where're doing here

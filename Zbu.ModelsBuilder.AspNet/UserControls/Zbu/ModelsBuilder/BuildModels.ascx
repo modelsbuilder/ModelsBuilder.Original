@@ -7,7 +7,7 @@
         // <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
         // <umb:CssInclude runat="server" FilePath="propertypane/style.css" PathNameAlias="UmbracoClient" />
 
-        phGenerate.Visible = Config.EnableAppDataModels || Config.EnableAppCodeModels;
+        phGenerate.Visible = (Config.EnableAppDataModels || Config.EnableAppCodeModels || Config.EnableDllModels) && !Config.EnableLiveModels;
         phGenerateWarning.Visible = Config.EnableAppCodeModels;
 
         var sb = new StringBuilder();
@@ -15,6 +15,7 @@
         if (Config.EnableApi) sb.Append(" +EnableApi");
         if (Config.EnableAppDataModels) sb.Append(" +EnableAppDataModels");
         if (Config.EnableAppCodeModels) sb.Append(" +EnableAppCodeModels");
+        if (Config.EnableDllModels) sb.Append(" +EnableDllModels");
         if (Config.EnableLiveModels) sb.Append(" +EnableLiveModels");
         if (Config.EnablePublishedContentModelsFactory) sb.Append(" +EnablePublishedContentModelsFactory");
         sb.AppendFormat("<br />Config.ModelsNameSpace: \"{0}\"", Config.ModelsNamespace);
