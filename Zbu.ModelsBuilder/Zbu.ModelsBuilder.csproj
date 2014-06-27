@@ -82,6 +82,7 @@
     <Compile Include="Build\Builder.cs" />
     <Compile Include="Build\CodeDomBuilder.cs" />
     <Compile Include="Build\CodeParser.cs" />
+    <Compile Include="Build\Compiler.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="ImplementPropertyTypeAttribute.cs" />
     <Compile Include="ImplementContentTypeAttribute.cs" />

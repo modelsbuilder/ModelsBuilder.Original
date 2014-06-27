@@ -22,8 +22,20 @@ namespace Zbu.ModelsBuilder.Build
         /// <remarks>The set of files is a dictionary of name, content.</remarks>
         public ParseResult Parse(IDictionary<string, string> files)
         {
+            SyntaxTree[] trees;
+            var compilation = GetCompilation("Zbu.ModelsBuilder.Generated", files, out trees);
+
+            var disco = new ParseResult();
+            foreach (var tree in trees)
+                Parse(disco, compilation, tree);
+
+            return disco;
+        }
+
+        public static CSharpCompilation GetCompilation(string assemblyName, IDictionary<string, string> files, out SyntaxTree[] trees)
+        {
             var options = new CSharpParseOptions();
-            var trees = files.Select(x =>
+            trees = files.Select(x =>
             {
                 var text = x.Value;
                 var tree = CSharpSyntaxTree.ParseText(text, options: options);
@@ -39,24 +51,22 @@ namespace Zbu.ModelsBuilder.Build
             //var refs = Enumerable.Empty<MetadataReference>();
             // so use the bare minimum
             var asms = new HashSet<Assembly>();
-            var a1 = typeof (IgnoreContentTypeAttribute).Assembly;
+            var a1 = typeof(IgnoreContentTypeAttribute).Assembly;
             asms.Add(a1);
             foreach (var a in GetDeepReferencedAssemblies(a1)) asms.Add(a);
             var refs = asms.Select(x => new MetadataFileReference(x.Location));
 
+            var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
             var compilation = CSharpCompilation.Create(
-                "Zbu.ModelsBuilder.Generated",
+                assemblyName,
                 /*syntaxTrees:*/ trees,
-                /*references:*/ refs);
+                /*references:*/ refs,
+                compilationOptions);
 
-            var disco = new ParseResult();
-            foreach (var tree in trees)
-                Parse(disco, compilation, tree);
-
-            return disco;
+            return compilation;
         }
 
-        private static IEnumerable<Assembly> GetDeepReferencedAssemblies(Assembly assembly)
+        internal static IEnumerable<Assembly> GetDeepReferencedAssemblies(Assembly assembly)
         {
             var visiting = new Stack<Assembly>();
             var visited = new HashSet<Assembly>();

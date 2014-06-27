@@ -105,6 +105,7 @@
     <Compile Include="ApiTests.cs" />
     <Compile Include="AppDomainTests.cs" />
     <Compile Include="BuilderTests.cs" />
+    <Compile Include="CompilerTests.cs" />
     <Compile Include="ExtensionsTests.cs" />
     <Compile Include="TestVisualStudioExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
