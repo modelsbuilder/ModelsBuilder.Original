@@ -80,7 +80,7 @@
       <license url="http://www.opensource.org/licenses/mit-license.php">MIT license</license>
       <url>http://localhost/package</url>
       <requirements>
-        <major>4</major>
+        <major>7</major>
         <minor>1</minor>
         <patch>4</patch>
       </requirements>
