@@ -7,8 +7,8 @@
         // <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
         // <umb:CssInclude runat="server" FilePath="propertypane/style.css" PathNameAlias="UmbracoClient" />
 
-        phGenerate.Visible = (Config.EnableAppDataModels || Config.EnableAppCodeModels || Config.EnableDllModels) && !Config.EnableLiveModels;
-        phGenerateWarning.Visible = Config.EnableAppCodeModels;
+        phGenerate.Visible = Config.EnableAppDataModels || Config.EnableAppCodeModels || Config.EnableDllModels;
+        phGenerateWarning.Visible = Config.EnableAppCodeModels || Config.EnableDllModels;
 
         var sb = new StringBuilder();
         sb.Append("Config: ");

@@ -112,6 +112,7 @@
       <Link>Properties\CommonInfo.cs</Link>
     </Compile>
     <Compile Include="Initializer.cs" />
+    <Compile Include="LiveModelsProvider.cs" />
     <Compile Include="ModelsBuilderApi.cs" />
     <Compile Include="ModelsBuilderAuthFilter.cs" />
     <Compile Include="ModelsBuilderApiController.cs" />

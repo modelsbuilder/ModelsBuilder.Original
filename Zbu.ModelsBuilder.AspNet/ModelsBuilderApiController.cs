@@ -180,7 +180,7 @@ namespace Zbu.ModelsBuilder.AspNet
 
         #endregion
 
-        private static void GenerateModels(string appData, string bin)
+        public static void GenerateModels(string appData, string bin)
         {
             var modelsDirectory = Path.Combine(appData, "Models");
             if (!Directory.Exists(modelsDirectory))
@@ -216,7 +216,7 @@ namespace Zbu.ModelsBuilder.AspNet
             }
         }
 
-        private static void TouchModelsFile(string appCode)
+        public static void TouchModelsFile(string appCode)
         {
             var modelsFile = Path.Combine(appCode, "build.models");
 
