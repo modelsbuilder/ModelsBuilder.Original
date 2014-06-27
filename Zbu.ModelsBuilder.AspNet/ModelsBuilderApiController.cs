@@ -90,8 +90,11 @@ namespace Zbu.ModelsBuilder.AspNet
                 if (!user.AllowedSections.Contains("developer"))
                     return new HttpResponseMessage(HttpStatusCode.Unauthorized);
 
-                if (!Config.EnableAppDataModels && !Config.EnableAppCodeModels && !Config.EnableLiveModels)
-                    return Request.CreateResponse(HttpStatusCode.Forbidden, "Models generation is not enabled.");
+                if (!Config.EnableAppDataModels && !Config.EnableAppCodeModels && !Config.EnableDllModels)
+                {
+                    var result2 = new BuildResult { Success = false, Message = "Models generation is not enabled." };
+                    return Request.CreateResponse(HttpStatusCode.OK, result2, Configuration.Formatters.JsonFormatter);
+                }
 
                 var appData = HostingEnvironment.MapPath("~/App_Data");
                 if (appData == null)

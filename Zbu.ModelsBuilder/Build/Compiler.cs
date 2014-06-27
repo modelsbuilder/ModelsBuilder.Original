@@ -55,10 +55,10 @@ namespace Zbu.ModelsBuilder.Build
             SyntaxTree[] trees;
             var compilation = GetCompilation(assemblyName, files, out trees);
 
-            // check diagnostics?
-            foreach (var diag in compilation.GetDiagnostics())
+            // check diagnostics for errors (not warnings)
+            foreach (var diag in compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error))
             {
-                throw new Exception(string.Format("Compilation error: {0}", diag.GetMessage()));
+                throw new Exception(string.Format("Models compilation {0}: {1}", diag.Severity, diag.GetMessage()));
             }
 
             // write the dll
@@ -76,10 +76,10 @@ namespace Zbu.ModelsBuilder.Build
             SyntaxTree[] trees;
             var compilation = GetCompilation(assemblyName, files, out trees);
 
-            // check diagnostics?
-            foreach (var diag in compilation.GetDiagnostics())
+            // check diagnostics for errors (not warnings)
+            foreach (var diag in compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error))
             {
-                throw new Exception(string.Format("Compilation error: {0}", diag.GetMessage()));
+                throw new Exception(string.Format("Models compilation {0}: {1}", diag.Severity, diag.GetMessage()));
             }
 
             // emit
@@ -99,10 +99,10 @@ namespace Zbu.ModelsBuilder.Build
             SyntaxTree[] trees;
             var compilation = GetCompilation(assemblyName, new Dictionary<string, string>{{"code", code}}, out trees);
 
-            // check diagnostics?
-            foreach (var diag in compilation.GetDiagnostics())
+            // check diagnostics for errors (not warnings)
+            foreach (var diag in compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error))
             {
-                throw new Exception(string.Format("Compilation error: {0}", diag.GetMessage()));
+                throw new Exception(string.Format("Models compilation {0}: {1}", diag.Severity, diag.GetMessage()));
             }
 
             // emit
