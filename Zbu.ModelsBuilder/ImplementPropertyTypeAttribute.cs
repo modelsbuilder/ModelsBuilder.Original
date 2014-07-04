@@ -14,6 +14,10 @@ namespace Zbu.ModelsBuilder
     public sealed class ImplementPropertyTypeAttribute : Attribute
     {
         public ImplementPropertyTypeAttribute(string alias)
-        {}
+        {
+            Alias = alias;
+        }
+
+        public string Alias { get; private set; }
     }
 }

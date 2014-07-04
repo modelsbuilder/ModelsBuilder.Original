@@ -92,7 +92,6 @@
     <Compile Include="RenameContentTypeAttribute.cs" />
     <Compile Include="Build\ParseResult.cs" />
     <Compile Include="RenamePropertyTypeAttribute.cs" />
-    <Compile Include="ModelPropertyAliasAttribute.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Build\PropertyModel.cs" />
     <Compile Include="StringExtensions.cs" />

@@ -224,7 +224,7 @@ namespace Zbu.ModelsBuilder.Build
             if (!string.IsNullOrWhiteSpace(property.Name))
                 sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString(property.Name));
 
-            sb.AppendFormat("\t\t[ModelPropertyAlias(\"{0}\")]\n", property.Alias);
+            sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
 
             sb.Append("\t\tpublic ");
             WriteClrType(sb, property.ClrType);

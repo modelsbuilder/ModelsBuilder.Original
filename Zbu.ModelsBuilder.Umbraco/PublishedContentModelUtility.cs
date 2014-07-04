@@ -40,8 +40,8 @@ namespace Zbu.ModelsBuilder.Umbraco
             // see note above : accepted risk...
 
             var attr = expr.Member
-                .GetCustomAttributes(typeof (ModelPropertyAliasAttribute), false)
-                .OfType<ModelPropertyAliasAttribute>()
+                .GetCustomAttributes(typeof (ImplementPropertyTypeAttribute), false)
+                .OfType<ImplementPropertyTypeAttribute>()
                 .SingleOrDefault();
 
             if (attr == null || string.IsNullOrWhiteSpace(attr.Alias))
