@@ -5,7 +5,7 @@ using Microsoft.Web.XmlTransform;
 using Umbraco.Core.Logging;
 using umbraco.interfaces;
 
-namespace Zbu.ModelsBuilder.Umbraco.PackageActions
+namespace Zbu.ModelsBuilder.AspNet.PackageActions
 {
     public class Configure2 : IPackageAction
     {

@@ -4,7 +4,7 @@ using System.Xml;
 using Umbraco.Core.Logging;
 using umbraco.interfaces;
 
-namespace Zbu.ModelsBuilder.Umbraco.PackageActions
+namespace Zbu.ModelsBuilder.AspNet.PackageActions
 {
     // see also http://our.umbraco.org/forum/umbraco-7/developing-umbraco-7-packages/46885-How-can-I-run-code-on-package-uninstall
     // see also http://packageactioncontrib.codeplex.com

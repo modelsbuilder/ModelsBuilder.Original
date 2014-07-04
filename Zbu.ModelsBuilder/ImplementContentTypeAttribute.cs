@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Zbu.ModelsBuilder
 {
+    // NOTE
+    // that attribute should inherit from PublishedContentModelAttribute
+    // so we do not have different syntaxes
+    // but... is sealed at the moment.
+
     /// <summary>
     /// Indicates that a (partial) class defines the model type for a specific alias.
     /// </summary>

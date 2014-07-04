@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data.Common;
-using System.IO;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Strings;
-using Zbu.ModelsBuilder.Build;
+using Zbu.ModelsBuilder.Building;
 
 namespace Zbu.ModelsBuilder.Umbraco
 {

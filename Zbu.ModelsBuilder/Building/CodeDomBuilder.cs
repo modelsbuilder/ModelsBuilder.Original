@@ -1,7 +1,7 @@
 ﻿using System.CodeDom;
 using System.Collections.Generic;
 
-namespace Zbu.ModelsBuilder.Build
+namespace Zbu.ModelsBuilder.Building
 {
     // NOTE
     // See nodes in Builder.cs class - that one does not work, is not complete,

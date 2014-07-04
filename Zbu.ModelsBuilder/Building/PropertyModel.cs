@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Zbu.ModelsBuilder.Build
+namespace Zbu.ModelsBuilder.Building
 {
     /// <summary>
     /// Represents a model property.

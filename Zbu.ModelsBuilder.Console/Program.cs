@@ -1,15 +1,7 @@
 ﻿using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
-using System;
-using System.Text;
-using System.Threading.Tasks;
-using Zbu.ModelsBuilder.Build;
-using Zbu.ModelsBuilder.Configuration;
-using Zbu.ModelsBuilder.Umbraco;
+using Zbu.ModelsBuilder.Building;
 using SysConsole = System.Console;
 
 namespace Zbu.ModelsBuilder.Console

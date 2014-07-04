@@ -76,6 +76,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\umbraco\interfaces.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Web.XmlTransform, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Web.Xdt.2.1.1\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
+    </Reference>
     <Reference Include="MSBuild.Umbraco.Tasks">
       <HintPath>..\packages\MSBuild.Umbraco.Tasks.1.0\lib\MSBuild.Umbraco.Tasks.dll</HintPath>
     </Reference>
@@ -117,14 +121,12 @@
     <Compile Include="ModelsBuilderAuthFilter.cs" />
     <Compile Include="ModelsBuilderApiController.cs" />
     <Compile Include="ModelsBuildProvider.cs" />
+    <Compile Include="PackageActions\Configure.cs" />
+    <Compile Include="PackageActions\Configure2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RazorBuildProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Zbu.ModelsBuilder.Umbraco\Zbu.ModelsBuilder.Umbraco.csproj">
-      <Project>{ba9b7672-c446-4001-bb64-2b6abe7a42f2}</Project>
-      <Name>Zbu.ModelsBuilder.Umbraco</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Zbu.ModelsBuilder\Zbu.ModelsBuilder.csproj">
       <Project>{998fb014-303a-4146-b3e4-b927bab0210f}</Project>
       <Name>Zbu.ModelsBuilder</Name>

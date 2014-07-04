@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 
-namespace Zbu.ModelsBuilder.Build
+namespace Zbu.ModelsBuilder.Building
 {
     public class Compiler
     {

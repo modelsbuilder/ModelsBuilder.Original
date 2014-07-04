@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Zbu.ModelsBuilder.Build
+namespace Zbu.ModelsBuilder.Building
 {
     /// <summary>
     /// Implements code parsing.
@@ -100,7 +100,7 @@ namespace Zbu.ModelsBuilder.Build
                     //    break;
                     case "Zbu.ModelsBuilder.ImplementContentTypeAttribute":
                         var contentAliasToRename = (string)attrData.ConstructorArguments[0].Value;
-                        disco.SetRenamedContent(contentAliasToRename, symbol.Name /*SymbolDisplay.ToDisplayString(symbol)*/);
+                        disco.SetRenamedContent(contentAliasToRename, symbol.Name, true /*SymbolDisplay.ToDisplayString(symbol)*/);
                         break;
                 }
             }
@@ -152,7 +152,7 @@ namespace Zbu.ModelsBuilder.Build
                     case "Zbu.ModelsBuilder.RenameContentTypeAttribute":
                         var contentAliasToRename = (string) attrData.ConstructorArguments[0].Value;
                         var contentRenamed = (string)attrData.ConstructorArguments[1].Value;
-                        disco.SetRenamedContent(contentAliasToRename, contentRenamed);
+                        disco.SetRenamedContent(contentAliasToRename, contentRenamed, false);
                         break;
 
                     case "Zbu.ModelsBuilder.ModelsBaseClassAttribute":

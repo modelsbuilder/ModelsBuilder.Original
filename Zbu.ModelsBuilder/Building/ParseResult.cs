@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Zbu.ModelsBuilder.Build
+namespace Zbu.ModelsBuilder.Building
 {
     /// <summary>
     /// Contains the result of a code parsing.
@@ -23,6 +23,8 @@ namespace Zbu.ModelsBuilder.Build
         //    = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         private readonly Dictionary<string, string> _renamedContent 
             = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+        private readonly HashSet<string> _withImplementContent
+            = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         private readonly Dictionary<string, HashSet<string>> _ignoredProperty
             = new Dictionary<string, HashSet<string>>();
         private readonly Dictionary<string, Dictionary<string, string>> _renamedProperty
@@ -51,9 +53,11 @@ namespace Zbu.ModelsBuilder.Build
         }
 
         // content with that alias should be generated with a different name
-        public void SetRenamedContent(string contentAlias, string contentName)
+        public void SetRenamedContent(string contentAlias, string contentName, bool withImplement)
         {
             _renamedContent[contentAlias] = contentName;
+            if (withImplement)
+                _withImplementContent.Add(contentAlias);
         }
 
         // property with that alias should not be generated
@@ -143,6 +147,11 @@ namespace Zbu.ModelsBuilder.Build
         public bool IsContentRenamed(string contentAlias)
         {
             return _renamedContent.ContainsKey(contentAlias);
+        }
+
+        public bool HasContentImplement(string contentAlias)
+        {
+            return _withImplementContent.Contains(contentAlias);
         }
 
         public string ContentClrName(string contentAlias)

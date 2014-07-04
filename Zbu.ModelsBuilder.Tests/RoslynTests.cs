@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Zbu.ModelsBuilder.Build;
+using Zbu.ModelsBuilder.Building;
 
 namespace Zbu.ModelsBuilder.Tests
 {

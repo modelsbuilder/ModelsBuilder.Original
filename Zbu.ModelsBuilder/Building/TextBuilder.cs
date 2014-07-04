@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Zbu.ModelsBuilder.Build
+namespace Zbu.ModelsBuilder.Building
 {
     /// <summary>
     /// Implements a builder that works by writing text.
@@ -143,6 +143,9 @@ namespace Zbu.ModelsBuilder.Build
                 sb.AppendFormat("\t// Content Type {0} with alias \"{1}\"\n", type.Id, type.Alias);
             if (!string.IsNullOrWhiteSpace(type.Name))
                 sb.AppendFormat("\t/// <summary>{0}</summary>\n", XmlCommentString(type.Name));
+            // cannot do it now. see note in ImplementContentTypeAttribute
+            //if (!type.HasImplement)
+            //    sb.AppendFormat("\t[ImplementContentType(\"{0}\")]\n", type.Alias);
             sb.AppendFormat("\t[PublishedContentModel(\"{0}\")]\n", type.Alias);
             sb.AppendFormat("\tpublic partial class {0}", type.ClrName);
             var inherits = type.BaseType == null || type.BaseType.IsContentIgnored

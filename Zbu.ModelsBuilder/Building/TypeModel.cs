@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Zbu.ModelsBuilder.Build
+namespace Zbu.ModelsBuilder.Building
 {
     /// <summary>
     /// Represents a model.
@@ -86,6 +86,11 @@ namespace Zbu.ModelsBuilder.Build
         /// Gets a value indicating whether this model has been renamed.
         /// </summary>
         public bool IsRenamed;
+
+        /// <summary>
+        /// Gets a value indicating whether this model has [ImplementContentType] already.
+        /// </summary>
+        public bool HasImplement;
 
         /// <summary>
         /// Gets a value indicating whether this model is used as a mixin by another model.

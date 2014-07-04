@@ -11,7 +11,7 @@ using System.Web.Hosting;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Web.WebApi;
-using Zbu.ModelsBuilder.Build;
+using Zbu.ModelsBuilder.Building;
 using Zbu.ModelsBuilder.Configuration;
 using Application = Zbu.ModelsBuilder.Umbraco.Application;
 

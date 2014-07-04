@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata minClientVersion="2.8.1">
-		<id>Zbu.ModelsBuilder.Umbraco</id>
+		<id>Zbu.ModelsBuilder</id>
 		<version>$version$</version>
 		<title>ZpqrtBnk Umbraco ModelsBuilder Libraries</title>
 		<authors>Pilotine - ZpqrtBnk</authors>
@@ -16,7 +16,6 @@
 	<files>
     <!-- our dlls -->
     <file src="..\..\bin\Release\Zbu.ModelsBuilder.dll" target="lib\Zbu.ModelsBuilder.dll" />
-    <file src="..\..\bin\Release\Zbu.ModelsBuilder.Umbraco.dll" target="lib\Zbu.ModelsBuilder.Umbraco.dll" />
 
     <!-- content // we don't have any -->
 		

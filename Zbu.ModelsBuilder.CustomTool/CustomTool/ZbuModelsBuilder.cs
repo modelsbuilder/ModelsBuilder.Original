@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.VisualStudio.Shell.Interop;
-using Zbu.ModelsBuilder.Build;
+using Zbu.ModelsBuilder.Building;
 using Zbu.ModelsBuilder.CustomTool.VisualStudio;
 
 namespace Zbu.ModelsBuilder.CustomTool.CustomTool

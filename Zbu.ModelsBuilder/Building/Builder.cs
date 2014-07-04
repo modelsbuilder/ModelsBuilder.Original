@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Zbu.ModelsBuilder.Build
+namespace Zbu.ModelsBuilder.Building
 {
     // NOTE
     // The idea was to have different types of builder, because I wanted to experiment with
@@ -124,6 +124,12 @@ namespace Zbu.ModelsBuilder.Build
             {
                 typeModel.ClrName = ParseResult.ContentClrName(typeModel.Alias);
                 typeModel.IsRenamed = true;
+            }
+
+            // handle implement
+            foreach (var typeModel in _typeModels.Where(x => ParseResult.HasContentImplement(x.Alias)))
+            {
+                typeModel.HasImplement = true;
             }
 
             // mark OmitBase models that we discovered already have a base class

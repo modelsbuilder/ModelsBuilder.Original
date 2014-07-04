@@ -11,7 +11,7 @@
 		<copyright>Copyright © Pilotine - ZpqrtBnk 2013-2014</copyright>
 		<dependencies>
 			<dependency id="Microsoft.CodeAnalysis.CSharp" version="0.6.4033103-beta" />
-      <dependency id="Zbu.ModelsBuilder.Umbraco" version="$version$" />
+      <dependency id="Zbu.ModelsBuilder" version="$version$" />
     </dependencies>
 	</metadata>
 	<files>

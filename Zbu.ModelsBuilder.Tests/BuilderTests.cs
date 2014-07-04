@@ -2,13 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.ValueConverters;
-using Zbu.ModelsBuilder;
-using Zbu.ModelsBuilder.Build;
+using Zbu.ModelsBuilder.Building;
 
 namespace Zbu.ModelsBuilder.Tests
 {

@@ -123,6 +123,6 @@ But, time will come...]]></readme>
       </section>
     </Action>
     -->
-    <Action runat="install" undo="true" alias="Zbu.ModelsBuilder.Umbraco.PackageActions.Configure2" />
+    <Action runat="install" undo="true" alias="Zbu.ModelsBuilder.AspNet.PackageActions.Configure2" />
   </Actions>
 </umbPackage>
