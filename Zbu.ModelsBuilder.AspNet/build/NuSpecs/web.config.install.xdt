@@ -12,10 +12,13 @@
         <add extension=".models" type="Zbu.ModelsBuilder.AspNet.ModelsBuildProvider, Zbu.ModelsBuilder.AspNet"
           xdt:Transform="Insert" />
         <!-- Insert actually appends so these two will go to the bottom of the list & replace the .cshtml provider -->
+        <!-- NOT see note in ConfigurePublishedContentModelFactory.cs -->
+        <!--
         <remove extension=".cshtml"
           xdt:Transform="Insert" />
         <add extension=".cshtml" type="Zbu.ModelsBuilder.AspNet.RazorBuildProvider, Zbu.ModelsBuilder.AspNet"
           xdt:Transform="Insert"/>
+        -->
       </buildProviders>
      </compilation>
 	</system.web>
