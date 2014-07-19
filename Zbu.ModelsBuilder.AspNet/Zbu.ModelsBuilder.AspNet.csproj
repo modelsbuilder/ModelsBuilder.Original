@@ -64,17 +64,41 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="businesslogic, Version=1.0.5224.23752, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="businesslogic" Condition=" '$(Configuration)' == 'Release' or '$(Configuration)' == 'Debug' ">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\umbraco\businesslogic.dll</HintPath>
+    </Reference>
+    <Reference Include="umbraco" Condition=" '$(Configuration)' == 'Release' or '$(Configuration)' == 'Debug' ">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\umbraco\umbraco.dll</HintPath>
+    </Reference>
+    <Reference Include="Umbraco.Core" Condition=" '$(Configuration)' == 'Release' or '$(Configuration)' == 'Debug' ">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\umbraco\Umbraco.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="interfaces" Condition=" '$(Configuration)' == 'Release' or '$(Configuration)' == 'Debug' ">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\umbraco\interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="businesslogic" Condition=" '$(Configuration)' == 'Release-U6' or '$(Configuration)' == 'Debug-U6' ">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\umbraco-6\businesslogic.dll</HintPath>
+    </Reference>
+    <Reference Include="umbraco" Condition=" '$(Configuration)' == 'Release-U6' or '$(Configuration)' == 'Debug-U6' ">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\umbraco-6\umbraco.dll</HintPath>
+    </Reference>
+    <Reference Include="Umbraco.Core" Condition=" '$(Configuration)' == 'Release-U6' or '$(Configuration)' == 'Debug-U6' ">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\umbraco-6\Umbraco.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="interfaces" Condition=" '$(Configuration)' == 'Release-U6' or '$(Configuration)' == 'Debug-U6' ">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\umbraco-6\interfaces.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
-    <Reference Include="interfaces, Version=1.0.5222.27960, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\umbraco\interfaces.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Web.XmlTransform, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -83,9 +107,13 @@
     <Reference Include="MSBuild.Umbraco.Tasks">
       <HintPath>..\packages\MSBuild.Umbraco.Tasks.1.0\lib\MSBuild.Umbraco.Tasks.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+    <Reference Include="Newtonsoft.Json" Condition=" '$(Configuration)' == 'Release' or '$(Configuration)' == 'Debug' ">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\umbraco\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json" Condition=" '$(Configuration)' == 'Release-U6' or '$(Configuration)' == 'Debug-U6' ">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\umbraco-6\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -102,14 +130,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="umbraco, Version=1.0.5224.23755, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\umbraco\umbraco.dll</HintPath>
-    </Reference>
-    <Reference Include="Umbraco.Core, Version=1.0.5224.23751, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\umbraco\Umbraco.Core.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Zbu.ModelsBuilder\Properties\CommonInfo.cs">
@@ -175,7 +195,7 @@
     </CreateProperty>
   </Target>
   -->
-  <Target Name="UmbracoPackage">
+  <Target Name="UmbracoPackage" Condition=" '$(Configuration)' == 'Release' ">
     <!-- get the assembly version -->
     <GetAssemblyIdentity AssemblyFiles="$(OutputPath)Zbu.ModelsBuilder.dll">
       <Output TaskParameter="Assemblies" ItemName="AssemblyInfos" />
@@ -219,7 +239,7 @@
     <RemoveDir Directories="$(ProjectDir)pkg" />
   </Target>
   <!-- auto by NuGet: DependsOnTargets="BuildPackage" -->
-  <Target Name="NuGetPackage">
+  <Target Name="NuGetPackage" Condition=" '$(Configuration)' == 'Release' ">
     <!-- get the assembly version -->
     <GetAssemblyIdentity AssemblyFiles="$(OutputPath)Zbu.ModelsBuilder.dll">
       <Output TaskParameter="Assemblies" ItemName="AssemblyInfos2" />

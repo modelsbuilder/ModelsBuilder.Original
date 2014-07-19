@@ -60,36 +60,49 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="interfaces">
-      <HintPath>..\lib\umbraco-7.1.4\interfaces.dll</HintPath>
+    <Reference Include="interfaces" Condition=" '$(Configuration)' == 'Release' or '$(Configuration)' == 'Debug' ">
+      <HintPath>..\lib\umbraco\interfaces.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CodeAnalysis">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.0.6.4033103-beta\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
+    <Reference Include="Microsoft.CodeAnalysis, Version=0.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.0.7.4052301-beta\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CodeAnalysis.CSharp">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.0.6.4033103-beta\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=0.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.0.7.4052301-beta\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections.Immutable, Version=1.1.22.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Bcl.Immutable.1.1.22-beta\lib\portable-net45+win8+wpa81\System.Collections.Immutable.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reflection.Metadata, Version=1.0.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Bcl.Metadata.1.0.11-alpha\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
+    </Reference>
+    <Reference Include="umbraco" Condition=" '$(Configuration)' == 'Release' or '$(Configuration)' == 'Debug' ">
+      <HintPath>..\lib\umbraco\umbraco.dll</HintPath>
+    </Reference>
+    <Reference Include="Umbraco.Core" Condition=" '$(Configuration)' == 'Release' or '$(Configuration)' == 'Debug' ">
+      <HintPath>..\lib\umbraco\Umbraco.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="interfaces" Condition=" '$(Configuration)' == 'Release-U6' or '$(Configuration)' == 'Debug-U6' ">
+      <HintPath>..\lib\umbraco-6\interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="umbraco" Condition=" '$(Configuration)' == 'Release-U6' or '$(Configuration)' == 'Debug-U6' ">
+      <HintPath>..\lib\umbraco-6\umbraco.dll</HintPath>
+    </Reference>
+    <Reference Include="Umbraco.Core" Condition=" '$(Configuration)' == 'Release-U6' or '$(Configuration)' == 'Debug-U6' ">
+      <HintPath>..\lib\umbraco-6\Umbraco.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Collections.Immutable">
-      <HintPath>..\packages\Microsoft.Bcl.Immutable.1.1.20-beta\lib\portable-net45+win8\System.Collections.Immutable.dll</HintPath>
-    </Reference>
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Reflection.Metadata">
-      <HintPath>..\packages\Microsoft.Bcl.Metadata.1.0.9-alpha\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
-    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="umbraco">
-      <HintPath>..\lib\umbraco-7.1.4\umbraco.dll</HintPath>
-    </Reference>
-    <Reference Include="Umbraco.Core">
-      <HintPath>..\lib\umbraco-7.1.4\Umbraco.Core.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyUtility.cs" />
@@ -124,6 +137,7 @@
     <Compile Include="Umbraco\RemoteApplication.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="build\NuSpecs\Zbu.ModelsBuilder.nuspec" />
     <None Include="Key.snk" />
     <None Include="packages.config" />
@@ -138,7 +152,7 @@
   <Target Name="AfterBuild" DependsOnTargets="NuGetPackage">
   </Target>
   <!-- auto by NuGet: DependsOnTargets="BuildPackage" -->
-  <Target Name="NuGetPackage">
+  <Target Name="NuGetPackage" Condition=" '$(Configuration)' == 'Release' ">
     <!-- get the assembly version -->
     <GetAssemblyIdentity AssemblyFiles="$(OutputPath)Zbu.ModelsBuilder.dll">
       <Output TaskParameter="Assemblies" ItemName="AssemblyInfos" />

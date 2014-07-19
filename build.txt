@@ -1,0 +1,28 @@
+BUILD
+-----
+
+Configurations "Debug-U6" and "Release-U6" are for Umbraco v6.
+  Both define compile constant UMBRACO_6
+  Which is used in Zbu.ModelsBuilder.AspNet.ModelsBuilderAuthFilter
+
+Umbraco dependencies
+  The following libs must be in lib/umbraco:
+    businesslogic.dll
+	interfaces.dll
+	newtonsoft.Json.dll
+	Umbraco.Core.dll
+	umbraco.dll
+
+  In order to build for v6 the same libs must be in lib/umbraco-v6
+  These are conditional references in csproj files
+
+Packages (NuGet, Umbraco, Vsix...) are created for "Release" build only,
+in the build directory.
+
+NOTES
+  SharpZipLib in lib is there for MSBuild.Umbraco.Tasks
+    Could not get it to use the one in the nuget package
+    See AspNet.csproj
+  Newtonsoft.Json
+    Using the one that comes with Umbraco not a package
+	because of version issues

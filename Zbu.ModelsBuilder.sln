@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zbu.ModelsBuilder", "Zbu.ModelsBuilder\Zbu.ModelsBuilder.csproj", "{998FB014-303A-4146-B3E4-B927BAB0210F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zbu.ModelsBuilder.Tests", "Zbu.ModelsBuilder.Tests\Zbu.ModelsBuilder.Tests.csproj", "{CF597D44-04EA-4FD7-89C8-E4849D1355C8}"
-EndProject
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{0B372908-9779-4E73-9D28-F96B72B1CF45}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
@@ -12,17 +10,22 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{0B3729
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{C7535949-9EEE-4711-8351-0CA8EB32DBE6}"
+	ProjectSection(SolutionItems) = preProject
+		build.txt = build.txt
+		license.txt = license.txt
+		readme.md = readme.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zbu.ModelsBuilder", "Zbu.ModelsBuilder\Zbu.ModelsBuilder.csproj", "{998FB014-303A-4146-B3E4-B927BAB0210F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zbu.ModelsBuilder.Tests", "Zbu.ModelsBuilder.Tests\Zbu.ModelsBuilder.Tests.csproj", "{CF597D44-04EA-4FD7-89C8-E4849D1355C8}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zbu.ModelsBuilder.CustomTool", "Zbu.ModelsBuilder.CustomTool\Zbu.ModelsBuilder.CustomTool.csproj", "{0419A43D-78C2-46C9-95A9-2470F224D60F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zbu.ModelsBuilder.AspNet", "Zbu.ModelsBuilder.AspNet\Zbu.ModelsBuilder.AspNet.csproj", "{9670E426-0872-4A87-9DDE-805828546DE9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zbu.ModelsBuilder.Console", "Zbu.ModelsBuilder.Console\Zbu.ModelsBuilder.Console.csproj", "{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{C7535949-9EEE-4711-8351-0CA8EB32DBE6}"
-	ProjectSection(SolutionItems) = preProject
-		license.txt = license.txt
-		readme.md = readme.md
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
