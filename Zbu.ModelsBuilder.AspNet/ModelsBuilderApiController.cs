@@ -29,7 +29,7 @@ namespace Zbu.ModelsBuilder.AspNet
         private const string ControllerUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi";
 
         // indicate which versions of the client API are supported by this server's API.
-        private static readonly Version MinClientVersion = new Version(1, 7, 0, 0);
+        private static readonly Version MinClientVersion = new Version(2, 0, 0, 0);
         private static readonly Version MaxClientVersion = Builder.Version;
 
         #region Models
