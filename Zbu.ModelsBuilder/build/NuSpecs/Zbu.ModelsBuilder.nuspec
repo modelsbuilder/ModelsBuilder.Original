@@ -10,7 +10,7 @@
 		<description>ZpqrtBnk Umbraco ModeslBuilder Libraries.</description>
 		<copyright>Copyright © Pilotine - ZpqrtBnk 2013-2014</copyright>
 		<dependencies>
-			<dependency id="Microsoft.CodeAnalysis.CSharp" version="0.6.4033103-beta" />
+			<dependency id="Microsoft.CodeAnalysis.CSharp" version="0.7.4052301-beta" />
 		</dependencies>
 	</metadata>
 	<files>
