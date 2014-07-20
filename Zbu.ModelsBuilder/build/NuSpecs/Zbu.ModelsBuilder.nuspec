@@ -11,7 +11,9 @@
 		<copyright>Copyright © Pilotine - ZpqrtBnk 2013-2014</copyright>
 		<dependencies>
 			<dependency id="Microsoft.CodeAnalysis.CSharp" version="0.7.4052301-beta" />
-		</dependencies>
+      <dependency id="Microsoft.Bcl.Immutable" version="1.1.22-beta" />
+      <dependency id="Microsoft.Bcl.Metadata" version="1.0.11-alpha" />
+    </dependencies>
 	</metadata>
 	<files>
     <!-- our dlls -->
