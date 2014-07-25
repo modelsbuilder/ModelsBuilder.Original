@@ -9,7 +9,7 @@ namespace Zbu.ModelsBuilder.AspNet.PackageActions
 {
     public class Configure2 : IPackageAction
     {
-        private const string ActionAlias = "Zbu.ModelsBuilder.Umbraco.PackageActions.Configure2";
+        private const string ActionAlias = "Zbu.ModelsBuilder.AspNet.PackageActions.Configure2";
 
         public string Alias()
         {
