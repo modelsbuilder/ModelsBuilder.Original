@@ -42,11 +42,6 @@
 		  <orgName>Zbu.ModelsBuilder.dll</orgName>
 	  </file>
 	  <file>
-		  <guid>Zbu.ModelsBuilder.Umbraco.dll</guid>
-		  <orgPath>/bin</orgPath>
-		  <orgName>Zbu.ModelsBuilder.Umbraco.dll</orgName>
-	  </file>
-	  <file>
 		  <guid>Zbu.ModelsBuilder.AspNet.dll</guid>
 		  <orgPath>/bin</orgPath>
 		  <orgName>Zbu.ModelsBuilder.AspNet.dll</orgName>
@@ -78,7 +73,7 @@
       <name>ZpqrtBnk Umbraco ModelsBuilder</name>
       <version>FieldPackageVersion</version>
       <license url="http://www.opensource.org/licenses/mit-license.php">MIT license</license>
-      <url>http://localhost/package</url>
+      <url>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</url>
       <requirements>
         <major>7</major>
         <minor>1</minor>
