@@ -88,11 +88,8 @@
 Copyright (C) Pilotine - ZpqrtBnk 2013-2014
 Distributed under the MIT license
 
-An experimental tool that can generate a complete set of strongly-typed published content models for Umbraco 6.2+ to be used in the MVC views. Either from the Umbraco UI, from the command line, or from Visual Studio.
-
-DISCLAIMER: THIS CODE IS BETA-CODE. USE AT YOUR OWN RISKS.
-
-But, time will come...]]></readme>
+A tool that can generate a complete set of strongly-typed published content models for Umbraco 7.1.4+ to be used in the MVC views. Either from the Umbraco UI, from the command line, or from Visual Studio.
+]]></readme>
   </info>
   <DocumentTypes />
   <Templates />
