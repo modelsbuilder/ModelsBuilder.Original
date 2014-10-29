@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
 using Zbu.ModelsBuilder.Building;
 
@@ -58,17 +59,24 @@ namespace Whatever
 {
     public class Something
     {
+        // auto-property initializer
         public int Value { get; set; } = 3;
 
         public void DoSomething()
         {
             Console.WriteLine(""Hello!"");
         }
+
+        public void DoSomething(string[] args)
+        {
+            // conditional access
+            var len = args?.Length ?? 0;
+        }
     }
 }
 ";
 
-            var compiler = new Compiler();
+            var compiler = new Compiler(LanguageVersion.Experimental);
             compiler.Compile(_tempDir, "Whatever", new Dictionary<string, string> { { "code", code1 } });
             Assert.IsTrue(File.Exists(Path.Combine(_tempDir, "Whatever.dll")));
         }

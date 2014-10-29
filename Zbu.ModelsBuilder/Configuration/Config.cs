@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Zbu.ModelsBuilder.Configuration
 {
@@ -18,6 +19,16 @@ namespace Zbu.ModelsBuilder.Configuration
             EnableApi = ConfigurationManager.AppSettings[prefix + "EnableApi"] != "false";
             ModelsNamespace = ConfigurationManager.AppSettings[prefix + "ModelsNamespace"];
             EnablePublishedContentModelsFactory = ConfigurationManager.AppSettings[prefix + "EnablePublishedContentModelsFactory"] != "false";
+
+            LanguageVersion = LanguageVersion.CSharp5;
+            var lvSetting = ConfigurationManager.AppSettings[prefix + "LanguageVersion"];
+            if (!string.IsNullOrWhiteSpace(lvSetting))
+            {
+                LanguageVersion lv;
+                if (!Enum.TryParse(lvSetting, true, out lv))
+                    throw new ConfigurationErrorsException(string.Format("Invalid language version \"{0}\".", lvSetting));
+                LanguageVersion = lv;
+            }
 
             var count =
                 (EnableDllModels ? 1 : 0)
@@ -119,5 +130,10 @@ namespace Zbu.ModelsBuilder.Configuration
         /// <remarks>Default value is <c>true</c> because no factory is enabled by default in Umbraco.</remarks>
         public static bool EnablePublishedContentModelsFactory { get; private set; }
 
+        /// <summary>
+        /// Gets the Roslyn parser language version.
+        /// </summary>
+        /// <remarks>Default value is <c>CSharp5</c>.</remarks>
+        public static LanguageVersion LanguageVersion { get; private set; }
     }
 }

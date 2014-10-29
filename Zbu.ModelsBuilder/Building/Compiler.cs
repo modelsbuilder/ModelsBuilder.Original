@@ -6,16 +6,28 @@ using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
+using Zbu.ModelsBuilder.Configuration;
 
 namespace Zbu.ModelsBuilder.Building
 {
     public class Compiler
     {
         public readonly HashSet<Assembly> ReferencedAssemblies = new HashSet<Assembly>();
+        private readonly LanguageVersion _languageVersion;
+
+        public Compiler()
+        {
+            _languageVersion = Config.LanguageVersion;
+        }
+
+        public Compiler(LanguageVersion languageVersion)
+        {
+            _languageVersion = languageVersion;
+        }
 
         public CSharpCompilation GetCompilation(string assemblyName, IDictionary<string, string> files, out SyntaxTree[] trees)
         {
-            var options = new CSharpParseOptions();
+            var options = new CSharpParseOptions(_languageVersion);
             trees = files.Select(x =>
             {
                 var text = x.Value;
