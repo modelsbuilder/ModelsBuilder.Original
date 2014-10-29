@@ -246,7 +246,7 @@ namespace Zbu.ModelsBuilder.Building
         private void WriteInterfaceProperty(StringBuilder sb, PropertyModel property)
         {
             if (!string.IsNullOrWhiteSpace(property.Name))
-                sb.AppendFormat("\t\t/// <summary>{0}</summary>", XmlCommentString(property.Name));
+                sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString(property.Name));
             sb.Append("\t\t");
             WriteClrType(sb, property.ClrType);
             sb.AppendFormat(" {0} {{ get; }}\n",
