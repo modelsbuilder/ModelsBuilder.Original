@@ -22,8 +22,22 @@ namespace Zbu.ModelsBuilder.Building
         /// <remarks>The set of files is a dictionary of name, content.</remarks>
         public ParseResult Parse(IDictionary<string, string> files)
         {
+            return Parse(files, Enumerable.Empty<Assembly>());
+        }
+
+        /// <summary>
+        /// Parses a set of file.
+        /// </summary>
+        /// <param name="files">A set of (filename,content) representing content to parse.</param>
+        /// <param name="referencedAssemblies">Assemblies to reference in compilations.</param>
+        /// <returns>The result of the code parsing.</returns>
+        /// <remarks>The set of files is a dictionary of name, content.</remarks>
+        public ParseResult Parse(IDictionary<string, string> files, IEnumerable<Assembly> referencedAssemblies)
+        {
             SyntaxTree[] trees;
             var compiler = new Compiler();
+            foreach (var asm in referencedAssemblies)
+                compiler.ReferencedAssemblies.Add(asm);
             var compilation = compiler.GetCompilation("Zbu.ModelsBuilder.Generated", files, out trees);
 
             var disco = new ParseResult();

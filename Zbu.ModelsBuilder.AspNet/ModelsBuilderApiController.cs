@@ -144,7 +144,10 @@ namespace Zbu.ModelsBuilder.AspNet
             var umbraco = Application.GetApplication();
             var typeModels = umbraco.GetAllTypes();
 
-            var parseResult = new CodeParser().Parse(data.Files);
+            // using BuildManager references
+            var referencedAssemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToArray();
+
+            var parseResult = new CodeParser().Parse(data.Files, referencedAssemblies);
             var builder = new TextBuilder(typeModels, parseResult, data.Namespace);
 
             var models = new Dictionary<string, string>();
@@ -192,8 +195,11 @@ namespace Zbu.ModelsBuilder.AspNet
             var umbraco = Application.GetApplication();
             var typeModels = umbraco.GetAllTypes();
 
+            // using BuildManager references
+            var referencedAssemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToArray();
+
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
-            var parseResult = new CodeParser().Parse(ourFiles);
+            var parseResult = new CodeParser().Parse(ourFiles, referencedAssemblies);
             var builder = new TextBuilder(typeModels, parseResult, Config.ModelsNamespace);
 
             foreach (var typeModel in builder.GetModelsToGenerate())
@@ -208,9 +214,8 @@ namespace Zbu.ModelsBuilder.AspNet
             {
                 foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                     ourFiles[file] = File.ReadAllText(file);
-                var compiler = new Compiler();
-                // using BuildManager references
-                foreach (var asm in BuildManager.GetReferencedAssemblies().Cast<Assembly>())
+                var compiler = new Compiler();                
+                foreach (var asm in referencedAssemblies)
                     compiler.ReferencedAssemblies.Add(asm);
                 compiler.Compile(bin, builder.GetModelsNamespace(), ourFiles);
             }

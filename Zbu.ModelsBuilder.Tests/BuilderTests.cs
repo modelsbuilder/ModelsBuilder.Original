@@ -140,6 +140,60 @@ using Zbu.ModelsBuilder;
         }
 
         [Test]
+        public void ReferencedAssemblies()
+        {
+            var type1 = new TypeModel
+            {
+                Id = 1,
+                Alias = "type1",
+                ClrName = "Type1",
+                BaseTypeId = 0,
+                BaseType = null,
+                ItemType = TypeModel.ItemTypes.Content,
+            };
+
+            var types = new[] { type1 };
+
+            var code1 = new Dictionary<string, string>
+            {
+                {"assembly", @"
+using Zbu.ModelsBuilder;
+public partial class Type1
+{}
+"}
+            };
+
+            Assert.IsFalse(new CodeParser().Parse(code1).HasContentBase("Type1"));
+
+            var code2 = new Dictionary<string, string>
+            {
+                {"assembly", @"
+using Zbu.ModelsBuilder;
+public partial class Type1 : IHasXmlNode
+{}
+"}
+            };
+
+            // assumes base is IHasXmlNode (cannot be verified...)
+            Assert.IsTrue(new CodeParser().Parse(code2).HasContentBase("Type1"));
+
+            var code3 = new Dictionary<string, string>
+            {
+                {"assembly", @"
+using Zbu.ModelsBuilder;
+using System.Xml;
+public partial class Type1 : IHasXmlNode
+{}
+"}
+            };
+
+            // figures out that IHasXmlNode is an interface, not base
+            // because of using + reference
+            var asms = new[] {typeof(System.Xml.IHasXmlNode).Assembly};
+            Assert.IsFalse(new CodeParser().Parse(code3, asms).HasContentBase("Type1"));
+        }
+
+        [Test]
         public void ContentTypeIgnoreWildcard()
         {
             // Umbraco returns nice, pascal-cased names
