@@ -834,24 +834,28 @@ namespace Umbraco.Web.PublishedContentModels
 	[PublishedContentModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
+#pragma warning disable 0109 // new is redundant
 		public new const string ModelTypeAlias = ""type1"";
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+#pragma warning restore 0109
 
 		public Type1(IPublishedContent content)
 			: base(content)
 		{ }
 
+#pragma warning disable 0109 // new is redundant
 		public new static PublishedContentType GetModelContentType()
 		{
 			return PublishedContentType.Get(ModelItemType, ModelTypeAlias);
 		}
+#pragma warning restore 0109
 
 		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
 		{
 			return PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 		}
 
-		[ModelPropertyAlias(""prop1"")]
+		[ImplementPropertyType(""prop1"")]
 		public string Prop1
 		{
 			get { return this.GetPropertyValue<string>(""prop1""); }
