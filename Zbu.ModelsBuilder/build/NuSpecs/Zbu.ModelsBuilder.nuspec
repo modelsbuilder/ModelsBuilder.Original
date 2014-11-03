@@ -10,9 +10,12 @@
 		<description>ZpqrtBnk Umbraco ModeslBuilder Libraries.</description>
 		<copyright>Copyright © Pilotine - ZpqrtBnk 2013-2014</copyright>
 		<dependencies>
-			<dependency id="Microsoft.CodeAnalysis.CSharp" version="0.7.4052301-beta" />
+			<dependency id="Microsoft.CodeAnalysis.CSharp" version="0.7.4091001-beta" />
+      <!-- don't need those as Microsoft.CodeAnalysis.CSharp depends on them -->
+      <!--
       <dependency id="Microsoft.Bcl.Immutable" version="1.1.22-beta" />
-      <dependency id="Microsoft.Bcl.Metadata" version="1.0.11-alpha" />
+      <dependency id="Microsoft.Bcl.Metadata" version="1.0.12-alpha" />
+      -->
     </dependencies>
 	</metadata>
 	<files>

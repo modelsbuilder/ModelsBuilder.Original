@@ -10,13 +10,16 @@
       </assemblies>
       <buildProviders>
         <add extension=".models" type="Zbu.ModelsBuilder.AspNet.ModelsBuildProvider, Zbu.ModelsBuilder.AspNet"
-          xdt:Transform="Remove" />
+          xdt:Transform="Remove" xdt:Locator="Match(extension,type)"/>
         <!-- remove our own remove, ie one having first following sibling being our own add -->
+        <!-- NOT see note in ConfigurePublishedContentModelFactory.cs -->
+        <!--
         <remove
           xdt:Transform="Remove"
           xdt:Locator="Condition(@extension='.cshtml' and (following-sibling::add [position()=1 and @extension='.cshtml' and @type='Zbu.ModelsBuilder.AspNet.RazorBuildProvider, Zbu.ModelsBuilder.AspNet']))"/>
         <add extension=".cshtml" type="Zbu.ModelsBuilder.AspNet.RazorBuildProvider, Zbu.ModelsBuilder.AspNet"
           xdt:Transform="Remove" xdt:Locator="Match(extension,type)"/>
+        -->
       </buildProviders>
 		</compilation>
 	</system.web>

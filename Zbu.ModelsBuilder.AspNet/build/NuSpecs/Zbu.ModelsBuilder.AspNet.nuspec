@@ -10,7 +10,10 @@
 		<description>ZpqrtBnk Umbraco ModelsBuilder Site Integration.</description>
 		<copyright>Copyright © Pilotine - ZpqrtBnk 2013-2014</copyright>
 		<dependencies>
+      <!-- dont need that one as Zbu.ModelsBuilder depends on it -->
+      <!--
 			<dependency id="Microsoft.CodeAnalysis.CSharp" version="0.6.4033103-beta" />
+      -->
       <dependency id="Zbu.ModelsBuilder" version="$version$" />
     </dependencies>
 	</metadata>

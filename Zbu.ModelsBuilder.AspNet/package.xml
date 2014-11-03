@@ -22,6 +22,16 @@
 		  <orgName>Microsoft.CodeAnalysis.CSharp.dll</orgName>
 	  </file>
     <file>
+      <guid>Microsoft.CodeAnalysis.Desktop.dll</guid>
+      <orgPath>/bin</orgPath>
+      <orgName>Microsoft.CodeAnalysis.Desktop.dll</orgName>
+    </file>
+    <file>
+      <guid>Microsoft.CodeAnalysis.CSharp.Desktop.dll</guid>
+      <orgPath>/bin</orgPath>
+      <orgName>Microsoft.CodeAnalysis.CSharp.Desktop.dll</orgName>
+    </file>
+    <file>
       <guid>System.Collections.Immutable.dll</guid>
       <orgPath>/bin</orgPath>
       <orgName>System.Collections.Immutable.dll</orgName>
