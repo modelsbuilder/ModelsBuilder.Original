@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace Zbu.ModelsBuilder.Building
 {
@@ -17,11 +16,6 @@ namespace Zbu.ModelsBuilder.Building
     /// </summary>
     public abstract class Builder
     {
-        /// <summary>
-        /// Gets the assembly version of the builder, ie the ModelsBuilder version.
-        /// </summary>
-        public static readonly Version Version = Assembly.GetExecutingAssembly().GetName().Version;
-
         private readonly IList<TypeModel> _typeModels;
         protected ParseResult ParseResult { get; private set; }
 

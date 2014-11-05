@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Text;
-using Zbu.ModelsBuilder.Building;
 
 namespace Zbu.ModelsBuilder.AspNet
 {
@@ -45,8 +44,13 @@ namespace Zbu.ModelsBuilder.AspNet
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
                     Convert.ToBase64String(Encoding.UTF8.GetBytes(_user + ':' + _password)));
 
-                var clientVersion = typeof(TypeModel).Assembly.GetName().Version;
-                var result = client.PostAsync(url + ModelsBuilderApiController.ValidateClientVersionUrl, clientVersion, new JsonMediaTypeFormatter()).Result;
+                var data = new ModelsBuilderApiController.ValidateClientVersionData
+                {
+                    ClientVersion = Compatibility.Version,
+                    MinServerVersionSupportingClient = Compatibility.MinServerVersionSupportingClient,
+                };
+
+                var result = client.PostAsync(url + ModelsBuilderApiController.ValidateClientVersionUrl, data, new JsonMediaTypeFormatter()).Result;
 
                 // this is not providing enough details in case of an error - do our own reporting
                 //result.EnsureSuccessStatusCode();
@@ -111,7 +115,8 @@ namespace Zbu.ModelsBuilder.AspNet
                 var data = new ModelsBuilderApiController.GetModelsData
                 {
                     Namespace = modelsNamespace,
-                    ClientVersion = typeof (TypeModel).Assembly.GetName().Version,
+                    ClientVersion = Compatibility.Version,
+                    MinServerVersionSupportingClient = Compatibility.MinServerVersionSupportingClient,
                     Files = ourFiles
                 };
 

@@ -19,7 +19,7 @@ namespace Zbu.ModelsBuilder.Console
 
         static void Main(string[] args)
         {
-            SysConsole.WriteLine("Zbu.ModelsBuilder v{0}", Builder.Version);
+            SysConsole.WriteLine("Zbu.ModelsBuilder v{0}", Compatibility.Version);
 
             string apiUrl, apiUser, apiPassword;
             string modelsDirectory, modelsNamespace;

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Reflection;
 using System.Text;
 using System.Web.Compilation;
@@ -28,10 +30,6 @@ namespace Zbu.ModelsBuilder.AspNet
         public const string ZbuArea = "Zbu";
         private const string ControllerUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi";
 
-        // indicate which versions of the client API are supported by this server's API.
-        private static readonly Version MinClientVersion = new Version(2, 0, 0, 0);
-        private static readonly Version MaxClientVersion = Builder.Version;
-
         #region Models
 
         public class BuildResult
@@ -40,9 +38,16 @@ namespace Zbu.ModelsBuilder.AspNet
             public string Message;
         }
 
+        public class ValidateClientVersionData
+        {
+            public Version ClientVersion { get; set; }
+            public Version MinServerVersionSupportingClient { get; set; }
+        }
+
         public class GetModelsData
         {
             public Version ClientVersion { get; set; }
+            public Version MinServerVersionSupportingClient { get; set; }
             public string Namespace { get; set; }
             public IDictionary<string, string> Files { get; set; }
         }
@@ -54,12 +59,12 @@ namespace Zbu.ModelsBuilder.AspNet
         // invoked by the API
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
         [ModelsBuilderAuthFilter("developer")] // have to use our own, non-cookie-based, auth
-        public HttpResponseMessage ValidateClientVersion(Version clientVersion)
+        public HttpResponseMessage ValidateClientVersion(ValidateClientVersionData data)
         {
             if (!Config.EnableApi)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API is not enabled.");
 
-            var checkResult = CheckVersion(clientVersion);
+            var checkResult = CheckVersion(data.ClientVersion, data.MinServerVersionSupportingClient);
             return (checkResult.Success
                 ? Request.CreateResponse(HttpStatusCode.OK, "OK", Configuration.Formatters.JsonFormatter)
                 : checkResult.Result);
@@ -137,7 +142,7 @@ namespace Zbu.ModelsBuilder.AspNet
             if (!Config.EnableApi)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API is not enabled.");
 
-            var checkResult = CheckVersion(data.ClientVersion);
+            var checkResult = CheckVersion(data.ClientVersion, data.MinServerVersionSupportingClient);
             if (!checkResult.Success)
                 return checkResult.Result;
 
@@ -233,13 +238,14 @@ namespace Zbu.ModelsBuilder.AspNet
             File.WriteAllText(modelsFile, text);
         }
 
-        private Attempt<HttpResponseMessage> CheckVersion(Version clientVersion)
+        private Attempt<HttpResponseMessage> CheckVersion(Version clientVersion, Version minServerVersionSupportingClient)
         {
-            var serverVersion = Builder.Version;
-            var isOk = clientVersion >= MinClientVersion && clientVersion <= MaxClientVersion;
+            var isOk = minServerVersionSupportingClient == null
+                ? Compatibility.IsCompatible(clientVersion) // clients up to 2.0.1, included
+                : Compatibility.IsCompatible(clientVersion, minServerVersionSupportingClient); // anything greater than 2.0.1
             var response = isOk ? null : Request.CreateResponse(HttpStatusCode.Forbidden, string.Format(
                 "API version conflict: client version ({0}) is not compatible with server version({1}).",
-                clientVersion, serverVersion));
+                clientVersion, Compatibility.Version));
             return Attempt<HttpResponseMessage>.SucceedIf(isOk, response);
         }
     }
