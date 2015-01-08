@@ -85,13 +85,13 @@ namespace Foo
             // http://msdn.microsoft.com/en-gb/vstudio/hh500769.aspx
             var tree = CSharpSyntaxTree.ParseText(code);
             //var mscorlib = new AssemblyFileReference(typeof(object).Assembly.Location);
-            var mscorlib = new MetadataFileReference(typeof (object).Assembly.Location);
+            var mscorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
 
             // YES! adding the reference and Random1 is found by compilation
             // SO we can get rid of the OmitWhatever attribute!!!!
             // provided that we load everything that's in BIN as references
             // => the CodeInfos must be built on the SERVER and we send files to the SERVER.
-            var testslib = new MetadataFileReference(typeof (RoslynTests).Assembly.Location);
+            var testslib = MetadataReference.CreateFromFile(typeof(RoslynTests).Assembly.Location);
 
             var compilation = CSharpCompilation.Create(
                 "MyCompilation",
@@ -154,8 +154,8 @@ public class MyBuilder : Zbu.ModelsBuilder.Tests.TestBuilder
 ";
 
             var tree = CSharpSyntaxTree.ParseText(code);
-            var mscorlib = new MetadataFileReference(typeof(object).Assembly.Location);
-            var testslib = new MetadataFileReference(typeof(RoslynTests).Assembly.Location);
+            var mscorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
+            var testslib = MetadataReference.CreateFromFile(typeof(RoslynTests).Assembly.Location);
 
             var compilation = CSharpCompilation.Create(
                 "MyCompilation",
@@ -186,7 +186,7 @@ public class MyBuilder : Zbu.ModelsBuilder.Tests.TestBuilder
 ";
 
             var tree = CSharpSyntaxTree.ParseText(code);
-            var refs = AssemblyUtility.GetAllReferencedAssemblyLocations().Select(x => new MetadataFileReference(x));
+            var refs = AssemblyUtility.GetAllReferencedAssemblyLocations().Select(x => MetadataReference.CreateFromFile(x));
 
             var compilation = CSharpCompilation.Create(
                 "MyCompilation",
@@ -231,7 +231,7 @@ class SimpleClass
 }";
 
             var tree = CSharpSyntaxTree.ParseText(code);
-            var mscorlib = new MetadataFileReference(typeof(object).Assembly.Location);
+            var mscorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
 
             var compilation = CSharpCompilation.Create(
                 "MyCompilation",

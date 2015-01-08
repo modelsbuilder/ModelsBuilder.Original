@@ -47,7 +47,7 @@ namespace Zbu.ModelsBuilder.Building
             var a1 = typeof(Builder).Assembly;
             asms.Add(a1);
             foreach (var a in GetDeepReferencedAssemblies(a1)) asms.Add(a);
-            var refs = asms.Select(x => new MetadataFileReference(x.Location));
+            var refs = asms.Select(x => MetadataReference.CreateFromFile(x.Location));
 
             var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
             var compilation = CSharpCompilation.Create(
