@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{0B372908-9779-4E73-9D28-F96B72B1CF45}"
 	ProjectSection(SolutionItems) = preProject
@@ -26,6 +26,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zbu.ModelsBuilder.AspNet", "Zbu.ModelsBuilder.AspNet\Zbu.ModelsBuilder.AspNet.csproj", "{9670E426-0872-4A87-9DDE-805828546DE9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zbu.ModelsBuilder.Console", "Zbu.ModelsBuilder.Console\Zbu.ModelsBuilder.Console.csproj", "{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{602A8CFF-1CB0-45F3-86D5-9B8494F8A24D}"
+	ProjectSection(SolutionItems) = preProject
+		.build\MSBuild.Community.Tasks.dll = .build\MSBuild.Community.Tasks.dll
+		.build\MSBuild.Community.Tasks.targets = .build\MSBuild.Community.Tasks.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

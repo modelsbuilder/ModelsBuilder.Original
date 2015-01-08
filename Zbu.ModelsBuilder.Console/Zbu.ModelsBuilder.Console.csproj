@@ -2,6 +2,11 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <MSBuildUmbracoTasksPath>$(SolutionDir)\lib</MSBuildUmbracoTasksPath>
+	<MSBuildCommunityTasksPath>$(SolutionDir)\.build</MSBuildCommunityTasksPath>
+  </PropertyGroup>
+  <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}</ProjectGuid>
@@ -92,11 +97,39 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets"/>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
   -->
+  <Target Name="AfterBuild">
+    <!-- get the assembly version -->
+    <GetAssemblyIdentity AssemblyFiles="$(OutputPath)Zbu.ModelsBuilder.dll">
+      <Output TaskParameter="Assemblies" ItemName="AssemblyInfos2" />
+    </GetAssemblyIdentity>
+    <!-- dunno how to get the assembly informational version -->
+    <ReadLinesFromFile File="$(SolutionDir)Zbu.ModelsBuilder\Properties\CommonInfo.cs">
+      <Output TaskParameter="Lines" ItemName="CommonInfosLines2" />
+    </ReadLinesFromFile>
+    <PropertyGroup>
+      <Pattern>(?&lt;=\[assembly: AssemblyInformationalVersion\(").*(?="\)\])</Pattern>
+      <In>@(CommonInfosLines2)</In>
+      <PackageVersion2>$([System.Text.RegularExpressions.Regex]::Match($(In), $(Pattern)))</PackageVersion2>
+    </PropertyGroup>
+
+	<ItemGroup>
+      <ZipFilesToDelete Include="$(ProjectDir)build\*.zip" />
+    </ItemGroup>
+    <Delete Files="@(ZipFilesToDelete)" />
+
+	<CreateItem Include="$(ProjectDir)bin\$(Configuration)\**\*.*">
+		<Output ItemName="ZipFiles" TaskParameter="Include" />
+	</CreateItem>
+	<Zip ZipFileName="$(ProjectDir)build\Zbu.ModelsBuilder.Console.$(PackageVersion2).zip" WorkingDirectory="$(ProjectDir)bin\$(Configuration)" Files="@(ZipFiles)" />
+    <ItemGroup>
+      <FilesToCopy Include="$(ProjectDir)build\*.zip" />
+    </ItemGroup>
+    <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(SolutionDir)build\$(Configuration)" />
+  </Target>
 </Project>

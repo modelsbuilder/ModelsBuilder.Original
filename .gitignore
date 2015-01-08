@@ -8,3 +8,4 @@ refs
 *.snk
 /build/Debug
 /build/Release
+/Zbu.ModelsBuilder.Console/build
