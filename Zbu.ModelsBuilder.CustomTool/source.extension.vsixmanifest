@@ -4,7 +4,7 @@
                  xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
     <Identity Id="916c2f10-863f-4d87-b57c-ff69b7037498"
-              Version="2.0.3.33"
+              Version="2.0.3.34"
               Language="en-US"
 	      Publisher="Pilotine - ZpqrtBnk" />
     <DisplayName>ZpqrtBnk Umbraco ModelsBuilder Custom Tool</DisplayName>
