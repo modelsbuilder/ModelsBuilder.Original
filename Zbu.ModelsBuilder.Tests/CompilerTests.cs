@@ -76,7 +76,7 @@ namespace Whatever
 }
 ";
 
-            var compiler = new Compiler(LanguageVersion.Experimental);
+            var compiler = new Compiler(LanguageVersion.CSharp6);
             compiler.Compile(_tempDir, "Whatever", new Dictionary<string, string> { { "code", code1 } });
             Assert.IsTrue(File.Exists(Path.Combine(_tempDir, "Whatever.dll")));
         }

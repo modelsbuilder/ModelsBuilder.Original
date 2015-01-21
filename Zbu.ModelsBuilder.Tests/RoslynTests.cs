@@ -149,8 +149,14 @@ namespace Foo
         public void SemTestMissingReference()
         {
             const string code = @"
+using System.Collections.Generic;
+using Zbu.ModelsBuilder.Building;
 public class MyBuilder : Zbu.ModelsBuilder.Tests.TestBuilder
-{}
+{
+    public MyBuilder(IList<TypeModel> typeModels, ParseResult parseResult)
+        : base(typeModels, parseResult)
+    { }
+}
 ";
 
             var tree = CSharpSyntaxTree.ParseText(code);
@@ -163,7 +169,9 @@ public class MyBuilder : Zbu.ModelsBuilder.Tests.TestBuilder
                 references: new MetadataReference[] { mscorlib, testslib });
             var model = compilation.GetSemanticModel(tree);
 
-            // CS0012: Zbu.ModelsBuilder.Builder is referenced in an assembly that is not referenced
+            // CS0012: The type '...' is defined in an assembly that is not referenced
+            // CS0246: The type or namespace '...' could not be found
+            // CS0234: The nume or namespace name '...' does not exist in the namespace '...'
             var diags = model.GetDiagnostics();
             if (diags.Length > 0)
             {
@@ -173,16 +181,25 @@ public class MyBuilder : Zbu.ModelsBuilder.Tests.TestBuilder
                 }
             }
 
-            Assert.AreEqual(1, diags.Length);
-            Assert.AreEqual("CS0012", diags[0].Id);
+            //Assert.AreEqual(1, diags.Length);
+            Assert.GreaterOrEqual(diags.Length, 2);
+            
+            Assert.AreEqual("CS0234", diags[0].Id);
+            Assert.AreEqual("CS0012", diags[1].Id);
         }
 
         [Test]
         public void SemTestWithReferences()
         {
             const string code = @"
+using System.Collections.Generic;
+using Zbu.ModelsBuilder.Building;
 public class MyBuilder : Zbu.ModelsBuilder.Tests.TestBuilder
-{}
+{
+    public MyBuilder(IList<TypeModel> typeModels, ParseResult parseResult)
+        : base(typeModels, parseResult)
+    { }
+}
 ";
 
             var tree = CSharpSyntaxTree.ParseText(code);
