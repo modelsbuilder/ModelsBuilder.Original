@@ -92,7 +92,7 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                 if (string.IsNullOrWhiteSpace(wszDefaultNamespace))
                     throw new Exception("No namespace.");
 
-                VisualStudioHelper.ReportMessage("Starting {0}.", DateTime.Now);
+                VisualStudioHelper.ReportMessage("Starting v{0} {1}.", Compatibility.Version, DateTime.Now);
 
                 var path = Path.GetDirectoryName(wszInputFilePath) ?? "";
 
