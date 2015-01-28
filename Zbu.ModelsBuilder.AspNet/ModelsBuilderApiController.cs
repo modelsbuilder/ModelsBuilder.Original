@@ -240,6 +240,11 @@ namespace Zbu.ModelsBuilder.AspNet
 
         private Attempt<HttpResponseMessage> CheckVersion(Version clientVersion, Version minServerVersionSupportingClient)
         {
+            if (clientVersion == null)
+                return Attempt<HttpResponseMessage>.Fail(Request.CreateResponse(HttpStatusCode.Forbidden, string.Format(
+                    "API version conflict: client version (<null>) is not compatible with server version({0}).",
+                    Compatibility.Version)));
+
             var isOk = minServerVersionSupportingClient == null
                 ? Compatibility.IsCompatible(clientVersion) // clients up to 2.0.1, included
                 : Compatibility.IsCompatible(clientVersion, minServerVersionSupportingClient); // anything greater than 2.0.1
