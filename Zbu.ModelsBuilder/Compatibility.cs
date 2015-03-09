@@ -15,10 +15,10 @@ namespace Zbu.ModelsBuilder
         public static readonly Version Version = Assembly.GetExecutingAssembly().GetName().Version;
 
         // indicate which versions of the client API are supported by this server's API.
-        public static readonly Version MinClientVersionSupportedByServer = new Version(2, 0, 0, 0);
+        public static readonly Version MinClientVersionSupportedByServer = new Version(2, 1, 0, 0);
         
         // indicate which versions of the server API support this client
-        public static readonly Version MinServerVersionSupportingClient = new Version(2, 0, 0, 0);
+        public static readonly Version MinServerVersionSupportingClient = new Version(2, 1, 0, 0);
 
         // say, version 42 adds an optional parameter to the API
         //  min client = 40 (because we support clients that do not send the optional parameter)
