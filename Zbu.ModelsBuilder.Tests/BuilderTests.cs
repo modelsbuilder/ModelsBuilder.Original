@@ -465,6 +465,96 @@ namespace Models
         }
 
         [Test]
+        public void ContentTypeCustomBaseClass()
+        {
+            var type1 = new TypeModel
+            {
+                Id = 1,
+                Alias = "type1",
+                ClrName = "Type1",
+                BaseTypeId = 0,
+                BaseType = null,
+                ItemType = TypeModel.ItemTypes.Content,
+            };
+            var type2 = new TypeModel
+            {
+                Id = 2,
+                Alias = "type2",
+                ClrName = "Type2",
+                BaseTypeId = 0,
+                BaseType = null,
+                ItemType = TypeModel.ItemTypes.Content,
+            };
+            var type3 = new TypeModel
+            {
+                Id = 3,
+                Alias = "type3",
+                ClrName = "Type3",
+                BaseTypeId = 1,
+                BaseType = type1,
+                ItemType = TypeModel.ItemTypes.Content,
+            };
+            var types = new[] { type1, type2, type3 };
+
+            var code = new Dictionary<string, string>
+            {
+                {"assembly", @"
+using Zbu.ModelsBuilder;
+using Dang;
+namespace Dang
+{
+    public abstract class MyModelBase : PublishedContentModel
+    {
+        public MyModelBase(IPublishedContent content)
+            : base(content)
+        { }
+    }
+
+    public abstract class MyType1 : Type1
+    { 
+        public MyType1(IPublishedContent content)
+            : base(content)
+        { }
+    }
+
+    public partial class Type1
+    {}
+
+    public partial class Type2 : MyModelBase
+    {}
+
+    public partial class Type3 : MyType1
+    { }
+}
+"}
+            };
+
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
+            var btypes = builder.TypeModels;
+
+            Assert.AreEqual(3, btypes.Count);
+            var btype1 = btypes[0];
+            Assert.AreEqual("Type1", btype1.ClrName);
+            var btype2 = btypes[1];
+            Assert.AreEqual("Type2", btype2.ClrName);
+            var btype3 = btypes[2];
+            Assert.AreEqual("Type3", btype3.ClrName);
+
+            Assert.IsFalse(btype1.HasBase);
+            Assert.IsTrue(btype2.HasBase);
+            Assert.IsTrue(btype3.HasBase);
+
+            var sb = new StringBuilder();
+            builder.Generate(sb, btype3);
+            var gen = sb.ToString();
+            Console.WriteLine(gen);
+
+            Assert.Greater(gen.IndexOf("public partial class Type3\n"), 0);
+            Assert.Greater(0, gen.IndexOf("public partial class Type3 : "));
+        }
+
+        [Test]
         public void PropertyTypeIgnore()
         {
             // Umbraco returns nice, pascal-cased names

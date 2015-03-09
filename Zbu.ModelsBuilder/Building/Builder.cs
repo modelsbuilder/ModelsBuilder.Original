@@ -160,9 +160,11 @@ namespace Zbu.ModelsBuilder.Building
                         string.Join(", ", xx.Select(x => "\"" + x.Alias + "\""))));
 
             // ensure we have no collision between base types
-            foreach (var xx in _typeModels.Where(x => !x.IsContentIgnored).Where(x => x.BaseType != null && x.HasBase))
-                throw new InvalidOperationException(string.Format("Type alias \"{0}\" has a more than one parent class.",
-                    xx.Alias));
+            // NO: we may want to define a base class in a partial, on a model that has a parent
+            // we are NOT checking that the defined base type does maintain the inheritance chain
+            //foreach (var xx in _typeModels.Where(x => !x.IsContentIgnored).Where(x => x.BaseType != null && x.HasBase))
+            //    throw new InvalidOperationException(string.Format("Type alias \"{0}\" has more than one parent class.",
+            //        xx.Alias));
 
             // discover interfaces that need to be declared / implemented
             foreach (var typeModel in _typeModels)

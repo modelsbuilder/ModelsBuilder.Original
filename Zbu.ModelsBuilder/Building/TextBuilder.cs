@@ -148,9 +148,11 @@ namespace Zbu.ModelsBuilder.Building
             //    sb.AppendFormat("\t[ImplementContentType(\"{0}\")]\n", type.Alias);
             sb.AppendFormat("\t[PublishedContentModel(\"{0}\")]\n", type.Alias);
             sb.AppendFormat("\tpublic partial class {0}", type.ClrName);
-            var inherits = type.BaseType == null || type.BaseType.IsContentIgnored
-                ? (type.HasBase ? null : GetModelsBaseClassName())
-                : type.BaseType.ClrName;
+            var inherits = type.HasBase 
+                ? null // has its own base already
+                : (type.BaseType == null || type.BaseType.IsContentIgnored
+                    ? GetModelsBaseClassName()
+                    : type.BaseType.ClrName);
             if (inherits != null)
                 sb.AppendFormat(" : {0}", inherits);
 
