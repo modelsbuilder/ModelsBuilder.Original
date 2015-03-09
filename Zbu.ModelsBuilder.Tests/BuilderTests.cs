@@ -918,6 +918,184 @@ namespace Models
         }
 
         [Test]
+        public void PropertyTypeImplementOnClass()
+        {
+            var type1 = new TypeModel
+            {
+                Id = 1,
+                Alias = "type1",
+                ClrName = "Type1",
+                BaseTypeId = 0,
+                BaseType = null,
+                ItemType = TypeModel.ItemTypes.Content,
+            };
+            type1.Properties.Add(new PropertyModel
+            {
+                Alias = "prop1",
+                ClrName = "Prop1",
+                ClrType = typeof(string),
+            });
+            var types = new[] { type1 };
+
+            var code = new Dictionary<string, string>
+            {
+                {"assembly", @"
+using Zbu.ModelsBuilder;
+using Dang;
+namespace Dang
+{
+    public partial class Type1
+    {
+        [ImplementPropertyType(""prop1"")]
+        public string Foo { get { return string.Empty; } }
+    }
+}
+"}
+            };
+
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
+            var btypes = builder.TypeModels;
+
+            Assert.AreEqual(1, btypes.Count);
+            var btype1 = btypes[0];
+            Assert.AreEqual("Type1", btype1.ClrName);
+
+            var sb = new StringBuilder();
+            builder.Generate(sb, btype1);
+            var gen = sb.ToString();
+            Console.WriteLine(gen);
+
+            Assert.Greater(0, gen.IndexOf("string Prop1"));
+        }
+
+        [Test]
+        public void PropertyTypeImplementOnInterface()
+        {
+            var type1 = new TypeModel
+            {
+                Id = 1,
+                Alias = "type1",
+                ClrName = "Type1",
+                BaseTypeId = 0,
+                BaseType = null,
+                ItemType = TypeModel.ItemTypes.Content,
+            };
+            type1.Properties.Add(new PropertyModel
+            {
+                Alias = "prop1a",
+                ClrName = "Prop1a",
+                ClrType = typeof(string),
+            });
+            type1.Properties.Add(new PropertyModel
+            {
+                Alias = "prop1b",
+                ClrName = "Prop1b",
+                ClrType = typeof(string),
+            });
+            type1.Properties.Add(new PropertyModel
+            {
+                Alias = "prop1c",
+                ClrName = "Prop1c",
+                ClrType = typeof(string),
+            });
+            var type2 = new TypeModel
+            {
+                Id = 1,
+                Alias = "type2",
+                ClrName = "Type2",
+                BaseTypeId = 0,
+                BaseType = null,
+                ItemType = TypeModel.ItemTypes.Content,
+            };
+            type2.Properties.Add(new PropertyModel
+            {
+                Alias = "prop2",
+                ClrName = "Prop2",
+                ClrType = typeof(string),
+            });
+            var types = new[] { type1, type2 };
+
+            type2.MixinTypes.Add(type1);
+            type1.IsMixin = true;
+
+            var code = new Dictionary<string, string>
+            {
+                {"assembly", @"
+using Zbu.ModelsBuilder;
+using Dang;
+namespace Dang
+{
+    // both attributes are ignored on the interface - do it on the class
+    //[RenamePropertyType(""prop1b"", ""Prop1x"")]
+    //[IgnorePropertyType(""prop1c"")]
+    public partial interface IType1
+    {
+        // attribute is not supported (ie ignored) here
+        //[ImplementPropertyType(""prop1a"")]
+        // have to do this (see notes in Type1)
+        public string Foo { get; }
+    }
+
+    // both attributes on the class will be mirrored on the interface
+    [RenamePropertyType(""prop1b"", ""Prop1x"")]
+    [IgnorePropertyType(""prop1c"")]
+    public partial class Type1
+    {
+        // and then,
+        // - property will NOT be implemented in Type2, MUST be done manually
+        // - property will NOT be mirrored on the interface, MUST be done manually
+        [ImplementPropertyType(""prop1a"")]
+        public string Foo { get { return string.Empty; } }
+    }
+
+    public partial class Type2
+    {
+        // have to do this (see notes in Type1)
+        [ImplementPropertyType(""prop1a"")]
+        public string Foo { get { return string.Empty; } }
+    }
+}
+"}
+            };
+
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
+            var btypes = builder.TypeModels;
+
+            Assert.AreEqual(2, btypes.Count);
+            var btype1 = btypes[0];
+            Assert.AreEqual("Type1", btype1.ClrName);
+            var btype2 = btypes[1];
+            Assert.AreEqual("Type2", btype2.ClrName);
+
+            var sb = new StringBuilder();
+            builder.Generate(sb, btype1);
+            var gen = sb.ToString();
+            Console.WriteLine(gen);
+
+            // contains
+            Assert.Greater(gen.IndexOf("string Prop1x"), 0);
+            // does not contain
+            Assert.Greater(0, gen.IndexOf("string Prop1a"));
+            Assert.Greater(0, gen.IndexOf("string Prop1b"));
+            Assert.Greater(0, gen.IndexOf("string Prop1c"));
+
+            sb.Clear();
+            builder.Generate(sb, btype2);
+            gen = sb.ToString();
+            Console.WriteLine(gen);
+
+            // contains
+            Assert.Greater(gen.IndexOf("string Prop2"), 0);
+            Assert.Greater(gen.IndexOf("string Prop1x"), 0);
+            // does not contain
+            Assert.Greater(0, gen.IndexOf("string Prop1a"));
+            Assert.Greater(0, gen.IndexOf("string Prop1b"));
+            Assert.Greater(0, gen.IndexOf("string Prop1c"));
+        }
+
+        [Test]
         public void GenerateSimpleType()
         {
             // Umbraco returns nice, pascal-cased names

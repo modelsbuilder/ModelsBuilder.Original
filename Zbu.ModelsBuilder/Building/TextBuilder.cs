@@ -126,9 +126,9 @@ namespace Zbu.ModelsBuilder.Building
 
                 sb.Append("\n\t{\n");
 
-                // write the properties - only the local ones, we're an interface
+                // write the properties - only the local (non-ignored) ones, we're an interface
                 var more = false;
-                foreach (var prop in type.Properties.OrderBy(x => x.ClrName))
+                foreach (var prop in type.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
                 {
                     if (more) sb.Append("\n");
                     more = true;
