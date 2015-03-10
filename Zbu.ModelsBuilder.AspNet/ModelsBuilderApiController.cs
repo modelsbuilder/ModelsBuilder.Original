@@ -287,9 +287,10 @@ namespace Zbu.ModelsBuilder.AspNet
                     "API version conflict: client version (<null>) is not compatible with server version({0}).",
                     Compatibility.Version)));
 
+            // see also: CompatibilityTests
             var isOk = minServerVersionSupportingClient == null
-                ? Compatibility.IsCompatible(clientVersion) // clients up to 2.0.1, included
-                : Compatibility.IsCompatible(clientVersion, minServerVersionSupportingClient); // anything greater than 2.0.1
+                ? Compatibility.IsCompatible(clientVersion)
+                : Compatibility.IsCompatible(clientVersion, minServerVersionSupportingClient);
             var response = isOk ? null : Request.CreateResponse(HttpStatusCode.Forbidden, string.Format(
                 "API version conflict: client version ({0}) is not compatible with server version({1}).",
                 clientVersion, Compatibility.Version));
