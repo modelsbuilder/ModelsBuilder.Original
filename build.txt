@@ -1,6 +1,20 @@
 BUILD
 -----
 
+NEW VERSION
+-----------
+
+- update Zbu.ModelsBuilder/Properties/CommonInfo.cs
+- update Zbu.ModelsBuilder.CustomTool/source.extension.vsixmanifest
+
+NEW VERSION OF ROSLYN
+---------------------
+
+- update Zbu.ModelsBuilder/build/nuspecs/Zbu.ModelsBuilder.nuspec
+
+MISC
+----
+
 Configurations "Debug-U6" and "Release-U6" are for Umbraco v6.
   Both define compile constant UMBRACO_6
   Which is used in Zbu.ModelsBuilder.AspNet.ModelsBuilderAuthFilter
