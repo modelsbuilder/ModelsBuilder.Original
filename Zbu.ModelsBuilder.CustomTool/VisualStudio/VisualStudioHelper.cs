@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -9,48 +10,50 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
 {
     class VisualStudioHelper
     {
-        public static string GetProjectBin(string hint)
-        {
-            if (Path.IsPathRooted(hint)) return hint;
+        // ISSUE see GetSourceItem below, this works on the "current" project
 
-            var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
-            var dteProjects = (Array)dte.ActiveSolutionProjects;
-            if (dteProjects.Length <= 0)
-                throw new Exception("Panic: no projets.");
+        //public static string GetProjectBin(string hint)
+        //{
+        //    if (Path.IsPathRooted(hint)) return hint;
 
-            var dteProject = (EnvDTE.Project)dteProjects.GetValue(0);
+        //    var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
+        //    var dteProjects = (Array)dte.ActiveSolutionProjects;
+        //    if (dteProjects.Length <= 0)
+        //        throw new Exception("Panic: no projets.");
 
-            var proj = dteProject.FullName; // full path and name of the Project object's file
-            var opath = string.IsNullOrWhiteSpace(hint)
-                ? dteProject.ConfigurationManager.ActiveConfiguration.Properties.Item("OutputPath").Value.ToString()
-                : hint;
-            return Path.Combine(Path.GetDirectoryName(proj), opath);
-        }
+        //    var dteProject = (EnvDTE.Project)dteProjects.GetValue(0);
+
+        //    var proj = dteProject.FullName; // full path and name of the Project object's file
+        //    var opath = string.IsNullOrWhiteSpace(hint)
+        //        ? dteProject.ConfigurationManager.ActiveConfiguration.Properties.Item("OutputPath").Value.ToString()
+        //        : hint;
+        //    var dir = Path.GetDirectoryName(proj);
+        //    if (dir == null)
+        //        throw new Exception("Panic: null directory name.");
+        //    return Path.Combine(dir, opath);
+        //}
 
         public static EnvDTE.ProjectItem GetSourceItem(string inputFilePath)
         {
             var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
-            var dteProjects = (Array)dte.ActiveSolutionProjects;
-            if (dteProjects.Length <= 0)
-                throw new Exception("Panic: no projets.");
-
-            var dteProject = (EnvDTE.Project)dteProjects.GetValue(0);
 
             var pdwPriority = new VSDOCUMENTPRIORITY[1];
+            uint itemId = 0;
+            var vsProject = dte.Solution.Projects
+                .Cast<EnvDTE.Project>()
+                .Select(ToHierarchy)
+                .Cast<IVsProject>()
+                .FirstOrDefault(x =>
+                {
+                    int iFound;
+                    x.IsDocumentInProject(inputFilePath, out iFound, pdwPriority, out itemId);
+                    return iFound != 0 && itemId != 0;
+                });
 
-            // obtain a reference to the current project as an IVsProject type
-            var vsProject = ToHierarchy(dteProject) as IVsProject;
             if (vsProject == null)
-                throw new Exception("Panic: vsProject is null.");
+                throw new Exception("Panic: source file not found in any project.");
 
-            // locates, and returns a handle to source file, as a ProjectItem
-            int iFound;
-            uint itemId;
-            vsProject.IsDocumentInProject(inputFilePath, out iFound, pdwPriority, out itemId);
-            if (iFound == 0 || itemId == 0)
-                throw new Exception("Panic: source file not found in project.");
-
-            Microsoft.VisualStudio.OLE.Interop.IServiceProvider oleSp = null;
+            Microsoft.VisualStudio.OLE.Interop.IServiceProvider oleSp;
             vsProject.GetItemContext(itemId, out oleSp);
             if (oleSp == null)
                 throw new Exception("Panic: could not retrieve project item.");
