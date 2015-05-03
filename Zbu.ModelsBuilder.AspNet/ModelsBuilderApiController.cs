@@ -56,20 +56,25 @@ namespace Zbu.ModelsBuilder.AspNet
             [DataMember]
             public string ClientVersionString
             {
-                get { return ClientVersion.ToString(); }
+                get { return VersionToString(ClientVersion); }
                 set { ClientVersion = ParseVersion(value, false, "client"); }
             }
 
             [DataMember]
             public string MinServerVersionSupportingClientString
             {
-                get { return MinServerVersionSupportingClient.ToString(); }
+                get { return VersionToString(MinServerVersionSupportingClient); }
                 set { MinServerVersionSupportingClient = ParseVersion(value, true, "minServer"); }
             }
 
             // not serialized
             public Version ClientVersion { get; set; }
             public Version MinServerVersionSupportingClient { get; set; }
+
+            private static string VersionToString(Version version)
+            {
+                return version == null ? "0.0.0.0" : version.ToString();
+            }
 
             private static Version ParseVersion(string value, bool canBeNull, string name)
             {
