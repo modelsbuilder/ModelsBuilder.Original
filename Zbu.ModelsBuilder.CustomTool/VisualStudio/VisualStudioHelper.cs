@@ -41,6 +41,7 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
             uint itemId = 0;
             var vsProject = dte.Solution.Projects
                 .Cast<EnvDTE.Project>()
+                .Where(p => !p.Kind.Equals(EnvDTE.Constants.vsProjectKindSolutionItems))
                 .Select(ToHierarchy)
                 .Cast<IVsProject>()
                 .FirstOrDefault(x =>
@@ -88,7 +89,7 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
 
         private static IVsHierarchy ToHierarchy(EnvDTE.Project project)
         {
-            if (project == null)
+            if (project == null || string.IsNullOrWhiteSpace(project.FileName))
                 throw new ArgumentNullException("project");
 
             string projectGuid = null;
