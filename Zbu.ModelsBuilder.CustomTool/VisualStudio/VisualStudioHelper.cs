@@ -33,6 +33,12 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
         //    return Path.Combine(dir, opath);
         //}
 
+        private static readonly string[] ExcludedProjectKinds =
+        {
+            EnvDTE.Constants.vsProjectKindSolutionItems, // see [#49]
+            "{E24C65DC-7377-472B-9ABA-BC803B73C61A}" // see [#31]
+        };
+
         public static EnvDTE.ProjectItem GetSourceItem(string inputFilePath)
         {
             var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
@@ -41,7 +47,7 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
             uint itemId = 0;
             var vsProject = dte.Solution.Projects
                 .Cast<EnvDTE.Project>()
-                .Where(p => !p.Kind.Equals(EnvDTE.Constants.vsProjectKindSolutionItems))
+                .Where(p => !ExcludedProjectKinds.Contains(p.Kind))
                 .Select(ToHierarchy)
                 .Cast<IVsProject>()
                 .FirstOrDefault(x =>
@@ -93,7 +99,7 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
                 throw new ArgumentNullException("project");
 
             string projectGuid = null;
-            
+
             // DTE does not expose the project GUID that exists at in the msbuild project file.        
             // Cannot use MSBuild object model because it uses a static instance of the Engine,        
             // and using the Project will cause it to be unloaded from the engine when the         
