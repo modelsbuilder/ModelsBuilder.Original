@@ -53,6 +53,9 @@
     <Reference Include="interfaces" Condition=" '$(Configuration)' == 'Release' or '$(Configuration)' == 'Debug' ">
       <HintPath>..\lib\umbraco\interfaces.dll</HintPath>
     </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\lib\umbraco\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CodeAnalysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.CodeAnalysis.Common.1.0.0-rc2\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
@@ -126,6 +129,8 @@
     <Compile Include="CompatibilityTests.cs" />
     <Compile Include="CompilerTests.cs" />
     <Compile Include="ExtensionsTests.cs" />
+    <Compile Include="PublishedContentTests.cs" />
+    <Compile Include="TestElements.cs" />
     <Compile Include="TestVisualStudioExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoslynTests.cs" />
@@ -133,6 +138,7 @@
     <Compile Include="SampleSourceCode.cs" />
     <Compile Include="TestOptions.cs" />
     <Compile Include="UmbracoApplicationTests.cs" />
+    <Compile Include="UmbracoInternals.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
