@@ -35,8 +35,8 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
 
         private static readonly string[] ExcludedProjectKinds =
         {
-            EnvDTE.Constants.vsProjectKindSolutionItems, // see [#49]
-            "{E24C65DC-7377-472B-9ABA-BC803B73C61A}" // see [#31]
+            EnvDTE.Constants.vsProjectKindSolutionItems.ToLowerInvariant(), // see [#49]
+            "{E24C65DC-7377-472B-9ABA-BC803B73C61A}".ToLowerInvariant(), // see [#31]
         };
 
         public static EnvDTE.ProjectItem GetSourceItem(string inputFilePath)
@@ -46,22 +46,33 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
             var pdwPriority = new VSDOCUMENTPRIORITY[1];
             uint itemId = 0;
             var vsProject = dte.Solution.Projects
+                // process the project
                 .Cast<EnvDTE.Project>()
-                // debug
+                // exclude project types that are know to cause ToHierarchy to throw
+                .Where(p => !ExcludedProjectKinds.Contains(p.Kind.ToLowerInvariant()))
+                // try...catch ToHierarchy, in case it's a project type we should have excluded
                 .Select(x =>
                 {
-                    ReportMessage("Found project {0} ({1}) of kind {2}", x.FullName, x.FileName, x.Kind);
-                    return x;
+                    try
+                    {
+                        return ToHierarchy(x);
+                    }
+                    catch (Exception e)
+                    {
+                        var errmsg = string.Format("Failed to process project \"{0}\" at \"{1}\" of kind \"{2}\" (see inner exception).",
+                            x.FullName, x.FileName, x.Kind);
+
+                        // what shall we do? throwing is not nice neither required, but it's the
+                        // only way we can add project kinds to our exclude list... for the time
+                        // being, throw.
+                        throw new Exception(errmsg, e);
+                        //ReportMessage(errmsg);
+                        //return null;
+                    }
                 })
-                // is this working?!
-                .Where(p => !ExcludedProjectKinds.Contains(p.Kind))
-                // debug
-                .Select(x =>
-                {
-                    ReportMessage("Process project {0} ({1}) of kind {2}", x.FullName, x.FileName, x.Kind);
-                    return x;
-                })
-                .Select(ToHierarchy)
+                // when ToHierachy has thrown, all we have is null
+                .Where(x => x != null)
+                // process the IVsProject
                 .Cast<IVsProject>()
                 .FirstOrDefault(x =>
                 {
