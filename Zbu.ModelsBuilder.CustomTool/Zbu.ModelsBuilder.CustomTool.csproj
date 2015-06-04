@@ -215,7 +215,7 @@
   -->
   <Target Name="AfterBuild" DependsOnTargets="CopyVsix">
   </Target>
-  <Target Name="CopyVsix">
+  <Target Name="CopyVsix" Condition=" '$(Configuration)' == 'Release' ">
     <!-- get the assembly version -->
     <GetAssemblyIdentity AssemblyFiles="$(OutputPath)Zbu.ModelsBuilder.dll">
       <Output TaskParameter="Assemblies" ItemName="AssemblyInfos" />
