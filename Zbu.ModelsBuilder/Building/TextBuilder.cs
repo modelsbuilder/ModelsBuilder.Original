@@ -208,9 +208,13 @@ namespace Zbu.ModelsBuilder.Building
 
         private void WriteContentTypeProperties(StringBuilder sb, TypeModel type)
         {
+            // 1 is the original version
+            // 2 uses static methods for mixin properties
+            var mixinPropsMode = Configuration.Config.MixinPropertiesGeneratorMode;
+
             // write the properties
             foreach (var prop in type.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
-                WriteProperty(sb, prop);
+                WriteProperty(sb, prop, mixinPropsMode > 1 && type.IsMixin ? type.ClrName : null);
 
             // no need to write the parent properties since we inherit from the parent
             // and the parent defines its own properties. need to write the mixins properties
@@ -219,10 +223,18 @@ namespace Zbu.ModelsBuilder.Building
             // write the mixins properties
             foreach (var mixinType in type.ImplementingInterfaces.OrderBy(x => x.ClrName))
                 foreach (var prop in mixinType.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
-                    WriteProperty(sb, prop);
+                    switch (mixinPropsMode)
+                    {
+                        case 1:
+                            WriteProperty(sb, prop);
+                            break;
+                        case 2:
+                            WriteMixinProperty(sb, prop, mixinType.ClrName);
+                            break;
+                    }
         }
 
-        private void WriteProperty(StringBuilder sb, PropertyModel property)
+        private void WriteMixinProperty(StringBuilder sb, PropertyModel property, string mixinClrName)
         {
             sb.Append("\n");
 
@@ -233,15 +245,67 @@ namespace Zbu.ModelsBuilder.Building
 
             sb.Append("\t\tpublic ");
             WriteClrType(sb, property.ClrType);
-            sb.AppendFormat(" {0}\n\t\t{{\n\t\t\tget {{ return this.GetPropertyValue",
-                property.ClrName);
+            sb.AppendFormat(" {0}\n\t\t{{\n\t\t\tget {{ return {1}.{2}(this); }}\n\t\t}}\n",
+                property.ClrName, mixinClrName, MixinStaticGetterName(property.ClrName));
+        }
+
+        private static string MixinStaticGetterName(string clrName)
+        {
+            return "Get" + clrName;
+        }
+
+        private void WriteProperty(StringBuilder sb, PropertyModel property, string mixinClrName = null)
+        {
+            var mixinStatic = mixinClrName != null;
+
+            sb.Append("\n");
+
+            if (!string.IsNullOrWhiteSpace(property.Name))
+                sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString(property.Name));
+
+            sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
+
+            if (mixinStatic)
+            {
+                sb.Append("\t\tpublic ");
+                WriteClrType(sb, property.ClrType);
+                sb.AppendFormat(" {0}\n\t\t{{\n\t\t\tget {{ return {1}(this); }}\n\t\t}}\n",
+                    property.ClrName, MixinStaticGetterName(property.ClrName));
+            }
+            else
+            {
+                sb.Append("\t\tpublic ");
+                WriteClrType(sb, property.ClrType);
+                sb.AppendFormat(" {0}\n\t\t{{\n\t\t\tget {{ return this.GetPropertyValue",
+                    property.ClrName);
+                if (property.ClrType != typeof(object))
+                {
+                    sb.Append("<");
+                    WriteClrType(sb, property.ClrType);
+                    sb.Append(">");
+                }
+                sb.AppendFormat("(\"{0}\"); }}\n\t\t}}\n",
+                    property.Alias);
+            }
+
+            if (!mixinStatic) return;
+
+            sb.Append("\n");
+
+            if (!string.IsNullOrWhiteSpace(property.Name))
+                sb.AppendFormat("\t\t/// <summary>Static getter for {0}</summary>\n", XmlCommentString(property.Name));
+
+            sb.Append("\t\tpublic static ");
+            WriteClrType(sb, property.ClrType);
+            sb.AppendFormat(" {0}(I{1} that) {{ return that.GetPropertyValue",
+                MixinStaticGetterName(property.ClrName), mixinClrName);
             if (property.ClrType != typeof(object))
             {
                 sb.Append("<");
                 WriteClrType(sb, property.ClrType);
                 sb.Append(">");
             }
-            sb.AppendFormat("(\"{0}\"); }}\n\t\t}}\n",
+            sb.AppendFormat("(\"{0}\"); }}\n",
                 property.Alias);
         }
 

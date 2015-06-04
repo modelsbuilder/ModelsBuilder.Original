@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace Zbu.ModelsBuilder.Configuration
@@ -19,6 +20,16 @@ namespace Zbu.ModelsBuilder.Configuration
             EnableApi = ConfigurationManager.AppSettings[prefix + "EnableApi"] != "false";
             ModelsNamespace = ConfigurationManager.AppSettings[prefix + "ModelsNamespace"];
             EnablePublishedContentModelsFactory = ConfigurationManager.AppSettings[prefix + "EnablePublishedContentModelsFactory"] != "false";
+
+            int i;
+            var s = ConfigurationManager.AppSettings[prefix + "GeneratorMode.MixinProperties"] ?? "-1";
+            if (!int.TryParse(s, out i))
+                throw new ConfigurationErrorsException(string.Format("Invalid mixin properties generator mode: {0}", s));
+
+            var validModes = new[] { -1, 2, 1 }; // -1 will be replaced by the last one
+            if (!validModes.Contains(i))
+                throw new ConfigurationErrorsException(string.Format("Invalid mixin properties generator mode: {0}", i));
+            MixinPropertiesGeneratorMode = i >= 0 ? i : validModes.Last();
 
             LanguageVersion = LanguageVersion.CSharp5;
             var lvSetting = ConfigurationManager.AppSettings[prefix + "LanguageVersion"];
@@ -135,5 +146,11 @@ namespace Zbu.ModelsBuilder.Configuration
         /// </summary>
         /// <remarks>Default value is <c>CSharp5</c>.</remarks>
         public static LanguageVersion LanguageVersion { get; private set; }
+
+        /// <summary>
+        /// Gets the generator mode for mixin properties.
+        /// </summary>
+        /// <remarks>Default value is latest.</remarks>
+        public static int MixinPropertiesGeneratorMode { get; internal set; }
     }
 }

@@ -19,6 +19,7 @@
         if (Config.EnableLiveModels) sb.Append(" +EnableLiveModels");
         if (Config.EnablePublishedContentModelsFactory) sb.Append(" +EnablePublishedContentModelsFactory");
         sb.AppendFormat("<br />Config.ModelsNameSpace: \"{0}\"", Config.ModelsNamespace);
+        sb.AppendFormat("<br />Config.GeneratorMode.MixinProperties: {0}", Config.MixinPropertiesGeneratorMode);
         txtReport.Text = sb.ToString();
 
         var ver = Umbraco.Core.Configuration.UmbracoVersion.Current;        
