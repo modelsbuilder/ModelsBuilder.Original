@@ -8,6 +8,16 @@ using Umbraco.Web.Cache;
 using Zbu.ModelsBuilder.AspNet;
 using Zbu.ModelsBuilder.Configuration;
 
+// note
+// we do not support pure LiveModels anymore - see notes in various places
+// this should provide live AppData, AppCode or Dll models - but we do not want to
+// restart the app anytime something changes, ?
+//
+// ideally we'd want something that does not generate models all the time, but
+// only after a while, and then restarts, but that is prone to too much confusion,
+// so we decide that ONLY live App_Data models are supported from now on.
+
+// will install only if configuration says it needs to be installed
 [assembly: PreApplicationStartMethod(typeof(LiveModelsProviderModule), "Install")]
 
 namespace Zbu.ModelsBuilder.AspNet
@@ -17,12 +27,30 @@ namespace Zbu.ModelsBuilder.AspNet
         private static Mutex _mutex;
         private static int _req;
 
+        internal static bool IsEnabled
+        {
+            get
+            {
+                if (!Config.EnableLiveModels)
+                    return false;
+
+                // not supported anymore
+                //if (Config.EnableAppCodeModels || Config.EnableDllModels)
+                //    return true;
+
+                if (Config.EnableAppDataModels)
+                    return true;
+
+                // pure live is not supported anymore
+                return false;
+            }
+        }
+
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             base.ApplicationStarted(umbracoApplication, applicationContext);
 
-            // if no live, or pure live, do nothing
-            if (!Config.EnableLiveModels || (!Config.EnableAppCodeModels && !Config.EnableDllModels))
+            if (!IsEnabled)
                 return;
 
             // initialize mutex
@@ -37,7 +65,7 @@ namespace Zbu.ModelsBuilder.AspNet
 
             // at the end of a request since we're restarting the pool
             // NOTE - this does NOT trigger - see module below
-            umbracoApplication.EndRequest += GenerateModelsIfRequested;
+            //umbracoApplication.EndRequest += GenerateModelsIfRequested;
         }
 
         // NOTE
@@ -51,7 +79,7 @@ namespace Zbu.ModelsBuilder.AspNet
         private static void RequestModelsGeneration(object sender, EventArgs args)
         {
             //HttpContext.Current.Items[this] = true;
-            LogHelper.Debug<LiveModelsProvider>("Request to generate models.");
+            LogHelper.Debug<LiveModelsProvider>("Requested to generate models.");
             Interlocked.Exchange(ref _req, 1);
         }
 
@@ -62,14 +90,19 @@ namespace Zbu.ModelsBuilder.AspNet
 
             // cannot use a simple lock here because we don't want another AppDomain
             // to generate while we do... and there could be 2 AppDomains if the app restarts.
-            // or... am I being paranoid?
 
             try
             {
-                LogHelper.Debug<LiveModelsProvider>("Requested to generate models.");
-                _mutex.WaitOne(); // wait until it is safe, and acquire
-                LogHelper.Info<LiveModelsProvider>("Generate models.");
+                LogHelper.Debug<LiveModelsProvider>("Generate models...");
+                const int timeout = 2*60*1000; // 2 mins
+                _mutex.WaitOne(timeout); // wait until it is safe, and acquire
+                LogHelper.Info<LiveModelsProvider>("Generate models now.");
                 GenerateModels();
+                LogHelper.Info<LiveModelsProvider>("Generated.");
+            }
+            catch (TimeoutException)
+            {
+                LogHelper.Warn<LiveModelsProvider>("Timeout, models were NOT generated.");
             }
             catch (Exception e)
             {
@@ -120,8 +153,7 @@ namespace Zbu.ModelsBuilder.AspNet
 
         public static void Install()
         {
-            // if no live, or pure live, do nothing
-            if (!Config.EnableLiveModels || (!Config.EnableAppCodeModels && !Config.EnableDllModels))
+            if (!LiveModelsProvider.IsEnabled)
                 return;
 
             HttpApplication.RegisterModule(typeof(LiveModelsProviderModule));
