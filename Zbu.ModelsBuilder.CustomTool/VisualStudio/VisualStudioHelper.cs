@@ -47,7 +47,20 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
             uint itemId = 0;
             var vsProject = dte.Solution.Projects
                 .Cast<EnvDTE.Project>()
+                // debug
+                .Select(x =>
+                {
+                    ReportMessage("Found project {0} ({1}) of kind {2}", x.FullName, x.FileName, x.Kind);
+                    return x;
+                })
+                // is this working?!
                 .Where(p => !ExcludedProjectKinds.Contains(p.Kind))
+                // debug
+                .Select(x =>
+                {
+                    ReportMessage("Process project {0} ({1}) of kind {2}", x.FullName, x.FileName, x.Kind);
+                    return x;
+                })
                 .Select(ToHierarchy)
                 .Cast<IVsProject>()
                 .FirstOrDefault(x =>
