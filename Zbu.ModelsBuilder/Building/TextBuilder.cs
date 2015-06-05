@@ -208,13 +208,11 @@ namespace Zbu.ModelsBuilder.Building
 
         private void WriteContentTypeProperties(StringBuilder sb, TypeModel type)
         {
-            // 1 is the original version
-            // 2 uses static methods for mixin properties
-            var mixinPropsMode = Configuration.Config.MixinPropertiesGeneratorMode;
+            var staticMixinGetters = Configuration.Config.StaticMixinGetters;
 
             // write the properties
             foreach (var prop in type.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
-                WriteProperty(sb, type, prop, mixinPropsMode > 1 && type.IsMixin ? type.ClrName : null);
+                WriteProperty(sb, type, prop, staticMixinGetters && type.IsMixin ? type.ClrName : null);
 
             // no need to write the parent properties since we inherit from the parent
             // and the parent defines its own properties. need to write the mixins properties
@@ -223,15 +221,10 @@ namespace Zbu.ModelsBuilder.Building
             // write the mixins properties
             foreach (var mixinType in type.ImplementingInterfaces.OrderBy(x => x.ClrName))
                 foreach (var prop in mixinType.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
-                    switch (mixinPropsMode)
-                    {
-                        case 1:
-                            WriteProperty(sb, mixinType, prop);
-                            break;
-                        case 2:
-                            WriteMixinProperty(sb, prop, mixinType.ClrName);
-                            break;
-                    }
+                    if (staticMixinGetters)
+                        WriteMixinProperty(sb, prop, mixinType.ClrName);
+                    else
+                        WriteProperty(sb, mixinType, prop);
         }
 
         private void WriteMixinProperty(StringBuilder sb, PropertyModel property, string mixinClrName)
@@ -251,7 +244,7 @@ namespace Zbu.ModelsBuilder.Building
 
         private static string MixinStaticGetterName(string clrName)
         {
-            return string.Format(Configuration.Config.MixinPropertiesStaticPattern, clrName);
+            return string.Format(Configuration.Config.StaticMixinGetterPattern, clrName);
         }
 
         private void WriteProperty(StringBuilder sb, TypeModel type, PropertyModel property, string mixinClrName = null)

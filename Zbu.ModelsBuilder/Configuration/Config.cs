@@ -21,19 +21,10 @@ namespace Zbu.ModelsBuilder.Configuration
             ModelsNamespace = ConfigurationManager.AppSettings[prefix + "ModelsNamespace"];
             EnablePublishedContentModelsFactory = ConfigurationManager.AppSettings[prefix + "EnablePublishedContentModelsFactory"] != "false";
 
-            int i;
-            var s = ConfigurationManager.AppSettings[prefix + "GeneratorMode.MixinProperties"] ?? "-1";
-            if (!int.TryParse(s, out i))
-                throw new ConfigurationErrorsException(string.Format("Invalid mixin properties generator mode: {0}", s));
-
-            var validModes = new[] { -1, 2, 1 }; // -1 will be replaced by the last one
-            if (!validModes.Contains(i))
-                throw new ConfigurationErrorsException(string.Format("Invalid mixin properties generator mode: {0}", i));
-            MixinPropertiesGeneratorMode = i >= 0 ? i : validModes.Last();
-
-            MixinPropertiesStaticPattern = ConfigurationManager.AppSettings[prefix + "MixinPropertiesStaticPattern"];
-            if (string.IsNullOrWhiteSpace(MixinPropertiesStaticPattern))
-                MixinPropertiesStaticPattern = "Get{0}";
+            StaticMixinGetters = ConfigurationManager.AppSettings[prefix + "StaticMixinGetters"] == "true";
+            StaticMixinGetterPattern = ConfigurationManager.AppSettings[prefix + "StaticMixinGetterPattern"];
+            if (string.IsNullOrWhiteSpace(StaticMixinGetterPattern))
+                StaticMixinGetterPattern = "Get{0}";
 
             LanguageVersion = LanguageVersion.CSharp5;
             var lvSetting = ConfigurationManager.AppSettings[prefix + "LanguageVersion"];
@@ -153,15 +144,15 @@ namespace Zbu.ModelsBuilder.Configuration
         public static LanguageVersion LanguageVersion { get; internal set; }
 
         /// <summary>
-        /// Gets the generator mode for mixin properties.
+        /// Gets a value indicating whether to generate static mixin getters.
         /// </summary>
-        /// <remarks>Default value is latest.</remarks>
-        public static int MixinPropertiesGeneratorMode { get; internal set; }
+        /// <remarks>Default value is <c>false</c> for backward compat reaons.</remarks>
+        public static bool StaticMixinGetters { get; internal set; }
 
         /// <summary>
         /// Gets the string pattern for mixin properties static getter name.
         /// </summary>
         /// <remarks>Default value is "GetXxx". Standard string format.</remarks>
-        public static string MixinPropertiesStaticPattern { get; internal set; }
+        public static string StaticMixinGetterPattern { get; internal set; }
     }
 }
