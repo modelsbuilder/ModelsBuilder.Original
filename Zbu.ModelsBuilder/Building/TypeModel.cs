@@ -76,6 +76,11 @@ namespace Zbu.ModelsBuilder.Building
         public readonly List<TypeModel> ImplementingInterfaces = new List<TypeModel>();
 
         /// <summary>
+        /// Gets the list of existing static mixin method candidates.
+        /// </summary>
+        public readonly List<string> StaticMixinMethods = new List<string>();
+
+        /// <summary>
         /// Gets a value indicating whether this model has a base class.
         /// </summary>
         /// <remarks>Can be either because the content type has a base content type declared in Umbraco,

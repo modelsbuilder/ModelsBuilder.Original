@@ -201,6 +201,10 @@ namespace Zbu.ModelsBuilder.Building
                 if (!TypesUsing.Contains(usingNamespace))
                     TypesUsing.Add(usingNamespace);
             }
+
+            // discover static mixin methods
+            foreach (var typeModel in _typeModels)
+                typeModel.StaticMixinMethods.AddRange(ParseResult.StaticMixinMethods(typeModel.ClrName));
         }
 
         public string GetModelsNamespace()

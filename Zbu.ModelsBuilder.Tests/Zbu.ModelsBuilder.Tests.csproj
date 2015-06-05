@@ -130,6 +130,7 @@
     <Compile Include="CompilerTests.cs" />
     <Compile Include="ExtensionsTests.cs" />
     <Compile Include="PublishedContentTests.cs" />
+    <Compile Include="StringExtensions.cs" />
     <Compile Include="TestElements.cs" />
     <Compile Include="TestVisualStudioExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

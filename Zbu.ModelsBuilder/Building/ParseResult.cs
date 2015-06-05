@@ -35,8 +35,34 @@ namespace Zbu.ModelsBuilder.Building
             = new Dictionary<string, string[]>();
         private readonly List<string> _usingNamespaces
             = new List<string>();
+        private readonly Dictionary<string, List<StaticMixinMethodInfo>> _staticMixins
+            = new Dictionary<string, List<StaticMixinMethodInfo>>();
 
         public static readonly ParseResult Empty = new ParseResult();
+
+        private class StaticMixinMethodInfo
+        {
+            public StaticMixinMethodInfo(string contentName, string methodName, string returnType, string paramType)
+            {
+                ContentName = contentName;
+                MethodName = methodName;
+                //ReturnType = returnType;
+                //ParamType = paramType;
+            }
+
+            // short name eg Type1
+            public string ContentName { get; private set; }
+
+            // short name eg GetProp1
+            public string MethodName { get; private set; }
+
+            // those types cannot be FQ because when parsing, some of them
+            // might not exist since we're generating them... and so prob.
+            // that info is worthless - not using it anyway at the moment...
+
+            //public string ReturnType { get; private set; }
+            //public string ParamType { get; private set; }
+        }
 
         #region Declare
 
@@ -109,6 +135,14 @@ namespace Zbu.ModelsBuilder.Building
         public void SetUsingNamespace(string usingNamespace)
         {
             _usingNamespaces.Add(usingNamespace);
+        }
+
+        public void SetStaticMixinMethod(string contentName, string methodName, string returnType, string paramType)
+        {
+            if (!_staticMixins.ContainsKey(contentName))
+                _staticMixins[contentName] = new List<StaticMixinMethodInfo>();
+
+            _staticMixins[contentName].Add(new StaticMixinMethodInfo(contentName, methodName, returnType, paramType));
         }
 
         #endregion
@@ -215,6 +249,13 @@ namespace Zbu.ModelsBuilder.Building
         public IEnumerable<string> UsingNamespaces
         {
             get { return _usingNamespaces; }
+        }
+
+        public IEnumerable<string> StaticMixinMethods(string contentName)
+        {
+            return _staticMixins.ContainsKey(contentName)
+                ? _staticMixins[contentName].Select(x => x.MethodName)
+                : Enumerable.Empty<string>() ;
         }
 
         #endregion

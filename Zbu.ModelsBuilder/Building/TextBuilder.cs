@@ -214,7 +214,7 @@ namespace Zbu.ModelsBuilder.Building
 
             // write the properties
             foreach (var prop in type.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
-                WriteProperty(sb, prop, mixinPropsMode > 1 && type.IsMixin ? type.ClrName : null);
+                WriteProperty(sb, type, prop, mixinPropsMode > 1 && type.IsMixin ? type.ClrName : null);
 
             // no need to write the parent properties since we inherit from the parent
             // and the parent defines its own properties. need to write the mixins properties
@@ -226,7 +226,7 @@ namespace Zbu.ModelsBuilder.Building
                     switch (mixinPropsMode)
                     {
                         case 1:
-                            WriteProperty(sb, prop);
+                            WriteProperty(sb, mixinType, prop);
                             break;
                         case 2:
                             WriteMixinProperty(sb, prop, mixinType.ClrName);
@@ -251,10 +251,10 @@ namespace Zbu.ModelsBuilder.Building
 
         private static string MixinStaticGetterName(string clrName)
         {
-            return "Get" + clrName;
+            return string.Format(Configuration.Config.MixinPropertiesStaticPattern, clrName);
         }
 
-        private void WriteProperty(StringBuilder sb, PropertyModel property, string mixinClrName = null)
+        private void WriteProperty(StringBuilder sb, TypeModel type, PropertyModel property, string mixinClrName = null)
         {
             var mixinStatic = mixinClrName != null;
 
@@ -290,6 +290,10 @@ namespace Zbu.ModelsBuilder.Building
 
             if (!mixinStatic) return;
 
+            var mixinStaticGetterName = MixinStaticGetterName(property.ClrName);
+
+            if (type.StaticMixinMethods.Contains(mixinStaticGetterName)) return;
+
             sb.Append("\n");
 
             if (!string.IsNullOrWhiteSpace(property.Name))
@@ -298,7 +302,7 @@ namespace Zbu.ModelsBuilder.Building
             sb.Append("\t\tpublic static ");
             WriteClrType(sb, property.ClrType);
             sb.AppendFormat(" {0}(I{1} that) {{ return that.GetPropertyValue",
-                MixinStaticGetterName(property.ClrName), mixinClrName);
+                mixinStaticGetterName, mixinClrName);
             if (property.ClrType != typeof(object))
             {
                 sb.Append("<");

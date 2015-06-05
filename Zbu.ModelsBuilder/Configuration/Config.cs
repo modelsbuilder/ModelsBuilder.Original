@@ -31,6 +31,10 @@ namespace Zbu.ModelsBuilder.Configuration
                 throw new ConfigurationErrorsException(string.Format("Invalid mixin properties generator mode: {0}", i));
             MixinPropertiesGeneratorMode = i >= 0 ? i : validModes.Last();
 
+            MixinPropertiesStaticPattern = ConfigurationManager.AppSettings[prefix + "MixinPropertiesStaticPattern"];
+            if (string.IsNullOrWhiteSpace(MixinPropertiesStaticPattern))
+                MixinPropertiesStaticPattern = "Get{0}";
+
             LanguageVersion = LanguageVersion.CSharp5;
             var lvSetting = ConfigurationManager.AppSettings[prefix + "LanguageVersion"];
             if (!string.IsNullOrWhiteSpace(lvSetting))
@@ -50,6 +54,8 @@ namespace Zbu.ModelsBuilder.Configuration
                 throw new Exception("Configuration error: you can enable only one of Dll, AppCode or AppData models at a time.");
         }
 
+        // note: making setters internal below for testing purposes
+
         /// <summary>
         /// Gets a value indicating whether "Dll models" are enabled.
         /// </summary>
@@ -62,7 +68,7 @@ namespace Zbu.ModelsBuilder.Configuration
         ///     are re-generated from the dashboard. This is probably what you want to do, but we're forcing
         ///     you to make a concious decision at the moment.</para>
         /// </remarks>
-        public static bool EnableDllModels { get; private set; }
+        public static bool EnableDllModels { get; internal set; }
 
         /// <summary>
         /// Gets a value indicating whether "App_Code models" are enabled. 
@@ -77,7 +83,7 @@ namespace Zbu.ModelsBuilder.Configuration
         ///     are re-generated from the dashboard. This is probably what you want to do, but we're forcing
         ///     you to make a concious decision at the moment.</para>
         /// </remarks>
-        public static bool EnableAppCodeModels { get; private set; }
+        public static bool EnableAppCodeModels { get; internal set; }
 
         /// <summary>
         /// Gets a value indicating whether "App_Data models" are enabled.
@@ -87,7 +93,7 @@ namespace Zbu.ModelsBuilder.Configuration
         ///     <para>When "App_Data models" is enabled, the dashboard shows the "generate" button so that
         ///     models can be generated in App_Data/Models. Nothing else happens so the site does not restart.</para>
         /// </remarks>
-        public static bool EnableAppDataModels { get; private set; }
+        public static bool EnableAppDataModels { get; internal set; }
 
         /// <summary>
         /// Gets a value indicating whether "live models" are enabled.
@@ -102,7 +108,7 @@ namespace Zbu.ModelsBuilder.Configuration
         ///     below.</para>
         ///     <para>Default value is <c>false</c>.</para>
         /// </remarks>
-        public static bool EnableLiveModels { get; private set; }
+        public static bool EnableLiveModels { get; internal set; }
 
         /// <summary>
         /// Gets a value indicating whether only "live models" are enabled.
@@ -126,30 +132,36 @@ namespace Zbu.ModelsBuilder.Configuration
         ///     <para>The API is used by the Visual Studio extension and the console tool to talk to Umbraco
         ///     and retrieve the content types. It needs to be enabled so the extension & tool can work.</para>
         /// </remarks>
-        public static bool EnableApi { get; private set; }
+        public static bool EnableApi { get; internal set; }
 
         /// <summary>
         /// Gets the models namespace.
         /// </summary>
         /// <remarks>No default value. That value could be overriden by other (attribute in user's code...).</remarks>
-        public static string ModelsNamespace { get; private set; }
+        public static string ModelsNamespace { get; internal set; }
 
         /// <summary>
         /// Gets a value indicating whether we should enable the models factory.
         /// </summary>
         /// <remarks>Default value is <c>true</c> because no factory is enabled by default in Umbraco.</remarks>
-        public static bool EnablePublishedContentModelsFactory { get; private set; }
+        public static bool EnablePublishedContentModelsFactory { get; internal set; }
 
         /// <summary>
         /// Gets the Roslyn parser language version.
         /// </summary>
         /// <remarks>Default value is <c>CSharp5</c>.</remarks>
-        public static LanguageVersion LanguageVersion { get; private set; }
+        public static LanguageVersion LanguageVersion { get; internal set; }
 
         /// <summary>
         /// Gets the generator mode for mixin properties.
         /// </summary>
         /// <remarks>Default value is latest.</remarks>
         public static int MixinPropertiesGeneratorMode { get; internal set; }
+
+        /// <summary>
+        /// Gets the string pattern for mixin properties static getter name.
+        /// </summary>
+        /// <remarks>Default value is "GetXxx". Standard string format.</remarks>
+        public static string MixinPropertiesStaticPattern { get; internal set; }
     }
 }

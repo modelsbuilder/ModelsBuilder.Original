@@ -70,6 +70,9 @@ namespace Zbu.ModelsBuilder.Building
 
                 foreach (var propertySymbol in classSymbol.GetMembers().Where(x => x is IPropertySymbol))
                     ParsePropertySymbols(disco, classSymbol, propertySymbol);
+
+                foreach (var staticMethodSymbol in classSymbol.GetMembers().Where(x => x is IMethodSymbol))
+                    ParseMethodSymbol(disco, classSymbol, staticMethodSymbol);
             }
 
             var interfaceDecls = tree.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>();
@@ -187,6 +190,32 @@ namespace Zbu.ModelsBuilder.Building
                         break;
                 }
             }
+        }
+
+        private static void ParseMethodSymbol(ParseResult disco, ISymbol classSymbol, ISymbol symbol)
+        {
+            var methodSymbol = symbol as IMethodSymbol;
+
+            if (methodSymbol == null 
+                || !methodSymbol.IsStatic
+                || methodSymbol.IsGenericMethod
+                || methodSymbol.ReturnsVoid
+                || methodSymbol.IsExtensionMethod
+                || methodSymbol.Parameters.Length != 1)
+                return;
+
+            var returnType = methodSymbol.ReturnType;
+            var paramSymbol = methodSymbol.Parameters[0];
+            var paramType = paramSymbol.Type;
+
+            // cannot do this because maybe the param type is ISomething and we don't have
+            // that type yet - will be generated - so cannot put any condition on it really
+            //const string iPublishedContent = "Umbraco.Core.Models.IPublishedContent";
+            //var implements = paramType.AllInterfaces.Any(x => x.ToDisplayString() == iPublishedContent);
+            //if (!implements)
+            //    return;
+
+            disco.SetStaticMixinMethod(classSymbol.Name, methodSymbol.Name, returnType.Name, paramType.Name);
         }
     }
 }
