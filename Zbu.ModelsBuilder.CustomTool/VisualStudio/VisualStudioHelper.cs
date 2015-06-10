@@ -49,7 +49,27 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
                 // process the project
                 .Cast<EnvDTE.Project>()
                 // exclude project types that are know to cause ToHierarchy to throw
-                .Where(p => !ExcludedProjectKinds.Contains(p.Kind.ToLowerInvariant()))
+                .Where(p =>
+                {
+                    var exclude = ExcludedProjectKinds.Contains(p.Kind.ToLowerInvariant());
+                    if (!exclude) return true;
+
+                    var msg = string.Format("Skipping project \"{0}\" at \"{1}\" of kind \"{2}\" (excluded kind).",
+                        p.FullName, p.FileName, p.Kind);
+                    ReportMessage(msg);
+                    return false;
+                })
+                // exclude projet types that don't have a filename (ToHierarchy cannot work)
+                .Where(p =>
+                {
+                    var exclude = string.IsNullOrWhiteSpace(p.FileName);
+                    if (!exclude) return true;
+
+                    var msg = string.Format("Skipping project \"{0}\" at \"{1}\" of kind \"{2}\" (empty filename).",
+                        p.FullName, p.FileName, p.Kind);
+                    ReportMessage(msg);
+                    return false;
+                })
                 // try...catch ToHierarchy, in case it's a project type we should have excluded
                 .Select(x =>
                 {
@@ -64,7 +84,7 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
 
                         // what shall we do? throwing is not nice neither required, but it's the
                         // only way we can add project kinds to our exclude list... for the time
-                        // being, throw.
+                        // being, be a pain to everybody and throw
                         throw new Exception(errmsg, e);
                         //ReportMessage(errmsg);
                         //return null;
