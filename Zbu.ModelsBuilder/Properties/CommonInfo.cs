@@ -28,11 +28,11 @@ using System.Runtime.InteropServices;
 // Also need to 
 
 // Assembly
-[assembly: AssemblyVersion("2.1.3.46")]
-[assembly: AssemblyFileVersion("2.1.3.46")]
+[assembly: AssemblyVersion("2.1.3.50")]
+[assembly: AssemblyFileVersion("2.1.3.50")]
 
 // NuGet Package
 // Note: cannot release "1.8.0" because it depends on pre-release NuGet packages
 // so I have to use 1.8.0-final...
-[assembly: AssemblyInformationalVersion("2.1.3-beta004")]
+[assembly: AssemblyInformationalVersion("2.1.3-beta008")]
 // Do not remove this line.
