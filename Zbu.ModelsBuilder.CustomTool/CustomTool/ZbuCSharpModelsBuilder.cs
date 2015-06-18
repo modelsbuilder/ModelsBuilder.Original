@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using Microsoft.CSharp;
 
 namespace Zbu.ModelsBuilder.CustomTool.CustomTool
 {
@@ -7,15 +6,13 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
     [ComVisible(true)]
     public class ZbuCSharpModelsBuilder : ZbuModelsBuilder
     {
-        public ZbuCSharpModelsBuilder()
-            //: base(new CSharpCodeProvider())
-        {
-        }
+        //public ZbuCSharpModelsBuilder()
+        //    : base(new CSharpCodeProvider())
+        //{ }
 
-        public override int DefaultExtension(out string pbstrDefaultExtension)
+        protected override string GetDefaultExtension()
         {
-            pbstrDefaultExtension = ".generated.cs";
-            return 0;
+            return ".generated.cs";
         }
     }
 }

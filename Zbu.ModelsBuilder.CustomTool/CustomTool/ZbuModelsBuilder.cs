@@ -10,22 +10,11 @@ using Zbu.ModelsBuilder.CustomTool.VisualStudio;
 namespace Zbu.ModelsBuilder.CustomTool.CustomTool
 {
     [ComVisible(true)]
-    public abstract class ZbuModelsBuilder : IVsSingleFileGenerator
-    {
-        //private readonly CodeDomProvider _codeDomProvider;
-        //private readonly TypeAttributes? _classAccessibility;
-
-        //protected ZbuModelsBuilder(CodeDomProvider codeDomProvider, TypeAttributes? classAccessibility = null*)
-        //{
-        //    this._codeDomProvider = codeDomProvider;
-        //    this._classAccessibility = classAccessibility;
-        //}
-
+    public abstract class ZbuModelsBuilder : BaseCodeGeneratorWithSite
+    { 
         #region IVsSingleFileGenerator Members
 
-        public abstract int DefaultExtension(out string pbstrDefaultExtension);
-
-        public virtual int Generate(string wszInputFilePath,
+        protected override int Generate(string wszInputFilePath,
                                     string bstrInputFileContents,
                                     string wszDefaultNamespace,
                                     IntPtr[] rgbOutputFileContents,
@@ -42,7 +31,7 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
 
         // wraps GenerateRaw in a message pump so that Visual Studio
         // will display the nice "waiting" modal window...
-        private static int GenerateWithPump(string wszInputFilePath,
+        private int GenerateWithPump(string wszInputFilePath,
                                      //string bstrInputFileContents,
                                      string wszDefaultNamespace,
                                      IntPtr[] rgbOutputFileContents,
@@ -74,7 +63,7 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
             return rc;
         }
 
-        private static int GenerateRaw(string wszInputFilePath,
+        private int GenerateRaw(string wszInputFilePath,
                                 //string bstrInputFileContents,
                                 string wszDefaultNamespace,
                                 IntPtr[] rgbOutputFileContents,
@@ -112,7 +101,9 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                 VisualStudioHelper.ReportMessage("Found {0} content types in Umbraco.", modelTypes.Count);
                 */
 
-                var vsitem = VisualStudioHelper.GetSourceItem(wszInputFilePath);
+                // GetSourceItem was an endless source of confusion - this should be better
+                //var vsitem = VisualStudioHelper.GetSourceItem(wszInputFilePath);
+                var vsitem = GetProjectItem();
                 VisualStudioHelper.ClearExistingItems(vsitem);
 
                 foreach (var file in Directory.GetFiles(path, "*.generated.cs"))

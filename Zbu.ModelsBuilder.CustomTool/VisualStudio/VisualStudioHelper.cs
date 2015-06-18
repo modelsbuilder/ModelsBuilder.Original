@@ -10,34 +10,27 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
 {
     class VisualStudioHelper
     {
-        // ISSUE see GetSourceItem below, this works on the "current" project
+        // GetSourceItem was an endless source of confusion
 
-        //public static string GetProjectBin(string hint)
-        //{
-        //    if (Path.IsPathRooted(hint)) return hint;
-
-        //    var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
-        //    var dteProjects = (Array)dte.ActiveSolutionProjects;
-        //    if (dteProjects.Length <= 0)
-        //        throw new Exception("Panic: no projets.");
-
-        //    var dteProject = (EnvDTE.Project)dteProjects.GetValue(0);
-
-        //    var proj = dteProject.FullName; // full path and name of the Project object's file
-        //    var opath = string.IsNullOrWhiteSpace(hint)
-        //        ? dteProject.ConfigurationManager.ActiveConfiguration.Properties.Item("OutputPath").Value.ToString()
-        //        : hint;
-        //    var dir = Path.GetDirectoryName(proj);
-        //    if (dir == null)
-        //        throw new Exception("Panic: null directory name.");
-        //    return Path.Combine(dir, opath);
-        //}
+        /*
 
         private static readonly string[] ExcludedProjectKinds =
         {
             EnvDTE.Constants.vsProjectKindSolutionItems.ToLowerInvariant(), // see [#49]
             "{E24C65DC-7377-472B-9ABA-BC803B73C61A}".ToLowerInvariant(), // see [#31]
         };
+
+        private static string GetProjectName(EnvDTE.Project project)
+        {
+            try
+            {
+                return project.Name;
+            }
+            catch
+            {
+                return "(throws)";
+            }
+        }
 
         public static EnvDTE.ProjectItem GetSourceItem(string inputFilePath)
         {
@@ -54,8 +47,8 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
                     var exclude = ExcludedProjectKinds.Contains(p.Kind.ToLowerInvariant());
                     if (!exclude) return true;
 
-                    var msg = string.Format("Skipping project \"{0}\" at \"{1}\" of kind \"{2}\" (excluded kind).",
-                        p.FullName, p.FileName, p.Kind);
+                    var msg = string.Format("Skipping project at \"{0}\" named \"{1}\" of kind \"{2}\" (excluded kind).",
+                        p.FileName, GetProjectName(p), p.Kind);
                     ReportMessage(msg);
                     return false;
                 })
@@ -65,8 +58,8 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
                     var exclude = string.IsNullOrWhiteSpace(p.FileName);
                     if (!exclude) return true;
 
-                    var msg = string.Format("Skipping project \"{0}\" at \"{1}\" of kind \"{2}\" (empty filename).",
-                        p.FullName, p.FileName, p.Kind);
+                    var msg = string.Format("Skipping project at \"{0}\" named \"{1}\" of kind \"{2}\" (empty filename).",
+                        p.FileName, GetProjectName(p), p.Kind);
                     ReportMessage(msg);
                     return false;
                 })
@@ -79,8 +72,8 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
                     }
                     catch (Exception e)
                     {
-                        var errmsg = string.Format("Failed to process project \"{0}\" at \"{1}\" of kind \"{2}\" (see inner exception).",
-                            x.FullName, x.FileName, x.Kind);
+                        var errmsg = string.Format("Failed to process project at \"{0}\" named \"{1}\" of kind \"{2}\" (see inner exception).",
+                            x.FileName, GetProjectName(x), x.Kind);
 
                         // what shall we do? throwing is not nice neither required, but it's the
                         // only way we can add project kinds to our exclude list... for the time
@@ -118,6 +111,7 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
 
             return sourceItem;
         }
+        */
 
         public static void ClearExistingItems(EnvDTE.ProjectItem sourceItem)
         {
@@ -137,6 +131,7 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
             newItem.Properties.Item("BuildAction").Value = 1;
         }
 
+        /*
         private static IVsHierarchy ToHierarchy(EnvDTE.Project project)
         {
             if (project == null || string.IsNullOrWhiteSpace(project.FileName))
@@ -170,6 +165,7 @@ namespace Zbu.ModelsBuilder.CustomTool.VisualStudio
             IServiceProvider serviceProvider = new ServiceProvider(project.DTE as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
             return VsShellUtilities.GetHierarchy(serviceProvider, new Guid(projectGuid));
         }
+        */
 
         // see http://msdn.microsoft.com/fr-fr/library/microsoft.visualstudio.shell.interop.ivsgeneratorprogress.generatorerror%28v=vs.90%29.aspx
         // level is ignored, line should be -1 if not specified

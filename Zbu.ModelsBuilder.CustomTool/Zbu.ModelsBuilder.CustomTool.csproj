@@ -148,6 +148,8 @@
     <Compile Include="..\Zbu.ModelsBuilder\Properties\CommonInfo.cs">
       <Link>Properties\CommonInfo.cs</Link>
     </Compile>
+    <Compile Include="CustomTool\BaseCodeGenerator.cs" />
+    <Compile Include="CustomTool\BaseCodeGeneratorWithSite.cs" />
     <Compile Include="CustomTool\ZbuModelsBuilder.cs" />
     <Compile Include="CustomTool\ZbuCSharpModelsBuilder.cs" />
     <Compile Include="Guids.cs" />
