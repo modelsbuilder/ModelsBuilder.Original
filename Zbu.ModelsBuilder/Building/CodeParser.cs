@@ -68,6 +68,19 @@ namespace Zbu.ModelsBuilder.Building
                 disco.SetContentInterfaces(classSymbol.Name, //SymbolDisplay.ToDisplayString(classSymbol),
                     interfaceSymbols.Select(x => x.Name)); //SymbolDisplay.ToDisplayString(x)));
 
+                var hasCtor = classSymbol.Constructors
+                    .Any(x =>
+                    {
+                        if (x.IsStatic) return false;
+                        if (x.Parameters.Length != 1) return false;
+                        var type1 = x.Parameters[0].Type;
+                        var type2 = typeof (global::Umbraco.Core.Models.IPublishedContent);
+                        return type1.ToDisplayString() == type2.FullName;
+                    });
+
+                if (hasCtor)
+                    disco.SetHasCtor(classSymbol.Name);
+
                 foreach (var propertySymbol in classSymbol.GetMembers().Where(x => x is IPropertySymbol))
                     ParsePropertySymbols(disco, classSymbol, propertySymbol);
 

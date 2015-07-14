@@ -186,8 +186,9 @@ namespace Zbu.ModelsBuilder.Building
             sb.Append("#pragma warning restore 0109\n\n");
 
             // write the ctor
-            sb.AppendFormat("\t\tpublic {0}(IPublishedContent content)\n\t\t\t: base(content)\n\t\t{{ }}\n\n",
-                type.ClrName);
+            if (!type.HasCtor)
+                sb.AppendFormat("\t\tpublic {0}(IPublishedContent content)\n\t\t\t: base(content)\n\t\t{{ }}\n\n",
+                    type.ClrName);
 
             // write the static methods
             // as 'new' since parent has its own - or maybe not - disable warning

@@ -37,6 +37,8 @@ namespace Zbu.ModelsBuilder.Building
             = new List<string>();
         private readonly Dictionary<string, List<StaticMixinMethodInfo>> _staticMixins
             = new Dictionary<string, List<StaticMixinMethodInfo>>();
+        private readonly HashSet<string> _withCtor
+            = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
         public static readonly ParseResult Empty = new ParseResult();
 
@@ -143,6 +145,11 @@ namespace Zbu.ModelsBuilder.Building
                 _staticMixins[contentName] = new List<StaticMixinMethodInfo>();
 
             _staticMixins[contentName].Add(new StaticMixinMethodInfo(contentName, methodName, returnType, paramType));
+        }
+
+        public void SetHasCtor(string contentName)
+        {
+            _withCtor.Add(contentName);
         }
 
         #endregion
@@ -256,6 +263,11 @@ namespace Zbu.ModelsBuilder.Building
             return _staticMixins.ContainsKey(contentName)
                 ? _staticMixins[contentName].Select(x => x.MethodName)
                 : Enumerable.Empty<string>() ;
+        }
+
+        public bool HasCtor(string contentName)
+        {
+            return _withCtor.Contains(contentName);
         }
 
         #endregion

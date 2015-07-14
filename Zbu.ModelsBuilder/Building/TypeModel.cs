@@ -113,6 +113,11 @@ namespace Zbu.ModelsBuilder.Building
         public bool IsContentIgnored;
 
         /// <summary>
+        /// Gets a value indicating whether the ctor is already defined in a partial.
+        /// </summary>
+        public bool HasCtor;
+
+        /// <summary>
         /// Represents the different model item types.
         /// </summary>
         public enum ItemTypes

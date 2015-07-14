@@ -205,6 +205,10 @@ namespace Zbu.ModelsBuilder.Building
             // discover static mixin methods
             foreach (var typeModel in _typeModels)
                 typeModel.StaticMixinMethods.AddRange(ParseResult.StaticMixinMethods(typeModel.ClrName));
+
+            // handle ctor
+            foreach (var typeModel in _typeModels.Where(x => ParseResult.HasCtor(x.ClrName)))
+                typeModel.HasCtor = true;
         }
 
         public string GetModelsNamespace()
