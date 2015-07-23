@@ -19,7 +19,9 @@
         if (Config.EnableLiveModels) sb.Append(" +EnableLiveModels");
         if (Config.EnablePublishedContentModelsFactory) sb.Append(" +EnablePublishedContentModelsFactory");
         sb.AppendFormat("<br />Config.ModelsNameSpace: \"{0}\"", Config.ModelsNamespace);
-        sb.AppendFormat("<br />Config.GeneratorMode.MixinProperties: {0}", Config.MixinPropertiesGeneratorMode);
+        sb.AppendFormat("<br />Config.StaticMixinGetters: {0}", Config.StaticMixinGetters ? "enabled" : "disabled");
+        if (Config.StaticMixinGetters)
+            sb.AppendFormat(", Config.StaticMixinGetterPattern: \"{0}\"", Config.StaticMixinGetterPattern);
         txtReport.Text = sb.ToString();
 
         var ver = Umbraco.Core.Configuration.UmbracoVersion.Current;        
