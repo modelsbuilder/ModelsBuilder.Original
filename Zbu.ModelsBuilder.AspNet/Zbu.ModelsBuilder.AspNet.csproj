@@ -254,8 +254,6 @@
       <PackageFiles Include="$(ProjectDir)UserControls\Zbu\ModelsBuilder\logo32x32.png" />
       <PackageFiles Include="$(OutputPath)Microsoft.CodeAnalysis.dll" />
       <PackageFiles Include="$(OutputPath)Microsoft.CodeAnalysis.CSharp.dll" />
-      <PackageFiles Include="$(OutputPath)Microsoft.CodeAnalysis.Desktop.dll" />
-      <PackageFiles Include="$(OutputPath)Microsoft.CodeAnalysis.CSharp.Desktop.dll" />
       <PackageFiles Include="$(OutputPath)System.Collections.Immutable.dll" />
       <PackageFiles Include="$(OutputPath)Zbu.ModelsBuilder.dll" />
       <PackageFiles Include="$(OutputPath)Zbu.ModelsBuilder.AspNet.dll" />
