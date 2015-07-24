@@ -1687,7 +1687,7 @@ namespace Umbraco.Web.PublishedContentModels
             Console.WriteLine(gen);
             return;
 
-            Assert.AreEqual(expected.ClearLf(), gen);
+            //Assert.AreEqual(expected.ClearLf(), gen);
         }
 
         [TestCase("int", typeof(int))]

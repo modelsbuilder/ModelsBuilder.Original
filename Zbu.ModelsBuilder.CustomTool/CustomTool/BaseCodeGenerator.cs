@@ -19,7 +19,7 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                 pbstrDefaultExtension = GetDefaultExtension();
                 return VSConstants.S_OK;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 pbstrDefaultExtension = string.Empty;
                 return VSConstants.E_FAIL;
