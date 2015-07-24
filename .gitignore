@@ -9,3 +9,5 @@ refs
 /build/Debug
 /build/Release
 /Zbu.ModelsBuilder.Console/build
+/lib/umbraco*
+/debug/

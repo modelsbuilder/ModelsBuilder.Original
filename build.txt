@@ -40,3 +40,6 @@ NOTES
   Newtonsoft.Json
     Using the one that comes with Umbraco not a package
 	because of version issues
+
+Issue w/building, do
+msbuild Zbu.ModelsBuilder.sln /t:Rebuild /p:Configuration=Release /v:diag > rebuild.txt
