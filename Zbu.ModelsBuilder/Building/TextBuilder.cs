@@ -231,9 +231,21 @@ namespace Zbu.ModelsBuilder.Building
         private void WriteMixinProperty(StringBuilder sb, PropertyModel property, string mixinClrName)
         {
             sb.Append("\n");
+            
+            // Adds xml summary to each property containing
+            // property name and property description
+            if (!string.IsNullOrWhiteSpace(property.Name) || !string.IsNullOrWhiteSpace(property.Description))
+            {
+                sb.Append("\t\t///<summary>\n");
 
-            if (!string.IsNullOrWhiteSpace(property.Name))
-                sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString(property.Name));
+                if (!string.IsNullOrWhiteSpace(property.Name))
+                    sb.AppendFormat("\t\t///{0}\n", XmlCommentString(property.Name));
+
+                if (!string.IsNullOrWhiteSpace(property.Description))
+                    sb.AppendFormat("\t\t///{0}\n", XmlCommentString(property.Description));
+
+                sb.Append("\t\t///</summary>\n");
+            }
 
             sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
 
@@ -253,9 +265,21 @@ namespace Zbu.ModelsBuilder.Building
             var mixinStatic = mixinClrName != null;
 
             sb.Append("\n");
+            
+            // Adds xml summary to each property containing
+            // property name and property description
+            if (!string.IsNullOrWhiteSpace(property.Name) || !string.IsNullOrWhiteSpace(property.Description))
+            {
+                sb.Append("\t\t///<summary>\n");
 
-            if (!string.IsNullOrWhiteSpace(property.Name))
-                sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString(property.Name));
+                if (!string.IsNullOrWhiteSpace(property.Name))
+                    sb.AppendFormat("\t\t///{0}\n", XmlCommentString(property.Name));
+
+                if (!string.IsNullOrWhiteSpace(property.Description))
+                    sb.AppendFormat("\t\t///{0}\n", XmlCommentString(property.Description));
+
+                sb.Append("\t\t///</summary>\n");
+            }
 
             sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
 
