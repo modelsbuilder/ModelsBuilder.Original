@@ -343,20 +343,28 @@ namespace Zbu.ModelsBuilder.Building
 
         private void WriteNonGenericClrType(StringBuilder sb, string s)
         {
-            var ls = s.ToLowerInvariant();
-            if (TypesMap.ContainsKey(ls))
+            string typeName;
+            if (!TypesMap.TryGetValue(s.ToLowerInvariant(), out typeName)) // takes care eg of "System.Int32" vs. "int"
             {
-                s = TypesMap[ls];
-            }
-            else
-            {
-                var p = s.LastIndexOf('.');
-                if (p > 0 && TypesUsing.Contains(s.Substring(0, p)))
-                    s = s.Substring(p + 1);
-                s = s.Replace("+", "."); // nested types *after* using
+                // if full type name matches a using clause, strip
+                typeName = s;
+                var p = typeName.LastIndexOf('.');
+                if (p > 0 && TypesUsing.Contains(typeName.Substring(0, p)))
+                    typeName = typeName.Substring(p + 1);
+
+                // nested types *after* using
+                typeName = typeName.Replace("+", ".");
+
+                // symbol to test is the first part of the name
+                p = typeName.IndexOf('.');
+                var symbol = p > 0 ? typeName.Substring(0, p) : typeName;
+
+                // globalize anything that is ambiguous
+                if (IsAmbiguousSymbol(symbol))
+                    typeName = "global::" + s.Replace("+", ".");
             }
 
-            sb.Append(s);
+            sb.Append(typeName);
         }
 
         private static string XmlCommentString(string s)

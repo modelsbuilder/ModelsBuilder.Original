@@ -1697,6 +1697,7 @@ namespace Umbraco.Web.PublishedContentModels
         public void WriteClrType(string expected, Type input)
         {
             var builder = new TextBuilder();
+            builder.ModelsNamespaceForTests = "ModelsNamespace";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, input);
             Assert.AreEqual(expected, sb.ToString());
@@ -1710,12 +1711,77 @@ namespace Umbraco.Web.PublishedContentModels
         {
             var builder = new TextBuilder();
             builder.Using.Add("Zbu.ModelsBuilder.Tests");
+            builder.ModelsNamespaceForTests = "ModelsNamespace";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, input);
             Assert.AreEqual(expected, sb.ToString());
         }
 
+        [Test]
+        public void WriteClrType_WithUsing()
+        {
+            var builder = new TextBuilder();
+            builder.Using.Add("System.Text");
+            builder.ModelsNamespaceForTests = "Zbu.ModelsBuilder.Tests.Models";
+            var sb = new StringBuilder();
+            builder.WriteClrType(sb, typeof(StringBuilder));
+            Assert.AreEqual("StringBuilder", sb.ToString());
+        }
+
+        [Test]
+        public void WriteClrTypeAnother_WithoutUsing()
+        {
+            var builder = new TextBuilder();
+            builder.ModelsNamespaceForTests = "Zbu.ModelsBuilder.Tests.Models";
+            var sb = new StringBuilder();
+            builder.WriteClrType(sb, typeof(StringBuilder));
+            Assert.AreEqual("System.Text.StringBuilder", sb.ToString());
+        }
+
+        [Test]
+        public void WriteClrType_Ambiguous()
+        {
+            var builder = new TextBuilder();
+            builder.Using.Add("System.Text");
+            builder.Using.Add("Zbu.ModelsBuilder.Tests");
+            builder.ModelsNamespaceForTests = "SomeRandomNamespace";
+            var sb = new StringBuilder();
+            builder.WriteClrType(sb, typeof(System.Text.ASCIIEncoding));
+            Assert.AreEqual("global::System.Text.ASCIIEncoding", sb.ToString());
+        }
+
+        [Test]
+        public void WriteClrType_AmbiguousNot()
+        {
+            var builder = new TextBuilder();
+            builder.Using.Add("System.Text");
+            builder.Using.Add("Zbu.ModelsBuilder.Tests");
+            builder.ModelsNamespaceForTests = "Zbu.ModelsBuilder.Tests.Models";
+            var sb = new StringBuilder();
+            builder.WriteClrType(sb, typeof(System.Text.ASCIIEncoding));
+            Assert.AreEqual("ASCIIEncoding", sb.ToString());
+        }
+
+        [Test]
+        public void WriteClrType_AmbiguousWithNested()
+        {
+            var builder = new TextBuilder();
+            builder.Using.Add("System.Text");
+            builder.Using.Add("Zbu.ModelsBuilder.Tests");
+            builder.ModelsNamespaceForTests = "SomeRandomNamespace";
+            var sb = new StringBuilder();
+            builder.WriteClrType(sb, typeof(ASCIIEncoding.Nested));
+            Assert.AreEqual("global::Zbu.ModelsBuilder.Tests.ASCIIEncoding.Nested", sb.ToString());
+        }
+
         public class Class1 { }
+    }
+
+    // make it public to be ambiguous (see above)
+    public class ASCIIEncoding
+    {
+        // can we handle nested types?
+        public class Nested { }
     }
 
     class BuilderTestsClass1 {}

@@ -416,6 +416,150 @@ class MyClass
             Assert.AreEqual(0, diags.Length);
             // unknown attribute is a semantic error
         }
+
+        [Test]
+        public void SymbolLookup_Ambiguous1()
+        {
+            const string code = @"
+using System.Text;
+using Zbu.ModelsBuilder.Tests;
+namespace SomeCryptoNameThatDoesReallyNotExistEgAGuid
+{ }
+";
+
+            SemanticModel model;
+            int pos;
+            GetSemantic(code, out model, out pos);
+
+            Assert.AreEqual(1, LookupSymbol(model, pos, null, "StringBuilder"));
+            Assert.AreEqual(1, LookupSymbol(model, pos, null, "RoslynTests"));
+            Assert.AreEqual(2, LookupSymbol(model, pos, null, "ASCIIEncoding"));
+        }
+
+        public void SymbolLookup_Ambiguous2()
+        {
+            const string code = @"
+using System.Text;
+using Zbu.ModelsBuilder.Tests;
+namespace Zbu.ModelsBuilder.Tests.Models
+{ }
+";
+
+            SemanticModel model;
+            int pos;
+            GetSemantic(code, out model, out pos);
+
+            Assert.AreEqual(1, LookupSymbol(model, pos, null, "StringBuilder"));
+            Assert.AreEqual(1, LookupSymbol(model, pos, null, "RoslynTests"));
+
+            // not ambiguous !
+            Assert.AreEqual(1, LookupSymbol(model, pos, null, "ASCIIEncoding"));
+        }
+
+        [Test]
+        public void SymbolLookup()
+        {
+            const string code = @"
+using System.Collections.Generic;
+using System.Text;
+namespace MyNamespace
+{
+    // %%POS%%
+
+    public class MyClass
+    {
+        public MyClass()
+        { }
+
+        public void Do()
+        { }
+    }
+
+    public class OtherClass
+    {
+        public class NestedClass { }
+        private class HiddenClass { }
+    }
+}
+";
+            SemanticModel model;
+            int pos;
+            GetSemantic(code, out model, out pos);
+
+            // only in proper scope
+            Assert.AreEqual(1, LookupSymbol(model, pos, null, "MyClass"));
+            Assert.AreEqual(0, LookupSymbol(model, 0, null, "MyClass"));
+
+            // not! looking for symbols only
+            Assert.AreEqual(0, LookupSymbol(model, 0, null, "MyNamespace.MyClass"));
+            Assert.AreEqual(0, LookupSymbol(model, pos, null, "MyNamespace.MyClass"));
+
+            // yes!
+            Assert.AreEqual(1, LookupSymbol(model, 0, null, "StringBuilder"));
+            Assert.AreEqual(1, LookupSymbol(model, pos, null, "StringBuilder"));
+
+            // not! looking for symbols only
+            Assert.AreEqual(0, LookupSymbol(model, 0, null, "System.Text.StringBuilder"));
+            Assert.AreEqual(0, LookupSymbol(model, 0, null, "global::StringBuilder"));
+            Assert.AreEqual(0, LookupSymbol(model, 0, null, "global::System.Text.StringBuilder"));
+
+            // cannot find Int32 at root because of no using clause
+            Assert.AreEqual(0, LookupSymbol(model, 0, null, "Int32"));
+
+            // can find System.Collections.Generic.Dictionary<TKey, TValue> (using clause)
+            Assert.AreEqual(1, LookupSymbol(model, 0, null, "Dictionary"));
+
+            // can find OtherClass within MyNamespace, & nested...
+            Assert.AreEqual(1, LookupSymbol(model, pos, null, "OtherClass"));
+
+            // that's not how it works
+            //Assert.AreEqual(0, LookupSymbol(model, pos, null, "NestedClass"));
+            //Assert.AreEqual(1, LookupSymbol(model, pos, null, "OtherClass.NestedClass"));
+            //Assert.AreEqual(0, LookupSymbol(model, pos, null, "OtherClass+HiddenClass"));
+        }
+
+        private void GetSemantic(string code, out SemanticModel model, out int pos)
+        {
+            var tree = CSharpSyntaxTree.ParseText(code);
+
+            //var writer = new ConsoleDumpWalker();
+            //writer.Visit(tree.GetRoot());
+
+            var refs = AssemblyUtility.GetAllReferencedAssemblyLocations()
+                .Distinct()
+                .Select(x => MetadataReference.CreateFromFile(x));
+
+            var compilation = CSharpCompilation.Create(
+                "MyCompilation",
+                syntaxTrees: new[] { tree },
+                references: refs);
+            model = compilation.GetSemanticModel(tree);
+
+            var diags = model.GetDiagnostics();
+            foreach (var diag in diags)
+            {
+                if (diag.Id == "CS8019") continue;
+                Console.WriteLine(diag);
+                Assert.Fail();
+            }
+
+            var ns = tree.GetRoot().DescendantNodes().OfType<NamespaceDeclarationSyntax>().First();
+            pos = ns.OpenBraceToken.SpanStart;
+
+            // if we use that as a "container" then we get what's in the container *only*
+            // not what we want here, then we have to use the position to determine *scope*
+            //var ss = model.GetDeclaredSymbol(ns);
+        }
+
+        private int LookupSymbol(SemanticModel model, int pos, INamespaceOrTypeSymbol container, string symbol)
+        {
+            Console.WriteLine("lookup: " + symbol);
+            //var symbols = model.LookupSymbols(0, container, symbol);
+            var symbols = model.LookupNamespacesAndTypes(pos, container, symbol);
+            foreach (var x in symbols)
+                Console.WriteLine(x.ToDisplayString());
+            return symbols.Length;
+        }
     }
 
     class TestWalker : CSharpSyntaxWalker

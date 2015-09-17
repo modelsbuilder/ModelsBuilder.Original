@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Zbu.ModelsBuilder.Building
 {
@@ -211,8 +215,52 @@ namespace Zbu.ModelsBuilder.Building
                 typeModel.HasCtor = true;
         }
 
+        private SemanticModel _ambiguousSymbolsModel;
+        private int _ambiguousSymbolsPos;
+
+        // internal for tests
+        internal void PrepareAmbiguousSymbols()
+        {
+            var codeBuilder = new StringBuilder();
+            foreach (var t in TypesUsing)
+                codeBuilder.AppendFormat("using {0};\n", t);
+
+            codeBuilder.AppendFormat("namespace {0}\n{{ }}\n", GetModelsNamespace());
+
+            var tree = CSharpSyntaxTree.ParseText(codeBuilder.ToString());
+
+            var refs = AssemblyUtility.GetAllReferencedAssemblyLocations()
+                .Distinct() // else massively duplicated...
+                .Select(x => MetadataReference.CreateFromFile(x));
+
+            var compilation = CSharpCompilation.Create(
+                "MyCompilation",
+                syntaxTrees: new[] { tree },
+                references: refs);
+            _ambiguousSymbolsModel = compilation.GetSemanticModel(tree);
+
+            var namespaceSyntax = tree.GetRoot().DescendantNodes().OfType<NamespaceDeclarationSyntax>().First();
+            //var namespaceSymbol = model.GetDeclaredSymbol(namespaceSyntax);
+            _ambiguousSymbolsPos = namespaceSyntax.OpenBraceToken.SpanStart;
+        }
+
+        protected bool IsAmbiguousSymbol(string symbol)
+        {
+            if (_ambiguousSymbolsModel == null)
+                PrepareAmbiguousSymbols();
+            if (_ambiguousSymbolsModel == null)
+                throw new Exception("Could not prepare ambiguous symbols.");
+            var symbols = _ambiguousSymbolsModel.LookupNamespacesAndTypes(_ambiguousSymbolsPos, null, symbol);
+            return symbols.Length > 1;
+        }
+
+        internal string ModelsNamespaceForTests;
+
         public string GetModelsNamespace()
         {
+            if (ModelsNamespaceForTests != null)
+                return ModelsNamespaceForTests;
+
             // code attribute overrides everything
             if (ParseResult.HasModelsNamespace)
                 return ParseResult.ModelsNamespace;
