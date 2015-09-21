@@ -215,6 +215,20 @@ namespace Zbu.ModelsBuilder.AspNet
 
         public const string GetModelsUrl = ControllerUrl + "/GetModels";
 
+        // invoked by the back-office
+        // requires that the user is logged into the backoffice and has access to the developer section
+        [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
+        [global::Umbraco.Web.WebApi.UmbracoAuthorize] // can use Umbraco's
+        public HttpResponseMessage GetModelsOutOfDateStatus()
+        {
+            var status = OutOfDateModelsStatus.IsEnabled
+                ? (OutOfDateModelsStatus.IsOutOfDate ? "out-of-date" : "current")
+                : "unknown";
+            return Request.CreateResponse(HttpStatusCode.OK, status, Configuration.Formatters.JsonFormatter);
+        }
+
+        public const string GetModelsOutOfDateStatusUrl = ControllerUrl + "/GetModelsOutOfDateStatus";
+
         // invoked by the API
         // DISABLED - works but useless, because if we return type models that
         // reference some Clr types that exist only on the server and not in the
@@ -271,6 +285,8 @@ namespace Zbu.ModelsBuilder.AspNet
                     compiler.ReferencedAssemblies.Add(asm);
                 compiler.Compile(bin, builder.GetModelsNamespace(), ourFiles);
             }
+
+            OutOfDateModelsStatus.Clear();
         }
 
         public static void TouchModelsFile(string appCode)

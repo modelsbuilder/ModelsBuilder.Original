@@ -20,6 +20,7 @@ namespace Zbu.ModelsBuilder.Configuration
             EnableApi = ConfigurationManager.AppSettings[prefix + "EnableApi"] != "false";
             ModelsNamespace = ConfigurationManager.AppSettings[prefix + "ModelsNamespace"];
             EnablePublishedContentModelsFactory = ConfigurationManager.AppSettings[prefix + "EnablePublishedContentModelsFactory"] != "false";
+            FlagOutOfDateModels = ConfigurationManager.AppSettings[prefix + "FlagOutOfDateModels"] == "true";
 
             StaticMixinGetters = ConfigurationManager.AppSettings[prefix + "StaticMixinGetters"] == "true";
             StaticMixinGetterPattern = ConfigurationManager.AppSettings[prefix + "StaticMixinGetterPattern"];
@@ -154,5 +155,13 @@ namespace Zbu.ModelsBuilder.Configuration
         /// </summary>
         /// <remarks>Default value is "GetXxx". Standard string format.</remarks>
         public static string StaticMixinGetterPattern { get; internal set; }
+
+        /// <summary>
+        /// Gets a value indicating whether we should flag out-of-date models.
+        /// </summary>
+        /// <remarks>Models become out-of-date when data types or content types are updated. When this
+        /// setting is activated the ~/App_Data/Models/ood.txt file is then created. When models are
+        /// generated through the dashboard, the files is cleared. Default value is <c>false</c>.</remarks>
+        public static bool FlagOutOfDateModels { get; internal set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" %>
 <%@ Import Namespace="Zbu.ModelsBuilder.Configuration" %>
+<%@ Import Namespace="Zbu.ModelsBuilder.AspNet" %>
 
 <script runat="server">
     protected override void OnLoad(EventArgs e)
@@ -18,11 +19,16 @@
         if (Config.EnableDllModels) sb.Append(" +EnableDllModels");
         if (Config.EnableLiveModels) sb.Append(" +EnableLiveModels");
         if (Config.EnablePublishedContentModelsFactory) sb.Append(" +EnablePublishedContentModelsFactory");
+        if (Config.FlagOutOfDateModels) sb.Append(" +FlagOutOfDateModels");
         sb.AppendFormat("<br />Config.ModelsNameSpace: \"{0}\"", Config.ModelsNamespace);
         sb.AppendFormat("<br />Config.StaticMixinGetters: {0}", Config.StaticMixinGetters ? "enabled" : "disabled");
         if (Config.StaticMixinGetters)
             sb.AppendFormat(", Config.StaticMixinGetterPattern: \"{0}\"", Config.StaticMixinGetterPattern);
         txtReport.Text = sb.ToString();
+
+        txtGenerate.Text = "Click button to generate models.";
+        if (OutOfDateModelsStatus.IsOutOfDate)
+            txtGenerate.Text = "Models are <strong>out-of-date</strong>, click button to generate models.";
 
         var ver = Umbraco.Core.Configuration.UmbracoVersion.Current;        
         if (ver.Major == 6)
@@ -87,7 +93,7 @@
                 <asp:PlaceHolder runat="server" ID="phGenerate">
                     <div style="margin-top: 24px;">
 				        <div id="generateModelsPane" style="min-height: 240px;">
-					        <p>Click button to generate models.</p>
+				            <p><asp:Literal runat="server" ID="txtGenerate"/></p>
                             <asp:PlaceHolder runat="server" ID="phGenerateWarning">
                                 <p style="color:red;">Beware! This will restart the application.</p>
                             </asp:PlaceHolder>

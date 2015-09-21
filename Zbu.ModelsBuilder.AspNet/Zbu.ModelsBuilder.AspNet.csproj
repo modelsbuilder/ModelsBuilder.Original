@@ -173,6 +173,7 @@
     <Compile Include="..\Zbu.ModelsBuilder\Properties\CommonInfo.cs">
       <Link>Properties\CommonInfo.cs</Link>
     </Compile>
+    <Compile Include="OutOfDateModelsStatus.cs" />
     <Compile Include="Initializer.cs" />
     <Compile Include="LiveModelsProvider.cs" />
     <Compile Include="ModelsBuilderApi.cs" />
