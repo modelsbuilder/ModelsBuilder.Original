@@ -26,6 +26,36 @@ namespace Zbu.ModelsBuilder.Tests
     public class RoslynTests
     {
         [Test]
+        public void CompilerLanguageVersionTest()
+        {
+            const string code = @"
+class Test
+{
+    private string GetValue()
+    {
+        return ""value"";
+    }
+
+    // this is csharp v6
+    public string Value => this.GetValue();
+}
+";
+            var files = new Dictionary<string, string> { { "source", code } };
+            SyntaxTree[] trees;
+            Compiler compiler;
+
+            Assert.Throws<Exception>(() =>
+            {
+                compiler = new Compiler();
+                compiler.GetCompilation("Zbu.ModelsBuilder.Generated", files, out trees);
+            });
+
+            // works
+            compiler = new Compiler(LanguageVersion.CSharp6);
+            compiler.GetCompilation("Zbu.ModelsBuilder.Generated", files, out trees);
+        }
+
+        [Test]
         public void SemTest1()
         {
             // http://social.msdn.microsoft.com/Forums/vstudio/en-US/64ee86b8-0fd7-457d-8428-a0f238133476/can-roslyn-tell-me-if-a-member-of-a-symbol-is-visible-from-a-position-in-a-document?forum=roslyn
@@ -436,6 +466,7 @@ namespace SomeCryptoNameThatDoesReallyNotExistEgAGuid
             Assert.AreEqual(2, LookupSymbol(model, pos, null, "ASCIIEncoding"));
         }
 
+        [Test]
         public void SymbolLookup_Ambiguous2()
         {
             const string code = @"

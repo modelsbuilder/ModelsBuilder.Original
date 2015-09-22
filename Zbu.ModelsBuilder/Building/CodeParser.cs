@@ -5,6 +5,7 @@ using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Zbu.ModelsBuilder.Configuration;
 
 namespace Zbu.ModelsBuilder.Building
 {
@@ -35,7 +36,7 @@ namespace Zbu.ModelsBuilder.Building
         public ParseResult Parse(IDictionary<string, string> files, IEnumerable<Assembly> referencedAssemblies)
         {
             SyntaxTree[] trees;
-            var compiler = new Compiler();
+            var compiler = new Compiler(Config.LanguageVersion);
             foreach (var asm in referencedAssemblies)
                 compiler.ReferencedAssemblies.Add(asm);
             var compilation = compiler.GetCompilation("Zbu.ModelsBuilder.Generated", files, out trees);
