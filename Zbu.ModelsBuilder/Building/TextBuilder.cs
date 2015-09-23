@@ -238,11 +238,10 @@ namespace Zbu.ModelsBuilder.Building
             {
                 sb.Append("\t\t///<summary>\n");
 
-                if (!string.IsNullOrWhiteSpace(property.Name))
-                    sb.AppendFormat("\t\t///{0}\n", XmlCommentString(property.Name));
-
                 if (!string.IsNullOrWhiteSpace(property.Description))
-                    sb.AppendFormat("\t\t///{0}\n", XmlCommentString(property.Description));
+                    sb.AppendFormat("\t\t/// {0}: {1}\n", XmlCommentString(property.Name), XmlCommentString(property.Description));
+                else
+                    sb.AppendFormat("\t\t/// {0}\n", XmlCommentString(property.Name));
 
                 sb.Append("\t\t///</summary>\n");
             }
@@ -271,12 +270,11 @@ namespace Zbu.ModelsBuilder.Building
             if (!string.IsNullOrWhiteSpace(property.Name) || !string.IsNullOrWhiteSpace(property.Description))
             {
                 sb.Append("\t\t///<summary>\n");
-
-                if (!string.IsNullOrWhiteSpace(property.Name))
-                    sb.AppendFormat("\t\t///{0}\n", XmlCommentString(property.Name));
-
+                
                 if (!string.IsNullOrWhiteSpace(property.Description))
-                    sb.AppendFormat("\t\t///{0}\n", XmlCommentString(property.Description));
+                    sb.AppendFormat("\t\t/// {0}: {1}\n", XmlCommentString(property.Name), XmlCommentString(property.Description));
+                else
+                    sb.AppendFormat("\t\t/// {0}\n", XmlCommentString(property.Name));
 
                 sb.Append("\t\t///</summary>\n");
             }
