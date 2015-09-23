@@ -35,6 +35,7 @@ namespace Zbu.ModelsBuilder.AspNet
 
         public static void Clear()
         {
+            if (Config.FlagOutOfDateModels == false) return;
             var path = GetFlagPath();
             if (path == null || !File.Exists(path)) return;
             File.Delete(path);
@@ -49,6 +50,7 @@ namespace Zbu.ModelsBuilder.AspNet
         {
             get
             {
+                if (Config.FlagOutOfDateModels == false) return false;
                 var path = GetFlagPath();
                 return path != null && File.Exists(path);
             }

@@ -44,6 +44,10 @@ namespace Zbu.ModelsBuilder.Configuration
 
             if (count > 1)
                 throw new Exception("Configuration error: you can enable only one of Dll, AppCode or AppData models at a time.");
+
+            // not flagging if not generating, or live
+            if (count == 0 || EnableLiveModels)
+                FlagOutOfDateModels = false;
         }
 
         // note: making setters internal below for testing purposes
