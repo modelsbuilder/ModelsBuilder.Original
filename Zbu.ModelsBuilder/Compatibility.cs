@@ -15,11 +15,13 @@ namespace Zbu.ModelsBuilder
         public static readonly Version Version = Assembly.GetExecutingAssembly().GetName().Version;
 
         // indicate which versions of the client API are supported by this server's API.
-        // (eg our Version = 4.8 but we support connections from VSIX down to version 3.2)
+        //   eg our Version = 4.8 but we support connections from VSIX down to version 3.2
+        //   => as a server, we accept connections from client down to version 2.1.0.0
         public static readonly Version MinClientVersionSupportedByServer = new Version(2, 1, 0, 0);
         
         // indicate which versions of the server API support this client
-        // (eg our Version = 4.8 and we know we're compatible with website server down to version 3.2)
+        //   eg our Version = 4.8 and we know we're compatible with website server down to version 3.2
+        //   => as a client, we tell the server down to version 2.1.0.0 that it should accept us
         public static readonly Version MinServerVersionSupportingClient = new Version(2, 1, 0, 0);
 
         // say, version 42 adds an optional parameter to the API
