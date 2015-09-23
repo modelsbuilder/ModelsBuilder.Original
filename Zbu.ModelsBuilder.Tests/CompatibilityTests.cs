@@ -20,18 +20,19 @@ namespace Zbu.ModelsBuilder.Tests
             Assert.IsFalse(IsOk(new Version(2, 0, 3, 0)));
             Assert.IsFalse(IsOk(new Version(2, 0, 4, 0)));
 
-            // client version 2.1.0-2.1.4 supported
+            // client version 2.1.0-2.1.5 supported
             Assert.IsTrue(IsOk(new Version(2, 1, 0, 0)));
             Assert.IsTrue(IsOk(new Version(2, 1, 1, 0)));
             Assert.IsTrue(IsOk(new Version(2, 1, 2, 0)));
             Assert.IsTrue(IsOk(new Version(2, 1, 3, 0)));
             Assert.IsTrue(IsOk(new Version(2, 1, 4, 0)));
+            Assert.IsTrue(IsOk(new Version(2, 1, 5, 0)));
 
-            // client version > 2.1.4 not supported
-            Assert.IsFalse(IsOk(new Version(2, 1, 5, 0)));
+            // client version > 2.1.5 not supported
+            Assert.IsFalse(IsOk(new Version(2, 1, 6, 0)));
 
             // unless client says so
-            Assert.IsTrue(IsOk(new Version(2, 1, 5, 0), new Version(2, 1, 0, 0)));
+            Assert.IsTrue(IsOk(new Version(2, 1, 6, 0), new Version(2, 1, 0, 0)));
         }
 
         private static bool IsOk(Version clientVersion, Version minServerVersionSupportingClient = null)
