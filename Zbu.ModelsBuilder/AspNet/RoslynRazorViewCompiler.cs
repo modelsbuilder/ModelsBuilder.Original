@@ -33,8 +33,7 @@ namespace Zbu.ModelsBuilder.AspNet
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) => 
                 args.Name == _modelsVersionString ? _modelsAssembly : null;
 
-            References = AssemblyUtility.GetAllReferencedAssemblyLocations()
-                .Where(x => string.IsNullOrWhiteSpace(x) == false) // fixme - dynamic already excluded?
+            References = AssemblyUtility.AllReferencedAssemblyLocations
                 .Select(x => MetadataReference.CreateFromFile(x))
                 .ToArray();
         }

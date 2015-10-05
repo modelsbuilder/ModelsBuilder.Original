@@ -230,7 +230,7 @@ namespace Zbu.ModelsBuilder.Building
 
             var tree = CSharpSyntaxTree.ParseText(codeBuilder.ToString());
 
-            var refs = AssemblyUtility.GetAllReferencedAssemblyLocations()
+            var refs = AssemblyUtility.AllReferencedAssemblyLocations
                 .Distinct() // else massively duplicated...
                 .Select(x => MetadataReference.CreateFromFile(x));
 

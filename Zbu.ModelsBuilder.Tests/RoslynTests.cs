@@ -233,7 +233,7 @@ public class MyBuilder : Zbu.ModelsBuilder.Tests.TestBuilder
 ";
 
             var tree = CSharpSyntaxTree.ParseText(code);
-            var refs = AssemblyUtility.GetAllReferencedAssemblyLocations().Select(x => MetadataReference.CreateFromFile(x));
+            var refs = AssemblyUtility.AllReferencedAssemblyLocations.Select(x => MetadataReference.CreateFromFile(x));
 
             var compilation = CSharpCompilation.Create(
                 "MyCompilation",
@@ -556,7 +556,7 @@ namespace MyNamespace
             //var writer = new ConsoleDumpWalker();
             //writer.Visit(tree.GetRoot());
 
-            var refs = AssemblyUtility.GetAllReferencedAssemblyLocations()
+            var refs = AssemblyUtility.AllReferencedAssemblyLocations
                 .Distinct()
                 .Select(x => MetadataReference.CreateFromFile(x));
 

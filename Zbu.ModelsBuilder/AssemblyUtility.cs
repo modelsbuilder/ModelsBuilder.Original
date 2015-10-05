@@ -20,21 +20,32 @@ namespace Zbu.ModelsBuilder
 
     public static class AssemblyUtility
     {
-        // fixme - this is slow and should probably be cached in a static var!
-        // fixme - if this runs within Umbraco then we have already loaded them all?!
+        static AssemblyUtility()
+        {
+            // caching in a static var - not going to change
+            AllReferencedAssemblyLocations = GetAllReferencedAssemblyLocations();
+        }
 
-        public static IEnumerable<string> GetAllReferencedAssemblyLocations()
+        public static IEnumerable<string> AllReferencedAssemblyLocations { get; private set; }
+
+        private static IEnumerable<string> GetAllReferencedAssemblyLocations()
         {
             var assemblies = new List<Assembly>();
             var tmp1 = new List<Assembly>();
             var failed = new List<AssemblyName>();
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(x => x.IsDynamic == false))
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()
+                .Where(x => x.IsDynamic == false)
+                .Where(x => !string.IsNullOrWhiteSpace(x.Location))) // though... IsDynamic should be enough?
             {
                 assemblies.Add(assembly);
                 tmp1.Add(assembly);
             }
-            // fixme - should we also load everything that's in the same directory?
-            // fixme - do we want to load in the current app domain?
+
+            // fixme - AssemblyUtility questions
+            // - should we also load everything that's in the same directory?
+            // - do we want to load in the current app domain?
+            // - if this runs within Umbraco then we have already loaded them all?
+
             while (tmp1.Count > 0)
             {
                 var tmp2 = tmp1
