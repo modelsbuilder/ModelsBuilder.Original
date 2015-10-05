@@ -43,7 +43,10 @@ namespace Zbu.ModelsBuilder.Configuration
                 + (EnableAppDataModels ? 1 : 0);
 
             if (count > 1)
-                throw new Exception("Configuration error: you can enable only one of Dll, AppCode or AppData models at a time.");
+                throw new ConfigurationErrorsException("You can enable only one of Dll, AppCode or AppData models at a time.");
+
+            if (EnableLiveModels && (EnableDllModels || EnableAppCodeModels))
+                throw new ConfigurationErrorsException("Live Dll or AppCode models are not supported.");
 
             // not flagging if not generating, or live
             if (count == 0 || EnableLiveModels)
@@ -95,11 +98,11 @@ namespace Zbu.ModelsBuilder.Configuration
         /// Gets a value indicating whether "live models" are enabled.
         /// </summary>
         /// <remarks>
-        ///     <para>When neither Dll, App_Data nor App_Code models are enabled, indicates whether models
+        ///     <para>When App_Data models are not enabled, indicates whether models
         ///     should be automatically generated (in-memory), compiled and loaded into an assembly
         ///     referenced by our custom Razor engine, so they are available to views and are updated
         ///     when content types change, without Umbraco restarting.</para>
-        ///     <para>When either Dll, App_Data or App_Code models are enabled, indicates whether models
+        ///     <para>When App_Data models are enabled, indicates whether models
         ///     should be automatically generated anytime a content type changes, see EnablePureLiveModels
         ///     below.</para>
         ///     <para>Default value is <c>false</c>.</para>
@@ -115,7 +118,7 @@ namespace Zbu.ModelsBuilder.Configuration
         /// </remarks>
         public static bool EnablePureLiveModels
         {
-            get { return EnableLiveModels && !(EnableAppCodeModels || EnableDllModels || EnableAppDataModels); }
+            get { return EnableLiveModels && !EnableAppDataModels; }
         }
 
         /// <summary>
