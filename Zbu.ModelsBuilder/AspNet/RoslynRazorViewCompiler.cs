@@ -13,7 +13,6 @@ namespace Zbu.ModelsBuilder.AspNet
 
     public static class RoslynRazorViewCompiler
     {
-        //private const LanguageVersion CompilerLanguageVersion = LanguageVersion.CSharp6;
         private static int _modelsGeneration;
 
         // read - about dynamic assemblies
@@ -42,7 +41,7 @@ namespace Zbu.ModelsBuilder.AspNet
 
         private static CSharpCompilation GetCompilation(string assemblyName, IDictionary<string, string> files, out SyntaxTree[] trees)
         {
-            var options = new CSharpParseOptions(/*CompilerLanguageVersion*/);
+            var options = new CSharpParseOptions(Configuration.Config.LanguageVersion);
             trees = files.Select(x =>
             {
                 var text = x.Value;
