@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Zbu.ModelsBuilder
 {
@@ -17,6 +14,12 @@ namespace Zbu.ModelsBuilder
                     list.RemoveAt(i--); // i-- is important here!
                 }
             }
+        }
+
+        public static IEnumerable<T> And<T>(this IEnumerable<T> enumerable, T item)
+        {
+            foreach (var x in enumerable) yield return x;
+            yield return item;
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Zbu.ModelsBuilder.Configuration;
 
 namespace Zbu.ModelsBuilder.Building
 {
@@ -270,7 +271,7 @@ namespace Zbu.ModelsBuilder.Building
                 return ModelsNamespace;
 
             // default
-            return "Umbraco.Web.PublishedContentModels";
+            return Config.DefaultModelsNamespace;
         }
 
         protected string GetModelsBaseClassName()

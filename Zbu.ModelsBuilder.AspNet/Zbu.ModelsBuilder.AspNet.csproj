@@ -177,6 +177,7 @@
     <Compile Include="..\Zbu.ModelsBuilder\Properties\CommonInfo.cs">
       <Link>Properties\CommonInfo.cs</Link>
     </Compile>
+    <Compile Include="ModelsBuilderApplication.cs" />
     <Compile Include="OutOfDateModelsStatus.cs" />
     <Compile Include="Initializer.cs" />
     <Compile Include="LiveModelsProvider.cs" />
@@ -187,7 +188,12 @@
     <Compile Include="PackageActions\Configure.cs" />
     <Compile Include="PackageActions\Configure2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RazorBuildProvider.cs" />
+    <Compile Include="ViewEngine\RoslynPluginViewEngine.cs" />
+    <Compile Include="ViewEngine\RoslynRazorView.cs" />
+    <Compile Include="ViewEngine\RoslynRenderViewEngine.cs" />
+    <Compile Include="ViewEngine\RoslynViewEngineBase.cs" />
+    <Compile Include="ViewEngine\UmbracoInternals.cs" />
+    <Compile Include="ViewEngine\ViewEngineCollectionExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Zbu.ModelsBuilder\Zbu.ModelsBuilder.csproj">

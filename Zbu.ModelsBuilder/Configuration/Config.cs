@@ -111,13 +111,11 @@ namespace Zbu.ModelsBuilder.Configuration
         /// </summary>
         /// <remarks>
         ///     <para>When true neither Dll, App_Data nor App_Code models are enabled and we want our
-        ///     custom Razor engine do handle models - NOTE: pure live models are disabled because
-        ///     they sort of don't work.</para>
+        ///     custom Razor engine do handle models.</para>
         /// </remarks>
         public static bool EnablePureLiveModels
         {
-            get { return false; }
-            //get { return EnableLiveModels && !(EnableAppCodeModels || EnableDllModels || EnableAppDataModels); }
+            get { return EnableLiveModels && !(EnableAppCodeModels || EnableDllModels || EnableAppDataModels); }
         }
 
         /// <summary>
@@ -167,5 +165,7 @@ namespace Zbu.ModelsBuilder.Configuration
         /// setting is activated the ~/App_Data/Models/ood.txt file is then created. When models are
         /// generated through the dashboard, the files is cleared. Default value is <c>false</c>.</remarks>
         public static bool FlagOutOfDateModels { get; internal set; }
+
+        public const string DefaultModelsNamespace = "Umbraco.Web.PublishedContentModels";
     }
 }

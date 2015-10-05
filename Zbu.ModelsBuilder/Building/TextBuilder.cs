@@ -68,6 +68,9 @@ namespace Zbu.ModelsBuilder.Building
             foreach (var t in TypesUsing)
                 sb.AppendFormat("using {0};\n", t);
 
+            // assembly attributes marker
+            sb.Append("\n//ASSATTR\n");
+
             sb.Append("\n");
             sb.AppendFormat("namespace {0}\n", GetModelsNamespace());
             sb.Append("{\n");
