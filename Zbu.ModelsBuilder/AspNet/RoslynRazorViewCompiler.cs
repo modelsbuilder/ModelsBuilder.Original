@@ -83,7 +83,10 @@ namespace Zbu.ModelsBuilder.AspNet
             return assembly;
         }
 
-        // fixme - locking issue here!
+        // invoked by the PureLiveModelsFactory when it detects it needs to rebuild models
+        // the factory should have notified all "pure live models" view engines that it is
+        // rebuilding models, and engines should have suspended compilation, so it is safe
+        // to have zero lock in this method
         public static Assembly CompileAndRegisterModels(string code)
         {
             // zero everything and increment generation

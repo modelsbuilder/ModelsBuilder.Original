@@ -30,7 +30,7 @@ namespace Zbu.ModelsBuilder.AspNet.ViewEngine
     // which is a more complex (robust?) version of what we have here,
     // obviously inspired from the very same sources, looking at their code
 
-    public class RoslynViewEngineBase : RazorViewEngine, IVirtualPathFactory, IPureLiveModelsObserver
+    public class RoslynViewEngineBase : RazorViewEngine, IVirtualPathFactory, IPureLiveModelsEngine
     {
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
         private const string CachePrefix = "RoslynRenderViewEngine_";
@@ -132,11 +132,13 @@ namespace Zbu.ModelsBuilder.AspNet.ViewEngine
             return new HttpParseException(error.Message + Environment.NewLine, null, virtualPath, null, error.Location.LineIndex + 1);
         }
 
-        void IPureLiveModelsObserver.NotifyRebuild()
+        void IPureLiveModelsEngine.NotifyRebuilding()
         {
             // clear all views cache
+            // write-lock to suspend views compilation
 
             _locker.EnterWriteLock();
+
             try
             {
                 var cachedViewKeys = HttpRuntime.Cache
@@ -147,10 +149,18 @@ namespace Zbu.ModelsBuilder.AspNet.ViewEngine
                 foreach (var key in cachedViewKeys)
                     HttpRuntime.Cache.Remove(key);
             }
-            finally
+            catch
             {
                 _locker.ExitWriteLock();
+                throw;
             }
+        }
+
+        void IPureLiveModelsEngine.NotifyRebuilt()
+        {
+            // all clear
+
+            _locker.ExitWriteLock();
         }
 
         #endregion

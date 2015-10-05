@@ -22,12 +22,12 @@ namespace Zbu.ModelsBuilder.Umbraco
     {
         private Dictionary<string, Func<IPublishedContent, IPublishedContent>> _constructors;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
-        private readonly IPureLiveModelsObserver[] _notifiables;
+        private readonly IPureLiveModelsEngine[] _engines;
         private bool _hasModels;
 
-        public PureLiveModelFactory(params IPureLiveModelsObserver[] notifiables)
+        public PureLiveModelFactory(params IPureLiveModelsEngine[] engines)
         {
-            _notifiables = notifiables;
+            _engines = engines;
             ContentTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModels();
             DataTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModels();
         }
@@ -88,16 +88,26 @@ namespace Zbu.ModelsBuilder.Umbraco
             {
                 if (_hasModels) return _constructors;
 
-                var code = GenerateModelsCode();
-                var assembly = RoslynRazorViewCompiler.CompileAndRegisterModels(code);
-                var types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>());
+                // this will lock the engines - must take care that whatever happens,
+                // we unlock them - even if generation failed for some reason
+                foreach (var engine in _engines)
+                    engine.NotifyRebuilding();
 
-                _constructors = RegisterModels(types);
-                _hasModels = true;
+                try
+                {
+                    var code = GenerateModelsCode();
+                    var assembly = RoslynRazorViewCompiler.CompileAndRegisterModels(code);
+                    var types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>());
 
-                foreach (var notifiable in _notifiables)
-                    notifiable.NotifyRebuild();
-                
+                    _constructors = RegisterModels(types);
+                    _hasModels = true;
+                }
+                finally
+                {
+                    foreach (var engine in _engines)
+                        engine.NotifyRebuilt();
+                }
+
                 return _constructors;
             }
             finally

@@ -136,7 +136,7 @@
     <Compile Include="Properties\CommonInfo.cs" />
     <Compile Include="Umbraco\Application.cs" />
     <Compile Include="Umbraco\ModelsBuilderApplication.cs" />
-    <Compile Include="Umbraco\IPureLiveModelsObserver.cs" />
+    <Compile Include="Umbraco\IPureLiveModelsEngine.cs" />
     <Compile Include="Umbraco\PureLiveModelFactory.cs" />
     <Compile Include="Umbraco\PublishedContentModelUtility.cs" />
     <Compile Include="Umbraco\RemoteApplication.cs" />
