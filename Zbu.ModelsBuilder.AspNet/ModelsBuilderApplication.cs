@@ -27,7 +27,11 @@ namespace Zbu.ModelsBuilder.AspNet
             ViewEngines.Engines.Substitute<RenderViewEngine>(renderViewEngine);
             ViewEngines.Engines.Substitute<PluginViewEngine>(pluginViewEngine);
 
-            // FIXME WHAT IS THIS?!
+            // fixme - VirtualPathFactory?
+            // is what handles layouts for views - if we don't have it, then the layouts
+            // don't seem to see our models nor to be compiled by Roslyn - but then, is
+            // it taking care both of Umbraco templates, and regular MVC? should we filter
+            // the virtual paths in the view engine?
             VirtualPathFactoryManager.RegisterVirtualPathFactory(renderViewEngine);
 
             var factory = new PureLiveModelFactory(renderViewEngine, pluginViewEngine);
