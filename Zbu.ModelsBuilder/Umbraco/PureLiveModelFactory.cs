@@ -9,6 +9,7 @@ using System.Threading;
 using System.Web.Compilation;
 using System.Web.Hosting;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Cache;
@@ -59,6 +60,7 @@ namespace Zbu.ModelsBuilder.Umbraco
         // tells the factory that it should build a new generation of models
         private void ResetModels()
         {
+            LogHelper.Debug<PureLiveModelFactory>("Resetting models.");
             _locker.EnterWriteLock();
             try
             {
@@ -73,6 +75,7 @@ namespace Zbu.ModelsBuilder.Umbraco
         // ensure that the factory is running with the lastest generation of models
         private Dictionary<string, Func<IPublishedContent, IPublishedContent>> EnsureModels()
         {
+            LogHelper.Debug<PureLiveModelFactory>("Ensuring models.");
             _locker.EnterReadLock();
             try
             {
@@ -87,6 +90,8 @@ namespace Zbu.ModelsBuilder.Umbraco
             try
             {
                 if (_hasModels) return _constructors;
+
+                LogHelper.Debug<PureLiveModelFactory>("Rebuilding models.");
 
                 // this will lock the engines - must take care that whatever happens,
                 // we unlock them - even if generation failed for some reason
@@ -108,6 +113,7 @@ namespace Zbu.ModelsBuilder.Umbraco
                         engine.NotifyRebuilt();
                 }
 
+                LogHelper.Debug<PureLiveModelFactory>("Done rebuilding.");
                 return _constructors;
             }
             finally
