@@ -35,13 +35,13 @@ namespace Zbu.ModelsBuilder.AspNet
                     return false;
 
                 // not supported anymore
-                //if (Config.EnableAppCodeModels || Config.EnableDllModels)
+                //if (Config.EnableAppCodeModels)
                 //    return true;
 
-                if (Config.EnableAppDataModels)
+                if (Config.EnableAppDataModels || Config.EnableDllModels)
                     return true;
 
-                // pure live is not supported anymore
+                // we do not manage pure live here
                 return false;
             }
         }

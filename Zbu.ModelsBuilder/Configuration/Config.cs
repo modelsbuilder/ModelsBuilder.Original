@@ -45,8 +45,12 @@ namespace Zbu.ModelsBuilder.Configuration
             if (count > 1)
                 throw new ConfigurationErrorsException("You can enable only one of Dll, AppCode or AppData models at a time.");
 
-            if (EnableLiveModels && (EnableDllModels || EnableAppCodeModels))
-                throw new ConfigurationErrorsException("Live Dll or AppCode models are not supported.");
+            // live alone = pure live
+            // live + app_data = just generate files
+            // live + dll = generate the dll (and restart)
+            // live + app_code = disabled
+            if (EnableLiveModels && EnableAppCodeModels)
+                throw new ConfigurationErrorsException("Live AppCode models are not supported.");
 
             // not flagging if not generating, or live
             if (count == 0 || EnableLiveModels)
