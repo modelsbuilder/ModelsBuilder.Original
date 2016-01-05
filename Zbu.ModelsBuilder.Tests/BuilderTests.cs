@@ -71,7 +71,7 @@ using Zbu.ModelsBuilder;
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -114,7 +114,7 @@ using Zbu.ModelsBuilder;
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -147,7 +147,7 @@ using Zbu.ModelsBuilder;
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -203,7 +203,7 @@ public partial class Type1 : IHasXmlNode
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -213,7 +213,7 @@ public partial class Type1 : IHasXmlNode
                 Id = 2,
                 Alias = "type2",
                 ClrName = "Type2",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -223,7 +223,7 @@ public partial class Type1 : IHasXmlNode
                 Id = 3,
                 Alias = "ttype3",
                 ClrName = "Ttype3",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -262,7 +262,7 @@ using Zbu.ModelsBuilder;
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -272,7 +272,7 @@ using Zbu.ModelsBuilder;
                 Id = 2,
                 Alias = "type2",
                 ClrName = "Type2",
-                BaseTypeId = 1,
+                ParentId = 1,
                 BaseType = type1,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -311,7 +311,7 @@ using Zbu.ModelsBuilder;
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -321,7 +321,7 @@ using Zbu.ModelsBuilder;
                 Id = 2,
                 Alias = "type2",
                 ClrName = "Type2",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -363,7 +363,7 @@ using Zbu.ModelsBuilder;
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -373,7 +373,7 @@ using Zbu.ModelsBuilder;
                 Id = 2,
                 Alias = "type2",
                 ClrName = "Type2",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -416,7 +416,7 @@ using Zbu.ModelsBuilder;
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -426,7 +426,7 @@ using Zbu.ModelsBuilder;
                 Id = 2,
                 Alias = "type2",
                 ClrName = "Type2",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -472,7 +472,7 @@ namespace Models
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -481,7 +481,7 @@ namespace Models
                 Id = 2,
                 Alias = "type2",
                 ClrName = "Type2",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -490,7 +490,7 @@ namespace Models
                 Id = 3,
                 Alias = "type3",
                 ClrName = "Type3",
-                BaseTypeId = 1,
+                ParentId = 1,
                 BaseType = type1,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -564,7 +564,7 @@ namespace Dang
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -611,7 +611,7 @@ namespace Models
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -674,7 +674,7 @@ namespace Models
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -725,7 +725,7 @@ namespace Models
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -774,7 +774,7 @@ namespace Models
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -827,7 +827,7 @@ namespace Models
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -875,7 +875,7 @@ namespace Models
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -925,7 +925,7 @@ namespace Models
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -977,7 +977,7 @@ namespace Dang
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -1004,7 +1004,7 @@ namespace Dang
                 Id = 1,
                 Alias = "type2",
                 ClrName = "Type2",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -1105,7 +1105,7 @@ namespace Dang
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
                 IsMixin = true,
@@ -1128,7 +1128,7 @@ namespace Dang
                 Id = 2,
                 Alias = "type2",
                 ClrName = "Type2",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -1320,7 +1320,7 @@ namespace Umbraco.Web.PublishedContentModels
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -1412,7 +1412,7 @@ namespace Umbraco.Web.PublishedContentModels
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -1516,7 +1516,7 @@ namespace Umbraco.Web.PublishedContentModels
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
@@ -1628,7 +1628,7 @@ namespace Umbraco.Web.PublishedContentModels
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
                 IsMixin =  true,
@@ -1645,7 +1645,7 @@ namespace Umbraco.Web.PublishedContentModels
                 Id = 2,
                 Alias = "type2",
                 ClrName = "Type2",
-                BaseTypeId = 0,
+                ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };

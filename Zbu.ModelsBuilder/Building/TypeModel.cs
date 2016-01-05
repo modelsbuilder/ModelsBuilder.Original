@@ -36,10 +36,11 @@ namespace Zbu.ModelsBuilder.Building
         public string ClrName;
 
         /// <summary>
-        /// Gets the unique identifier of the base content type.
+        /// Gets the unique identifier of the parent.
         /// </summary>
-        /// <remarks>If the content type does not have a base content type, then returns <c>-1</c>.</remarks>
-        public int BaseTypeId;
+        /// <remarks>The parent can either be a base content type, or a content types container. If the content
+        /// type does not have a base content type, then returns <c>-1</c>.</remarks>
+        public int ParentId;
 
         /// <summary>
         /// Gets the base model.

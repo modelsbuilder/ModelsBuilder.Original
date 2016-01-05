@@ -295,7 +295,7 @@ namespace Zbu.ModelsBuilder.Umbraco
                     Id = contentType.Id,
                     Alias = contentType.Alias,
                     ClrName = contentType.Alias.ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase),
-                    BaseTypeId = contentType.ParentId,
+                    ParentId = contentType.ParentId,
 
                     Name = contentType.Name,
                     Description = contentType.Description
@@ -339,11 +339,13 @@ namespace Zbu.ModelsBuilder.Umbraco
             }
 
             // wire the base types
-            foreach (var typeModel in typeModels.Where(x => x.BaseTypeId > 0))
+            foreach (var typeModel in typeModels.Where(x => x.ParentId > 0))
             {
-                typeModel.BaseType = typeModels.SingleOrDefault(x => x.Id == typeModel.BaseTypeId);
-                if (typeModel.BaseType == null) throw new Exception("Panic: parent type does not exist.");
-                typeModel.IsParent = true;
+                typeModel.BaseType = typeModels.SingleOrDefault(x => x.Id == typeModel.ParentId);
+                // Umbraco 7.4 introduces content types containers, so even though ParentId > 0, the parent might
+                // not be a content type - here we assume that BaseType being null while ParentId > 0 means that 
+                // the parent is a container (and we don't check).
+                typeModel.IsParent = typeModel.BaseType != null;
             }
 
             // discover mixins
