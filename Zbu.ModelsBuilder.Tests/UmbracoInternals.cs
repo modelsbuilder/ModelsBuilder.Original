@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 
@@ -19,7 +20,9 @@ namespace Zbu.ModelsBuilder.Tests
 
         public static void InitializeConverters()
         {
-            var r = Ctor<PropertyValueConvertersResolver>((IEnumerable<Type>)new Type[0]);
+            var serviceProvider = new MockServiceProvider();
+            var logger = new MockLogger();
+            var r = Ctor<PropertyValueConvertersResolver>(serviceProvider, logger, (IEnumerable<Type>)new Type[0]);
             PropertyValueConvertersResolver.Current = r;
         }
 
@@ -41,5 +44,57 @@ namespace Zbu.ModelsBuilder.Tests
         {
             return Ctor<PublishedContentType>(id, alias, propertyTypes);
         }
+
+        #region Mock
+
+        // we should use a mock framework
+
+        class MockServiceProvider : IServiceProvider
+        {
+            public object GetService(Type serviceType)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        class MockLogger : ILogger
+        {
+            public void Error(Type callingType, string message, Exception exception)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Warn(Type callingType, string message, params Func<object>[] formatItems)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void WarnWithException(Type callingType, string message, Exception e, params Func<object>[] formatItems)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Info(Type callingType, Func<string> generateMessage)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Info(Type type, string generateMessageFormat, params Func<object>[] formatItems)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Debug(Type callingType, Func<string> generateMessage)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Debug(Type type, string generateMessageFormat, params Func<object>[] formatItems)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        #endregion
     }
 }
