@@ -11,3 +11,4 @@ refs
 /Zbu.ModelsBuilder.Console/build
 /lib/umbraco*
 /debug/
+/Zbu.ModelsBuilder.Tests/App_Data/
