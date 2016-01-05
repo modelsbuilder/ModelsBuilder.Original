@@ -46,8 +46,8 @@ namespace Zbu.ModelsBuilder.AspNet
 
                 var data = new ModelsBuilderApiController.ValidateClientVersionData
                 {
-                    ClientVersion = Compatibility.Version,
-                    MinServerVersionSupportingClient = Compatibility.MinServerVersionSupportingClient,
+                    ClientVersion = ApiVersion.Current.Version,
+                    MinServerVersionSupportingClient = ApiVersion.Current.MinServerVersionSupportingClient,
                 };
 
                 var result = client.PostAsync(url + ModelsBuilderApiController.ValidateClientVersionUrl, data, new JsonMediaTypeFormatter()).Result;
@@ -115,8 +115,8 @@ namespace Zbu.ModelsBuilder.AspNet
                 var data = new ModelsBuilderApiController.GetModelsData
                 {
                     Namespace = modelsNamespace,
-                    ClientVersion = Compatibility.Version,
-                    MinServerVersionSupportingClient = Compatibility.MinServerVersionSupportingClient,
+                    ClientVersion = ApiVersion.Current.Version,
+                    MinServerVersionSupportingClient = ApiVersion.Current.MinServerVersionSupportingClient,
                     Files = ourFiles
                 };
 

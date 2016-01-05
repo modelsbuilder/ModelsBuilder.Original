@@ -111,7 +111,7 @@
     <Compile Include="Building\CodeDomBuilder.cs" />
     <Compile Include="Building\CodeParser.cs" />
     <Compile Include="Building\Compiler.cs" />
-    <Compile Include="Compatibility.cs" />
+    <Compile Include="ApiVersion.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="FixReferences.cs" />
     <Compile Include="ImplementPropertyTypeAttribute.cs" />
