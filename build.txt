@@ -5,7 +5,7 @@ NEW VERSION
 -----------
 
 - update Zbu.ModelsBuilder/Properties/CommonInfo.cs
-- update Zbu.ModelsBuilder/Compatibility.cs (and tests)
+- update Zbu.ModelsBuilder/ApiVersion.cs (and tests)
 - update Zbu.ModelsBuilder.CustomTool/source.extension.vsixmanifest
 
 NEW VERSION OF ROSLYN

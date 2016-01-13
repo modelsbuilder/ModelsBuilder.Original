@@ -8,7 +8,7 @@
 		<owners>Pilotine - ZpqrtBnk</owners>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>ZpqrtBnk Umbraco ModelsBuilder Site Integration.</description>
-		<copyright>Copyright © Pilotine - ZpqrtBnk 2013-2015</copyright>
+		<copyright>Copyright © Pilotine - ZpqrtBnk 2013-2016</copyright>
 		<dependencies>
       <!-- dont need that one as Zbu.ModelsBuilder depends on it -->
       <!--

@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyProduct("ZpqrtBnk Umbraco ModelsBuilder")]
 [assembly: AssemblyCompany("Pilotine - ZpqrtBnk")]
-[assembly: AssemblyCopyright("Copyright © Pilotine - ZpqrtBnk 2013-2015")]
+[assembly: AssemblyCopyright("Copyright © Pilotine - ZpqrtBnk 2013-2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -28,12 +28,12 @@ using System.Runtime.InteropServices;
 // Also need to 
 
 // Assembly
-[assembly: AssemblyVersion("2.1.5.54")]
-[assembly: AssemblyFileVersion("2.1.5.54")]
+[assembly: AssemblyVersion("2.2.0.59")]
+[assembly: AssemblyFileVersion("2.2.0.59")]
 
 // NuGet Package
 // Note: could not release "1.8.0" because it was depending on pre-release NuGet packages
 //  for Roslyn, so had to release 1.8.0-final... starting with 2.1.3 Roslyn has a released
 //  1.0 version, so now we can release "2.1.3" without the "-final" extension.
-[assembly: AssemblyInformationalVersion("2.1.5")]
+[assembly: AssemblyInformationalVersion("2.2.0-beta001")]
 // Do not remove this line.
