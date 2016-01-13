@@ -1,6 +1,6 @@
-#### ZpqrtBnk Umbraco Models Builder
+#### Umbraco Models Builder
 
-Copyright (C) Pilotine - ZpqrtBnk 2013-2016  
+Copyright (C) Umbraco ZpqrtBnk 2013-2016
 Distributed under the MIT license  
 
 A tool that can generate a complete set of strongly-typed published content models for Umbraco.

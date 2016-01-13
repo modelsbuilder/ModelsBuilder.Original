@@ -4,21 +4,21 @@ BUILD
 NEW VERSION
 -----------
 
-- update Zbu.ModelsBuilder/Properties/CommonInfo.cs
-- update Zbu.ModelsBuilder/ApiVersion.cs (and tests)
-- update Zbu.ModelsBuilder.CustomTool/source.extension.vsixmanifest
+- update Umbraco.ModelsBuilder/Properties/CommonInfo.cs
+- update Umbraco.ModelsBuilder/ApiVersion.cs (and tests)
+- update Umbraco.ModelsBuilder.CustomTool/source.extension.vsixmanifest
 
 NEW VERSION OF ROSLYN
 ---------------------
 
-- update Zbu.ModelsBuilder/build/nuspecs/Zbu.ModelsBuilder.nuspec
+- update Umbraco.ModelsBuilder/build/nuspecs/Umbraco.ModelsBuilder.nuspec
 
 MISC
 ----
 
 Configurations "Debug-U6" and "Release-U6" are for Umbraco v6.
   Both define compile constant UMBRACO_6
-  Which is used in Zbu.ModelsBuilder.AspNet.ModelsBuilderAuthFilter
+  Which is used in Umbraco.ModelsBuilder.AspNet.ModelsBuilderAuthFilter
 
 Umbraco dependencies
   The following libs must be in lib/umbraco:
@@ -43,4 +43,4 @@ NOTES
 	because of version issues
 
 Issue w/building, do
-msbuild Zbu.ModelsBuilder.sln /t:Rebuild /p:Configuration=Release /v:diag > rebuild.txt
+msbuild Umbraco.ModelsBuilder.sln /t:Rebuild /p:Configuration=Release /v:diag > rebuild.txt

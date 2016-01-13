@@ -8,8 +8,8 @@ refs
 *.snk
 /build/Debug
 /build/Release
-/Zbu.ModelsBuilder.Console/build
+/Umbraco.ModelsBuilder.Console/build
 /lib/umbraco*
 /debug/
-/Zbu.ModelsBuilder.Tests/App_Data/
+/Umbraco.ModelsBuilder.Tests/App_Data/
 .vs/
