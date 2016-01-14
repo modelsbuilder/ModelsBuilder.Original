@@ -183,7 +183,7 @@
     <Compile Include="LiveModelsProvider.cs" />
     <Compile Include="ModelsBuilderApi.cs" />
     <Compile Include="ModelsBuilderAuthFilter.cs" />
-    <Compile Include="ModelsBuilderApiController.cs" />
+    <Compile Include="ModelsBuilderController.cs" />
     <Compile Include="ModelsBuildProvider.cs" />
     <Compile Include="PackageActions\Configure.cs" />
     <Compile Include="PackageActions\Configure2.cs" />

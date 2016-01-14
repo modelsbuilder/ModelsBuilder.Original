@@ -129,11 +129,11 @@ namespace Umbraco.ModelsBuilder.AspNet
                 throw new Exception("Panic: bin is null.");
 
             // EnableDllModels will recycle the app domain - but this request will end properly
-            ModelsBuilderApiController.GenerateModels(appData, Config.EnableDllModels ? bin : null);
+            ModelsBuilderController.GenerateModels(appData, Config.EnableDllModels ? bin : null);
 
             // will recycle the app domain - but this request will end properly
             if (Config.EnableAppCodeModels)
-                ModelsBuilderApiController.TouchModelsFile(appCode);
+                ModelsBuilderController.TouchModelsFile(appCode);
         }
     }
 

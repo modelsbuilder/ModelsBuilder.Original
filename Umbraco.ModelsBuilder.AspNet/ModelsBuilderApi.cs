@@ -44,13 +44,14 @@ namespace Umbraco.ModelsBuilder.AspNet
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
                     Convert.ToBase64String(Encoding.UTF8.GetBytes(_user + ':' + _password)));
 
-                var data = new ModelsBuilderApiController.ValidateClientVersionData
+                var data = new ModelsBuilderController.ValidateClientVersionData
                 {
                     ClientVersion = ApiVersion.Current.Version,
                     MinServerVersionSupportingClient = ApiVersion.Current.MinServerVersionSupportingClient,
                 };
 
-                var result = client.PostAsync(url + ModelsBuilderApiController.ValidateClientVersionUrl, data, new JsonMediaTypeFormatter()).Result;
+                var result = client.PostAsync(url + ModelsBuilderController.ActionUrl(nameof(ModelsBuilderController.ValidateClientVersion)),
+                    data, new JsonMediaTypeFormatter()).Result;
 
                 // this is not providing enough details in case of an error - do our own reporting
                 //result.EnsureSuccessStatusCode();
@@ -112,7 +113,7 @@ namespace Umbraco.ModelsBuilder.AspNet
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
                     Convert.ToBase64String(Encoding.UTF8.GetBytes(_user + ':' + _password)));
 
-                var data = new ModelsBuilderApiController.GetModelsData
+                var data = new ModelsBuilderController.GetModelsData
                 {
                     Namespace = modelsNamespace,
                     ClientVersion = ApiVersion.Current.Version,
@@ -120,7 +121,8 @@ namespace Umbraco.ModelsBuilder.AspNet
                     Files = ourFiles
                 };
 
-                var result = client.PostAsync(url + ModelsBuilderApiController.GetModelsUrl, data, new JsonMediaTypeFormatter()).Result;
+                var result = client.PostAsync(url + ModelsBuilderController.ActionUrl(nameof(ModelsBuilderController.GetModels)),
+                    data, new JsonMediaTypeFormatter()).Result;
 
                 // this is not providing enough details in case of an error - do our own reporting
                 //result.EnsureSuccessStatusCode();

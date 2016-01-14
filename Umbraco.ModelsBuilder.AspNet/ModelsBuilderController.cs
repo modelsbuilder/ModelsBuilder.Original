@@ -24,12 +24,12 @@ namespace Umbraco.ModelsBuilder.AspNet
     // read http://our.umbraco.org/forum/developers/api-questions/43025-Web-API-authentication
     // UmbracoAuthorizedApiController :: /Umbraco/BackOffice/Zbu/ModelsBuilderApi/GetTypeModels
     // UmbracoApiController :: /Umbraco/Zbu/ModelsBuilderApi/GetTypeModels ??  UNLESS marked with isbackoffice
-    [PluginController(ZbuArea)]
+    [PluginController(ControllerArea)]
     [IsBackOffice] // because we want back-office users
-    public class ModelsBuilderApiController : UmbracoApiController //UmbracoAuthorizedApiController
+    public class ModelsBuilderController : UmbracoApiController //UmbracoAuthorizedApiController
     {
-        public const string ZbuArea = "Zbu";
-        private const string ControllerUrl = "/Umbraco/BackOffice/Zbu/ModelsBuilderApi";
+        public const string ControllerArea = "UmbracoApi";
+        public static readonly string ControllerUrl = "/Umbraco/BackOffice/" + ControllerArea + "/" + nameof(ModelsBuilderController).TrimEnd("Controller");
 
         #region Models
 
@@ -117,8 +117,6 @@ namespace Umbraco.ModelsBuilder.AspNet
                 : checkResult.Result);
         }
 
-        public const string ValidateClientVersionUrl = ControllerUrl + "/ValidateClientVersion";
-
         // invoked by the dashboard
         // requires that the user is logged into the backoffice and has access to the developer section
         [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
@@ -179,8 +177,6 @@ namespace Umbraco.ModelsBuilder.AspNet
             }
         }
 
-        public const string BuildModelsUrl = ControllerUrl + "/BuildModels";
-
         // invoked by the API
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
         [ModelsBuilderAuthFilter("developer")] // have to use our own, non-cookie-based, auth
@@ -213,8 +209,6 @@ namespace Umbraco.ModelsBuilder.AspNet
             return Request.CreateResponse(HttpStatusCode.OK, models, Configuration.Formatters.JsonFormatter);
         }
 
-        public const string GetModelsUrl = ControllerUrl + "/GetModels";
-
         // invoked by the back-office
         // requires that the user is logged into the backoffice and has access to the developer section
         [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
@@ -227,7 +221,10 @@ namespace Umbraco.ModelsBuilder.AspNet
             return Request.CreateResponse(HttpStatusCode.OK, status, Configuration.Formatters.JsonFormatter);
         }
 
-        public const string GetModelsOutOfDateStatusUrl = ControllerUrl + "/GetModelsOutOfDateStatus";
+        public static string ActionUrl(string actionName)
+        {
+            return ControllerUrl + "/" + actionName;
+        }
 
         // invoked by the API
         // DISABLED - works but useless, because if we return type models that

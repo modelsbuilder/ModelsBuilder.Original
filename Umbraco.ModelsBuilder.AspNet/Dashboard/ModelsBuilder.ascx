@@ -49,7 +49,7 @@
 
         function buildModelsOnServer(callback) {
             // encodeURIComponent(args)...
-            $.getJSON('<%=ModelsBuilderApiController.BuildModelsUrl%>', function (json) {
+            $.getJSON('<%=ModelsBuilderController.ActionUrl(nameof(ModelsBuilderController.BuildModels))%>', function (json) {
 		        callback(json);
 		    });
 		}
