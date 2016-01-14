@@ -147,7 +147,6 @@
     <None Include="build\NuSpecs\Umbraco.ModelsBuilder.nuspec">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Key.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
