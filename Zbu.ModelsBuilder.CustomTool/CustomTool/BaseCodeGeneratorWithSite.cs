@@ -17,8 +17,20 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
 
         #region IObjectWithSite Members
 
-
         void VSOLE.IObjectWithSite.GetSite(ref Guid riid, out IntPtr ppvSite)
+        {
+            GetSite(ref riid, out ppvSite);
+        }
+
+        void VSOLE.IObjectWithSite.SetSite(object pUnkSite)
+        {
+            SetSite(pUnkSite);
+        }
+
+        // use the following methods instead of doing it in explicit methods above,
+        // else we have a "CA1033: Interface methods should be callable by child types"
+
+        protected void GetSite(ref Guid riid, out IntPtr ppvSite)
         {
             if (_site == null)
                 throw new COMException("object is not sited", VSConstants.E_FAIL);
@@ -33,7 +45,7 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
             ppvSite = intPointer;
         }
 
-        void VSOLE.IObjectWithSite.SetSite(object pUnkSite)
+        protected void SetSite(object pUnkSite)
         {
             _site = pUnkSite;
         }

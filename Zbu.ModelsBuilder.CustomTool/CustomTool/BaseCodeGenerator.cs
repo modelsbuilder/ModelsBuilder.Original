@@ -14,6 +14,21 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
 
         int IVsSingleFileGenerator.DefaultExtension(out string pbstrDefaultExtension)
         {
+            return DefaultExtension(out pbstrDefaultExtension);
+        }
+
+        int IVsSingleFileGenerator.Generate(string wszInputFilePath, string bstrInputFileContents, string wszDefaultNamespace, IntPtr[] rgbOutputFileContents, out uint pcbOutput, IVsGeneratorProgress pGenerateProgress)
+        {
+            if (bstrInputFileContents == null)
+                throw new ArgumentNullException("bstrInputFileContents");
+            return Generate(wszInputFilePath, bstrInputFileContents, wszDefaultNamespace, rgbOutputFileContents, out pcbOutput, pGenerateProgress);
+        }
+
+        // use the following methods instead of doing it in explicit methods above,
+        // else we have a "CA1033: Interface methods should be callable by child types"
+
+        protected int DefaultExtension(out string pbstrDefaultExtension)
+        {
             try
             {
                 pbstrDefaultExtension = GetDefaultExtension();
@@ -24,13 +39,6 @@ namespace Zbu.ModelsBuilder.CustomTool.CustomTool
                 pbstrDefaultExtension = string.Empty;
                 return VSConstants.E_FAIL;
             }
-        }
-
-        int IVsSingleFileGenerator.Generate(string wszInputFilePath, string bstrInputFileContents, string wszDefaultNamespace, IntPtr[] rgbOutputFileContents, out uint pcbOutput, IVsGeneratorProgress pGenerateProgress)
-        {
-            if (bstrInputFileContents == null)
-                throw new ArgumentNullException("bstrInputFileContents");
-            return Generate(wszInputFilePath, bstrInputFileContents, wszDefaultNamespace, rgbOutputFileContents, out pcbOutput, pGenerateProgress);
         }
 
         #endregion
