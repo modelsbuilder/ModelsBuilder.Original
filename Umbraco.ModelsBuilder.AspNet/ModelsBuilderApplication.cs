@@ -37,6 +37,11 @@ namespace Umbraco.ModelsBuilder.AspNet
             var factory = new PureLiveModelFactory(renderViewEngine, pluginViewEngine);
             PublishedContentModelFactoryResolver.Current.SetFactory(factory);
 
+            // the following would add @using statement in every view so user's don't
+            // have to do it - however, then noone understands where the @using statement
+            // comes from, and it cannot be avoided / removed --- DISABLED
+            //
+            /*
             // no need for @using in views
             // note:
             //  we are NOT using the in-code attribute here, config is required
@@ -46,6 +51,7 @@ namespace Umbraco.ModelsBuilder.AspNet
             if (string.IsNullOrWhiteSpace(modelsNamespace))
                 modelsNamespace = Configuration.Config.DefaultModelsNamespace;
             System.Web.WebPages.Razor.WebPageRazorHost.AddGlobalImport(modelsNamespace);
+            */
         }
     }
 }
