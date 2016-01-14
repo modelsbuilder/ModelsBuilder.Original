@@ -13,7 +13,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             // - we want it
             // - we don't also want pure live models
 
-            if (!Config.EnablePublishedContentModelsFactory || Config.EnablePureLiveModels)
+            if (!Config.EnableFactory || Config.EnablePureLiveModels)
                 return;
 
             var types = PluginManager.Current.ResolveTypes<PublishedContentModel>();

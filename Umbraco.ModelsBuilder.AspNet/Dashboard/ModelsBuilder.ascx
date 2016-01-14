@@ -1,46 +1,16 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" %>
-<%@ Import Namespace="Umbraco.ModelsBuilder.Configuration" %>
-<%@ Import Namespace="Umbraco.ModelsBuilder.AspNet" %>
+<%@ Import Namespace="Umbraco.ModelsBuilder.AspNet.Dashboard" %>
 
 <script runat="server">
     protected override void OnLoad(EventArgs e)
     {
-        // <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
-        // <umb:CssInclude runat="server" FilePath="propertypane/style.css" PathNameAlias="UmbracoClient" />
+        phGenerate.Visible = DashboardHelper.CanGenerate();
+        phGenerateWarning.Visible = DashboardHelper.GenerateRestarts();
+        txtReport.Text = DashboardHelper.Report();
+        txtGenerate.Text = DashboardHelper.GenerateLabel();
 
-        phGenerate.Visible = Config.EnableAppDataModels || Config.EnableAppCodeModels || Config.EnableDllModels;
-        phGenerateWarning.Visible = Config.EnableAppCodeModels || Config.EnableDllModels;
-
-        var sb = new StringBuilder();
-        sb.Append("Config: ");
-        if (Config.EnableApi) sb.Append(" +EnableApi");
-        if (Config.EnableAppDataModels) sb.Append(" +EnableAppDataModels");
-        if (Config.EnableAppCodeModels) sb.Append(" +EnableAppCodeModels");
-        if (Config.EnableDllModels) sb.Append(" +EnableDllModels");
-        if (Config.EnableLiveModels) sb.Append(" +EnableLiveModels");
-        if (Config.EnablePublishedContentModelsFactory) sb.Append(" +EnablePublishedContentModelsFactory");
-        if (Config.FlagOutOfDateModels) sb.Append(" +FlagOutOfDateModels");
-        sb.AppendFormat("<br />Config.ModelsNameSpace: \"{0}\"", Config.ModelsNamespace);
-        sb.AppendFormat("<br />Config.StaticMixinGetters: {0}", Config.StaticMixinGetters ? "enabled" : "disabled");
-        if (Config.StaticMixinGetters)
-            sb.AppendFormat(", Config.StaticMixinGetterPattern: \"{0}\"", Config.StaticMixinGetterPattern);
-        txtReport.Text = sb.ToString();
-
-        txtGenerate.Text = "Click button to generate models.";
-        if (OutOfDateModelsStatus.IsOutOfDate)
-            txtGenerate.Text = "Models are <strong>out-of-date</strong>, click button to generate models.";
-
-        var ver = Umbraco.Core.Configuration.UmbracoVersion.Current;        
-        if (ver.Major == 6)
-            Umbraco6();
-    }
-
-    private void Umbraco6()
-    {
-        var css = new ClientDependency.Core.Controls.CssInclude();
-        css.FilePath = "propertypane/style.css";
-        css.PathNameAlias = "UmbracoClient";
-        Page.Controls.Add(css);
+        if (DashboardHelper.IsUmbraco6())
+            Page.Controls.Add(DashboardHelper.Umbraco6Control());
     }
 </script>
 
@@ -49,7 +19,7 @@
 
         function buildModelsOnServer(callback) {
             // encodeURIComponent(args)...
-            $.getJSON('<%=ModelsBuilderController.ActionUrl(nameof(ModelsBuilderController.BuildModels))%>', function (json) {
+            $.getJSON('<%=DashboardHelper.BuildUrl()%>', function (json) {
 		        callback(json);
 		    });
 		}

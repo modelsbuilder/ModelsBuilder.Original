@@ -13,27 +13,42 @@ namespace Umbraco.ModelsBuilder.Configuration
             // and is static ie requires the app to be restarted for changes to be detected
 
             const string prefix = "Umbraco.ModelsBuilder.";
-            EnableDllModels = ConfigurationManager.AppSettings[prefix + "EnableDllModels"] == "true";
-            EnableAppCodeModels = ConfigurationManager.AppSettings[prefix + "EnableAppCodeModels"] == "true";
-            EnableAppDataModels = ConfigurationManager.AppSettings[prefix + "EnableAppDataModels"] == "true";
-            EnableLiveModels = ConfigurationManager.AppSettings[prefix + "EnableLiveModels"] == "true";
-            EnableApi = ConfigurationManager.AppSettings[prefix + "EnableApi"] != "false";
-            ModelsNamespace = ConfigurationManager.AppSettings[prefix + "ModelsNamespace"];
-            EnablePublishedContentModelsFactory = ConfigurationManager.AppSettings[prefix + "EnablePublishedContentModelsFactory"] != "false";
-            FlagOutOfDateModels = ConfigurationManager.AppSettings[prefix + "FlagOutOfDateModels"] == "true";
 
-            StaticMixinGetters = ConfigurationManager.AppSettings[prefix + "StaticMixinGetters"] == "true";
+            // giant kill switch, default: false
+            // must be explicitely set to true for anything else to happen
+            Enable = ConfigurationManager.AppSettings[prefix + "Enable"] == "true";
+
+            // stop here, everything is false
+            if (!Enable) return;
+
+            // all of these have default: false
+            EnableDllModels = Enable && ConfigurationManager.AppSettings[prefix + "EnableDllModels"].InvariantEquals("true");
+            EnableAppCodeModels = Enable && ConfigurationManager.AppSettings[prefix + "EnableAppCodeModels"].InvariantEquals("true");
+            EnableAppDataModels = Enable && ConfigurationManager.AppSettings[prefix + "EnableAppDataModels"].InvariantEquals("true");
+            EnableLiveModels = Enable && ConfigurationManager.AppSettings[prefix + "EnableLiveModels"].InvariantEquals("true");
+            FlagOutOfDateModels = Enable && ConfigurationManager.AppSettings[prefix + "FlagOutOfDateModels"].InvariantEquals("true");
+            EnableApi = Enable && ConfigurationManager.AppSettings[prefix + "EnableApi"].InvariantEquals("true");
+
+            // default: true
+            EnableFactory = Enable && !ConfigurationManager.AppSettings[prefix + "EnableFactory"].InvariantEquals("false");
+            StaticMixinGetters = Enable && !ConfigurationManager.AppSettings[prefix + "StaticMixinGetters"].InvariantEquals("false");
+
+            // no default
+            ModelsNamespace = ConfigurationManager.AppSettings[prefix + "ModelsNamespace"];
+
+            // default: "Get{0}"
             StaticMixinGetterPattern = ConfigurationManager.AppSettings[prefix + "StaticMixinGetterPattern"];
             if (string.IsNullOrWhiteSpace(StaticMixinGetterPattern))
                 StaticMixinGetterPattern = "Get{0}";
 
+            // default: CSharp5
             LanguageVersion = LanguageVersion.CSharp5;
             var lvSetting = ConfigurationManager.AppSettings[prefix + "LanguageVersion"];
             if (!string.IsNullOrWhiteSpace(lvSetting))
             {
                 LanguageVersion lv;
                 if (!Enum.TryParse(lvSetting, true, out lv))
-                    throw new ConfigurationErrorsException(string.Format("Invalid language version \"{0}\".", lvSetting));
+                    throw new ConfigurationErrorsException($"Invalid language version \"{lvSetting}\".");
                 LanguageVersion = lv;
             }
 
@@ -47,10 +62,8 @@ namespace Umbraco.ModelsBuilder.Configuration
 
             // live alone = pure live
             // live + app_data = just generate files
-            // live + dll = generate the dll (and restart)
-            // live + app_code = disabled
-            if (EnableLiveModels && EnableAppCodeModels)
-                throw new ConfigurationErrorsException("Live AppCode models are not supported.");
+            // live + dll = generate the dll (causes restart)
+            // live + app_code = generate the files, and restart
 
             // not flagging if not generating, or live
             if (count == 0 || EnableLiveModels)
@@ -58,6 +71,15 @@ namespace Umbraco.ModelsBuilder.Configuration
         }
 
         // note: making setters internal below for testing purposes
+
+        /// <summary>
+        /// Gets a value indicating whether the whole models experience is enabled.
+        /// </summary>
+        /// <remarks>
+        ///     <para>If this is false then absolutely nothing happens.</para>
+        ///     <para>Default value is <c>true</c> which means that unless we have this setting, nothing happens.</para>
+        /// </remarks>
+        public static bool Enable { get; internal set; }
 
         /// <summary>
         /// Gets a value indicating whether "Dll models" are enabled.
@@ -120,10 +142,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         ///     <para>When true neither Dll, App_Data nor App_Code models are enabled and we want our
         ///     custom Razor engine do handle models.</para>
         /// </remarks>
-        public static bool EnablePureLiveModels
-        {
-            get { return EnableLiveModels && !EnableAppDataModels; }
-        }
+        public static bool EnablePureLiveModels => EnableLiveModels && !EnableAppDataModels && !EnableDllModels && !EnableAppCodeModels;
 
         /// <summary>
         /// Gets a value indicating whether to enable the API.
@@ -145,7 +164,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         /// Gets a value indicating whether we should enable the models factory.
         /// </summary>
         /// <remarks>Default value is <c>true</c> because no factory is enabled by default in Umbraco.</remarks>
-        public static bool EnablePublishedContentModelsFactory { get; internal set; }
+        public static bool EnableFactory { get; internal set; }
 
         /// <summary>
         /// Gets the Roslyn parser language version.
