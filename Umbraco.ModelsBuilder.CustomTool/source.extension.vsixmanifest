@@ -3,8 +3,8 @@
                  xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011"
                  xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="916c2f10-863f-4d87-b57c-ff69b7037498"
-              Version="2.2.0.59"
+    <Identity Id="F5C32FC3-6672-4665-803D-6C5D2CAC556A"
+              Version="2.2.0.61"
               Language="en-US"
 	      Publisher="Umbraco ZpqrtBnk" />
     <DisplayName>Umbraco ModelsBuilder Custom Tool</DisplayName>
