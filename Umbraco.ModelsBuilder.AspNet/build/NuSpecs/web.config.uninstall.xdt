@@ -14,8 +14,6 @@
   <system.web>
 		<compilation>
 		  <assemblies>
-  			<add assembly="System.Runtime, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" 
-           xdt:Transform="Remove" xdt:Locator="Match(assembly)"/>
         <add assembly="Umbraco.ModelsBuilder"
           xdt:Transform="Remove" xdt:Locator="Match(assembly)" />
       </assemblies>
