@@ -13,6 +13,7 @@ using System.Web.Compilation;
 using System.Web.Hosting;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.ModelsBuilder.AspNet.Dashboard;
 using Umbraco.Web.WebApi;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
@@ -29,7 +30,8 @@ namespace Umbraco.ModelsBuilder.AspNet
     public class ModelsBuilderController : UmbracoApiController //UmbracoAuthorizedApiController
     {
         public const string ControllerArea = "UmbracoApi";
-        public static readonly string ControllerUrl = "/Umbraco/BackOffice/" + ControllerArea + "/" + nameof(ModelsBuilderController).TrimEnd("Controller");
+        public static readonly string ControllerUrl = "/Umbraco/BackOffice/" 
+            + ControllerArea + "/" + nameof(ModelsBuilderController).TrimEnd("Controller") + "/";
 
         #region Models
 
@@ -119,6 +121,7 @@ namespace Umbraco.ModelsBuilder.AspNet
 
         // invoked by the dashboard
         // requires that the user is logged into the backoffice and has access to the developer section
+        // beware! the name of the method appears in modelsbuilder.controller.js
         [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
         [global::Umbraco.Web.WebApi.UmbracoAuthorize] // can use Umbraco's
         public HttpResponseMessage BuildModels()
@@ -221,9 +224,27 @@ namespace Umbraco.ModelsBuilder.AspNet
             return Request.CreateResponse(HttpStatusCode.OK, status, Configuration.Formatters.JsonFormatter);
         }
 
+        // invoked by the back-office
+        // requires that the user is logged into the backoffice and has access to the developer section
+        // beware! the name of the method appears in modelsbuilder.controller.js
+        [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
+        [global::Umbraco.Web.WebApi.UmbracoAuthorize] // can use Umbraco's
+        public HttpResponseMessage GetDashboard()
+        {
+            var dashboard = new
+            {
+                enable = Config.Enable,
+                text = DashboardHelper.Text(),
+                canGenerate = DashboardHelper.CanGenerate(),
+                generateCausesRestart = DashboardHelper.GenerateCausesRestart(),
+                outOfDateModels = DashboardHelper.AreModelsOutOfDate(),
+            };
+            return Request.CreateResponse(HttpStatusCode.OK, dashboard, Configuration.Formatters.JsonFormatter);
+        }
+
         public static string ActionUrl(string actionName)
         {
-            return ControllerUrl + "/" + actionName;
+            return ControllerUrl + actionName;
         }
 
         // invoked by the API

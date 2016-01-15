@@ -3,9 +3,19 @@
   <files>
 	  <file>
 		  <guid>ModelsBuilder.ascx</guid>
-		  <orgPath>/Dashboard</orgPath>
-		  <orgName>ModelsBuilder.ascx</orgName>
+		  <orgPath>/App_Plugins/ModelsBuilder</orgPath>
+		  <orgName>modelsbuilder.htm</orgName>
 	  </file>
+    <file>
+      <guid>ModelsBuilder.ascx</guid>
+      <orgPath>/App_Plugins/ModelsBuilder</orgPath>
+      <orgName>modelsbuilder.controller.js</orgName>
+    </file>
+    <file>
+      <guid>ModelsBuilder.ascx</guid>
+      <orgPath>/App_Plugins/ModelsBuilder</orgPath>
+      <orgName>package.manifest</orgName>
+    </file>
     <file>
 		  <guid>Microsoft.CodeAnalysis.dll</guid>
 		  <orgPath>/bin</orgPath>

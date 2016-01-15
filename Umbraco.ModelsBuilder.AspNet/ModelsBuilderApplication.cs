@@ -1,10 +1,13 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Web.Mvc;
 using System.Web.WebPages;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 using Umbraco.ModelsBuilder.AspNet.ViewEngine;
 using Umbraco.ModelsBuilder.Umbraco;
+using Umbraco.Web.UI.JavaScript;
 
 namespace Umbraco.ModelsBuilder.AspNet
 {
@@ -14,9 +17,16 @@ namespace Umbraco.ModelsBuilder.AspNet
         {
             // install pure-live models if required
 
-            if (!Configuration.Config.EnablePureLiveModels)
-                return;
+            if (Configuration.Config.EnablePureLiveModels)
+                ApplicationStartingLiveModels();
 
+            // always setup the dashboard
+
+            ApplicationStartingDashboard();
+        }
+
+        private void ApplicationStartingLiveModels()
+        {
             var renderViewEngine = new RoslynRenderViewEngine();
             var pluginViewEngine = new RoslynPluginViewEngine();
 
@@ -52,6 +62,24 @@ namespace Umbraco.ModelsBuilder.AspNet
                 modelsNamespace = Configuration.Config.DefaultModelsNamespace;
             System.Web.WebPages.Razor.WebPageRazorHost.AddGlobalImport(modelsNamespace);
             */
+        }
+
+        private void ApplicationStartingDashboard()
+        {
+            // register our url - for the backoffice api
+            ServerVariablesParser.Parsing += (sender, objects) =>
+            {
+                if (!objects.ContainsKey("umbracoUrls"))
+                    throw new Exception("Missing umbracoUrls.");
+                var umbracoUrlsObject = objects["umbracoUrls"];
+                if (umbracoUrlsObject == null)
+                    throw new Exception("Null umbracoUrls");
+                var umbracoUrls = umbracoUrlsObject as Dictionary<string, object>;
+                if (umbracoUrls == null)
+                    throw new Exception("Invalid umbracoUrls");
+
+                umbracoUrls["modelsBuilderBaseUrl"] = ModelsBuilderController.ControllerUrl;
+            };
         }
     }
 }

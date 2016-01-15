@@ -22,8 +22,10 @@
     <file src="..\..\bin\Release\Umbraco.ModelsBuilder.AspNet.dll" target="lib\Umbraco.ModelsBuilder.AspNet.dll" />
 
     <!-- content for the dashboard -->
-    <file src="..\..\Dashboard\ModelsBuilder.ascx" target="content\Dashboard\ModelsBuilder.ascx" />
-		
+    <file src="..\..\Dashboard\modelsbuilder.htm" target="content\App_Plugins\ModelsBuilder\modelsbuilder.htm" />
+    <file src="..\..\Dashboard\modelsbuilder.controller.js" target="content\App_Plugins\ModelsBuilder\modelsbuilder.controller.js" />
+    <file src="..\..\Dashboard\package.manifest" target="content\App_Plugins\ModelsBuilder\package.manifest" />
+
     <!-- post-install script // we don't have one -->
     <!--
 		<file src="tools\install.ps1" target="tools\install.ps1" />

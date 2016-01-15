@@ -206,9 +206,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Dashboard\ModelsBuilder.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="Dashboard\modelsbuilder.controller.js" />
+    <Content Include="Dashboard\modelsbuilder.htm" />
     <None Include="app.config" />
     <None Include="build\NuSpecs\dashboard.config.install.xdt" />
     <None Include="build\NuSpecs\dashboard.config.uninstall.xdt" />
@@ -217,6 +216,7 @@
     <None Include="build\NuSpecs\Umbraco.ModelsBuilder.AspNet.nuspec">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Dashboard\package.manifest" />
     <None Include="package.xml">
       <SubType>Designer</SubType>
     </None>
@@ -268,7 +268,9 @@
     <ManifestUpdate ManifestFile="$(ProjectDir)pkg\package.xml" WorkingDirectory="$(ProjectDir)pkg" PackageVersion="$(PackageVersion)" />
     <ItemGroup>
       <PackageFiles Include="$(ProjectDir)pkg\package.xml" />
-      <PackageFiles Include="$(ProjectDir)Dashboard\ModelsBuilder.ascx" />
+      <PackageFiles Include="$(ProjectDir)Dashboard\modelsbuilder.htm" />
+      <PackageFiles Include="$(ProjectDir)Dashboard\modelsbuilder.controller.js" />
+      <PackageFiles Include="$(ProjectDir)Dashboard\package.manifest" />
       <PackageFiles Include="$(OutputPath)Microsoft.CodeAnalysis.dll" />
       <PackageFiles Include="$(OutputPath)Microsoft.CodeAnalysis.CSharp.dll" />
       <PackageFiles Include="$(OutputPath)System.Collections.Immutable.dll" />

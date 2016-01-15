@@ -70,7 +70,7 @@ namespace Umbraco.ModelsBuilder.AspNet
 
             // check diagnostics for errors (not warnings)
             foreach (var diag in compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error))
-                throw new Exception(string.Format("Compilation {0}: {1}", diag.Severity, diag.GetMessage()));
+                throw new Exception($"Compilation {diag.Severity}: {diag.GetMessage()}");
 
             // emit
             Assembly assembly;

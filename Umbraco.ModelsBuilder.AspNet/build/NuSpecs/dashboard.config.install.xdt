@@ -15,9 +15,9 @@
     <areas>
       <area>developer</area>
     </areas>
-    <tab caption="ModelsBuilder">
+    <tab caption="Models Builder">
       <control>
-        /Dashboard/ModelsBuilder.ascx
+        /App_Plugins/ModelsBuilder/modelsbuilder.htm
       </control>
     </tab>
   </section>
