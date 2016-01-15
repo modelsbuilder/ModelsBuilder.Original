@@ -6,10 +6,13 @@
     <Identity Id="F5C32FC3-6672-4665-803D-6C5D2CAC556A"
               Version="2.2.0.61"
               Language="en-US"
-	      Publisher="Umbraco ZpqrtBnk" />
+              Publisher="Umbraco HQ" />
     <DisplayName>Umbraco ModelsBuilder Custom Tool</DisplayName>
     <Description xml:space="preserve">Umbraco Visual Studio Custom Tool for generating strongly typed IPublishedContent models.</Description>
+    <MoreInfo>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</MoreInfo>
     <License>license.txt</License>
+    <Icon>u32.png</Icon>
+    <Tags>umbraco</Tags>
   </Metadata>
   <Installation InstalledByMsi="false">
     <!--

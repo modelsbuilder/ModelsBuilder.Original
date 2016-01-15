@@ -1,15 +1,20 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata minClientVersion="2.8.1">
-		<id>Umbraco.ModelsBuilder</id>
-		<version>$version$</version>
-		<title>Umbraco ModelsBuilder Libraries</title>
-		<authors>Umbraco ZpqrtBnk</authors>
-		<owners>Umbraco ZpqrtBnk</owners>
-		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<description>Umbraco ModeslBuilder Libraries.</description>
-		<copyright>Copyright © Umbraco ZpqrtBnk 2013-2016</copyright>
-		<dependencies>
+    <id>Umbraco.ModelsBuilder</id>
+    <version>$version$</version>
+    <title>Umbraco ModelsBuilder Libraries</title>
+    <authors>Umbraco HQ</authors>
+    <owners>Umbraco HQ</owners>
+    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
+    <description>Umbraco ModeslBuilder Libraries.</description>
+    <projectUrl>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</projectUrl>
+    <copyright>Copyright © Umbraco HQ 2013-2016</copyright>
+    <language>en-US</language>
+    <tags>umbraco</tags>
+    <dependencies>
 			<dependency id="Microsoft.CodeAnalysis.CSharp" version="1.0.0" />
       <!-- don't need those as Microsoft.CodeAnalysis.CSharp depends on them -->
       <!--

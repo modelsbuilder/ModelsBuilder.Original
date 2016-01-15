@@ -185,6 +185,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="u32.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Resource Include="debug.txt" />
     <Content Include="license.txt">
       <IncludeInVSIX>true</IncludeInVSIX>

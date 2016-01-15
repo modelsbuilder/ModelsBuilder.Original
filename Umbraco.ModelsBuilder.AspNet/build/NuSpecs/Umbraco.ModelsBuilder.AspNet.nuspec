@@ -1,15 +1,20 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata minClientVersion="2.8.1">
-		<id>Umbraco.ModelsBuilder.AspNet</id>
-		<version>$version$</version>
-		<title>Umbraco ModelsBuilder Site Integration</title>
-		<authors>Umbraco ZpqrtBnk</authors>
-		<owners>Umbraco ZpqrtBnk</owners>
-		<requireLicenseAcceptance>false</requireLicenseAcceptance>
-		<description>Umbraco ModelsBuilder Site Integration.</description>
-		<copyright>Copyright © Umbraco ZpqrtBnk 2013-2016</copyright>
-		<dependencies>
+    <id>Umbraco.ModelsBuilder.AspNet</id>
+    <version>$version$</version>
+    <title>Umbraco ModelsBuilder Site Integration</title>
+    <authors>Umbraco HQ</authors>
+    <owners>Umbraco HQ</owners>
+    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
+    <description>Umbraco ModelsBuilder Site Integration.</description>
+    <projectUrl>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</projectUrl>
+    <copyright>Copyright © Umbraco HQ 2013-2016</copyright>
+    <language>en-US</language>
+    <tags>umbraco</tags>
+    <dependencies>
       <!-- dont need that one as Umbraco.ModelsBuilder depends on it -->
       <!--
 			<dependency id="Microsoft.CodeAnalysis.CSharp" version="0.6.4033103-beta" />
