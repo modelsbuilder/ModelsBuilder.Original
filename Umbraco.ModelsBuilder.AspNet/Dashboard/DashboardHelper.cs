@@ -45,22 +45,25 @@ namespace Umbraco.ModelsBuilder.AspNet.Dashboard
 
             if (Config.EnablePureLiveModels)
                 sb.Append("<li><strong>Pure Live models</strong> are enabled");
+
             if (Config.EnableDllModels)
                 sb.Append("<li><strong>Dll models</strong> are enabled");
             if (Config.EnableAppCodeModels)
                 sb.Append("<li><strong>AppCode models</strong> are enabled");
             if (Config.EnableAppDataModels)
                 sb.Append("<li><strong>AppData models</strong> are enabled");
-            if (Config.EnableLiveModels &&
-                (Config.EnableDllModels || Config.EnableAppCodeModels || Config.EnableAppDataModels))
+            if ((Config.EnableDllModels || Config.EnableAppCodeModels || Config.EnableAppDataModels))
             {
-                sb.Append(", in <strong>live</strong> mode, ie models are generated anytime content types change");
-                if (Config.EnableDllModels || Config.EnableAppCodeModels)
-                    sb.Append(", and the application restarts");
-            }
-            else
-            {
-                sb.Append(", but not <em>live</em>&mdash;use the button below to generate");
+                if (Config.EnableLiveModels)
+                {
+                    sb.Append(", in <strong>live</strong> mode, ie models are generated anytime content types change");
+                    if (Config.EnableDllModels || Config.EnableAppCodeModels)
+                        sb.Append("&mdash;and the application restarts");
+                }
+                else
+                {
+                    sb.Append(", but not <em>live</em>&mdash;use the button below to generate");
+                }
             }
             if (Config.EnablePureLiveModels || Config.EnableDllModels || Config.EnableAppCodeModels || Config.EnableAppDataModels)
                 sb.Append(".</li>");
