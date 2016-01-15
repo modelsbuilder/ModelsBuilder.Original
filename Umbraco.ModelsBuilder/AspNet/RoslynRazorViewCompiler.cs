@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Web;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Umbraco.Core;
 
 namespace Umbraco.ModelsBuilder.AspNet
 {
@@ -45,8 +47,9 @@ namespace Umbraco.ModelsBuilder.AspNet
             {
                 var text = x.Value;
                 var tree = CSharpSyntaxTree.ParseText(text, /*options:*/ options);
-                if (tree.GetDiagnostics().Any())
-                    throw new Exception(string.Format("Syntax error in file \"{0}\".", x.Key));
+                var diagnostic = tree.GetDiagnostics().FirstOrDefault(y => y.Severity == DiagnosticSeverity.Error);
+                if (diagnostic != null)
+                    ThrowExceptionFromDiagnostic(x.Key, x.Value, diagnostic);
                 return tree;
             }).ToArray();
 
@@ -62,25 +65,37 @@ namespace Umbraco.ModelsBuilder.AspNet
             return compilation;
         }
 
-        public static Assembly Compile(string assemblyName, string code)
+        public static Assembly Compile(string assemblyName, string path, string code)
         {
             // create the compilation
             SyntaxTree[] trees;
-            var compilation = GetCompilation(assemblyName, new Dictionary<string, string> { { "code", code } }, out trees);
+            var compilation = GetCompilation(assemblyName, new Dictionary<string, string> { { path, code } }, out trees);
 
             // check diagnostics for errors (not warnings)
-            foreach (var diag in compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error))
-                throw new Exception($"Compilation {diag.Severity}: {diag.GetMessage()}");
+            foreach (var diagnostic in compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error))
+                ThrowExceptionFromDiagnostic(path, code, diagnostic);
 
             // emit
             Assembly assembly;
             using (var stream = new MemoryStream())
             {
-                compilation.Emit(stream); // should we check the result?
+                var result = compilation.Emit(stream);
+                if (!result.Success)
+                {
+                    var diagnostic = result.Diagnostics.First(x => x.Severity == DiagnosticSeverity.Error);
+                    ThrowExceptionFromDiagnostic(path, code, diagnostic);
+                }
                 assembly = Assembly.Load(stream.GetBuffer());
             }
 
             return assembly;
+        }
+
+        private static void ThrowExceptionFromDiagnostic(string path, string code, Diagnostic diagnostic)
+        {
+            var message = diagnostic.GetMessage();
+            var position = diagnostic.Location.GetLineSpan().StartLinePosition.Line + 1;
+            throw new HttpParseException(message, null, path, code, position);
         }
 
         // invoked by the PureLiveModelsFactory when it detects it needs to rebuild models

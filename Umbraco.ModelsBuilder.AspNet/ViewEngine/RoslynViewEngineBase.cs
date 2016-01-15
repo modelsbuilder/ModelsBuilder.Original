@@ -11,6 +11,7 @@ using System.Web.Hosting;
 using System.Web.Mvc;
 using System.Web.Razor;
 using System.Web.Razor.Parser.SyntaxTree;
+using System.Web.Razor.Text;
 using System.Web.WebPages;
 using System.Web.WebPages.Razor;
 using Microsoft.CSharp;
@@ -97,7 +98,7 @@ namespace Umbraco.ModelsBuilder.AspNet.ViewEngine
 
             // use Roslyn to compile the code into an assembly
             var name = string.Format(CultureInfo.CurrentCulture, "{0}_{1}", host.DefaultNamespace, host.DefaultClassName);
-            var assembly = RoslynRazorViewCompiler.Compile(name, code);
+            var assembly = RoslynRazorViewCompiler.Compile(name, virtualPath, code);
 
             return assembly.GetType(string.Format(CultureInfo.CurrentCulture, "{0}.{1}", host.DefaultNamespace, host.DefaultClassName));
         }
@@ -106,18 +107,19 @@ namespace Umbraco.ModelsBuilder.AspNet.ViewEngine
         {
             // create Razor engine and use it to generate a CodeCompileUnit
             var engine = new RazorTemplateEngine(host);
-            GeneratorResults results;
             var file = HostingEnvironment.VirtualPathProvider.GetFile(virtualPath);
+
+            // load the source (eg cshtml) code
+            string code;
             using (var stream = file.Open())
             using (TextReader reader = new StreamReader(stream))
-            {
-                results = engine.GenerateCode(reader, null, null, host.PhysicalPath);
-            }
+                code = reader.ReadToEnd();
 
+            // generate the target (C#) code
+            ITextBuffer textBuffer = new SeekableTextReader(code);
+            var results = engine.GenerateCode(textBuffer, null, null, virtualPath);
             if (!results.Success)
-            {
-                throw CreateExceptionFromParserError(results.ParserErrors.Last(), virtualPath);
-            }
+                ThrowExceptionFromParserError(virtualPath, code, results.ParserErrors.Last());
 
             // use CodeDom to generate source code from the CodeCompileUnit
             var codeDomProvider = new CSharpCodeProvider();
@@ -127,9 +129,11 @@ namespace Umbraco.ModelsBuilder.AspNet.ViewEngine
             return srcFileWriter.ToString();
         }
 
-        private static HttpParseException CreateExceptionFromParserError(RazorError error, string virtualPath)
+        private static void ThrowExceptionFromParserError(string path, string code, RazorError error)
         {
-            return new HttpParseException(error.Message + Environment.NewLine, null, virtualPath, null, error.Location.LineIndex + 1);
+            var message = error.Message;
+            var position = error.Location.LineIndex + 1;
+            throw new HttpParseException(message, null, path, code, position);
         }
 
         void IPureLiveModelsEngine.NotifyRebuilding()
