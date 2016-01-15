@@ -353,8 +353,7 @@
   <Target Name="BeforeBuild">
   </Target>
   -->
-  <Target Name="AfterBuild" DependsOnTargets="UmbracoPackage;NuGetPackage">
-  </Target>
+  
   <!-- PACKAGE -->
   <!-- SEE TOP OF FILE... TRYING TO FIX THE MESS BUT IT DOES NOT WORK
   <Target Name="BeforeResolveReferences">
@@ -406,38 +405,7 @@
     <Copy SourceFiles="@(PackageFilesToCopy)" DestinationFolder="$(SolutionDir)build\$(Configuration)" />
     <RemoveDir Directories="$(ProjectDir)pkg" />
   </Target>
-  <!-- auto by NuGet: DependsOnTargets="BuildPackage" -->
-  <Target Name="NuGetPackage" Condition=" '$(Configuration)' == 'Release' ">
-    <!-- get the assembly version -->
-    <GetAssemblyIdentity AssemblyFiles="$(OutputPath)Umbraco.ModelsBuilder.dll">
-      <Output TaskParameter="Assemblies" ItemName="AssemblyInfos2" />
-    </GetAssemblyIdentity>
-    <!-- dunno how to get the assembly informational version -->
-    <ReadLinesFromFile File="$(SolutionDir)Umbraco.ModelsBuilder\Properties\CommonInfo.cs">
-      <Output TaskParameter="Lines" ItemName="CommonInfosLines2" />
-    </ReadLinesFromFile>
-    <PropertyGroup>
-      <Pattern>(?&lt;=\[assembly: AssemblyInformationalVersion\(").*(?="\)\])</Pattern>
-      <In>@(CommonInfosLines2)</In>
-      <PackageVersion2>$([System.Text.RegularExpressions.Regex]::Match($(In), $(Pattern)))</PackageVersion2>
-    </PropertyGroup>
-    <!-- remove existing packages -->
-    <Message Importance="High" Text="Packaging version %(AssemblyInfos2.Version) into NuGet package $(PackageVersion2)" />
-    <ItemGroup>
-      <NuGetFilesToDelete Include="$(ProjectDir)build\Packages\*.nupkg" />
-    </ItemGroup>
-    <Delete Files="@(NuGetFilesToDelete)" />
-    <!-- then pack and copy package -->
-    <PropertyGroup>
-      <!-- -symbols -->
-      <NuGetBuildCommand>$(NuGetCommand) pack "$(ProjectDir)build\NuSpecs\Umbraco.ModelsBuilder.AspNet.nuspec" -Version "$(PackageVersion2)" -Properties "Configuration=$(Configuration);Platform=$(Platform)" $(NonInteractiveSwitch) -OutputDirectory "$(ProjectDir)build\Packages"</NuGetBuildCommand>
-    </PropertyGroup>
-    <Exec Command="$(NuGetBuildCommand)" LogStandardErrorAsError="true" />
-    <ItemGroup>
-      <NuGetFilesToCopy Include="$(ProjectDir)build\Packages\*.nupkg" />
-    </ItemGroup>
-    <Copy SourceFiles="@(NuGetFilesToCopy)" DestinationFolder="$(SolutionDir)build\$(Configuration)" />
-  </Target>
+ 
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
     <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
