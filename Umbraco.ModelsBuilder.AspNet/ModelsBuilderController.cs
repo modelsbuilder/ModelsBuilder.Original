@@ -32,7 +32,10 @@ namespace Umbraco.ModelsBuilder.AspNet
     [UmbracoApplicationAuthorize(Constants.Applications.Developer)]
     public class ModelsBuilderController : UmbracoAuthorizedApiController
     {
-        public const string ControllerArea = "UmbracoApi";
+        public const string ControllerArea = "ModelsBuilder";
+
+        //TODO: This is incorrect - never hard code URLs, this is the responsibility of the UrlHelper to generate URLs - which
+        // could occur if we need to change the underlying routing of Umbraco
         public static readonly string ControllerUrl = "/Umbraco/BackOffice/" 
             + ControllerArea + "/" + nameof(ModelsBuilderController).TrimEnd("Controller") + "/";
 
