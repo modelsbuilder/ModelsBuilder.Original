@@ -27,7 +27,9 @@ namespace Umbraco.ModelsBuilder.Configuration
             EnableAppDataModels = Enable && ConfigurationManager.AppSettings[prefix + "EnableAppDataModels"].InvariantEquals("true");
             EnableLiveModels = Enable && ConfigurationManager.AppSettings[prefix + "EnableLiveModels"].InvariantEquals("true");
             FlagOutOfDateModels = Enable && ConfigurationManager.AppSettings[prefix + "FlagOutOfDateModels"].InvariantEquals("true");
-            EnableApi = Enable && ConfigurationManager.AppSettings[prefix + "EnableApi"].InvariantEquals("true");
+
+            //TODO: Re-enable this when we fix auth for VS
+            EnableApi = false; //Enable && ConfigurationManager.AppSettings[prefix + "EnableApi"].InvariantEquals("true");
 
             // default: true
             EnableFactory = Enable && !ConfigurationManager.AppSettings[prefix + "EnableFactory"].InvariantEquals("false");

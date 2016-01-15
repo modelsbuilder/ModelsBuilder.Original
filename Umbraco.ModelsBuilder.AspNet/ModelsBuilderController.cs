@@ -17,6 +17,7 @@ using Umbraco.ModelsBuilder.AspNet.Dashboard;
 using Umbraco.Web.WebApi;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
+using Umbraco.Web.WebApi.Filters;
 using Application = Umbraco.ModelsBuilder.Umbraco.Application;
 
 namespace Umbraco.ModelsBuilder.AspNet
@@ -25,9 +26,11 @@ namespace Umbraco.ModelsBuilder.AspNet
     // read http://our.umbraco.org/forum/developers/api-questions/43025-Web-API-authentication
     // UmbracoAuthorizedApiController :: /Umbraco/BackOffice/Zbu/ModelsBuilderApi/GetTypeModels
     // UmbracoApiController :: /Umbraco/Zbu/ModelsBuilderApi/GetTypeModels ??  UNLESS marked with isbackoffice
+
     [PluginController(ControllerArea)]
-    [IsBackOffice] // because we want back-office users
-    public class ModelsBuilderController : UmbracoApiController //UmbracoAuthorizedApiController
+    [IsBackOffice]
+    [UmbracoApplicationAuthorize(Constants.Applications.Developer)]
+    public class ModelsBuilderController : UmbracoAuthorizedApiController
     {
         public const string ControllerArea = "UmbracoApi";
         public static readonly string ControllerUrl = "/Umbraco/BackOffice/" 
@@ -107,7 +110,6 @@ namespace Umbraco.ModelsBuilder.AspNet
 
         // invoked by the API
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
-        [ModelsBuilderAuthFilter("developer")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage ValidateClientVersion(ValidateClientVersionData data)
         {
             if (!Config.EnableApi)
@@ -123,26 +125,10 @@ namespace Umbraco.ModelsBuilder.AspNet
         // requires that the user is logged into the backoffice and has access to the developer section
         // beware! the name of the method appears in modelsbuilder.controller.js
         [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
-        [global::Umbraco.Web.WebApi.UmbracoAuthorize] // can use Umbraco's
         public HttpResponseMessage BuildModels()
         {
             try
             {
-                // the UmbracoAuthorize attribute validates the current user
-                // the UmbracoAuthorizedApiController would in addition check for .Disabled and .NoConsole
-                // but to do it it relies on internal methods so we have to do it here explicitely
-
-                // was doing it using legacy User class, now using new API class
-
-                //var user = umbraco.BusinessLogic.User.GetCurrent();
-                var user = UmbracoContext.Security.CurrentUser;
-                //if (user.Disabled || user.NoConsole)
-                if (!user.IsApproved && user.IsLockedOut)
-                    return new HttpResponseMessage(HttpStatusCode.Unauthorized);
-                //if (user.Applications.All(x => x.alias != "developer"))
-                if (!user.AllowedSections.Contains("developer"))
-                    return new HttpResponseMessage(HttpStatusCode.Unauthorized);
-
                 if (!Config.EnableAppDataModels && !Config.EnableAppCodeModels && !Config.EnableDllModels)
                 {
                     var result2 = new BuildResult { Success = false, Message = "Models generation is not enabled." };
@@ -182,7 +168,6 @@ namespace Umbraco.ModelsBuilder.AspNet
 
         // invoked by the API
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
-        [ModelsBuilderAuthFilter("developer")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage GetModels(GetModelsData data)
         {
             if (!Config.EnableApi)
@@ -215,7 +200,6 @@ namespace Umbraco.ModelsBuilder.AspNet
         // invoked by the back-office
         // requires that the user is logged into the backoffice and has access to the developer section
         [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
-        [global::Umbraco.Web.WebApi.UmbracoAuthorize] // can use Umbraco's
         public HttpResponseMessage GetModelsOutOfDateStatus()
         {
             var status = OutOfDateModelsStatus.IsEnabled
@@ -227,8 +211,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         // invoked by the back-office
         // requires that the user is logged into the backoffice and has access to the developer section
         // beware! the name of the method appears in modelsbuilder.controller.js
-        [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
-        [global::Umbraco.Web.WebApi.UmbracoAuthorize] // can use Umbraco's
+        [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!        
         public HttpResponseMessage GetDashboard()
         {
             var dashboard = new

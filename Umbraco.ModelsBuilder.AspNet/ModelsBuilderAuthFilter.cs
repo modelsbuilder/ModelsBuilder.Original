@@ -11,7 +11,15 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.ModelsBuilder.AspNet
 {
-    public class ModelsBuilderAuthFilter : System.Web.Http.Filters.ActionFilterAttribute // use the http one, not mvc, with api controllers!
+
+    //TODO: This needs to be changed:
+    // * Authentication cannot happen in a filter, only Authorization
+    // * The filter must be an AuthorizationFilter, not an ActionFilter
+    // * Authorization must be done using the Umbraco logic - it is very specific for claim checking for ASP.Net Identity
+    // * Theoretically this shouldn't be required whatsoever because when we authenticate a request that has Basic Auth (i.e. for
+    //   VS to work, it will add the correct Claims to the Identity and it will automatically be authorized.
+
+    internal class ModelsBuilderAuthFilter : System.Web.Http.Filters.ActionFilterAttribute // use the http one, not mvc, with api controllers!
     {
         private static readonly char[] Separator = ":".ToCharArray();
         private readonly string _section;
