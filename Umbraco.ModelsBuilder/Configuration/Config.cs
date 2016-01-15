@@ -18,6 +18,10 @@ namespace Umbraco.ModelsBuilder.Configuration
             // must be explicitely set to true for anything else to happen
             Enable = ConfigurationManager.AppSettings[prefix + "Enable"] == "true";
 
+            // ensure defaults are initialized for tests
+            StaticMixinGetterPattern = "Get{0}";
+            LanguageVersion = LanguageVersion.CSharp5;
+
             // stop here, everything is false
             if (!Enable) return;
 
@@ -37,18 +41,17 @@ namespace Umbraco.ModelsBuilder.Configuration
             ModelsNamespace = ConfigurationManager.AppSettings[prefix + "ModelsNamespace"];
 
             // default: "Get{0}"
-            StaticMixinGetterPattern = ConfigurationManager.AppSettings[prefix + "StaticMixinGetterPattern"];
-            if (string.IsNullOrWhiteSpace(StaticMixinGetterPattern))
-                StaticMixinGetterPattern = "Get{0}";
+            var value = ConfigurationManager.AppSettings[prefix + "StaticMixinGetterPattern"];
+            if (!string.IsNullOrWhiteSpace(value))
+                StaticMixinGetterPattern = value;
 
             // default: CSharp5
-            LanguageVersion = LanguageVersion.CSharp5;
-            var lvSetting = ConfigurationManager.AppSettings[prefix + "LanguageVersion"];
-            if (!string.IsNullOrWhiteSpace(lvSetting))
+            value = ConfigurationManager.AppSettings[prefix + "LanguageVersion"];
+            if (!string.IsNullOrWhiteSpace(value))
             {
                 LanguageVersion lv;
-                if (!Enum.TryParse(lvSetting, true, out lv))
-                    throw new ConfigurationErrorsException($"Invalid language version \"{lvSetting}\".");
+                if (!Enum.TryParse(value, true, out lv))
+                    throw new ConfigurationErrorsException($"Invalid language version \"{value}\".");
                 LanguageVersion = lv;
             }
 
