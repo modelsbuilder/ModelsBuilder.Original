@@ -148,8 +148,8 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Umbraco.ModelsBuilder\Properties\CommonInfo.cs">
-      <Link>Properties\CommonInfo.cs</Link>
+    <Compile Include="..\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="CustomTool\BaseCodeGenerator.cs" />
     <Compile Include="CustomTool\BaseCodeGeneratorWithSite.cs" />

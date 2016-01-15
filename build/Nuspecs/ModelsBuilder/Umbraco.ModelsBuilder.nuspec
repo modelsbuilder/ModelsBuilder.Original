@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata minClientVersion="2.8.1">
     <id>Umbraco.ModelsBuilder</id>
-    <version>$version$</version>
+    <version>0.0.0.0</version>
     <title>Umbraco ModelsBuilder Libraries</title>
     <authors>Umbraco HQ</authors>
     <owners>Umbraco HQ</owners>
@@ -11,7 +11,7 @@
     <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
     <description>Umbraco ModeslBuilder Libraries.</description>
     <projectUrl>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</projectUrl>
-    <copyright>Copyright © Umbraco HQ 2013-2016</copyright>
+    <copyright>$copyright$</copyright>
     <language>en-US</language>
     <tags>umbraco</tags>
     <dependencies>
@@ -25,7 +25,8 @@
 	</metadata>
 	<files>
     <!-- our dlls -->
-    <file src="..\..\bin\Release\Umbraco.ModelsBuilder.dll" target="lib\Umbraco.ModelsBuilder.dll" />
+    <file src="Umbraco.ModelsBuilder.dll" target="lib\Umbraco.ModelsBuilder.dll" />
+    <file src="Umbraco.ModelsBuilder.pdb" target="lib\Umbraco.ModelsBuilder.pdb" />
 
     <!-- content // we don't have any -->
 		

@@ -13,3 +13,4 @@ refs
 /debug/
 /Umbraco.ModelsBuilder.Tests/App_Data/
 .vs/
+build/nuget.exe

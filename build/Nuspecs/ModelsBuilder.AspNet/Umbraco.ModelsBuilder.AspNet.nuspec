@@ -11,7 +11,7 @@
     <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
     <description>Umbraco ModelsBuilder Site Integration.</description>
     <projectUrl>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</projectUrl>
-    <copyright>Copyright © Umbraco HQ 2013-2016</copyright>
+    <copyright>$copyright$</copyright>
     <language>en-US</language>
     <tags>umbraco</tags>
     <dependencies>
@@ -24,12 +24,13 @@
 	</metadata>
 	<files>
     <!-- our dlls -->
-    <file src="..\..\bin\Release\Umbraco.ModelsBuilder.AspNet.dll" target="lib\Umbraco.ModelsBuilder.AspNet.dll" />
+    <file src="Umbraco.ModelsBuilder.AspNet.dll" target="lib\Umbraco.ModelsBuilder.AspNet.dll" />
+    <file src="Umbraco.ModelsBuilder.AspNet.pdb" target="lib\Umbraco.ModelsBuilder.AspNet.pdb" />
 
     <!-- content for the dashboard -->
-    <file src="..\..\Dashboard\modelsbuilder.htm" target="content\App_Plugins\ModelsBuilder\modelsbuilder.htm" />
-    <file src="..\..\Dashboard\modelsbuilder.controller.js" target="content\App_Plugins\ModelsBuilder\modelsbuilder.controller.js" />
-    <file src="..\..\Dashboard\package.manifest" target="content\App_Plugins\ModelsBuilder\package.manifest" />
+    <file src="modelsbuilder.htm" target="content\App_Plugins\ModelsBuilder\modelsbuilder.htm" />
+    <file src="modelsbuilder.controller.js" target="content\App_Plugins\ModelsBuilder\modelsbuilder.controller.js" />
+    <file src="package.manifest" target="content\App_Plugins\ModelsBuilder\package.manifest" />
 
     <!-- post-install script // we don't have one -->
     <!--
