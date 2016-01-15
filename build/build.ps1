@@ -1,8 +1,12 @@
 param (
 	[Parameter(Mandatory=$true)]
-	[ValidatePattern("\d+?\.\d+?\.\d+?\.\d")]
+	[ValidatePattern("\d+?\.\d+?\.\d")]
 	[string]
 	$ReleaseVersionNumber,
+	[Parameter(Mandatory=$true)]
+	[ValidatePattern("\d")]
+	[string]
+	$BuildNumber,
 	[Parameter(Mandatory=$true)]
 	[string]
 	[AllowEmptyString()]
@@ -14,7 +18,7 @@ param (
 $PSScriptFilePath = Get-Item $MyInvocation.MyCommand.Path
 $RepoRoot = $PSScriptFilePath.Directory.Parent.FullName
 $BuildFolder = Join-Path -Path $RepoRoot -ChildPath "build";
-$ReleaseFolder = Join-Path -Path $BuildFolder -ChildPath "Release\v$ReleaseVersionNumber$PreReleaseName";
+$ReleaseFolder = Join-Path -Path $BuildFolder -ChildPath "Release\v$ReleaseVersionNumber.$BuildNumber$PreReleaseName";
 $SolutionRoot = $RepoRoot;
 $ProgFiles86 = [Environment]::GetEnvironmentVariable("ProgramFiles(x86)");
 $MSBuild = "$ProgFiles86\MSBuild\14.0\Bin\MSBuild.exe"
@@ -37,13 +41,13 @@ If ($FileExists -eq $False) {
 # Set the version number in SolutionInfo.cs
 $SolutionInfoPath = Join-Path -Path $SolutionRoot -ChildPath "SolutionInfo.cs"
 (gc -Path $SolutionInfoPath) `
-	-replace "(?<=Version\(`")[.\d]*(?=`"\))", $ReleaseVersionNumber |
+	-replace "(?<=Version\(`")[.\d]*(?=`"\))", "$ReleaseVersionNumber.$BuildNumber" |
 	sc -Path $SolutionInfoPath -Encoding UTF8
 (gc -Path $SolutionInfoPath) `
-	-replace "(?<=AssemblyInformationalVersion\(`")[.\w-]*(?=`"\))", "$ReleaseVersionNumber$PreReleaseName" |
+	-replace "(?<=AssemblyInformationalVersion\(`")[.\w-]*(?=`"\))", "$ReleaseVersionNumber.$BuildNumber$PreReleaseName" |
 	sc -Path $SolutionInfoPath -Encoding UTF8
 # Set the copyright
-$Copyright = "Copyright © ZpqrtBnk " + (Get-Date).year;
+$Copyright = "Copyright © Umbraco HQ " + (Get-Date).year;
 (gc -Path $SolutionInfoPath) `
 	-replace "(?<=AssemblyCopyright\(`").*(?=`"\))", $Copyright |
 	sc -Path $SolutionInfoPath -Encoding UTF8;
