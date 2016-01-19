@@ -135,7 +135,7 @@ namespace Umbraco.ModelsBuilder.AspNet
             {
                 var config = UmbracoConfig.For.ModelsBuilder();
 
-                if (!config.EnableAppDataModels && !config.EnableAppCodeModels && !config.EnableDllModels)
+                if (!config.ModelsMode.SupportsExplicitGeneration())
                 {
                     var result2 = new BuildResult { Success = false, Message = "Models generation is not enabled." };
                     return Request.CreateResponse(HttpStatusCode.OK, result2, Configuration.Formatters.JsonFormatter);
@@ -154,10 +154,10 @@ namespace Umbraco.ModelsBuilder.AspNet
                     throw new Exception("Panic: bin is null.");
 
                 // EnableDllModels will recycle the app domain - but this request will end properly
-                GenerateModels(appData, config.EnableDllModels ? bin : null);
+                GenerateModels(appData, config.ModelsMode.IsAnyDll() ? bin : null);
 
                 // will recycle the app domain - but this request will end properly
-                if (config.EnableAppCodeModels)
+                if (config.ModelsMode.IsAnyAppCode())
                     TouchModelsFile(appCode);
 
                 var result = new BuildResult {Success = true};

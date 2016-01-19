@@ -9,13 +9,17 @@ namespace Umbraco.ModelsBuilder.AspNet.Dashboard
         public static bool CanGenerate()
         {
             var config = UmbracoConfig.For.ModelsBuilder();
-            return config.EnableAppDataModels || config.EnableAppCodeModels || config.EnableDllModels;
+            return config.ModelsMode.SupportsExplicitGeneration();
         }
 
         public static bool GenerateCausesRestart()
         {
             var config = UmbracoConfig.For.ModelsBuilder();
-            return config.EnableAppCodeModels || config.EnableDllModels;
+            return
+                config.ModelsMode == ModelsMode.AppCode
+                || config.ModelsMode == ModelsMode.LiveAppCode
+                || config.ModelsMode == ModelsMode.Dll
+                || config.ModelsMode == ModelsMode.LiveDll;
         }
 
         public static bool AreModelsOutOfDate()
@@ -36,7 +40,7 @@ namespace Umbraco.ModelsBuilder.AspNet.Dashboard
             sb.Append("<ul>");
 
             sb.Append("<li>The <strong>models factory</strong> is ");
-            sb.Append(config.EnableFactory || config.EnablePureLiveModels
+            sb.Append(config.EnableFactory || config.ModelsMode == ModelsMode.PureLive
                 ? "enabled" 
                 : "not enabled. Umbraco will <em>not</em> use models");
             sb.Append(".</li>");
@@ -47,30 +51,9 @@ namespace Umbraco.ModelsBuilder.AspNet.Dashboard
                 : "not enabled. External tools such as Visual Studio <em>cannot</em> use the API");
             sb.Append(".</li>");
 
-            if (config.EnablePureLiveModels)
-                sb.Append("<li><strong>Pure Live models</strong> are enabled");
-
-            if (config.EnableDllModels)
-                sb.Append("<li><strong>Dll models</strong> are enabled");
-            if (config.EnableAppCodeModels)
-                sb.Append("<li><strong>AppCode models</strong> are enabled");
-            if (config.EnableAppDataModels)
-                sb.Append("<li><strong>AppData models</strong> are enabled");
-            if ((config.EnableDllModels || config.EnableAppCodeModels || config.EnableAppDataModels))
-            {
-                if (config.EnableLiveModels)
-                {
-                    sb.Append(", in <strong>live</strong> mode, ie models are generated anytime content types change");
-                    if (config.EnableDllModels || config.EnableAppCodeModels)
-                        sb.Append("&mdash;and the application restarts");
-                }
-                else
-                {
-                    sb.Append(", but not <em>live</em>&mdash;use the button below to generate");
-                }
-            }
-            if (config.EnablePureLiveModels || config.EnableDllModels || config.EnableAppCodeModels || config.EnableAppDataModels)
-                sb.Append(".</li>");
+            sb.Append(config.ModelsMode != ModelsMode.Nothing
+                ? $"<li><strong>{config.ModelsMode} models</strong> are enabled.</li>"
+                : "<li>No models mode is specified: models will <em>not</em> be generated.</li>");
 
             sb.Append("<li>Models namespace is ");
             sb.Append(string.IsNullOrWhiteSpace(config.ModelsNamespace)

@@ -19,7 +19,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         {
             // install pure-live models if required
 
-            if (UmbracoConfig.For.ModelsBuilder().EnablePureLiveModels)
+            if (UmbracoConfig.For.ModelsBuilder().ModelsMode == ModelsMode.PureLive)
                 ApplicationStartingLiveModels();
 
             // always setup the dashboard
