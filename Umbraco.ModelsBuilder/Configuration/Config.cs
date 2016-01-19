@@ -52,24 +52,50 @@ namespace Umbraco.ModelsBuilder.Configuration
             // ensure defaults are initialized for tests
             StaticMixinGetterPattern = DefaultStaticMixinGetterPattern;
             LanguageVersion = DefaultLanguageVersion;
-            
+
             // stop here, everything is false
             if (!Enable) return;
 
-            // all of these have default: false
-            EnableDllModels = Enable && ConfigurationManager.AppSettings[prefix + "EnableDllModels"].InvariantEquals("true");
-            EnableAppCodeModels = Enable && ConfigurationManager.AppSettings[prefix + "EnableAppCodeModels"].InvariantEquals("true");
-            EnableAppDataModels = Enable && ConfigurationManager.AppSettings[prefix + "EnableAppDataModels"].InvariantEquals("true");
-            EnableLiveModels = Enable && ConfigurationManager.AppSettings[prefix + "EnableLiveModels"].InvariantEquals("true");
-            //default is true
-            FlagOutOfDateModels = Enable && ConfigurationManager.AppSettings[prefix + "FlagOutOfDateModels"].InvariantEquals("false") == false;
+            // mode
+            var modelsMode = ConfigurationManager.AppSettings[prefix + "ModelsMode"];
+            if (!string.IsNullOrWhiteSpace(modelsMode))
+            {
+                switch (modelsMode)
+                {
+                    case nameof(ModelsMode.PureLive):
+                        ModelsMode = ModelsMode.PureLive;
+                        break;
+                    case nameof(ModelsMode.Dll):
+                        ModelsMode = ModelsMode.Dll;
+                        break;
+                    case nameof(ModelsMode.LiveDll):
+                        ModelsMode = ModelsMode.LiveDll;
+                        break;
+                    case nameof(ModelsMode.AppCode):
+                        ModelsMode = ModelsMode.AppCode;
+                        break;
+                    case nameof(ModelsMode.LiveAppCode):
+                        ModelsMode = ModelsMode.LiveAppCode;
+                        break;
+                    case nameof(ModelsMode.AppData):
+                        ModelsMode = ModelsMode.AppData;
+                        break;
+                    case nameof(ModelsMode.LiveAppData):
+                        ModelsMode = ModelsMode.LiveAppData;
+                        break;
+                    default:
+                        throw new ConfigurationErrorsException($"ModelsMode \"{modelsMode}\" is not a valid mode."
+                            + " Note that modes are case-sensitive.");
+                }
+            }
 
             //TODO: Re-enable this when we fix auth for VS
             EnableApi = false; //Enable && ConfigurationManager.AppSettings[prefix + "EnableApi"].InvariantEquals("true");
 
-            // all of these have default: true
+            // default: true
             EnableFactory = Enable && !ConfigurationManager.AppSettings[prefix + "EnableFactory"].InvariantEquals("false");
             StaticMixinGetters = Enable && !ConfigurationManager.AppSettings[prefix + "StaticMixinGetters"].InvariantEquals("false");
+            FlagOutOfDateModels = Enable && !ConfigurationManager.AppSettings[prefix + "FlagOutOfDateModels"].InvariantEquals("false");
 
             // no default
             ModelsNamespace = ConfigurationManager.AppSettings[prefix + "ModelsNamespace"];
@@ -89,21 +115,8 @@ namespace Umbraco.ModelsBuilder.Configuration
                 LanguageVersion = lv;
             }
 
-            var count =
-                (EnableDllModels ? 1 : 0)
-                + (EnableAppCodeModels ? 1 : 0)
-                + (EnableAppDataModels ? 1 : 0);
-
-            if (count > 1)
-                throw new ConfigurationErrorsException("You can enable only one of Dll, AppCode or AppData models at a time.");
-
-            // live alone = pure live
-            // live + app_data = just generate files
-            // live + dll = generate the dll (causes restart)
-            // live + app_code = generate the files, and restart
-
-            // not flagging if not generating, or live
-            if (count == 0 || EnableLiveModels)
+            // not flagging if not generating, or live (incl. pure)
+            if (ModelsMode == ModelsMode.Nothing || ModelsMode.IsLive())
                 FlagOutOfDateModels = false;
         }
 
@@ -111,11 +124,8 @@ namespace Umbraco.ModelsBuilder.Configuration
         /// Initializes a new instance of the <see cref="Config"/> class.
         /// </summary>
         public Config(
-            bool enable = false, 
-            bool enableDllModels = false,
-            bool enableAppCodeModels = false,
-            bool enableAppDataModels = false,
-            bool enableLiveModels = false,
+            bool enable = false,
+            ModelsMode modelsMode = ModelsMode.Nothing,
             bool enableApi = true,
             string modelsNamespace = null,
             bool enableFactory = true,
@@ -125,10 +135,7 @@ namespace Umbraco.ModelsBuilder.Configuration
             bool flagOutOfDateModels = true)
         {
             Enable = enable;
-            EnableDllModels = enableDllModels;
-            EnableAppCodeModels = enableAppCodeModels;
-            EnableAppDataModels = enableAppDataModels;
-            EnableLiveModels = enableLiveModels;
+            ModelsMode = modelsMode;
             EnableApi = enableApi;
             ModelsNamespace = modelsNamespace;
             EnableFactory = enableFactory;
@@ -148,67 +155,9 @@ namespace Umbraco.ModelsBuilder.Configuration
         public bool Enable { get; }
 
         /// <summary>
-        /// Gets a value indicating whether "Dll models" are enabled.
+        /// Gets the models mode.
         /// </summary>
-        /// <remarks>
-        ///     <para>Indicates whether a dll containing the models should be generated in ~/bin by compiling
-        ///     the models created in App_Data.</para>
-        ///     <para>When "Dll models" is enabled, the dashboard shows the "generate" button so that
-        ///     models can be generated in App_Data/Models and then compiled in a dll.</para>
-        ///     <para>Default value is <c>false</c> because once enabled, Umbraco will restart anytime models
-        ///     are re-generated from the dashboard. This is probably what you want to do, but we're forcing
-        ///     you to make a concious decision at the moment.</para>
-        /// </remarks>
-        public bool EnableDllModels { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether "App_Code models" are enabled. 
-        /// </summary>
-        /// <remarks>
-        ///     <para>Indicates whether a "build.models" file should be created in App_Code and associated
-        ///     to a build provider so that models created in App_Data are automatically included in the site
-        ///     build and made available to the view.</para>
-        ///     <para>When "App_Code models" is enabled, the dashboard shows the "generate" button so that
-        ///     models can be generated in App_Data/Models.</para>
-        ///     <para>Default value is <c>false</c> because once enabled, Umbraco will restart anytime models
-        ///     are re-generated from the dashboard. This is probably what you want to do, but we're forcing
-        ///     you to make a concious decision at the moment.</para>
-        /// </remarks>
-        public bool EnableAppCodeModels { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether "App_Data models" are enabled.
-        /// </summary>
-        /// <remarks>
-        ///     <para>Default value is <c>false</c>.</para>
-        ///     <para>When "App_Data models" is enabled, the dashboard shows the "generate" button so that
-        ///     models can be generated in App_Data/Models. Nothing else happens so the site does not restart.</para>
-        /// </remarks>
-        public bool EnableAppDataModels { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether "live models" are enabled.
-        /// </summary>
-        /// <remarks>
-        ///     <para>When App_Data models are not enabled, indicates whether models
-        ///     should be automatically generated (in-memory), compiled and loaded into an assembly
-        ///     referenced by our custom Razor engine, so they are available to views and are updated
-        ///     when content types change, without Umbraco restarting.</para>
-        ///     <para>When App_Data models are enabled, indicates whether models
-        ///     should be automatically generated anytime a content type changes, see EnablePureLiveModels
-        ///     below.</para>
-        ///     <para>Default value is <c>false</c>.</para>
-        /// </remarks>
-        public bool EnableLiveModels { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether only "live models" are enabled.
-        /// </summary>
-        /// <remarks>
-        ///     <para>When true neither Dll, App_Data nor App_Code models are enabled and we want our
-        ///     custom Razor engine do handle models.</para>
-        /// </remarks>
-        public bool EnablePureLiveModels => EnableLiveModels && !EnableAppDataModels && !EnableDllModels && !EnableAppCodeModels;
+        public ModelsMode ModelsMode { get; }
 
         /// <summary>
         /// Gets a value indicating whether to enable the API.

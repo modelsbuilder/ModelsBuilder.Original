@@ -33,18 +33,8 @@ namespace Umbraco.ModelsBuilder.AspNet
             get
             {
                 var config = UmbracoConfig.For.ModelsBuilder();
-                if (!config.EnableLiveModels)
-                    return false;
-
-                // not supported anymore
-                //if (Config.EnableAppCodeModels)
-                //    return true;
-
-                if (config.EnableAppDataModels || config.EnableDllModels)
-                    return true;
-
+                return config.ModelsMode.IsLiveNotPure();
                 // we do not manage pure live here
-                return false;
             }
         }
 
@@ -133,11 +123,10 @@ namespace Umbraco.ModelsBuilder.AspNet
             var config = UmbracoConfig.For.ModelsBuilder();
 
             // EnableDllModels will recycle the app domain - but this request will end properly
-            ModelsBuilderBackOfficeController.GenerateModels(appData, config.EnableDllModels ? bin : null);
-
+            ModelsBuilderBackOfficeController.GenerateModels(appData, config.ModelsMode.IsAnyDll() ? bin : null);
 
             // will recycle the app domain - but this request will end properly
-            if (config.EnableAppCodeModels)
+            if (config.ModelsMode.IsAnyAppCode())
                 ModelsBuilderBackOfficeController.TouchModelsFile(appCode);
         }
     }
