@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Web.Compilation;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace Umbraco.ModelsBuilder.Configuration
@@ -51,7 +52,7 @@ namespace Umbraco.ModelsBuilder.Configuration
             // ensure defaults are initialized for tests
             StaticMixinGetterPattern = DefaultStaticMixinGetterPattern;
             LanguageVersion = DefaultLanguageVersion;
-
+            
             // stop here, everything is false
             if (!Enable) return;
 
@@ -60,7 +61,8 @@ namespace Umbraco.ModelsBuilder.Configuration
             EnableAppCodeModels = Enable && ConfigurationManager.AppSettings[prefix + "EnableAppCodeModels"].InvariantEquals("true");
             EnableAppDataModels = Enable && ConfigurationManager.AppSettings[prefix + "EnableAppDataModels"].InvariantEquals("true");
             EnableLiveModels = Enable && ConfigurationManager.AppSettings[prefix + "EnableLiveModels"].InvariantEquals("true");
-            FlagOutOfDateModels = Enable && ConfigurationManager.AppSettings[prefix + "FlagOutOfDateModels"].InvariantEquals("true");
+            //default is true
+            FlagOutOfDateModels = Enable && ConfigurationManager.AppSettings[prefix + "FlagOutOfDateModels"].InvariantEquals("false") == false;
 
             //TODO: Re-enable this when we fix auth for VS
             EnableApi = false; //Enable && ConfigurationManager.AppSettings[prefix + "EnableApi"].InvariantEquals("true");
@@ -120,7 +122,7 @@ namespace Umbraco.ModelsBuilder.Configuration
             LanguageVersion languageVersion = DefaultLanguageVersion,
             bool staticMixinGetters = true,
             string staticMixinGetterPattern = DefaultStaticMixinGetterPattern,
-            bool flagOutOfDateModels = false)
+            bool flagOutOfDateModels = true)
         {
             Enable = enable;
             EnableDllModels = enableDllModels;

@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security;
+using System.Web;
+using System.Web.Compilation;
+using System.Web.Hosting;
+using Umbraco.Core;
 
 namespace Umbraco.ModelsBuilder
 {
@@ -18,7 +23,7 @@ namespace Umbraco.ModelsBuilder
     // so it should be fine to exclude it.
     // Fixing by adding .Where(x => x.IsDynamic == false)
 
-    public static class AssemblyUtility
+    internal static class AssemblyUtility
     {
         static AssemblyUtility()
         {
@@ -30,6 +35,24 @@ namespace Umbraco.ModelsBuilder
 
         private static IEnumerable<string> GetAllReferencedAssemblyLocations()
         {
+            if (HostingEnvironment.IsHosted)
+            {
+                var assemblies = new HashSet<Assembly>(
+                    BuildManager.GetReferencedAssemblies()
+                        .Cast<Assembly>()
+                        .Where(a => a.IsDynamic == false && a.Location.IsNullOrWhiteSpace() == false));
+                return assemblies.Select(x => x.Location).Distinct();
+            }
+
+            //force load in all reference types
+            return ForceLoadingAllReferencedAssemblies();
+        }
+
+        private static IEnumerable<string> ForceLoadingAllReferencedAssemblies()
+        {
+            //TODO: This method has bugs since I've been stuck in an infinite loop with it, though this shouldn't
+            // execute while in the web application anyways.
+
             var assemblies = new List<Assembly>();
             var tmp1 = new List<Assembly>();
             var failed = new List<AssemblyName>();
@@ -69,7 +92,7 @@ namespace Umbraco.ModelsBuilder
                     }
                 }
             }
-            return assemblies.Select(x => x.Location);
+            return assemblies.Select(x => x.Location).Distinct();
         }
     }
 }
