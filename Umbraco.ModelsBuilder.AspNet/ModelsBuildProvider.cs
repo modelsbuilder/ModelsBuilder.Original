@@ -44,7 +44,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         {
             // issue: I can't put my files into App_Code or they'll get... compiled... too soon?
 
-            if (!UmbracoConfig.For.ModelsBuilder().EnableAppCodeModels)
+            if (!UmbracoConfig.For.ModelsBuilder().ModelsMode.IsAnyAppCode())
                 throw new Exception("Building models from App_Code is not enabled, yet a .models file was found in App_Code.");
 
             var appData = HostingEnvironment.MapPath("~/App_Data");
