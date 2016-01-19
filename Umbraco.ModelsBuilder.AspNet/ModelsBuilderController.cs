@@ -9,14 +9,18 @@ using System.Net.Http.Formatting;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Web;
 using System.Web.Compilation;
 using System.Web.Hosting;
+using System.Web.Mvc;
+using System.Web.Routing;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.ModelsBuilder.AspNet.Dashboard;
 using Umbraco.Web.WebApi;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
+using Umbraco.Web;
 using Umbraco.Web.WebApi.Filters;
 using Application = Umbraco.ModelsBuilder.Umbraco.Application;
 
@@ -33,11 +37,43 @@ namespace Umbraco.ModelsBuilder.AspNet
     public class ModelsBuilderController : UmbracoAuthorizedApiController
     {
         public const string ControllerArea = "ModelsBuilder";
+        
+        /// <summary>
+        /// Returns the base url for this controller
+        /// </summary>
+        public static string ControllerUrl { get; private set; }
 
-        //TODO: This is incorrect - never hard code URLs, this is the responsibility of the UrlHelper to generate URLs - which
-        // could occur if we need to change the underlying routing of Umbraco
-        public static readonly string ControllerUrl = "/Umbraco/BackOffice/" 
-            + ControllerArea + "/" + nameof(ModelsBuilderController).TrimEnd("Controller") + "/";
+        private static readonly Lazy<string> ControllerUrlLazy = new Lazy<string>(() =>
+        {
+            //Return the URL based on the booted umbraco application
+            if (HttpContext.Current != null)
+            {
+                var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
+                return urlHelper.GetUmbracoApiServiceBaseUrl<ModelsBuilderController>(controller => controller.GetModels(null)).EnsureEndsWith('/');
+            }
+
+            //NOTE: This could very well be incorrect depending on current route values, virtual folders, etc... 
+            // but without an HttpContext and without a booted Umbraco install we can't know.
+            return "/Umbraco/BackOffice/" + ControllerArea + "/" + nameof(ModelsBuilderController).TrimEnd("Controller") + "/";
+        });
+
+        /// <summary>
+        /// Returns the url for the action specified
+        /// </summary>
+        /// <param name="actionName"></param>
+        /// <returns></returns>
+        public static string ActionUrl(string actionName)
+        {
+            return ControllerUrl + actionName;
+        }
+
+        /// <summary>
+        /// Static constructor
+        /// </summary>
+        static ModelsBuilderController()
+        {
+            ControllerUrl = ControllerUrlLazy.Value;
+        }
 
         #region Models
 
@@ -127,7 +163,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         // invoked by the dashboard
         // requires that the user is logged into the backoffice and has access to the developer section
         // beware! the name of the method appears in modelsbuilder.controller.js
-        [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
+        [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
         public HttpResponseMessage BuildModels()
         {
             try
@@ -226,11 +262,6 @@ namespace Umbraco.ModelsBuilder.AspNet
                 outOfDateModels = DashboardHelper.AreModelsOutOfDate(),
             };
             return Request.CreateResponse(HttpStatusCode.OK, dashboard, Configuration.Formatters.JsonFormatter);
-        }
-
-        public static string ActionUrl(string actionName)
-        {
-            return ControllerUrl + actionName;
         }
 
         // invoked by the API

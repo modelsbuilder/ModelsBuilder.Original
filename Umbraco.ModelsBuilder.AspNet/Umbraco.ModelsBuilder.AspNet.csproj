@@ -329,6 +329,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Dashboard\modelsbuilder.resource.js" />
     <Content Include="Dashboard\modelsbuilder.controller.js" />
     <Content Include="Dashboard\modelsbuilder.htm" />
     <None Include="app.config" />

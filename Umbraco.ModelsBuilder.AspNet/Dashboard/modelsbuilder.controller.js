@@ -3,7 +3,7 @@
     $scope.generate = function() {
         $scope.generating = true;
         umbRequestHelper.resourcePromise(
-                $http.get(umbRequestHelper.getApiUrl("modelsBuilderBaseUrl", "BuildModels")),
+                $http.post(umbRequestHelper.getApiUrl("modelsBuilderBaseUrl", "BuildModels")),
                 'Failed to generate.')
             .then(function (result) {
                 $scope.generating = false;
