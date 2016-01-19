@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Web.Compilation;
 using System.Web.Hosting;
+using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.AspNet.Dashboard;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
@@ -34,7 +35,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         {
             try
             {
-                if (!Config.EnableAppDataModels && !Config.EnableAppCodeModels && !Config.EnableDllModels)
+                if (!UmbracoConfig.For.ModelsBuilder().EnableAppDataModels && !UmbracoConfig.For.ModelsBuilder().EnableAppCodeModels && !UmbracoConfig.For.ModelsBuilder().EnableDllModels)
                 {
                     var result2 = new BuildResult { Success = false, Message = "Models generation is not enabled." };
                     return Request.CreateResponse(HttpStatusCode.OK, result2, Configuration.Formatters.JsonFormatter);
@@ -53,10 +54,10 @@ namespace Umbraco.ModelsBuilder.AspNet
                     throw new Exception("Panic: bin is null.");
 
                 // EnableDllModels will recycle the app domain - but this request will end properly
-                GenerateModels(appData, Config.EnableDllModels ? bin : null);
+                GenerateModels(appData, UmbracoConfig.For.ModelsBuilder().EnableDllModels ? bin : null);
 
                 // will recycle the app domain - but this request will end properly
-                if (Config.EnableAppCodeModels)
+                if (UmbracoConfig.For.ModelsBuilder().EnableAppCodeModels)
                     TouchModelsFile(appCode);
 
                 var result = new BuildResult { Success = true };
@@ -93,7 +94,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         {
             var dashboard = new
             {
-                enable = Config.Enable,
+                enable = UmbracoConfig.For.ModelsBuilder().Enable,
                 text = DashboardHelper.Text(),
                 canGenerate = DashboardHelper.CanGenerate(),
                 generateCausesRestart = DashboardHelper.GenerateCausesRestart(),
@@ -131,7 +132,7 @@ namespace Umbraco.ModelsBuilder.AspNet
 
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
             var parseResult = new CodeParser().Parse(ourFiles, referencedAssemblies);
-            var builder = new TextBuilder(typeModels, parseResult, Config.ModelsNamespace);
+            var builder = new TextBuilder(typeModels, parseResult, UmbracoConfig.For.ModelsBuilder().ModelsNamespace);
 
             foreach (var typeModel in builder.GetModelsToGenerate())
             {
