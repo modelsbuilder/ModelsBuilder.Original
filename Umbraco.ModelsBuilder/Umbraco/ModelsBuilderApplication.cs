@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Configuration;
 
@@ -13,7 +14,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
             // - we want it
             // - we don't also want pure live models
 
-            if (!Config.EnableFactory || Config.EnablePureLiveModels)
+            var config = UmbracoConfig.For.ModelsBuilder();
+            if (!config.EnableFactory || config.EnablePureLiveModels)
                 return;
 
             var types = PluginManager.Current.ResolveTypes<PublishedContentModel>();

@@ -1,22 +1,56 @@
 ﻿using System;
 using System.Configuration;
-using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace Umbraco.ModelsBuilder.Configuration
 {
-    public static class Config
+    /// <summary>
+    /// Represents the models builder configuration.
+    /// </summary>
+    public class Config
     {
-        static Config()
-        {
-            // for the time being config is stored in web.config appSettings
-            // and is static ie requires the app to be restarted for changes to be detected
+        private static Config _value;
 
+        /// <summary>
+        /// Gets the configuration - internal so that the UmbracoConfig extension
+        /// can get the value to initialize its own value. Either a value has
+        /// been provided via the Setup method, or a new instance is created, which
+        /// will load settings from the config file.
+        /// </summary>
+        internal static Config Value => _value ?? new Config();
+
+        /// <summary>
+        /// Sets the configuration programmatically.
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <remarks>
+        /// <para>Once the configuration has been accessed via the UmbracoConfig extension,
+        /// it cannot be changed anymore, and using this method will achieve nothing.</para>
+        /// <para>For tests, see UmbracoConfigExtensions.ResetConfig().</para>
+        /// </remarks>
+        public static void Setup(Config config)
+        {
+            _value = config;
+        }
+
+        private const string DefaultStaticMixinGetterPattern = "Get{0}";
+        private const LanguageVersion DefaultLanguageVersion = LanguageVersion.CSharp5;
+        public const string DefaultModelsNamespace = "Umbraco.Web.PublishedContentModels";
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Config"/> class.
+        /// </summary>
+        private Config()
+        {
             const string prefix = "Umbraco.ModelsBuilder.";
 
             // giant kill switch, default: false
             // must be explicitely set to true for anything else to happen
             Enable = ConfigurationManager.AppSettings[prefix + "Enable"] == "true";
+
+            // ensure defaults are initialized for tests
+            StaticMixinGetterPattern = DefaultStaticMixinGetterPattern;
+            LanguageVersion = DefaultLanguageVersion;
 
             // stop here, everything is false
             if (!Enable) return;
@@ -31,26 +65,25 @@ namespace Umbraco.ModelsBuilder.Configuration
             //TODO: Re-enable this when we fix auth for VS
             EnableApi = false; //Enable && ConfigurationManager.AppSettings[prefix + "EnableApi"].InvariantEquals("true");
 
-            // default: true
+            // all of these have default: true
             EnableFactory = Enable && !ConfigurationManager.AppSettings[prefix + "EnableFactory"].InvariantEquals("false");
             StaticMixinGetters = Enable && !ConfigurationManager.AppSettings[prefix + "StaticMixinGetters"].InvariantEquals("false");
 
             // no default
             ModelsNamespace = ConfigurationManager.AppSettings[prefix + "ModelsNamespace"];
 
-            // default: "Get{0}"
-            StaticMixinGetterPattern = ConfigurationManager.AppSettings[prefix + "StaticMixinGetterPattern"];
-            if (string.IsNullOrWhiteSpace(StaticMixinGetterPattern))
-                StaticMixinGetterPattern = "Get{0}";
+            // default: see DefaultStaticMixinGetterPattern const
+            var value = ConfigurationManager.AppSettings[prefix + "StaticMixinGetterPattern"];
+            if (!string.IsNullOrWhiteSpace(value))
+                StaticMixinGetterPattern = value;
 
-            // default: CSharp5
-            LanguageVersion = LanguageVersion.CSharp5;
-            var lvSetting = ConfigurationManager.AppSettings[prefix + "LanguageVersion"];
-            if (!string.IsNullOrWhiteSpace(lvSetting))
+            // default: see DefaultLanguageVersion const
+            value = ConfigurationManager.AppSettings[prefix + "LanguageVersion"];
+            if (!string.IsNullOrWhiteSpace(value))
             {
                 LanguageVersion lv;
-                if (!Enum.TryParse(lvSetting, true, out lv))
-                    throw new ConfigurationErrorsException($"Invalid language version \"{lvSetting}\".");
+                if (!Enum.TryParse(value, true, out lv))
+                    throw new ConfigurationErrorsException($"Invalid language version \"{value}\".");
                 LanguageVersion = lv;
             }
 
@@ -72,16 +105,45 @@ namespace Umbraco.ModelsBuilder.Configuration
                 FlagOutOfDateModels = false;
         }
 
-        // note: making setters internal below for testing purposes
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Config"/> class.
+        /// </summary>
+        public Config(
+            bool enable = false, 
+            bool enableDllModels = false,
+            bool enableAppCodeModels = false,
+            bool enableAppDataModels = false,
+            bool enableLiveModels = false,
+            bool enableApi = true,
+            string modelsNamespace = null,
+            bool enableFactory = true,
+            LanguageVersion languageVersion = DefaultLanguageVersion,
+            bool staticMixinGetters = true,
+            string staticMixinGetterPattern = DefaultStaticMixinGetterPattern,
+            bool flagOutOfDateModels = false)
+        {
+            Enable = enable;
+            EnableDllModels = enableDllModels;
+            EnableAppCodeModels = enableAppCodeModels;
+            EnableAppDataModels = enableAppDataModels;
+            EnableLiveModels = enableLiveModels;
+            EnableApi = enableApi;
+            ModelsNamespace = modelsNamespace;
+            EnableFactory = enableFactory;
+            LanguageVersion = languageVersion;
+            StaticMixinGetters = staticMixinGetters;
+            StaticMixinGetterPattern = staticMixinGetterPattern;
+            FlagOutOfDateModels = flagOutOfDateModels;
+        }
 
         /// <summary>
         /// Gets a value indicating whether the whole models experience is enabled.
         /// </summary>
         /// <remarks>
         ///     <para>If this is false then absolutely nothing happens.</para>
-        ///     <para>Default value is <c>true</c> which means that unless we have this setting, nothing happens.</para>
+        ///     <para>Default value is <c>false</c> which means that unless we have this setting, nothing happens.</para>
         /// </remarks>
-        public static bool Enable { get; internal set; }
+        public bool Enable { get; }
 
         /// <summary>
         /// Gets a value indicating whether "Dll models" are enabled.
@@ -95,7 +157,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         ///     are re-generated from the dashboard. This is probably what you want to do, but we're forcing
         ///     you to make a concious decision at the moment.</para>
         /// </remarks>
-        public static bool EnableDllModels { get; internal set; }
+        public bool EnableDllModels { get; }
 
         /// <summary>
         /// Gets a value indicating whether "App_Code models" are enabled. 
@@ -110,7 +172,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         ///     are re-generated from the dashboard. This is probably what you want to do, but we're forcing
         ///     you to make a concious decision at the moment.</para>
         /// </remarks>
-        public static bool EnableAppCodeModels { get; internal set; }
+        public bool EnableAppCodeModels { get; }
 
         /// <summary>
         /// Gets a value indicating whether "App_Data models" are enabled.
@@ -120,7 +182,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         ///     <para>When "App_Data models" is enabled, the dashboard shows the "generate" button so that
         ///     models can be generated in App_Data/Models. Nothing else happens so the site does not restart.</para>
         /// </remarks>
-        public static bool EnableAppDataModels { get; internal set; }
+        public bool EnableAppDataModels { get; }
 
         /// <summary>
         /// Gets a value indicating whether "live models" are enabled.
@@ -135,7 +197,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         ///     below.</para>
         ///     <para>Default value is <c>false</c>.</para>
         /// </remarks>
-        public static bool EnableLiveModels { get; internal set; }
+        public bool EnableLiveModels { get; }
 
         /// <summary>
         /// Gets a value indicating whether only "live models" are enabled.
@@ -144,7 +206,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         ///     <para>When true neither Dll, App_Data nor App_Code models are enabled and we want our
         ///     custom Razor engine do handle models.</para>
         /// </remarks>
-        public static bool EnablePureLiveModels => EnableLiveModels && !EnableAppDataModels && !EnableDllModels && !EnableAppCodeModels;
+        public bool EnablePureLiveModels => EnableLiveModels && !EnableAppDataModels && !EnableDllModels && !EnableAppCodeModels;
 
         /// <summary>
         /// Gets a value indicating whether to enable the API.
@@ -154,37 +216,37 @@ namespace Umbraco.ModelsBuilder.Configuration
         ///     <para>The API is used by the Visual Studio extension and the console tool to talk to Umbraco
         ///     and retrieve the content types. It needs to be enabled so the extension & tool can work.</para>
         /// </remarks>
-        public static bool EnableApi { get; internal set; }
+        public bool EnableApi { get; }
 
         /// <summary>
         /// Gets the models namespace.
         /// </summary>
         /// <remarks>No default value. That value could be overriden by other (attribute in user's code...).</remarks>
-        public static string ModelsNamespace { get; internal set; }
+        public string ModelsNamespace { get; }
 
         /// <summary>
         /// Gets a value indicating whether we should enable the models factory.
         /// </summary>
         /// <remarks>Default value is <c>true</c> because no factory is enabled by default in Umbraco.</remarks>
-        public static bool EnableFactory { get; internal set; }
+        public bool EnableFactory { get; }
 
         /// <summary>
         /// Gets the Roslyn parser language version.
         /// </summary>
         /// <remarks>Default value is <c>CSharp5</c>.</remarks>
-        public static LanguageVersion LanguageVersion { get; internal set; }
+        public LanguageVersion LanguageVersion { get; }
 
         /// <summary>
         /// Gets a value indicating whether to generate static mixin getters.
         /// </summary>
         /// <remarks>Default value is <c>false</c> for backward compat reaons.</remarks>
-        public static bool StaticMixinGetters { get; internal set; }
+        public bool StaticMixinGetters { get; }
 
         /// <summary>
         /// Gets the string pattern for mixin properties static getter name.
         /// </summary>
         /// <remarks>Default value is "GetXxx". Standard string format.</remarks>
-        public static string StaticMixinGetterPattern { get; internal set; }
+        public string StaticMixinGetterPattern { get; }
 
         /// <summary>
         /// Gets a value indicating whether we should flag out-of-date models.
@@ -192,8 +254,6 @@ namespace Umbraco.ModelsBuilder.Configuration
         /// <remarks>Models become out-of-date when data types or content types are updated. When this
         /// setting is activated the ~/App_Data/Models/ood.txt file is then created. When models are
         /// generated through the dashboard, the files is cleared. Default value is <c>false</c>.</remarks>
-        public static bool FlagOutOfDateModels { get; internal set; }
-
-        public const string DefaultModelsNamespace = "Umbraco.Web.PublishedContentModels";
+        public bool FlagOutOfDateModels { get; }
     }
 }

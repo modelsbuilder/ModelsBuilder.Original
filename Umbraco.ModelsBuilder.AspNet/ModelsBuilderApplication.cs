@@ -5,9 +5,11 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.WebPages;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 using Umbraco.ModelsBuilder.AspNet.ViewEngine;
+using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.ModelsBuilder.Umbraco;
 using Umbraco.Web;
 using Umbraco.Web.UI.JavaScript;
@@ -20,7 +22,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         {
             // install pure-live models if required
 
-            if (Configuration.Config.EnablePureLiveModels)
+            if (UmbracoConfig.For.ModelsBuilder().EnablePureLiveModels)
                 ApplicationStartingLiveModels();
 
             // always setup the dashboard

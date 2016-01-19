@@ -14,6 +14,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.AspNet.Dashboard;
 using Umbraco.Web.WebApi;
 using Umbraco.ModelsBuilder.Building;
@@ -143,7 +144,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
         public HttpResponseMessage ValidateClientVersion(ValidateClientVersionData data)
         {
-            if (!Config.EnableApi)
+            if (!UmbracoConfig.For.ModelsBuilder().EnableApi)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API is not enabled.");
 
             var checkResult = CheckVersion(data.ClientVersion, data.MinServerVersionSupportingClient);
@@ -156,7 +157,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
         public HttpResponseMessage GetModels(GetModelsData data)
         {
-            if (!Config.EnableApi)
+            if (!UmbracoConfig.For.ModelsBuilder().EnableApi)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API is not enabled.");
 
             var checkResult = CheckVersion(data.ClientVersion, data.MinServerVersionSupportingClient);
