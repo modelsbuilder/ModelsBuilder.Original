@@ -4,21 +4,18 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.ModelsBuilder.Building;
+using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Tests
 {
     [TestFixture]
     public class BuilderTests
     {
-        //[SetUp]
-        [TestFixtureSetUp]
+        [SetUp]
         public void Setup()
         {
-            //var app = Umbraco.Web.Standalone.StandaloneApplication.GetApplication(Environment.CurrentDirectory)
-            //    .WithoutApplicationEventHandler<Umbraco.Web.Search.ExamineEvents>()
-            //    .WithApplicationEventHandler<AppHandler>();
-            ////if (app.Started == false)
-            //app.Start();
+            // this is needed to ensure that Config.Setup is OK in each test
+            UmbracoConfigExtensions.ResetConfig();
         }
 
         [Test]
@@ -1098,7 +1095,7 @@ namespace Dang
         [Test]
         public void MixinPropertyStatic()
         {
-            Configuration.Config.StaticMixinGetters = true; // try the new way
+            Config.Setup(new Config(staticMixinGetters: true));
 
             var type1 = new TypeModel
             {
@@ -1621,7 +1618,7 @@ namespace Umbraco.Web.PublishedContentModels
         {
             // Umbraco returns nice, pascal-cased names
 
-            Configuration.Config.StaticMixinGetters = true; // try the new way
+            Config.Setup(new Config(staticMixinGetters: true));
 
             var type1 = new TypeModel
             {

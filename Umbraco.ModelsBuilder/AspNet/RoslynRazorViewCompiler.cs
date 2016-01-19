@@ -7,6 +7,8 @@ using System.Web;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.AspNet
 {
@@ -42,7 +44,7 @@ namespace Umbraco.ModelsBuilder.AspNet
 
         private static CSharpCompilation GetCompilation(string assemblyName, IDictionary<string, string> files, out SyntaxTree[] trees)
         {
-            var options = new CSharpParseOptions(Configuration.Config.LanguageVersion);
+            var options = new CSharpParseOptions(UmbracoConfig.For.ModelsBuilder().LanguageVersion);
             trees = files.Select(x =>
             {
                 var text = x.Value;

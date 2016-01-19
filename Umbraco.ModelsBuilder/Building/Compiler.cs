@@ -6,6 +6,7 @@ using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
+using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Building
@@ -17,7 +18,7 @@ namespace Umbraco.ModelsBuilder.Building
 
         public Compiler()
         {
-            _languageVersion = Config.LanguageVersion;
+            _languageVersion = UmbracoConfig.For.ModelsBuilder().LanguageVersion;
         }
 
         public Compiler(LanguageVersion languageVersion)

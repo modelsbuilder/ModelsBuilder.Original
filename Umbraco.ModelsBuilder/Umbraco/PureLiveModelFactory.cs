@@ -9,6 +9,7 @@ using System.Threading;
 using System.Web.Compilation;
 using System.Web.Hosting;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -172,7 +173,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             var referencedAssemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToArray();
 
             var parseResult = new CodeParser().Parse(ourFiles, referencedAssemblies);
-            var builder = new TextBuilder(typeModels, parseResult, Config.ModelsNamespace);
+            var builder = new TextBuilder(typeModels, parseResult, UmbracoConfig.For.ModelsBuilder().ModelsNamespace);
 
             var codeBuilder = new StringBuilder();
             builder.Generate(codeBuilder, builder.GetModelsToGenerate());

@@ -309,6 +309,7 @@
     <Compile Include="Building\Compiler.cs" />
     <Compile Include="ApiVersion.cs" />
     <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Configuration\UmbracoConfigExtensions.cs" />
     <Compile Include="Dummy.cs" />
     <Compile Include="FixReferences.cs" />
     <Compile Include="ImplementPropertyTypeAttribute.cs" />

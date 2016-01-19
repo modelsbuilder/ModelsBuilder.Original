@@ -271,6 +271,7 @@ namespace Umbraco.ModelsBuilder.Building
                 return ModelsNamespace;
 
             // default
+            // fixme - should NOT reference config here, should make ModelsNamespace mandatory
             return Config.DefaultModelsNamespace;
         }
 
