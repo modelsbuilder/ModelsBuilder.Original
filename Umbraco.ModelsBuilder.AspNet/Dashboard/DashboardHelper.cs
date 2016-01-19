@@ -4,7 +4,7 @@ using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.AspNet.Dashboard
 {
-    public static class DashboardHelper
+    internal static class DashboardHelper
     {
         public static bool CanGenerate()
         {
@@ -41,7 +41,7 @@ namespace Umbraco.ModelsBuilder.AspNet.Dashboard
 
             sb.Append("<li>The <strong>models factory</strong> is ");
             sb.Append(config.EnableFactory || config.ModelsMode == ModelsMode.PureLive
-                ? "enabled" 
+                ? "enabled"
                 : "not enabled. Umbraco will <em>not</em> use models");
             sb.Append(".</li>");
 

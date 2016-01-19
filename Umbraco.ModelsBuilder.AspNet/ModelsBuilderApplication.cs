@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 using System.Web.WebPages;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -9,6 +11,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.ModelsBuilder.AspNet.ViewEngine;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.ModelsBuilder.Umbraco;
+using Umbraco.Web;
 using Umbraco.Web.UI.JavaScript;
 
 namespace Umbraco.ModelsBuilder.AspNet
@@ -24,7 +27,7 @@ namespace Umbraco.ModelsBuilder.AspNet
 
             // always setup the dashboard
 
-            ApplicationStartingDashboard();
+            RegisterServerVars();
         }
 
         private void ApplicationStartingLiveModels()
@@ -66,21 +69,27 @@ namespace Umbraco.ModelsBuilder.AspNet
             */
         }
 
-        private void ApplicationStartingDashboard()
+        /// <summary>
+        /// Add custom server variables for angular to use
+        /// </summary>
+        private void RegisterServerVars()
         {
             // register our url - for the backoffice api
-            ServerVariablesParser.Parsing += (sender, objects) =>
+            ServerVariablesParser.Parsing += (sender, serverVars) =>
             {
-                if (!objects.ContainsKey("umbracoUrls"))
+                if (!serverVars.ContainsKey("umbracoUrls"))
                     throw new Exception("Missing umbracoUrls.");
-                var umbracoUrlsObject = objects["umbracoUrls"];
+                var umbracoUrlsObject = serverVars["umbracoUrls"];
                 if (umbracoUrlsObject == null)
                     throw new Exception("Null umbracoUrls");
                 var umbracoUrls = umbracoUrlsObject as Dictionary<string, object>;
                 if (umbracoUrls == null)
                     throw new Exception("Invalid umbracoUrls");
 
-                umbracoUrls["modelsBuilderBaseUrl"] = ModelsBuilderController.ControllerUrl;
+                if (HttpContext.Current == null) throw new InvalidOperationException("HttpContext is null");
+                var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
+
+                umbracoUrls["modelsBuilderBaseUrl"] = urlHelper.GetUmbracoApiServiceBaseUrl<ModelsBuilderBackOfficeController>(controller => controller.BuildModels());
             };
         }
     }

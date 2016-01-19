@@ -305,6 +305,7 @@
     </Compile>
     <Compile Include="Dashboard\DashboardHelper.cs" />
     <Compile Include="ModelsBuilderApplication.cs" />
+    <Compile Include="ModelsBuilderBackOfficeController.cs" />
     <Compile Include="OutOfDateModelsStatus.cs" />
     <Compile Include="Initializer.cs" />
     <Compile Include="LiveModelsProvider.cs" />
@@ -329,6 +330,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Dashboard\modelsbuilder.resource.js" />
     <Content Include="Dashboard\modelsbuilder.controller.js" />
     <Content Include="Dashboard\modelsbuilder.htm" />
     <None Include="app.config" />

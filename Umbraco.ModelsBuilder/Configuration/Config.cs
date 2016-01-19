@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Web.Compilation;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace Umbraco.ModelsBuilder.Configuration
@@ -88,15 +89,13 @@ namespace Umbraco.ModelsBuilder.Configuration
                 }
             }
 
-            // default: false
-            FlagOutOfDateModels = Enable && ConfigurationManager.AppSettings[prefix + "FlagOutOfDateModels"].InvariantEquals("true");
-
             //TODO: Re-enable this when we fix auth for VS
             EnableApi = false; //Enable && ConfigurationManager.AppSettings[prefix + "EnableApi"].InvariantEquals("true");
 
             // default: true
             EnableFactory = Enable && !ConfigurationManager.AppSettings[prefix + "EnableFactory"].InvariantEquals("false");
             StaticMixinGetters = Enable && !ConfigurationManager.AppSettings[prefix + "StaticMixinGetters"].InvariantEquals("false");
+            FlagOutOfDateModels = Enable && !ConfigurationManager.AppSettings[prefix + "FlagOutOfDateModels"].InvariantEquals("false");
 
             // no default
             ModelsNamespace = ConfigurationManager.AppSettings[prefix + "ModelsNamespace"];
@@ -133,7 +132,7 @@ namespace Umbraco.ModelsBuilder.Configuration
             LanguageVersion languageVersion = DefaultLanguageVersion,
             bool staticMixinGetters = true,
             string staticMixinGetterPattern = DefaultStaticMixinGetterPattern,
-            bool flagOutOfDateModels = false)
+            bool flagOutOfDateModels = true)
         {
             Enable = enable;
             ModelsMode = modelsMode;

@@ -23,7 +23,7 @@ using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.AspNet
 {
-    public class LiveModelsProvider : ApplicationEventHandler
+    public sealed class LiveModelsProvider : ApplicationEventHandler
     {
         private static Mutex _mutex;
         private static int _req;
@@ -123,11 +123,11 @@ namespace Umbraco.ModelsBuilder.AspNet
             var config = UmbracoConfig.For.ModelsBuilder();
 
             // EnableDllModels will recycle the app domain - but this request will end properly
-            ModelsBuilderController.GenerateModels(appData, config.ModelsMode.IsAnyDll() ? bin : null);
+            ModelsBuilderBackOfficeController.GenerateModels(appData, config.ModelsMode.IsAnyDll() ? bin : null);
 
             // will recycle the app domain - but this request will end properly
             if (config.ModelsMode.IsAnyAppCode())
-                ModelsBuilderController.TouchModelsFile(appCode);
+                ModelsBuilderBackOfficeController.TouchModelsFile(appCode);
         }
     }
 

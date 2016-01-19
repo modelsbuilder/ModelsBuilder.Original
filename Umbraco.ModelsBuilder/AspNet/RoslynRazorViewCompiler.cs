@@ -15,7 +15,9 @@ namespace Umbraco.ModelsBuilder.AspNet
     // that class is static because of AppDomain.CurrentDomain.AssemblyResolve
     // (see in the static ctor)
 
-    public static class RoslynRazorViewCompiler
+    //NOTE: This is not a thread safe class
+        
+    internal static class RoslynRazorViewCompiler
     {
         private static int _modelsGeneration;
 
@@ -27,7 +29,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         private static PortableExecutableReference _modelsReference;
         private static Assembly _modelsAssembly;
         private static string _modelsVersionString;
-        private static readonly PortableExecutableReference[] References;
+        private static readonly Lazy<PortableExecutableReference[]> References;
 
         static RoslynRazorViewCompiler()
         {
@@ -37,9 +39,9 @@ namespace Umbraco.ModelsBuilder.AspNet
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) => 
                 args.Name == _modelsVersionString ? _modelsAssembly : null;
 
-            References = AssemblyUtility.AllReferencedAssemblyLocations
+            References = new Lazy<PortableExecutableReference[]>(() => AssemblyUtility.AllReferencedAssemblyLocations
                 .Select(x => MetadataReference.CreateFromFile(x))
-                .ToArray();
+                .ToArray());
         }
 
         private static CSharpCompilation GetCompilation(string assemblyName, IDictionary<string, string> files, out SyntaxTree[] trees)
@@ -55,7 +57,7 @@ namespace Umbraco.ModelsBuilder.AspNet
                 return tree;
             }).ToArray();
 
-            var refs = _modelsReference == null ? References : References.And(_modelsReference);
+            var refs = _modelsReference == null ? References.Value : References.Value.And(_modelsReference);
 
             var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
             var compilation = CSharpCompilation.Create(
