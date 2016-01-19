@@ -3,6 +3,7 @@ using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Cache;
 using Umbraco.ModelsBuilder.AspNet;
@@ -31,14 +32,15 @@ namespace Umbraco.ModelsBuilder.AspNet
         {
             get
             {
-                if (!Config.EnableLiveModels)
+                var config = UmbracoConfig.For.ModelsBuilder();
+                if (!config.EnableLiveModels)
                     return false;
 
                 // not supported anymore
                 //if (Config.EnableAppCodeModels)
                 //    return true;
 
-                if (Config.EnableAppDataModels || Config.EnableDllModels)
+                if (config.EnableAppDataModels || config.EnableDllModels)
                     return true;
 
                 // we do not manage pure live here
@@ -128,11 +130,13 @@ namespace Umbraco.ModelsBuilder.AspNet
             if (bin == null)
                 throw new Exception("Panic: bin is null.");
 
+            var config = UmbracoConfig.For.ModelsBuilder();
+
             // EnableDllModels will recycle the app domain - but this request will end properly
-            ModelsBuilderController.GenerateModels(appData, Config.EnableDllModels ? bin : null);
+            ModelsBuilderController.GenerateModels(appData, config.EnableDllModels ? bin : null);
 
             // will recycle the app domain - but this request will end properly
-            if (Config.EnableAppCodeModels)
+            if (config.EnableAppCodeModels)
                 ModelsBuilderController.TouchModelsFile(appCode);
         }
     }

@@ -5,6 +5,7 @@ using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Building
@@ -36,7 +37,7 @@ namespace Umbraco.ModelsBuilder.Building
         public ParseResult Parse(IDictionary<string, string> files, IEnumerable<Assembly> referencedAssemblies)
         {
             SyntaxTree[] trees;
-            var compiler = new Compiler(Config.LanguageVersion);
+            var compiler = new Compiler(UmbracoConfig.For.ModelsBuilder().LanguageVersion);
             foreach (var asm in referencedAssemblies)
                 compiler.ReferencedAssemblies.Add(asm);
             var compilation = compiler.GetCompilation("Umbraco.ModelsBuilder.Generated", files, out trees);

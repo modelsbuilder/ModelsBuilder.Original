@@ -13,6 +13,7 @@ using System.Web.Compilation;
 using System.Web.Hosting;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.AspNet.Dashboard;
 using Umbraco.Web.WebApi;
 using Umbraco.ModelsBuilder.Building;
@@ -115,7 +116,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
         public HttpResponseMessage ValidateClientVersion(ValidateClientVersionData data)
         {
-            if (!Config.EnableApi)
+            if (!UmbracoConfig.For.ModelsBuilder().EnableApi)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API is not enabled.");
 
             var checkResult = CheckVersion(data.ClientVersion, data.MinServerVersionSupportingClient);
@@ -132,7 +133,9 @@ namespace Umbraco.ModelsBuilder.AspNet
         {
             try
             {
-                if (!Config.EnableAppDataModels && !Config.EnableAppCodeModels && !Config.EnableDllModels)
+                var config = UmbracoConfig.For.ModelsBuilder();
+
+                if (!config.EnableAppDataModels && !config.EnableAppCodeModels && !config.EnableDllModels)
                 {
                     var result2 = new BuildResult { Success = false, Message = "Models generation is not enabled." };
                     return Request.CreateResponse(HttpStatusCode.OK, result2, Configuration.Formatters.JsonFormatter);
@@ -151,10 +154,10 @@ namespace Umbraco.ModelsBuilder.AspNet
                     throw new Exception("Panic: bin is null.");
 
                 // EnableDllModels will recycle the app domain - but this request will end properly
-                GenerateModels(appData, Config.EnableDllModels ? bin : null);
+                GenerateModels(appData, config.EnableDllModels ? bin : null);
 
                 // will recycle the app domain - but this request will end properly
-                if (Config.EnableAppCodeModels)
+                if (config.EnableAppCodeModels)
                     TouchModelsFile(appCode);
 
                 var result = new BuildResult {Success = true};
@@ -173,7 +176,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
         public HttpResponseMessage GetModels(GetModelsData data)
         {
-            if (!Config.EnableApi)
+            if (!UmbracoConfig.For.ModelsBuilder().EnableApi)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API is not enabled.");
 
             var checkResult = CheckVersion(data.ClientVersion, data.MinServerVersionSupportingClient);
@@ -219,7 +222,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         {
             var dashboard = new
             {
-                enable = Config.Enable,
+                enable = UmbracoConfig.For.ModelsBuilder().Enable,
                 text = DashboardHelper.Text(),
                 canGenerate = DashboardHelper.CanGenerate(),
                 generateCausesRestart = DashboardHelper.GenerateCausesRestart(),
@@ -270,7 +273,7 @@ namespace Umbraco.ModelsBuilder.AspNet
 
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
             var parseResult = new CodeParser().Parse(ourFiles, referencedAssemblies);
-            var builder = new TextBuilder(typeModels, parseResult, Config.ModelsNamespace);
+            var builder = new TextBuilder(typeModels, parseResult, UmbracoConfig.For.ModelsBuilder().ModelsNamespace);
 
             foreach (var typeModel in builder.GetModelsToGenerate())
             {

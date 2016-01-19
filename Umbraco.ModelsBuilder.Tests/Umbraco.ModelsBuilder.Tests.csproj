@@ -300,6 +300,7 @@
     <Compile Include="BuilderTests.cs" />
     <Compile Include="ApiVersionTests.cs" />
     <Compile Include="CompilerTests.cs" />
+    <Compile Include="ConfigTests.cs" />
     <Compile Include="ExtensionsTests.cs" />
     <Compile Include="PublishedContentTests.cs" />
     <Compile Include="StringExtensions.cs" />

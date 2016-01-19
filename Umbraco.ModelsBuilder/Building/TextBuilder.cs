@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.Configuration;
+using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Building
 {
@@ -212,7 +214,7 @@ namespace Umbraco.ModelsBuilder.Building
 
         private void WriteContentTypeProperties(StringBuilder sb, TypeModel type)
         {
-            var staticMixinGetters = Configuration.Config.StaticMixinGetters;
+            var staticMixinGetters = UmbracoConfig.For.ModelsBuilder().StaticMixinGetters;
 
             // write the properties
             foreach (var prop in type.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
@@ -259,7 +261,7 @@ namespace Umbraco.ModelsBuilder.Building
 
         private static string MixinStaticGetterName(string clrName)
         {
-            return string.Format(Configuration.Config.StaticMixinGetterPattern, clrName);
+            return string.Format(UmbracoConfig.For.ModelsBuilder().StaticMixinGetterPattern, clrName);
         }
 
         private void WriteProperty(StringBuilder sb, TypeModel type, PropertyModel property, string mixinClrName = null)
