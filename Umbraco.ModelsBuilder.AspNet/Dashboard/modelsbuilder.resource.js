@@ -11,6 +11,12 @@
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("modelsBuilderBaseUrl", "BuildModels")),
                 "Failed to build models");
+        },
+
+        getDashboard: function () {
+            return umbRequestHelper.resourcePromise(
+                $http.get(umbRequestHelper.getApiUrl("modelsBuilderBaseUrl", "GetDashboard")),
+                "Failed to get dashboard");
         }
     };
 }

@@ -7,7 +7,7 @@ using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.AspNet
 {
-    public class OutOfDateModelsStatus : ApplicationEventHandler
+    public sealed class OutOfDateModelsStatus : ApplicationEventHandler
     {
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {

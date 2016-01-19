@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -11,7 +10,6 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Web;
 using System.Web.Compilation;
-using System.Web.Hosting;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Web.Mvc;
@@ -30,14 +28,14 @@ namespace Umbraco.ModelsBuilder.AspNet
     // read http://our.umbraco.org/forum/developers/api-questions/43025-Web-API-authentication
     // UmbracoAuthorizedApiController :: /Umbraco/BackOffice/Zbu/ModelsBuilderApi/GetTypeModels
     // UmbracoApiController :: /Umbraco/Zbu/ModelsBuilderApi/GetTypeModels ??  UNLESS marked with isbackoffice
-
+    
     [PluginController(ControllerArea)]
     [IsBackOffice]
     [UmbracoApplicationAuthorize(Constants.Applications.Developer)]
     public class ModelsBuilderController : UmbracoAuthorizedApiController
     {
         public const string ControllerArea = "ModelsBuilder";
-        
+
         /// <summary>
         /// Returns the base url for this controller
         /// </summary>
@@ -76,13 +74,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         }
 
         #region Models
-
-        public class BuildResult
-        {
-            public bool Success;
-            public string Message;
-        }
-
+        
         [DataContract]
         public class ValidateClientVersionData
         {
@@ -159,52 +151,7 @@ namespace Umbraco.ModelsBuilder.AspNet
                 ? Request.CreateResponse(HttpStatusCode.OK, "OK", Configuration.Formatters.JsonFormatter)
                 : checkResult.Result);
         }
-
-        // invoked by the dashboard
-        // requires that the user is logged into the backoffice and has access to the developer section
-        // beware! the name of the method appears in modelsbuilder.controller.js
-        [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
-        public HttpResponseMessage BuildModels()
-        {
-            try
-            {
-                if (!Config.EnableAppDataModels && !Config.EnableAppCodeModels && !Config.EnableDllModels)
-                {
-                    var result2 = new BuildResult { Success = false, Message = "Models generation is not enabled." };
-                    return Request.CreateResponse(HttpStatusCode.OK, result2, Configuration.Formatters.JsonFormatter);
-                }
-
-                var appData = HostingEnvironment.MapPath("~/App_Data");
-                if (appData == null)
-                    throw new Exception("Panic: appData is null.");
-
-                var appCode = HostingEnvironment.MapPath("~/App_Code");
-                if (appCode == null)
-                    throw new Exception("Panic: appCode is null.");
-
-                var bin = HostingEnvironment.MapPath("~/bin");
-                if (bin== null)
-                    throw new Exception("Panic: bin is null.");
-
-                // EnableDllModels will recycle the app domain - but this request will end properly
-                GenerateModels(appData, Config.EnableDllModels ? bin : null);
-
-                // will recycle the app domain - but this request will end properly
-                if (Config.EnableAppCodeModels)
-                    TouchModelsFile(appCode);
-
-                var result = new BuildResult {Success = true};
-                return Request.CreateResponse(HttpStatusCode.OK, result, Configuration.Formatters.JsonFormatter);
-
-            }
-            catch (Exception e)
-            {
-                var message = string.Format("{0}: {1}\r\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
-                var result = new BuildResult { Success = false, Message = message };
-                return Request.CreateResponse(HttpStatusCode.OK, result, Configuration.Formatters.JsonFormatter);
-            }
-        }
-
+        
         // invoked by the API
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
         public HttpResponseMessage GetModels(GetModelsData data)
@@ -235,35 +182,7 @@ namespace Umbraco.ModelsBuilder.AspNet
 
             return Request.CreateResponse(HttpStatusCode.OK, models, Configuration.Formatters.JsonFormatter);
         }
-
-        // invoked by the back-office
-        // requires that the user is logged into the backoffice and has access to the developer section
-        [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
-        public HttpResponseMessage GetModelsOutOfDateStatus()
-        {
-            var status = OutOfDateModelsStatus.IsEnabled
-                ? (OutOfDateModelsStatus.IsOutOfDate ? "out-of-date" : "current")
-                : "unknown";
-            return Request.CreateResponse(HttpStatusCode.OK, status, Configuration.Formatters.JsonFormatter);
-        }
-
-        // invoked by the back-office
-        // requires that the user is logged into the backoffice and has access to the developer section
-        // beware! the name of the method appears in modelsbuilder.controller.js
-        [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!        
-        public HttpResponseMessage GetDashboard()
-        {
-            var dashboard = new
-            {
-                enable = Config.Enable,
-                text = DashboardHelper.Text(),
-                canGenerate = DashboardHelper.CanGenerate(),
-                generateCausesRestart = DashboardHelper.GenerateCausesRestart(),
-                outOfDateModels = DashboardHelper.AreModelsOutOfDate(),
-            };
-            return Request.CreateResponse(HttpStatusCode.OK, dashboard, Configuration.Formatters.JsonFormatter);
-        }
-
+        
         // invoked by the API
         // DISABLED - works but useless, because if we return type models that
         // reference some Clr types that exist only on the server and not in the
@@ -283,59 +202,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         //public const string GetTypeModelsUrl = ControllerUrl + "/GetTypeModels";
 
         #endregion
-
-        public static void GenerateModels(string appData, string bin)
-        {
-            var modelsDirectory = Path.Combine(appData, "Models");
-            if (!Directory.Exists(modelsDirectory))
-                Directory.CreateDirectory(modelsDirectory);
-
-            foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
-                File.Delete(file);
-
-            var umbraco = Application.GetApplication();
-            var typeModels = umbraco.GetAllTypes();
-
-            // using BuildManager references
-            var referencedAssemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToArray();
-
-            var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
-            var parseResult = new CodeParser().Parse(ourFiles, referencedAssemblies);
-            var builder = new TextBuilder(typeModels, parseResult, Config.ModelsNamespace);
-
-            foreach (var typeModel in builder.GetModelsToGenerate())
-            {
-                var sb = new StringBuilder();
-                builder.Generate(sb, typeModel);
-                var filename = Path.Combine(modelsDirectory, typeModel.ClrName + ".generated.cs");
-                File.WriteAllText(filename, sb.ToString());
-            }
-
-            if (bin != null)
-            {
-                foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
-                    ourFiles[file] = File.ReadAllText(file);
-                var compiler = new Compiler();                
-                foreach (var asm in referencedAssemblies)
-                    compiler.ReferencedAssemblies.Add(asm);
-                compiler.Compile(bin, builder.GetModelsNamespace(), ourFiles);
-            }
-
-            OutOfDateModelsStatus.Clear();
-        }
-
-        public static void TouchModelsFile(string appCode)
-        {
-            var modelsFile = Path.Combine(appCode, "build.models");
-
-            // touch the file & make sure it exists, will recycle the domain
-            var text = string.Format("Umbraco ModelsBuilder\r\n"
-                + "Actual models code in ~/App_Data/Models\r\n"
-                + "Removing this file disables all generated models\r\n"
-                + "{0:yyyy-MM-ddTHH:mm:ssZ}", DateTime.UtcNow);
-            File.WriteAllText(modelsFile, text);
-        }
-
+            
         private Attempt<HttpResponseMessage> CheckVersion(Version clientVersion, Version minServerVersionSupportingClient)
         {
             if (clientVersion == null)

@@ -22,7 +22,7 @@ using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.AspNet
 {
-    public class LiveModelsProvider : ApplicationEventHandler
+    public sealed class LiveModelsProvider : ApplicationEventHandler
     {
         private static Mutex _mutex;
         private static int _req;
@@ -129,11 +129,11 @@ namespace Umbraco.ModelsBuilder.AspNet
                 throw new Exception("Panic: bin is null.");
 
             // EnableDllModels will recycle the app domain - but this request will end properly
-            ModelsBuilderController.GenerateModels(appData, Config.EnableDllModels ? bin : null);
+            ModelsBuilderBackOfficeController.GenerateModels(appData, Config.EnableDllModels ? bin : null);
 
             // will recycle the app domain - but this request will end properly
             if (Config.EnableAppCodeModels)
-                ModelsBuilderController.TouchModelsFile(appCode);
+                ModelsBuilderBackOfficeController.TouchModelsFile(appCode);
         }
     }
 

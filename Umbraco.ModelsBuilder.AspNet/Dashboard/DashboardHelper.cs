@@ -3,7 +3,7 @@ using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.AspNet.Dashboard
 {
-    public static class DashboardHelper
+    internal static class DashboardHelper
     {
         public static bool CanGenerate()
         {

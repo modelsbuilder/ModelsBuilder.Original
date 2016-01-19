@@ -87,7 +87,7 @@ namespace Umbraco.ModelsBuilder.AspNet
                 if (HttpContext.Current == null) throw new InvalidOperationException("HttpContext is null");
                 var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
 
-                umbracoUrls["modelsBuilderBaseUrl"] = urlHelper.GetUmbracoApiServiceBaseUrl<ModelsBuilderController>(controller => controller.GetModels(null));
+                umbracoUrls["modelsBuilderBaseUrl"] = urlHelper.GetUmbracoApiServiceBaseUrl<ModelsBuilderBackOfficeController>(controller => controller.BuildModels());
             };
         }
     }
