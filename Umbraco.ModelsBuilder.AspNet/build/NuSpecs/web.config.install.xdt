@@ -13,10 +13,12 @@
   </xs:schema>
   <system.web>
 		<compilation>
+      <assemblies xdt:Transform="InsertIfMissing" />
 		  <assemblies>
         <add assembly="Umbraco.ModelsBuilder"
           xdt:Transform="InsertIfMissing" xdt:Locator="Match(assembly)" />
 		  </assemblies>
+      <buildProviders xdt:Transform="InsertIfMissing" />
       <buildProviders>
         <add extension=".models" type="Umbraco.ModelsBuilder.AspNet.ModelsBuildProvider, Umbraco.ModelsBuilder.AspNet"
           xdt:Transform="Insert" />
