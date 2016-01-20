@@ -15,8 +15,7 @@
     <language>en-US</language>
     <tags>umbraco</tags>
     <dependencies>
-			<dependency id="Microsoft.CodeAnalysis.CSharp" version="1.0.0" />
-      <dependency id="UmbracoCms.Core" version="[7.4-beta3, 8.0.0)" />
+			<dependency id="Microsoft.CodeAnalysis.CSharp" version="1.0.0" />      
     </dependencies>
 	</metadata>
 	<files>

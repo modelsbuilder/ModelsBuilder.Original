@@ -123,11 +123,31 @@ namespace Umbraco.ModelsBuilder.AspNet
                 if (umbracoUrls == null)
                     throw new Exception("Invalid umbracoUrls");
 
+                if (!serverVars.ContainsKey("umbracoPlugins"))
+                    throw new Exception("Missing umbracoPlugins.");
+                var umbracoPlugins = serverVars["umbracoPlugins"] as Dictionary<string, object>;
+                if (umbracoPlugins == null)
+                    throw new Exception("Invalid umbracoPlugins");
+
                 if (HttpContext.Current == null) throw new InvalidOperationException("HttpContext is null");
                 var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
 
                 umbracoUrls["modelsBuilderBaseUrl"] = urlHelper.GetUmbracoApiServiceBaseUrl<ModelsBuilderBackOfficeController>(controller => controller.BuildModels());
+                umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings();
             };
+        }
+
+        private Dictionary<string, object> GetModelsBuilderSettings()
+        {
+            if (ApplicationContext.Current.IsConfigured == false)
+                return null;
+
+            var settings = new Dictionary<string, object>
+                {
+                    {"enabled", UmbracoConfig.For.ModelsBuilder().Enable}
+                };
+
+            return settings;
         }
     }
 }
