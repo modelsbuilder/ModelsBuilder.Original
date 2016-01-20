@@ -6,7 +6,11 @@ using System.Web.Routing;
 using System.Web.WebPages;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web.Mvc;
 using Umbraco.ModelsBuilder.AspNet.ViewEngine;
 using Umbraco.ModelsBuilder.Configuration;
@@ -18,6 +22,39 @@ namespace Umbraco.ModelsBuilder.AspNet
 {
     public class ModelsBuilderApplication : ApplicationEventHandler
     {
+        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            FileService.SavingTemplate += FileService_SavingTemplate;
+        }
+
+        /// <summary>
+        /// Used to check if a template is being created based on a document type, in this case we need to 
+        /// ensure the template markup is correct based on the model name of the document type
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FileService_SavingTemplate(IFileService sender, Core.Events.SaveEventArgs<Core.Models.ITemplate> e)
+        {
+            //don't do anything if we're not enabled
+            if (!UmbracoConfig.For.ModelsBuilder().Enable) return;
+            //don't do anything if this special key is not found
+            if (!e.AdditionalData.ContainsKey("CreateTemplateForContentType")) return;
+
+            foreach (var template in e.SavedEntities)
+            {
+                //if it is in fact a new entity (not been saved yet) and the "CreateTemplateForContentType" key 
+                // is found, then it means a new template is being created based on the creation of a document type
+                if (template.IsNewEntity())
+                {
+                    //ensure is safe and always pascal cased, per razor standard
+                    var className = template.Name.ToCleanString(CleanStringType.Alias | CleanStringType.PascalCase);
+                    var markup = ViewHelper.GetDefaultFileContent(modelClassName: className);
+                    //set the template content to the new markup
+                    template.Content = markup;
+                }
+            }
+        }
+
         protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             // install pure-live models if required
