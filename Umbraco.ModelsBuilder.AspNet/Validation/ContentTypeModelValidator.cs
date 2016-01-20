@@ -28,20 +28,17 @@ namespace Umbraco.ModelsBuilder.AspNet.Validation
                     .Where(x => x.Inherited == false)
                     .ToArray();
 
-                if (properties.Any())
+                foreach (var prop in properties)
                 {
-                    foreach (var prop in properties)
-                    {
-                        //we need to return the field name with an index so it's wired up correctly
-                        var propertyGroup = model.Groups.Single(x => x.Properties.Contains(prop));
-                        var groupIndex = model.Groups.IndexOf(propertyGroup);
-                        var propertyIndex = propertyGroup.Properties.IndexOf(prop);
+                    //we need to return the field name with an index so it's wired up correctly
+                    var propertyGroup = model.Groups.Single(x => x.Properties.Contains(prop));
+                    var groupIndex = model.Groups.IndexOf(propertyGroup);
+                    var propertyIndex = propertyGroup.Properties.IndexOf(prop);
 
-                        var validationResult = ValidateProperty(prop, groupIndex, propertyIndex);
-                        if (validationResult != null)
-                        {
-                            yield return validationResult;
-                        }
+                    var validationResult = ValidateProperty(prop, groupIndex, propertyIndex);
+                    if (validationResult != null)
+                    {
+                        yield return validationResult;
                     }
                 }
             }
