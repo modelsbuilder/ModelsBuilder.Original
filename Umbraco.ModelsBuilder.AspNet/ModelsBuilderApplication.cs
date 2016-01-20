@@ -40,6 +40,9 @@ namespace Umbraco.ModelsBuilder.AspNet
             //don't do anything if this special key is not found
             if (!e.AdditionalData.ContainsKey("CreateTemplateForContentType")) return;
 
+            if (!e.AdditionalData.ContainsKey("ContentTypeAlias"))
+                throw new InvalidOperationException("The additionalData key: ContentTypeAlias was not found");
+
             foreach (var template in e.SavedEntities)
             {
                 //if it is in fact a new entity (not been saved yet) and the "CreateTemplateForContentType" key 
@@ -47,7 +50,7 @@ namespace Umbraco.ModelsBuilder.AspNet
                 if (!template.HasIdentity && template.Content.IsNullOrWhiteSpace())
                 {
                     //ensure is safe and always pascal cased, per razor standard
-                    var className = template.Name.ToCleanString(CleanStringType.Alias | CleanStringType.PascalCase);
+                    var className = e.AdditionalData["ContentTypeAlias"].ToString().ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase);
                     var markup = ViewHelper.GetDefaultFileContent(modelClassName: className);
                     //set the template content to the new markup
                     template.Content = markup;
