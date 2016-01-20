@@ -22,6 +22,7 @@ using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.Web;
 using Umbraco.Web.WebApi.Filters;
 using Application = Umbraco.ModelsBuilder.Umbraco.Application;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.ModelsBuilder.AspNet
 {
