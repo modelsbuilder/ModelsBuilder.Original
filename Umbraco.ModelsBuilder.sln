@@ -5,7 +5,6 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{C7535949-9EEE-4711-8351-0CA8EB32DBE6}"
 	ProjectSection(SolutionItems) = preProject
-		build.txt = build.txt
 		license.txt = license.txt
 		readme.md = readme.md
 		SolutionInfo.cs = SolutionInfo.cs
@@ -23,6 +22,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.Conso
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{42C3FC1A-26BA-4FAB-9585-AC8C25449B8F}"
 	ProjectSection(SolutionItems) = preProject
+		build\build-howto.txt = build\build-howto.txt
 		build\build.ps1 = build\build.ps1
 	EndProjectSection
 EndProject

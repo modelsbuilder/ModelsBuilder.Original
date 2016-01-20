@@ -13,7 +13,10 @@ param (
 	$PreReleaseName
 )
 
-
+if (-not [System.String]::IsNullOrWhitespace($PreReleaseName) -and -not $PreReleaseName.StartsWith("-"))
+{
+    $PreReleaseName = "-" + $PreReleaseName
+}
 
 $PSScriptFilePath = Get-Item $MyInvocation.MyCommand.Path
 $RepoRoot = $PSScriptFilePath.Directory.Parent.FullName
