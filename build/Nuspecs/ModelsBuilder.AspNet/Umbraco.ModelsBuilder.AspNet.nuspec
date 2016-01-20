@@ -15,10 +15,6 @@
     <language>en-US</language>
     <tags>umbraco</tags>
     <dependencies>
-      <!-- dont need that one as Umbraco.ModelsBuilder depends on it -->
-      <!--
-			<dependency id="Microsoft.CodeAnalysis.CSharp" version="0.6.4033103-beta" />
-      -->
       <dependency id="Umbraco.ModelsBuilder" version="$version$" />
     </dependencies>
 	</metadata>
@@ -33,11 +29,6 @@
     <file src="modelsbuilder.resource.js" target="content\App_Plugins\ModelsBuilder\modelsbuilder.resource.js" />
     <file src="package.manifest" target="content\App_Plugins\ModelsBuilder\package.manifest" />
 
-    <!-- post-install script // we don't have one -->
-    <!--
-		<file src="tools\install.ps1" target="tools\install.ps1" />
-		-->
-    
     <!-- transforms -->
     <file src="web.config.install.xdt" target="content" />
     <file src="web.config.uninstall.xdt" target="content" />

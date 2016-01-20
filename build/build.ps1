@@ -21,7 +21,7 @@ if (-not [System.String]::IsNullOrWhitespace($PreReleaseName) -and -not $PreRele
 $PSScriptFilePath = Get-Item $MyInvocation.MyCommand.Path
 $RepoRoot = $PSScriptFilePath.Directory.Parent.FullName
 $BuildFolder = Join-Path -Path $RepoRoot -ChildPath "build";
-$ReleaseFolder = Join-Path -Path $BuildFolder -ChildPath "Release\v$ReleaseVersionNumber.$BuildNumber$PreReleaseName";
+$ReleaseFolder = Join-Path -Path $BuildFolder -ChildPath "Release\v$ReleaseVersionNumber$PreReleaseName";
 $SolutionRoot = $RepoRoot;
 $ProgFiles86 = [Environment]::GetEnvironmentVariable("ProgramFiles(x86)");
 $MSBuild = "$ProgFiles86\MSBuild\14.0\Bin\MSBuild.exe"
