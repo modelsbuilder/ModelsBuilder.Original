@@ -44,7 +44,7 @@ namespace Umbraco.ModelsBuilder.AspNet
             {
                 //if it is in fact a new entity (not been saved yet) and the "CreateTemplateForContentType" key 
                 // is found, then it means a new template is being created based on the creation of a document type
-                if (template.IsNewEntity())
+                if (!template.HasIdentity && template.Content.IsNullOrWhiteSpace())
                 {
                     //ensure is safe and always pascal cased, per razor standard
                     var className = template.Name.ToCleanString(CleanStringType.Alias | CleanStringType.PascalCase);
