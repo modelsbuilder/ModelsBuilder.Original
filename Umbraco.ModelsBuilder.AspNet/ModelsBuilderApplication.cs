@@ -63,14 +63,14 @@ namespace Umbraco.ModelsBuilder.AspNet
             // install pure-live models if required
 
             if (UmbracoConfig.For.ModelsBuilder().ModelsMode == ModelsMode.PureLive)
-                ApplicationStartingLiveModels();
+                ApplicationStartingLiveModels(applicationContext);
 
             // always setup the dashboard
 
             RegisterServerVars();
         }
 
-        private void ApplicationStartingLiveModels()
+        private void ApplicationStartingLiveModels(ApplicationContext applicationContext)
         {
             var renderViewEngine = new RoslynRenderViewEngine();
             var pluginViewEngine = new RoslynPluginViewEngine();
@@ -89,7 +89,8 @@ namespace Umbraco.ModelsBuilder.AspNet
             // the virtual paths in the view engine?
             VirtualPathFactoryManager.RegisterVirtualPathFactory(renderViewEngine);
 
-            var factory = new PureLiveModelFactory(renderViewEngine, pluginViewEngine);
+            var logger = applicationContext.ProfilingLogger;
+            var factory = new PureLiveModelFactory(logger, renderViewEngine, pluginViewEngine);
             PublishedContentModelFactoryResolver.Current.SetFactory(factory);
 
             // the following would add @using statement in every view so user's don't
