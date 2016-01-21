@@ -3,6 +3,7 @@ using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Cache;
 using Umbraco.ModelsBuilder.AspNet;
@@ -22,7 +23,7 @@ using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.AspNet
 {
-    public class LiveModelsProvider : ApplicationEventHandler
+    public sealed class LiveModelsProvider : ApplicationEventHandler
     {
         private static Mutex _mutex;
         private static int _req;
@@ -31,18 +32,9 @@ namespace Umbraco.ModelsBuilder.AspNet
         {
             get
             {
-                if (!Config.EnableLiveModels)
-                    return false;
-
-                // not supported anymore
-                //if (Config.EnableAppCodeModels)
-                //    return true;
-
-                if (Config.EnableAppDataModels || Config.EnableDllModels)
-                    return true;
-
+                var config = UmbracoConfig.For.ModelsBuilder();
+                return config.ModelsMode.IsLiveNotPure();
                 // we do not manage pure live here
-                return false;
             }
         }
 
@@ -128,12 +120,14 @@ namespace Umbraco.ModelsBuilder.AspNet
             if (bin == null)
                 throw new Exception("Panic: bin is null.");
 
+            var config = UmbracoConfig.For.ModelsBuilder();
+
             // EnableDllModels will recycle the app domain - but this request will end properly
-            ModelsBuilderController.GenerateModels(appData, Config.EnableDllModels ? bin : null);
+            ModelsBuilderBackOfficeController.GenerateModels(appData, config.ModelsMode.IsAnyDll() ? bin : null);
 
             // will recycle the app domain - but this request will end properly
-            if (Config.EnableAppCodeModels)
-                ModelsBuilderController.TouchModelsFile(appCode);
+            if (config.ModelsMode.IsAnyAppCode())
+                ModelsBuilderBackOfficeController.TouchModelsFile(appCode);
         }
     }
 

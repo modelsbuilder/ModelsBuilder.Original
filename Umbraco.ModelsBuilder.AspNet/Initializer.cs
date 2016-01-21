@@ -1,4 +1,5 @@
 ﻿using System.Web.Compilation;
+using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
 
@@ -16,7 +17,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         public static void Initialize()
         {
             // registers the models build provider
-            if (Config.EnableAppCodeModels)
+            if (UmbracoConfig.For.ModelsBuilder().ModelsMode.IsAnyAppCode())
                 BuildProvider.RegisterBuildProvider(".models", typeof(ModelsBuildProvider));
 
             // ensure that Umbraco.ModelsBuilder is referenced

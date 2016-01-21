@@ -2,16 +2,17 @@
 using System.IO;
 using System.Web.Hosting;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.Cache;
 using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.AspNet
 {
-    public class OutOfDateModelsStatus : ApplicationEventHandler
+    public sealed class OutOfDateModelsStatus : ApplicationEventHandler
     {
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
-            if (Config.FlagOutOfDateModels == false) return;
+            if (UmbracoConfig.For.ModelsBuilder().FlagOutOfDateModels == false) return;
             ContentTypeCacheRefresher.CacheUpdated += (sender, args) => Write();
             DataTypeCacheRefresher.CacheUpdated += (sender, args) => Write();
         }
@@ -35,7 +36,7 @@ namespace Umbraco.ModelsBuilder.AspNet
 
         public static void Clear()
         {
-            if (Config.FlagOutOfDateModels == false) return;
+            if (UmbracoConfig.For.ModelsBuilder().FlagOutOfDateModels == false) return;
             var path = GetFlagPath();
             if (path == null || !File.Exists(path)) return;
             File.Delete(path);
@@ -43,14 +44,14 @@ namespace Umbraco.ModelsBuilder.AspNet
 
         public static bool IsEnabled
         {
-            get { return Config.FlagOutOfDateModels; }
+            get { return UmbracoConfig.For.ModelsBuilder().FlagOutOfDateModels; }
         }
 
         public static bool IsOutOfDate
         {
             get
             {
-                if (Config.FlagOutOfDateModels == false) return false;
+                if (UmbracoConfig.For.ModelsBuilder().FlagOutOfDateModels == false) return false;
                 var path = GetFlagPath();
                 return path != null && File.Exists(path);
             }

@@ -13,3 +13,4 @@ Requires Umbraco 7.1.4 or later.
 
 More infos, including a (hopefully) **complete documentation**, can be found in the [wiki](https://github.com/zpqrtbnk/Zbu.ModelsBuilder/wiki/Zbu.ModelsBuilder).
 
+To build, execute: /build/build.ps1

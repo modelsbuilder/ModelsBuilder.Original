@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata minClientVersion="2.8.1">
     <id>Umbraco.ModelsBuilder</id>
-    <version>$version$</version>
+    <version>0.0.0.0</version>
     <title>Umbraco ModelsBuilder Libraries</title>
     <authors>Umbraco HQ</authors>
     <owners>Umbraco HQ</owners>
@@ -11,30 +11,17 @@
     <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
     <description>Umbraco ModeslBuilder Libraries.</description>
     <projectUrl>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</projectUrl>
-    <copyright>Copyright © Umbraco HQ 2013-2016</copyright>
+    <copyright>$copyright$</copyright>
     <language>en-US</language>
     <tags>umbraco</tags>
     <dependencies>
-			<dependency id="Microsoft.CodeAnalysis.CSharp" version="1.0.0" />
-      <!-- don't need those as Microsoft.CodeAnalysis.CSharp depends on them -->
-      <!--
-      <dependency id="Microsoft.Bcl.Immutable" version="1.1.22-beta" />
-      <dependency id="Microsoft.Bcl.Metadata" version="1.0.12-alpha" />
-      -->
+			<dependency id="Microsoft.CodeAnalysis.CSharp" version="1.0.0" />      
     </dependencies>
 	</metadata>
 	<files>
     <!-- our dlls -->
-    <file src="..\..\bin\Release\Umbraco.ModelsBuilder.dll" target="lib\Umbraco.ModelsBuilder.dll" />
-
-    <!-- content // we don't have any -->
-		
-    <!-- post-install script // we don't have one -->
-    <!--
-		<file src="tools\install.ps1" target="tools\install.ps1" />
-		-->
-    
-    <!-- transforms // we don't have any -->
+    <file src="Umbraco.ModelsBuilder.dll" target="lib\Umbraco.ModelsBuilder.dll" />
+    <file src="Umbraco.ModelsBuilder.pdb" target="lib\Umbraco.ModelsBuilder.pdb" />
 
   </files>
 </package>

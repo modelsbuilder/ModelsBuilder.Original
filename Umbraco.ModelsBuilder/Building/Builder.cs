@@ -153,16 +153,16 @@ namespace Umbraco.ModelsBuilder.Building
 
             // ensure we have no duplicates type names
             foreach (var xx in _typeModels.Where(x => !x.IsContentIgnored).GroupBy(x => x.ClrName).Where(x => x.Count() > 1))
-                throw new InvalidOperationException(string.Format("Type name \"{0}\" is used for {1}. Should be used for one type only.", 
-                    xx.Key, 
-                    string.Join(", ", xx.Select(x => x.ItemType + ":\"" + x.Alias + "\""))));
+                throw new InvalidOperationException($"Type name \"{xx.Key}\" is used"
+                    + $" for types with alias {string.Join(", ", xx.Select(x => x.ItemType + ":\"" + x.Alias + "\""))}. Names have to be unique."
+                    + " Consider using an attribute to assign different names to conflicting types.");
 
             // ensure we have no duplicates property names
             foreach (var typeModel in _typeModels.Where(x => !x.IsContentIgnored))
                 foreach (var xx in typeModel.Properties.Where(x => !x.IsIgnored).GroupBy(x => x.ClrName).Where(x => x.Count() > 1))
-                    throw new InvalidOperationException(string.Format("Property name \"{0}\" in type with alias \"{1}\" is used for properties with alias {2}. Should be used for one property only.",
-                        xx.Key, typeModel.Alias,
-                        string.Join(", ", xx.Select(x => "\"" + x.Alias + "\""))));
+                    throw new InvalidOperationException($"Property name \"{xx.Key}\" in type {typeModel.ItemType}:\"{typeModel.Alias}\""
+                        + $" is used for properties with alias {string.Join(", ", xx.Select(x => "\"" + x.Alias + "\""))}. Names have to be unique."
+                        + " Consider using an attribute to assign different names to conflicting properties.");
 
             // ensure we have no collision between base types
             // NO: we may want to define a base class in a partial, on a model that has a parent
@@ -271,6 +271,7 @@ namespace Umbraco.ModelsBuilder.Building
                 return ModelsNamespace;
 
             // default
+            // fixme - should NOT reference config here, should make ModelsNamespace mandatory
             return Config.DefaultModelsNamespace;
         }
 

@@ -31,8 +31,5 @@
         -->
       </buildProviders>
 		</compilation>
-	</system.web>
-  <appSettings>
-    <add xdt:Transform="RemoveAll" xdt:Locator="Condition(starts-with(@key, 'Umbraco.ModelsBuilder.'))" />
-  </appSettings>
+	</system.web>  
 </configuration>

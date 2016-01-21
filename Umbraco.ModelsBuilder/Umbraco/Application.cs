@@ -118,7 +118,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         //            var factory = DbProviderFactories.GetFactory("MySql.Data.MySqlClient");
         //        }
         //        catch (Exception e)
-        //        {                    
+        //        {
         //            throw new Exception("Failed to configure MySql provider.", e);
         //        }
         //    }
@@ -162,7 +162,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         //    {
         //        if (_installedConfigSystem)
         //            global::Umbraco.Web.Standalone.WriteableConfigSystem.Uninstall();
-        //        _installedConfigSystem = false;                
+        //        _installedConfigSystem = false;
         //        throw;
         //    }
 
@@ -218,9 +218,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
         //            exists = true;
         //    if (!exists)
         //    {
-        //        // <add name="MySQL Data Provider" 
-        //        //      invariant="MySql.Data.MySqlClient" 
-        //        //      description=".Net Framework Data Provider for MySQL" 
+        //        // <add name="MySQL Data Provider"
+        //        //      invariant="MySql.Data.MySqlClient"
+        //        //      description=".Net Framework Data Provider for MySQL"
         //        //      type="MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data, Version=6.6.5.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d" />
         //        dbProviderFactories.Add("MySQL Data Provider",
         //            ".Net Framework Data Provider for MySQL",
@@ -242,15 +242,15 @@ namespace Umbraco.ModelsBuilder.Umbraco
             //    throw new InvalidOperationException("Application is not ready.");
 
             var types = new List<TypeModel>();
-            
+
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             types.AddRange(GetTypes(PublishedItemType.Content, contentTypeService.GetAllContentTypes().Cast<IContentTypeBase>().ToArray()));
             types.AddRange(GetTypes(PublishedItemType.Media, contentTypeService.GetAllMediaTypes().Cast<IContentTypeBase>().ToArray()));
 
             var memberTypeService = ApplicationContext.Current.Services.MemberTypeService;
             types.AddRange(GetTypes(PublishedItemType.Member, memberTypeService.GetAll().Cast<IContentTypeBase>().ToArray()));
-            
-            return types;
+
+            return EnsureDistinctAliases(types);
         }
 
         public IList<TypeModel> GetContentTypes()
@@ -260,7 +260,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             var contentTypes = contentTypeService.GetAllContentTypes().Cast<IContentTypeBase>().ToArray();
-            return GetTypes(PublishedItemType.Content, contentTypes);
+            return GetTypes(PublishedItemType.Content, contentTypes); // aliases have to be unique here
         }
 
         public IList<TypeModel> GetMediaTypes()
@@ -270,7 +270,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             var contentTypes = contentTypeService.GetAllMediaTypes().Cast<IContentTypeBase>().ToArray();
-            return GetTypes(PublishedItemType.Media, contentTypes);
+            return GetTypes(PublishedItemType.Media, contentTypes); // aliases have to be unique here
         }
 
         public IList<TypeModel> GetMemberTypes()
@@ -280,7 +280,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             var memberTypeService = ApplicationContext.Current.Services.MemberTypeService;
             var memberTypes = memberTypeService.GetAll().Cast<IContentTypeBase>().ToArray();
-            return GetTypes(PublishedItemType.Member, memberTypes);
+            return GetTypes(PublishedItemType.Member, memberTypes); // aliases have to be unique here
         }
 
         private static IList<TypeModel> GetTypes(PublishedItemType itemType, IContentTypeBase[] contentTypes)
@@ -343,7 +343,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             {
                 typeModel.BaseType = typeModels.SingleOrDefault(x => x.Id == typeModel.ParentId);
                 // Umbraco 7.4 introduces content types containers, so even though ParentId > 0, the parent might
-                // not be a content type - here we assume that BaseType being null while ParentId > 0 means that 
+                // not be a content type - here we assume that BaseType being null while ParentId > 0 means that
                 // the parent is a container (and we don't check).
                 typeModel.IsParent = typeModel.BaseType != null;
             }
@@ -380,6 +380,19 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 }
             }
 
+            return typeModels;
+        }
+
+        internal static IList<TypeModel> EnsureDistinctAliases(IList<TypeModel> typeModels)
+        {
+            var groups = typeModels.GroupBy(x => x.Alias.ToLowerInvariant());
+            foreach (var group in groups.Where(x => x.Count() > 1))
+            {
+                throw new NotSupportedException($"Alias \"{group.Key}\" is used by types"
+                    + $" {string.Join(", ", group.Select(x => x.ItemType + ":\"" + x.Alias + "\""))}. Aliases have to be unique."
+                    + " Consider disabling the ModelsBuilder by setting web.config appSettings Umbraco.ModelsBuilder.Enable to false."
+                    + " See also this issue: http://issues.umbraco.org/issue/U4-7731.");
+            }
             return typeModels;
         }
 
