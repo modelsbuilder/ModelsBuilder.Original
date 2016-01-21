@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Building
@@ -272,7 +273,7 @@ namespace Umbraco.ModelsBuilder.Building
 
             // default
             // fixme - should NOT reference config here, should make ModelsNamespace mandatory
-            return Config.DefaultModelsNamespace;
+            return UmbracoConfig.For.ModelsBuilder().ModelsNamespace;
         }
 
         protected string GetModelsBaseClassName()

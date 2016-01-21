@@ -55,11 +55,7 @@ namespace Umbraco.ModelsBuilder.AspNet.Dashboard
                 ? $"<li><strong>{config.ModelsMode} models</strong> are enabled.</li>"
                 : "<li>No models mode is specified: models will <em>not</em> be generated.</li>");
 
-            sb.Append("<li>Models namespace is ");
-            sb.Append(string.IsNullOrWhiteSpace(config.ModelsNamespace)
-                ? "not configured (will use default)"
-                : $"\"{config.ModelsNamespace}\"");
-            sb.Append(".</li>");
+            sb.Append($"<li>Models namespace is {config.ModelsNamespace}.</li>");
 
             sb.Append("<li>Static mixin getters are ");
             sb.Append(config.StaticMixinGetters ? "enabled" : "disabled");

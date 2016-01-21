@@ -254,12 +254,12 @@
     <Reference Include="umbraco, Version=1.0.5863.31142, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\UmbracoCms.Core.7.4.0-beta4\lib\umbraco.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Umbraco.Core, Version=1.0.5863.31137, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\UmbracoCms.Core.7.4.0-beta4\lib\Umbraco.Core.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="umbraco.DataLayer, Version=1.0.5863.31139, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\UmbracoCms.Core.7.4.0-beta4\lib\umbraco.DataLayer.dll</HintPath>
