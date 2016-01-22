@@ -28,30 +28,43 @@ namespace Umbraco.ModelsBuilder.AspNet
         }
 
         /// <summary>
-        /// Used to check if a template is being created based on a document type, in this case we need to 
+        /// Used to check if a template is being created based on a document type, in this case we need to
         /// ensure the template markup is correct based on the model name of the document type
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void FileService_SavingTemplate(IFileService sender, Core.Events.SaveEventArgs<Core.Models.ITemplate> e)
         {
-            //don't do anything if we're not enabled
+            // don't do anything if we're not enabled
             if (!UmbracoConfig.For.ModelsBuilder().Enable) return;
-            //don't do anything if this special key is not found
+
+            // don't do anything if this special key is not found
             if (!e.AdditionalData.ContainsKey("CreateTemplateForContentType")) return;
 
+            // ensure we have the content type alias
             if (!e.AdditionalData.ContainsKey("ContentTypeAlias"))
                 throw new InvalidOperationException("The additionalData key: ContentTypeAlias was not found");
 
             foreach (var template in e.SavedEntities)
             {
-                //if it is in fact a new entity (not been saved yet) and the "CreateTemplateForContentType" key 
+                // if it is in fact a new entity (not been saved yet) and the "CreateTemplateForContentType" key
                 // is found, then it means a new template is being created based on the creation of a document type
                 if (!template.HasIdentity && template.Content.IsNullOrWhiteSpace())
                 {
-                    //ensure is safe and always pascal cased, per razor standard
+                    // ensure is safe and always pascal cased, per razor standard
+                    // + this is how we get the default model name in Umbraco.ModelsBuilder.Umbraco.Application
                     var className = e.AdditionalData["ContentTypeAlias"].ToString().ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase);
-                    var markup = ViewHelper.GetDefaultFileContent(modelClassName: className);
+
+                    var modelNamespace = UmbracoConfig.For.ModelsBuilder().ModelsNamespace;
+
+                    // we do not support configuring this at the moment, so just let Umbraco use its default value
+                    //var modelNamespaceAlias = ...;
+
+                    var markup = ViewHelper.GetDefaultFileContent(
+                        modelClassName: className,
+                        modelNamespace: modelNamespace/*,
+                        modelNamespaceAlias: modelNamespaceAlias*/);
+
                     //set the template content to the new markup
                     template.Content = markup;
                 }

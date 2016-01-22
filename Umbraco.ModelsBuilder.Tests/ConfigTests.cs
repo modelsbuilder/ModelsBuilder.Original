@@ -32,5 +32,33 @@ namespace Umbraco.ModelsBuilder.Tests
             Config.Setup(new Config(modelsNamespace: "test2"));
             Assert.AreEqual("test2", UmbracoConfig.For.ModelsBuilder().ModelsNamespace);
         }
+
+        [Test]
+        public void DefaultModelsNamespace1()
+        {
+            Config.Setup(new Config(enable: true));
+            Assert.AreEqual(Config.DefaultModelsNamespace, UmbracoConfig.For.ModelsBuilder().ModelsNamespace);
+        }
+
+        [Test]
+        public void DefaultModelsNamespace2()
+        {
+            Config.Setup(new Config());
+            Assert.AreEqual(Config.DefaultModelsNamespace, UmbracoConfig.For.ModelsBuilder().ModelsNamespace);
+        }
+
+        [Test]
+        public void DefaultStaticMixinGetterPattern1()
+        {
+            Config.Setup(new Config(enable: true));
+            Assert.AreEqual(Config.DefaultStaticMixinGetterPattern, UmbracoConfig.For.ModelsBuilder().StaticMixinGetterPattern);
+        }
+
+        [Test]
+        public void DefaultStaticMixinGetterPattern2()
+        {
+            Config.Setup(new Config());
+            Assert.AreEqual(Config.DefaultStaticMixinGetterPattern, UmbracoConfig.For.ModelsBuilder().StaticMixinGetterPattern);
+        }
     }
 }

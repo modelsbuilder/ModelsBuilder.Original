@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Configuration;
-using System.Web.Compilation;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace Umbraco.ModelsBuilder.Configuration
@@ -34,9 +33,9 @@ namespace Umbraco.ModelsBuilder.Configuration
             _value = config;
         }
 
-        private const string DefaultStaticMixinGetterPattern = "Get{0}";
-        private const LanguageVersion DefaultLanguageVersion = LanguageVersion.CSharp5;
-        public const string DefaultModelsNamespace = "Umbraco.Web.PublishedContentModels";
+        internal const string DefaultStaticMixinGetterPattern = "Get{0}";
+        internal const LanguageVersion DefaultLanguageVersion = LanguageVersion.CSharp5;
+        internal const string DefaultModelsNamespace = "Umbraco.Web.PublishedContentModels";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Config"/> class.
@@ -52,6 +51,7 @@ namespace Umbraco.ModelsBuilder.Configuration
             // ensure defaults are initialized for tests
             StaticMixinGetterPattern = DefaultStaticMixinGetterPattern;
             LanguageVersion = DefaultLanguageVersion;
+            ModelsNamespace = DefaultModelsNamespace;
 
             // stop here, everything is false
             if (!Enable) return;
@@ -97,15 +97,17 @@ namespace Umbraco.ModelsBuilder.Configuration
             StaticMixinGetters = Enable && !ConfigurationManager.AppSettings[prefix + "StaticMixinGetters"].InvariantEquals("false");
             FlagOutOfDateModels = Enable && !ConfigurationManager.AppSettings[prefix + "FlagOutOfDateModels"].InvariantEquals("false");
 
-            // no default
-            ModelsNamespace = ConfigurationManager.AppSettings[prefix + "ModelsNamespace"];
+            // default: initialized above with DefaultModelsNamespace const
+            var value = ConfigurationManager.AppSettings[prefix + "ModelsNamespace"];
+            if (!string.IsNullOrWhiteSpace(value))
+                ModelsNamespace = value;
 
-            // default: see DefaultStaticMixinGetterPattern const
-            var value = ConfigurationManager.AppSettings[prefix + "StaticMixinGetterPattern"];
+            // default: initialized above with DefaultStaticMixinGetterPattern const
+            value = ConfigurationManager.AppSettings[prefix + "StaticMixinGetterPattern"];
             if (!string.IsNullOrWhiteSpace(value))
                 StaticMixinGetterPattern = value;
 
-            // default: see DefaultLanguageVersion const
+            // default: initialized above with DefaultLanguageVersion const
             value = ConfigurationManager.AppSettings[prefix + "LanguageVersion"];
             if (!string.IsNullOrWhiteSpace(value))
             {
@@ -131,17 +133,17 @@ namespace Umbraco.ModelsBuilder.Configuration
             bool enableFactory = true,
             LanguageVersion languageVersion = DefaultLanguageVersion,
             bool staticMixinGetters = true,
-            string staticMixinGetterPattern = DefaultStaticMixinGetterPattern,
+            string staticMixinGetterPattern = null,
             bool flagOutOfDateModels = true)
         {
             Enable = enable;
             ModelsMode = modelsMode;
             EnableApi = enableApi;
-            ModelsNamespace = modelsNamespace;
+            ModelsNamespace = string.IsNullOrWhiteSpace(modelsNamespace) ? DefaultModelsNamespace : modelsNamespace;
             EnableFactory = enableFactory;
             LanguageVersion = languageVersion;
             StaticMixinGetters = staticMixinGetters;
-            StaticMixinGetterPattern = staticMixinGetterPattern;
+            StaticMixinGetterPattern = string.IsNullOrWhiteSpace(staticMixinGetterPattern) ? DefaultStaticMixinGetterPattern : staticMixinGetterPattern;
             FlagOutOfDateModels = flagOutOfDateModels;
         }
 
@@ -172,7 +174,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         /// <summary>
         /// Gets the models namespace.
         /// </summary>
-        /// <remarks>No default value. That value could be overriden by other (attribute in user's code...).</remarks>
+        /// <remarks>That value could be overriden by other (attribute in user's code...). Return default if no value was supplied.</remarks>
         public string ModelsNamespace { get; }
 
         /// <summary>
