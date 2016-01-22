@@ -17,6 +17,7 @@ using Umbraco.Web.Cache;
 using Umbraco.ModelsBuilder.AspNet;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
+using File = System.IO.File;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
@@ -26,9 +27,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
         private readonly IPureLiveModelsEngine[] _engines;
         private bool _hasModels;
+        private bool _pendingRebuild;
+        private readonly ProfilingLogger _logger;
 
-        public PureLiveModelFactory(params IPureLiveModelsEngine[] engines)
+        public PureLiveModelFactory(ProfilingLogger logger, params IPureLiveModelsEngine[] engines)
         {
+            _logger = logger;
             _engines = engines;
             ContentTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModels();
             DataTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModels();
@@ -61,11 +65,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
         // tells the factory that it should build a new generation of models
         private void ResetModels()
         {
-            LogHelper.Debug<PureLiveModelFactory>("Resetting models.");
+            _logger.Logger.Debug<PureLiveModelFactory>("Resetting models.");
             _locker.EnterWriteLock();
             try
             {
                 _hasModels = false;
+                _pendingRebuild = true;
             }
             finally
             {
@@ -76,7 +81,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         // ensure that the factory is running with the lastest generation of models
         private Dictionary<string, Func<IPublishedContent, IPublishedContent>> EnsureModels()
         {
-            LogHelper.Debug<PureLiveModelFactory>("Ensuring models.");
+            _logger.Logger.Debug<PureLiveModelFactory>("Ensuring models.");
             _locker.EnterReadLock();
             try
             {
@@ -92,7 +97,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
             {
                 if (_hasModels) return _constructors;
 
-                LogHelper.Debug<PureLiveModelFactory>("Rebuilding models.");
+                // we don't have models,
+                // either they haven't been loaded from the cache yet
+                // or they have been reseted and are pending a rebuild
 
                 // this will lock the engines - must take care that whatever happens,
                 // we unlock them - even if generation failed for some reason
@@ -101,12 +108,13 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
                 try
                 {
-                    var code = GenerateModelsCode();
-                    var assembly = RoslynRazorViewCompiler.CompileAndRegisterModels(code);
-                    var types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>());
-
-                    _constructors = RegisterModels(types);
-                    _hasModels = true;
+                    using (_logger.DebugDuration<PureLiveModelFactory>("Get models.", "Got models."))
+                    {
+                        var assembly = GetModelsAssembly(_pendingRebuild);
+                        var types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>());
+                        _constructors = RegisterModels(types);
+                        _hasModels = true;
+                    }
                 }
                 finally
                 {
@@ -114,12 +122,96 @@ namespace Umbraco.ModelsBuilder.Umbraco
                         engine.NotifyRebuilt();
                 }
 
-                LogHelper.Debug<PureLiveModelFactory>("Done rebuilding.");
                 return _constructors;
             }
             finally
-            {                
+            {
                 _locker.ExitWriteLock();
+            }
+        }
+
+        private Assembly GetModelsAssembly(bool forceRebuild)
+        {
+            var appData = HostingEnvironment.MapPath("~/App_Data");
+            if (appData == null)
+                throw new Exception("Panic: appData is null.");
+
+            var modelsDirectory = Path.Combine(appData, "Models");
+            if (!Directory.Exists(modelsDirectory))
+                Directory.CreateDirectory(modelsDirectory);
+
+            // must filter out *.generated.cs because we haven't deleted them yet!
+            var ourFiles = Directory.Exists(modelsDirectory)
+                ? Directory.GetFiles(modelsDirectory, "*.cs")
+                    .Where(x => !x.EndsWith(".generated.cs"))
+                    .ToDictionary(x => x, File.ReadAllText)
+                : new Dictionary<string, string>();
+
+            var umbraco = Application.GetApplication();
+            var typeModels = umbraco.GetAllTypes();
+            var currentHash = Hash(ourFiles, typeModels);
+            var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
+            var modelsDllFile = Path.Combine(modelsDirectory, "models.dll");
+            Assembly assembly;
+
+            if (forceRebuild == false)
+            {
+                assembly = TryToLoadCachedModelsAssembly(modelsHashFile, modelsDllFile, currentHash);
+                if (assembly != null)
+                    return assembly;
+            }
+
+            // need to rebuild
+            _logger.Logger.Debug<PureLiveModelFactory>("Rebuilding models.");
+
+            // generate code
+            var code = GenerateModelsCode(ourFiles, typeModels);
+            code = RoslynRazorViewCompiler.PrepareCodeForCompilation(code);
+
+            // save code for debug purposes
+            var modelsCodeFile = Path.Combine(modelsDirectory, "models.generated.cs");
+            File.WriteAllText(modelsCodeFile, code);
+
+            // compile and register
+            byte[] bytes;
+            assembly = RoslynRazorViewCompiler.CompileAndRegisterModels(code, out bytes);
+
+            // assuming we can write and it's not going to cause exceptions...
+            File.WriteAllBytes(modelsDllFile, bytes);
+            File.WriteAllText(modelsHashFile, currentHash);
+
+            _logger.Logger.Debug<PureLiveModelFactory>("Done rebuilding.");
+            return assembly;
+        }
+
+        private Assembly TryToLoadCachedModelsAssembly(string modelsHashFile, string modelsDllFile, string currentHash)
+        {
+            _logger.Logger.Debug<PureLiveModelFactory>("Looking for cached models.");
+
+            if (!File.Exists(modelsHashFile) || !File.Exists(modelsDllFile))
+            {
+                _logger.Logger.Debug<PureLiveModelFactory>("Could not find cached models.");
+                return null;
+            }
+
+            var cachedHash = File.ReadAllText(modelsHashFile);
+            if (currentHash != cachedHash)
+            {
+                _logger.Logger.Debug<PureLiveModelFactory>("Found obsolete cached models.");
+                return null;
+            }
+
+            _logger.Logger.Debug<PureLiveModelFactory>("Found cached models, loading.");
+            try
+            {
+                var rawAssembly = File.ReadAllBytes(modelsDllFile);
+                var assembly = RoslynRazorViewCompiler.RegisterModels(rawAssembly);
+                return assembly;
+            }
+            catch (Exception e)
+            {
+                _logger.Logger.Error<PureLiveModelFactory>("Failed to load cached models.", e);
+                return null;
             }
         }
 
@@ -132,12 +224,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
             {
                 var constructor = type.GetConstructor(ctorArgTypes);
                 if (constructor == null)
-                    throw new InvalidOperationException(string.Format("Type {0} is missing a public constructor with one argument of type IPublishedContent.", type.FullName));
+                    throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type IPublishedContent.");
                 var attribute = type.GetCustomAttribute<PublishedContentModelAttribute>(false);
                 var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
 
                 if (constructors.ContainsKey(typeName))
-                    throw new InvalidOperationException(string.Format("More that one type want to be a model for content type {0}.", typeName));
+                    throw new InvalidOperationException($"More that one type want to be a model for content type {typeName}.");
 
                 var exprArg = Expression.Parameter(typeof(IPublishedContent), "content");
                 var exprNew = Expression.New(constructor, exprArg);
@@ -149,7 +241,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             return constructors.Count > 0 ? constructors : null;
         }
 
-        private static string GenerateModelsCode()
+        private static string GenerateModelsCode(IDictionary<string, string> ourFiles, IList<TypeModel> typeModels)
         {
             var appData = HostingEnvironment.MapPath("~/App_Data");
             if (appData == null)
@@ -160,14 +252,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 Directory.CreateDirectory(modelsDirectory);
 
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
-                System.IO.File.Delete(file);
-
-            var ourFiles = Directory.Exists(modelsDirectory)
-                ? Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, System.IO.File.ReadAllText)
-                : new Dictionary<string, string>();
-
-            var umbraco = Application.GetApplication();
-            var typeModels = umbraco.GetAllTypes();
+                File.Delete(file);
 
             // using BuildManager references
             var referencedAssemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToArray();
@@ -179,10 +264,47 @@ namespace Umbraco.ModelsBuilder.Umbraco
             builder.Generate(codeBuilder, builder.GetModelsToGenerate());
             var code = codeBuilder.ToString();
 
-            // save code for debug purposes
-            System.IO.File.WriteAllText(Path.Combine(modelsDirectory, "models.generated.cs"), code);
-
             return code;
+        }
+
+        #endregion
+
+        #region Hashing
+
+        private static string Hash(IDictionary<string, string> ourFiles, IEnumerable<TypeModel> typeModels)
+        {
+            var hash = new HashCodeCombiner();
+
+            foreach (var kvp in ourFiles)
+                hash.Add(kvp.Key + "::" + kvp.Value);
+
+            // see Umbraco.ModelsBuilder.Umbraco.Application for what's important to hash
+            // ie what comes from Umbraco (not computed by ModelsBuilder) and makes a difference
+
+            foreach (var typeModel in typeModels.OrderBy(x => x.Alias))
+            {
+                hash.Add("--- CONTENT TYPE MODEL ---");
+                hash.Add(typeModel.Id);
+                hash.Add(typeModel.Alias);
+                hash.Add(typeModel.ClrName);
+                hash.Add(typeModel.ParentId);
+                hash.Add(typeModel.Name);
+                hash.Add(typeModel.Description);
+                hash.Add(typeModel.ItemType.ToString());
+                hash.Add("MIXINS:" + string.Join(",", typeModel.MixinTypes.OrderBy(x => x.Id).Select(x => x.Id)));
+
+                foreach (var prop in typeModel.Properties.OrderBy(x => x.Alias))
+                {
+                    hash.Add("--- PROPERTY ---");
+                    hash.Add(prop.Alias);
+                    hash.Add(prop.ClrName);
+                    hash.Add(prop.Name);
+                    hash.Add(prop.Description);
+                    hash.Add(prop.ClrType.FullName);
+                }
+            }
+
+            return hash.GetCombinedHashCode();
         }
 
         #endregion

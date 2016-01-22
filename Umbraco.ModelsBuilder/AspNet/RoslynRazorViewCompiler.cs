@@ -102,11 +102,7 @@ namespace Umbraco.ModelsBuilder.AspNet
             throw new HttpParseException(message, null, path, code, position);
         }
 
-        // invoked by the PureLiveModelsFactory when it detects it needs to rebuild models
-        // the factory should have notified all "pure live models" view engines that it is
-        // rebuilding models, and engines should have suspended compilation, so it is safe
-        // to have zero lock in this method
-        public static Assembly CompileAndRegisterModels(string code)
+        public static string PrepareCodeForCompilation(string code)
         {
             // zero everything and increment generation
             _modelsReference = null;
@@ -119,8 +115,18 @@ namespace Umbraco.ModelsBuilder.AspNet
             var assemblyName = "__dynamic__" + _modelsGeneration + "__";
             var assemblyVersion = "0.0.0." + _modelsGeneration;
 
-            code = code.Replace("//ASSATTR", @"[assembly:System.Reflection.AssemblyTitle(""" + assemblyName + @""")]
+            return code.Replace("//ASSATTR", @"[assembly:System.Reflection.AssemblyTitle(""" + assemblyName + @""")]
 [assembly:System.Reflection.AssemblyVersion(""" + assemblyVersion + @""")]");
+        }
+
+        // invoked by the PureLiveModelsFactory when it detects it needs to rebuild models
+        // the factory should have notified all "pure live models" view engines that it is
+        // rebuilding models, and engines should have suspended compilation, so it is safe
+        // to have zero lock in this method
+        public static Assembly CompileAndRegisterModels(string code, out byte[] bytes)
+        {
+            var assemblyName = "__dynamic__" + _modelsGeneration + "__";
+            var assemblyVersion = "0.0.0." + _modelsGeneration;
 
             // create the compilation
             SyntaxTree[] trees;
@@ -128,15 +134,27 @@ namespace Umbraco.ModelsBuilder.AspNet
 
             // check diagnostics for errors (not warnings)
             foreach (var diag in compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error))
-                throw new Exception(string.Format("Compilation {0}: {1}", diag.Severity, diag.GetMessage()));
+                ThrowExceptionFromDiagnostic("models.generated.cs", code, diag);
 
             // emit
             var stream = new MemoryStream();
             compilation.Emit(stream); // should we check the result?
-            var bytes = stream.GetBuffer();
+            bytes = stream.GetBuffer();
 
             _modelsAssembly = Assembly.Load(bytes);
             _modelsVersionString = assemblyName + ", Version=" + assemblyVersion + ", Culture=neutral, PublicKeyToken=null";
+            _modelsReference = MetadataReference.CreateFromImage(bytes);
+
+            return _modelsAssembly;
+        }
+
+        public static Assembly RegisterModels(byte[] bytes)
+        {
+            _modelsAssembly = Assembly.Load(bytes);
+
+            _modelsGeneration = _modelsAssembly.GetName().Version.Revision;
+            _modelsVersionString = _modelsAssembly.FullName;
+
             _modelsReference = MetadataReference.CreateFromImage(bytes);
 
             return _modelsAssembly;

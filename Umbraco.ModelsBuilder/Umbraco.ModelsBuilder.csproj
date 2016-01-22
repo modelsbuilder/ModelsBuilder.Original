@@ -347,6 +347,7 @@
     <Compile Include="IgnorePropertyTypeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Umbraco\Application.cs" />
+    <Compile Include="Umbraco\HashCodeCombiner.cs" />
     <Compile Include="Umbraco\ModelsBuilderApplication.cs" />
     <Compile Include="Umbraco\IPureLiveModelsEngine.cs" />
     <Compile Include="Umbraco\PureLiveModelFactory.cs" />
