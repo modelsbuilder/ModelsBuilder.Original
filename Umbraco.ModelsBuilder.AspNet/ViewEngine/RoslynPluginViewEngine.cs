@@ -11,7 +11,7 @@ namespace Umbraco.ModelsBuilder.AspNet.ViewEngine
     // not inheriting Umbraco's PluginViewEngine, we could maybe, but better
     // have all the code here for the time being
 
-    public class RoslynPluginViewEngine : RoslynViewEngineBase
+    class RoslynPluginViewEngine : RoslynViewEngineBase
     {
         public RoslynPluginViewEngine()
 		{

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Reflection;
 using System.Web.Mvc;
-using Umbraco.Core.Profiling;
 
 namespace Umbraco.ModelsBuilder.AspNet.ViewEngine
 {

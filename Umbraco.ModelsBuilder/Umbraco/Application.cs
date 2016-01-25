@@ -9,7 +9,7 @@ using Umbraco.ModelsBuilder.Building;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
-    public class Application //: IDisposable
+    internal class Application //: IDisposable
     {
         #region Applicationmanagement
 

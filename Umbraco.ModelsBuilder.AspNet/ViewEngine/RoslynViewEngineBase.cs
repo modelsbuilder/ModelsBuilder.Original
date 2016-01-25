@@ -31,7 +31,7 @@ namespace Umbraco.ModelsBuilder.AspNet.ViewEngine
     // which is a more complex (robust?) version of what we have here,
     // obviously inspired from the very same sources, looking at their code
 
-    public class RoslynViewEngineBase : RazorViewEngine, IVirtualPathFactory, IPureLiveModelsEngine
+    class RoslynViewEngineBase : RazorViewEngine, IVirtualPathFactory, IPureLiveModelsEngine
     {
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
         private const string CachePrefix = "RoslynRenderViewEngine_";

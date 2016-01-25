@@ -15,7 +15,7 @@ namespace Umbraco.ModelsBuilder.Tests
     public interface IRandom2 : IRandom1
     {}
 
-    public class TestBuilder : Builder
+    class TestBuilder : Builder
     {
         public TestBuilder(IList<TypeModel> typeModels, ParseResult parseResult)
             : base(typeModels, parseResult)

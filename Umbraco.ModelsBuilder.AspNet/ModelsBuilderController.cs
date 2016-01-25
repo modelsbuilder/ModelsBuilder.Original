@@ -30,7 +30,7 @@ namespace Umbraco.ModelsBuilder.AspNet
     // read http://our.umbraco.org/forum/developers/api-questions/43025-Web-API-authentication
     // UmbracoAuthorizedApiController :: /Umbraco/BackOffice/Zbu/ModelsBuilderApi/GetTypeModels
     // UmbracoApiController :: /Umbraco/Zbu/ModelsBuilderApi/GetTypeModels ??  UNLESS marked with isbackoffice
-    
+
     [PluginController(ControllerArea)]
     [IsBackOffice]
     [UmbracoApplicationAuthorize(Constants.Applications.Developer)]
@@ -52,7 +52,7 @@ namespace Umbraco.ModelsBuilder.AspNet
                 return urlHelper.GetUmbracoApiServiceBaseUrl<ModelsBuilderController>(controller => controller.GetModels(null)).EnsureEndsWith('/');
             }
 
-            //NOTE: This could very well be incorrect depending on current route values, virtual folders, etc... 
+            //NOTE: This could very well be incorrect depending on current route values, virtual folders, etc...
             // but without an HttpContext and without a booted Umbraco install we can't know.
             return "/Umbraco/BackOffice/" + ControllerArea + "/" + nameof(ModelsBuilderController).TrimEnd("Controller") + "/";
         });
@@ -76,7 +76,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         }
 
         #region Models
-        
+
         [DataContract]
         public class ValidateClientVersionData
         {
@@ -153,7 +153,7 @@ namespace Umbraco.ModelsBuilder.AspNet
                 ? Request.CreateResponse(HttpStatusCode.OK, "OK", Configuration.Formatters.JsonFormatter)
                 : checkResult.Result);
         }
-        
+
         // invoked by the API
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
         public HttpResponseMessage GetModels(GetModelsData data)
@@ -184,7 +184,7 @@ namespace Umbraco.ModelsBuilder.AspNet
 
             return Request.CreateResponse(HttpStatusCode.OK, models, Configuration.Formatters.JsonFormatter);
         }
-        
+
         // invoked by the API
         // DISABLED - works but useless, because if we return type models that
         // reference some Clr types that exist only on the server and not in the
@@ -204,7 +204,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         //public const string GetTypeModelsUrl = ControllerUrl + "/GetTypeModels";
 
         #endregion
-            
+
         private Attempt<HttpResponseMessage> CheckVersion(Version clientVersion, Version minServerVersionSupportingClient)
         {
             if (clientVersion == null)

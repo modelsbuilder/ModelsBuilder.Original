@@ -11,7 +11,7 @@ using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Building
 {
-    public class Compiler
+    internal class Compiler
     {
         public readonly HashSet<Assembly> ReferencedAssemblies = new HashSet<Assembly>();
         private readonly LanguageVersion _languageVersion;

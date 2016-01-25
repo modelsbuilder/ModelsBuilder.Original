@@ -7,7 +7,7 @@ namespace Umbraco.ModelsBuilder.Building
     /// <summary>
     /// Represents a model.
     /// </summary>
-    public class TypeModel
+    internal class TypeModel
     {
         /// <summary>
         /// Gets the unique identifier of the corresponding content type.

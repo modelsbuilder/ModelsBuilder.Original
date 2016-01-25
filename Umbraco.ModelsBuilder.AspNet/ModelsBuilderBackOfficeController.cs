@@ -22,7 +22,7 @@ namespace Umbraco.ModelsBuilder.AspNet
     /// </summary>
     /// <remarks>
     /// We've created a different controller for the backoffice/angular specifically this is to ensure that the
-    /// correct CSRF security is adhered to for angular and it also ensures that this controller is not subseptipal to 
+    /// correct CSRF security is adhered to for angular and it also ensures that this controller is not subseptipal to
     /// global WebApi formatters being changed since this is always forced to only return Angular JSON Specific formats.
     /// </remarks>
     public class ModelsBuilderBackOfficeController : UmbracoAuthorizedJsonController
@@ -89,7 +89,7 @@ namespace Umbraco.ModelsBuilder.AspNet
         // invoked by the back-office
         // requires that the user is logged into the backoffice and has access to the developer section
         // beware! the name of the method appears in modelsbuilder.controller.js
-        [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!        
+        [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
         public HttpResponseMessage GetDashboard()
         {
             var dashboard = new

@@ -14,7 +14,7 @@ namespace Umbraco.ModelsBuilder.Building
     /// Implements code parsing.
     /// </summary>
     /// <remarks>Parses user's code and look for generator's instructions.</remarks>
-    public class CodeParser
+    internal class CodeParser
     {
         /// <summary>
         /// Parses a set of file.
@@ -76,7 +76,7 @@ namespace Umbraco.ModelsBuilder.Building
                         if (x.IsStatic) return false;
                         if (x.Parameters.Length != 1) return false;
                         var type1 = x.Parameters[0].Type;
-                        var type2 = typeof (global::Umbraco.Core.Models.IPublishedContent);
+                        var type2 = typeof (Core.Models.IPublishedContent);
                         return type1.ToDisplayString() == type2.FullName;
                     });
 
@@ -149,6 +149,7 @@ namespace Umbraco.ModelsBuilder.Building
                 if (attrData.AttributeConstructor == null) continue;
 
                 var attrClassName = SymbolDisplay.ToDisplayString(attrClassSymbol);
+                // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (attrClassName)
                 {
                     case "Umbraco.ModelsBuilder.ImplementPropertyTypeAttribute":
@@ -190,7 +191,7 @@ namespace Umbraco.ModelsBuilder.Building
                     case "Umbraco.ModelsBuilder.ModelsBaseClassAttribute":
                         var modelsBaseClass = (INamedTypeSymbol) attrData.ConstructorArguments[0].Value;
                         if (modelsBaseClass is IErrorTypeSymbol)
-                            throw new Exception(string.Format("Invalid base class type \"{0}\".", modelsBaseClass.Name));
+                            throw new Exception($"Invalid base class type \"{modelsBaseClass.Name}\".");
                         disco.SetModelsBaseClassName(SymbolDisplay.ToDisplayString(modelsBaseClass));
                         break;
 
@@ -211,7 +212,7 @@ namespace Umbraco.ModelsBuilder.Building
         {
             var methodSymbol = symbol as IMethodSymbol;
 
-            if (methodSymbol == null 
+            if (methodSymbol == null
                 || !methodSymbol.IsStatic
                 || methodSymbol.IsGenericMethod
                 || methodSymbol.ReturnsVoid

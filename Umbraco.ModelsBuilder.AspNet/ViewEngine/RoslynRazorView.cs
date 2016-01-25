@@ -6,7 +6,7 @@ using System.Web.WebPages;
 
 namespace Umbraco.ModelsBuilder.AspNet.ViewEngine
 {
-    public class RoslynRazorView : IView
+    class RoslynRazorView : IView
     {
         private readonly Type _type;
         private readonly string _virtualPath;
