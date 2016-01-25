@@ -33,13 +33,22 @@ if ((Get-Item $ReleaseFolder -ErrorAction SilentlyContinue) -ne $null)
 	Remove-Item $ReleaseFolder -Recurse
 }
 
-# Go get nuget.exe if we don't hae it
+# Go get nuget.exe if we don't have it
 $NuGet = "$BuildFolder\nuget.exe"
 $FileExists = Test-Path $NuGet 
 If ($FileExists -eq $False) {
 	$SourceNugetExe = "http://nuget.org/nuget.exe"
 	Invoke-WebRequest $SourceNugetExe -OutFile $NuGet
 }
+
+# Restore packages (if they don't exist the build will fail)
+$packagesTargetDirectory = "..\packages\"
+Write-Host "Restoring NuGet packages, this may take a while depending on your package cache and connection speed"
+.\nuget.exe install ..\Umbraco.ModelsBuilder\packages.config -OutputDirectory $packagesTargetDirectory -Verbosity quiet
+.\nuget.exe install ..\Umbraco.ModelsBuilder.AspNet\packages.config -OutputDirectory $packagesTargetDirectory -Verbosity quiet
+.\nuget.exe install ..\Umbraco.ModelsBuilder.Console\packages.config -OutputDirectory $packagesTargetDirectory -Verbosity quiet
+.\nuget.exe install ..\Umbraco.ModelsBuilder.CustomTool\packages.config -OutputDirectory $packagesTargetDirectory -Verbosity quiet
+.\nuget.exe install ..\Umbraco.ModelsBuilder.Tests\packages.config -OutputDirectory $packagesTargetDirectory -Verbosity quiet
 
 # Set the version number in SolutionInfo.cs
 $SolutionInfoPath = Join-Path -Path $SolutionRoot -ChildPath "SolutionInfo.cs"
