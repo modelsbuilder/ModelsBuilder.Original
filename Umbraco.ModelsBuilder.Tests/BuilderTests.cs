@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
@@ -186,7 +187,7 @@ public partial class Type1 : IHasXmlNode
 
             // figures out that IHasXmlNode is an interface, not base
             // because of using + reference
-            var asms = new[] {typeof(System.Xml.IHasXmlNode).Assembly};
+            var asms = new[] {typeof(System.Xml.IHasXmlNode).Assembly}.Select(x => MetadataReference.CreateFromFile(x.Location));
             Assert.IsFalse(new CodeParser().Parse(code3, asms).HasContentBase("Type1"));
         }
 

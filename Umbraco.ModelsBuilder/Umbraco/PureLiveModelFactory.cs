@@ -235,10 +235,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                 File.Delete(file);
 
-            // using BuildManager references
-            var referencedAssemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToArray();
-
-            var parseResult = new CodeParser().Parse(ourFiles, referencedAssemblies);
+            var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
             var builder = new TextBuilder(typeModels, parseResult, UmbracoConfig.For.ModelsBuilder().ModelsNamespace);
 
             var codeBuilder = new StringBuilder();

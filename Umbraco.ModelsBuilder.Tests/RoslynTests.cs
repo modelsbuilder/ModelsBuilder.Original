@@ -233,7 +233,7 @@ public class MyBuilder : Umbraco.ModelsBuilder.Tests.TestBuilder
 ";
 
             var tree = CSharpSyntaxTree.ParseText(code);
-            var refs = AssemblyUtility.AllReferencedAssemblyLocations.Select(x => MetadataReference.CreateFromFile(x));
+            var refs = ReferencedAssemblies.Locations.Select(x => MetadataReference.CreateFromFile(x));
 
             var compilation = CSharpCompilation.Create(
                 "MyCompilation",
@@ -556,7 +556,7 @@ namespace MyNamespace
             //var writer = new ConsoleDumpWalker();
             //writer.Visit(tree.GetRoot());
 
-            var refs = AssemblyUtility.AllReferencedAssemblyLocations
+            var refs = ReferencedAssemblies.Locations
                 .Distinct()
                 .Select(x => MetadataReference.CreateFromFile(x));
 

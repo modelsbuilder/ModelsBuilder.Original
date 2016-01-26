@@ -168,10 +168,7 @@ namespace Umbraco.ModelsBuilder.AspNet
             var umbraco = Application.GetApplication();
             var typeModels = umbraco.GetAllTypes();
 
-            // using BuildManager references
-            var referencedAssemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToArray();
-
-            var parseResult = new CodeParser().Parse(data.Files, referencedAssemblies);
+            var parseResult = new CodeParser().ParseWithReferencedAssemblies(data.Files);
             var builder = new TextBuilder(typeModels, parseResult, data.Namespace);
 
             var models = new Dictionary<string, string>();

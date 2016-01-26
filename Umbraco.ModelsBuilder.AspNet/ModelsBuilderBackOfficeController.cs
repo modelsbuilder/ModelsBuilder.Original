@@ -127,11 +127,8 @@ namespace Umbraco.ModelsBuilder.AspNet
             var umbraco = Application.GetApplication();
             var typeModels = umbraco.GetAllTypes();
 
-            // using BuildManager references
-            var referencedAssemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToArray();
-
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
-            var parseResult = new CodeParser().Parse(ourFiles, referencedAssemblies);
+            var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
             var builder = new TextBuilder(typeModels, parseResult, UmbracoConfig.For.ModelsBuilder().ModelsNamespace);
 
             foreach (var typeModel in builder.GetModelsToGenerate())
@@ -147,9 +144,7 @@ namespace Umbraco.ModelsBuilder.AspNet
                 foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                     ourFiles[file] = File.ReadAllText(file);
                 var compiler = new Compiler();
-                foreach (var asm in referencedAssemblies)
-                    compiler.ReferencedAssemblies.Add(asm);
-                compiler.Compile(bin, builder.GetModelsNamespace(), ourFiles);
+                compiler.Compile(builder.GetModelsNamespace(), ourFiles, bin);
             }
 
             OutOfDateModelsStatus.Clear();

@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Umbraco.Core.Configuration;
-using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Building
 {
@@ -24,22 +21,20 @@ namespace Umbraco.ModelsBuilder.Building
         /// <remarks>The set of files is a dictionary of name, content.</remarks>
         public ParseResult Parse(IDictionary<string, string> files)
         {
-            return Parse(files, Enumerable.Empty<Assembly>());
+            return Parse(files, Enumerable.Empty<PortableExecutableReference>());
         }
 
         /// <summary>
         /// Parses a set of file.
         /// </summary>
         /// <param name="files">A set of (filename,content) representing content to parse.</param>
-        /// <param name="referencedAssemblies">Assemblies to reference in compilations.</param>
+        /// <param name="references">Assemblies to reference in compilations.</param>
         /// <returns>The result of the code parsing.</returns>
         /// <remarks>The set of files is a dictionary of name, content.</remarks>
-        public ParseResult Parse(IDictionary<string, string> files, IEnumerable<Assembly> referencedAssemblies)
+        public ParseResult Parse(IDictionary<string, string> files, IEnumerable<PortableExecutableReference> references)
         {
             SyntaxTree[] trees;
-            var compiler = new Compiler(UmbracoConfig.For.ModelsBuilder().LanguageVersion);
-            foreach (var asm in referencedAssemblies)
-                compiler.ReferencedAssemblies.Add(asm);
+            var compiler = new Compiler { References = references };
             var compilation = compiler.GetCompilation("Umbraco.ModelsBuilder.Generated", files, out trees);
 
             var disco = new ParseResult();
@@ -47,6 +42,11 @@ namespace Umbraco.ModelsBuilder.Building
                 Parse(disco, compilation, tree);
 
             return disco;
+        }
+
+        public ParseResult ParseWithReferencedAssemblies(IDictionary<string, string> files)
+        {
+            return Parse(files, ReferencedAssemblies.References);
         }
 
         private static void Parse(ParseResult disco, CSharpCompilation compilation, SyntaxTree tree)

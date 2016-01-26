@@ -21,5 +21,13 @@ namespace Umbraco.ModelsBuilder
             foreach (var x in enumerable) yield return x;
             yield return item;
         }
+
+        public static IEnumerable<T> AndIfNotNull<T>(this IEnumerable<T> enumerable, T item)
+            where T : class
+        {
+            foreach (var x in enumerable) yield return x;
+            if (item != null)
+                yield return item;
+        }
     }
 }

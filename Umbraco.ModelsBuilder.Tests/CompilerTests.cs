@@ -44,7 +44,7 @@ namespace Whatever
 ";
 
             var compiler = new Compiler();
-            compiler.Compile(_tempDir, "Whatever", new Dictionary<string, string>{{"code", code1}});
+            compiler.Compile("Whatever", new Dictionary<string, string>{{"code", code1}}, _tempDir);
             Assert.IsTrue(File.Exists(Path.Combine(_tempDir, "Whatever.dll")));
         }
 
@@ -77,7 +77,7 @@ namespace Whatever
 ";
 
             var compiler = new Compiler(LanguageVersion.CSharp6);
-            compiler.Compile(_tempDir, "Whatever", new Dictionary<string, string> { { "code", code1 } });
+            compiler.Compile("Whatever", new Dictionary<string, string> { { "code", code1 } }, _tempDir);
             Assert.IsTrue(File.Exists(Path.Combine(_tempDir, "Whatever.dll")));
         }
     }

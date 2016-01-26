@@ -229,16 +229,10 @@ namespace Umbraco.ModelsBuilder.Building
 
             codeBuilder.AppendFormat("namespace {0}\n{{ }}\n", GetModelsNamespace());
 
-            var tree = CSharpSyntaxTree.ParseText(codeBuilder.ToString());
-
-            var refs = AssemblyUtility.AllReferencedAssemblyLocations
-                .Distinct() // else massively duplicated...
-                .Select(x => MetadataReference.CreateFromFile(x));
-
-            var compilation = CSharpCompilation.Create(
-                "MyCompilation",
-                syntaxTrees: new[] { tree },
-                references: refs);
+            var compiler = new Compiler();
+            SyntaxTree[] trees;
+            var compilation = compiler.GetCompilation("MyCompilation", new Dictionary<string, string> { { "code", codeBuilder.ToString() } }, out trees);
+            var tree = trees[0];
             _ambiguousSymbolsModel = compilation.GetSemanticModel(tree);
 
             var namespaceSyntax = tree.GetRoot().DescendantNodes().OfType<NamespaceDeclarationSyntax>().First();

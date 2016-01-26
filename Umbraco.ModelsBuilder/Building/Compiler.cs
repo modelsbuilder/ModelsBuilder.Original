@@ -1,54 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Emit;
 using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Building
 {
+    // main Roslyn compiler
     internal class Compiler
     {
-        public readonly HashSet<Assembly> ReferencedAssemblies = new HashSet<Assembly>();
         private readonly LanguageVersion _languageVersion;
 
         public Compiler()
-        {
-            _languageVersion = UmbracoConfig.For.ModelsBuilder().LanguageVersion;
-        }
+            : this(UmbracoConfig.For.ModelsBuilder().LanguageVersion)
+        { }
 
         public Compiler(LanguageVersion languageVersion)
         {
             _languageVersion = languageVersion;
+            References = ReferencedAssemblies.References;
         }
 
+        // gets or sets the references
+        public IEnumerable<PortableExecutableReference> References { get; set; }
+
+        // gets a compilation
+        public CSharpCompilation GetCompilation(string assemblyName, IDictionary<string, string> files)
+        {
+            SyntaxTree[] trees;
+            return GetCompilation(assemblyName, files, out trees);
+        }
+
+        // gets a compilation
+        // used by CodeParser to get a "compilation" of the existing files
         public CSharpCompilation GetCompilation(string assemblyName, IDictionary<string, string> files, out SyntaxTree[] trees)
         {
             var options = new CSharpParseOptions(_languageVersion);
             trees = files.Select(x =>
             {
                 var text = x.Value;
-                var tree = CSharpSyntaxTree.ParseText(text, options: options);
-                if (tree.GetDiagnostics().Any())
-                    throw new Exception(string.Format("Syntax error in file \"{0}\".", x.Key));
+                var tree = CSharpSyntaxTree.ParseText(text, /*options:*/ options);
+                var diagnostic = tree.GetDiagnostics().FirstOrDefault(y => y.Severity == DiagnosticSeverity.Error);
+                if (diagnostic != null)
+                    ThrowExceptionFromDiagnostic(x.Key, x.Value, diagnostic);
                 return tree;
             }).ToArray();
 
-            // adding everything is going to cause issues with dynamic assemblies
-            // so we would want to filter them anyway... but we don't need them really
-            //var refs = AssemblyUtility.GetAllReferencedAssemblyLocations().Select(x => new MetadataFileReference(x));
-            // though that one is not ok either since we want our own reference
-            //var refs = Enumerable.Empty<MetadataReference>();
-            // so use the bare minimum
-            var asms = ReferencedAssemblies;
-            var a1 = typeof(Builder).Assembly;
-            asms.Add(a1);
-            foreach (var a in GetDeepReferencedAssemblies(a1)) asms.Add(a);
-            var refs = asms.Select(x => MetadataReference.CreateFromFile(x.Location));
+            var refs = References;
 
             var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
             var compilation = CSharpCompilation.Create(
@@ -60,107 +61,76 @@ namespace Umbraco.ModelsBuilder.Building
             return compilation;
         }
 
-        public void Compile(string binPath, string assemblyName, IDictionary<string, string> files)
+        // compile files into a Dll
+        // used by ModelsBuilderBackOfficeController in [Live]Dll mode, to compile the models to disk
+        public void Compile(string assemblyName, IDictionary<string, string> files, string binPath)
         {
-            // see http://www.c-sharpcorner.com/UploadFile/25c78a/using-microsoft-roslyn/
-
-            // create the compilation
-            SyntaxTree[] trees;
-            var compilation = GetCompilation(assemblyName, files, out trees);
-
-            // check diagnostics for errors (not warnings)
-            foreach (var diag in compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error))
-            {
-                throw new Exception(string.Format("Models compilation {0}: {1}", diag.Severity, diag.GetMessage()));
-            }
-
-            // write the dll
-            EmitResult result;
             var assemblyPath = Path.Combine(binPath, assemblyName + ".dll");
-            using (var file = new FileStream(assemblyPath, FileMode.Create))
+            using (var stream = new FileStream(assemblyPath, FileMode.Create))
             {
-                result = compilation.Emit(file);
+                Compile(assemblyName, files, stream);
             }
         }
 
+        // compile files into an assembly
         public Assembly Compile(string assemblyName, IDictionary<string, string> files)
         {
+            using (var stream = new MemoryStream())
+            {
+                Compile(assemblyName, files, stream);
+                return Assembly.Load(stream.GetBuffer());
+            }
+        }
+
+        // compile one file into an assembly
+        public Assembly Compile(string assemblyName, string path, string code)
+        {
+            using (var stream = new MemoryStream())
+            {
+                Compile(assemblyName, new Dictionary<string, string> { { path, code } }, stream);
+               return Assembly.Load(stream.GetBuffer());
+            }
+        }
+
+        // compiles files into a stream
+        public void Compile(string assemblyName, IDictionary<string, string> files, Stream stream)
+        {
             // create the compilation
-            SyntaxTree[] trees;
-            var compilation = GetCompilation(assemblyName, files, out trees);
+            var compilation = GetCompilation(assemblyName, files);
 
             // check diagnostics for errors (not warnings)
             foreach (var diag in compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error))
-            {
-                throw new Exception(string.Format("Models compilation {0}: {1}", diag.Severity, diag.GetMessage()));
-            }
+                ThrowExceptionFromDiagnostic(files, diag);
 
             // emit
-            Assembly assembly;
-            using (var stream = new MemoryStream())
-            {
-                var emitResult = compilation.Emit(stream);
-                assembly = Assembly.Load(stream.GetBuffer());
-            }
+            var result = compilation.Emit(stream);
+            if (result.Success) return;
 
-            return assembly;
+            // deal with errors
+            var diagnostic = result.Diagnostics.First(x => x.Severity == DiagnosticSeverity.Error);
+            ThrowExceptionFromDiagnostic(files, diagnostic);
         }
 
-        public Assembly Compile(string assemblyName, string code)
+        // compiles one file into a stream
+        public void Compile(string assemblyName, string path, string code, Stream stream)
         {
-            // create the compilation
-            SyntaxTree[] trees;
-            var compilation = GetCompilation(assemblyName, new Dictionary<string, string>{{"code", code}}, out trees);
-
-            // check diagnostics for errors (not warnings)
-            foreach (var diag in compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error))
-            {
-                throw new Exception(string.Format("Models compilation {0}: {1}", diag.Severity, diag.GetMessage()));
-            }
-
-            // emit
-            Assembly assembly;
-            using (var stream = new MemoryStream())
-            {
-                var emitResult = compilation.Emit(stream);
-                assembly = Assembly.Load(stream.GetBuffer());
-            }
-
-            return assembly;
+            Compile(assemblyName, new Dictionary<string, string> { { path, code } }, stream);
         }
 
-        private static IEnumerable<Assembly> GetDeepReferencedAssemblies(Assembly assembly)
+        private static void ThrowExceptionFromDiagnostic(IDictionary<string, string> files, Diagnostic diagnostic)
         {
-            var visiting = new Stack<Assembly>();
-            var visited = new HashSet<Assembly>();
-
-            visiting.Push(assembly);
-            visited.Add(assembly);
-            while (visiting.Count > 0)
-            {
-                var visAsm = visiting.Pop();
-                foreach (var refAsm in visAsm.GetReferencedAssemblies()
-                    .Select(TryLoad)
-                    .Where(x => x != null && visited.Contains(x) == false))
-                {
-                    yield return refAsm;
-                    visiting.Push(refAsm);
-                    visited.Add(refAsm);
-                }
-            }
+            var message = diagnostic.GetMessage();
+            var position = diagnostic.Location.GetLineSpan().StartLinePosition.Line + 1;
+            var path = diagnostic.Location.SourceTree.FilePath;
+            var code = files.ContainsKey(path) ? files[path] : string.Empty;
+            throw new CompilerException(message, path, code, position);
         }
 
-        private static Assembly TryLoad(AssemblyName name)
+        private static void ThrowExceptionFromDiagnostic(string path, string code, Diagnostic diagnostic)
         {
-            try
-            {
-                return AppDomain.CurrentDomain.Load(name);
-            }
-            catch (Exception)
-            {
-                //Console.WriteLine(name);
-                return null;
-            }
+            var message = diagnostic.GetMessage();
+            var position = diagnostic.Location.GetLineSpan().StartLinePosition.Line + 1;
+            throw new CompilerException(message, path, code, position);
         }
     }
 }

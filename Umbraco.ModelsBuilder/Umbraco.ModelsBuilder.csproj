@@ -315,7 +315,8 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="AssemblyUtility.cs" />
+    <Compile Include="Building\CompilerException.cs" />
+    <Compile Include="ReferencedAssemblies.cs" />
     <Compile Include="Building\Builder.cs" />
     <Compile Include="Building\CodeDomBuilder.cs" />
     <Compile Include="Building\CodeParser.cs" />
