@@ -73,11 +73,8 @@ namespace Umbraco.ModelsBuilder.Configuration
                         ModelsMode = ModelsMode.LiveDll;
                         break;
                     case nameof(ModelsMode.AppCode):
-                        ModelsMode = ModelsMode.AppCode;
-                        break;
                     case nameof(ModelsMode.LiveAppCode):
-                        ModelsMode = ModelsMode.LiveAppCode;
-                        break;
+                        throw new ConfigurationErrorsException($"ModelsMode \"{modelsMode}\" is not supported anymore.");
                     case nameof(ModelsMode.AppData):
                         ModelsMode = ModelsMode.AppData;
                         break;
@@ -139,6 +136,10 @@ namespace Umbraco.ModelsBuilder.Configuration
         {
             Enable = enable;
             ModelsMode = modelsMode;
+
+            if (modelsMode.IsAnyAppCode())
+                throw new ConfigurationErrorsException($"ModelsMode \"{modelsMode}\" is not supported anymore.");
+
             EnableApi = enableApi;
             ModelsNamespace = string.IsNullOrWhiteSpace(modelsNamespace) ? DefaultModelsNamespace : modelsNamespace;
             EnableFactory = enableFactory;
