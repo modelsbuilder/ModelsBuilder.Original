@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Web;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Umbraco.Core.Configuration;
@@ -22,10 +23,13 @@ namespace Umbraco.ModelsBuilder.Building
         {
             _languageVersion = languageVersion;
             References = ReferencedAssemblies.References;
+            Debug = HttpContext.Current != null && HttpContext.Current.IsDebuggingEnabled;
         }
 
         // gets or sets the references
         public IEnumerable<PortableExecutableReference> References { get; set; }
+
+        public bool Debug { get; set; }
 
         // gets a compilation
         public CSharpCompilation GetCompilation(string assemblyName, IDictionary<string, string> files)
@@ -51,7 +55,11 @@ namespace Umbraco.ModelsBuilder.Building
 
             var refs = References;
 
-            var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
+            var compilationOptions = new CSharpCompilationOptions(
+                OutputKind.DynamicallyLinkedLibrary,
+                assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default,
+                optimizationLevel: Debug ? OptimizationLevel.Debug : OptimizationLevel.Release
+            );
             var compilation = CSharpCompilation.Create(
                 assemblyName,
                 /*syntaxTrees:*/ trees,
@@ -70,6 +78,26 @@ namespace Umbraco.ModelsBuilder.Building
             {
                 Compile(assemblyName, files, stream);
             }
+
+            // this is how we'd create the pdb:
+            /*
+            var pdbPath = Path.Combine(binPath, assemblyName + ".pdb");
+
+            // create the compilation
+            var compilation = GetCompilation(assemblyName, files);
+
+            // check diagnostics for errors (not warnings)
+            foreach (var diag in compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error))
+                ThrowExceptionFromDiagnostic(files, diag);
+
+            // emit
+            var result = compilation.Emit(assemblyPath, pdbPath);
+            if (result.Success) return;
+
+            // deal with errors
+            var diagnostic = result.Diagnostics.First(x => x.Severity == DiagnosticSeverity.Error);
+            ThrowExceptionFromDiagnostic(files, diagnostic);
+            */
         }
 
         // compile files into an assembly
