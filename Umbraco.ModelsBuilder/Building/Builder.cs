@@ -20,10 +20,10 @@ namespace Umbraco.ModelsBuilder.Building
     /// <summary>
     /// Provides a base class for all builders.
     /// </summary>
-    public abstract class Builder
+    internal abstract class Builder
     {
         private readonly IList<TypeModel> _typeModels;
-        protected ParseResult ParseResult { get; private set; }
+        protected ParseResult ParseResult { get; }
 
         // the list of assemblies that will be 'using' by default
         protected readonly IList<string> TypesUsing = new List<string>
@@ -48,7 +48,7 @@ namespace Umbraco.ModelsBuilder.Building
         /// <summary>
         /// Gets the list of assemblies to add to the set of 'using' assemblies in each model file.
         /// </summary>
-        public IList<string> Using { get { return TypesUsing; } }
+        public IList<string> Using => TypesUsing;
 
         /// <summary>
         /// Gets the list of models to generate.
@@ -63,7 +63,7 @@ namespace Umbraco.ModelsBuilder.Building
         /// Gets the list of all models.
         /// </summary>
         /// <remarks>Includes those that are ignored.</remarks>
-        internal IList<TypeModel> TypeModels { get { return _typeModels; } }
+        internal IList<TypeModel> TypeModels => _typeModels;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Builder"/> class with a list of models to generate
@@ -74,9 +74,9 @@ namespace Umbraco.ModelsBuilder.Building
         protected Builder(IList<TypeModel> typeModels, ParseResult parseResult)
         {
             if (typeModels == null)
-                throw new ArgumentNullException("typeModels");
+                throw new ArgumentNullException(nameof(typeModels));
             if (parseResult == null)
-                throw new ArgumentNullException("parseResult");
+                throw new ArgumentNullException(nameof(parseResult));
 
             _typeModels = typeModels;
             ParseResult = parseResult;

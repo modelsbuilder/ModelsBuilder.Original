@@ -25,8 +25,7 @@ namespace Umbraco.ModelsBuilder.AspNet
             if (result.IsSuccessStatusCode) return;
 
             var text = result.Content.ReadAsStringAsync().Result;
-            throw new Exception(string.Format("Response status code does not indicate success ({0})\n{1}",
-                result.StatusCode, text));
+            throw new Exception($"Response status code does not indicate success ({result.StatusCode})\n{text}");
         }
 
         public void ValidateClientVersion()

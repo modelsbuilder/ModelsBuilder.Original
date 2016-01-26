@@ -27,9 +27,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
             where TModel : PublishedContentModel
         {
             var expr = selector.Body as MemberExpression;
-            
+
             if (expr == null)
-                throw new ArgumentException("Not a property expression.", "selector");
+                throw new ArgumentException("Not a property expression.", nameof(selector));
 
             // there _is_ a risk that contentType and T do not match
             // see note above : accepted risk...
@@ -39,9 +39,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 .OfType<ImplementPropertyTypeAttribute>()
                 .SingleOrDefault();
 
-            if (attr == null || string.IsNullOrWhiteSpace(attr.Alias))
-                throw new InvalidOperationException(
-                    string.Format("Could not figure out property alias for property \"{0}\".", expr.Member.Name));
+            if (string.IsNullOrWhiteSpace(attr?.Alias))
+                throw new InvalidOperationException($"Could not figure out property alias for property \"{expr.Member.Name}\".");
 
             return contentType.GetPropertyType(attr.Alias);
         }

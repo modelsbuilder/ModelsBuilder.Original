@@ -8,3 +8,4 @@ using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.Tests")]
 [assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.AspNet")]
+[assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.CustomTool")]

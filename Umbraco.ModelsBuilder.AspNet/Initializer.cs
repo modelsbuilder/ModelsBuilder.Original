@@ -12,6 +12,8 @@ using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.AspNet
 {
+    // and since we don't do it... comment it out!
+    /*
     public static class Initializer
     {
         public static void Initialize()
@@ -24,4 +26,5 @@ namespace Umbraco.ModelsBuilder.AspNet
             BuildManager.AddReferencedAssembly(typeof(Builder).Assembly);
         }
     }
+    */
 }

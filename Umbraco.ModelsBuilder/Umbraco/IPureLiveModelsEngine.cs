@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.ModelsBuilder.Umbraco
 {
-    public interface IPureLiveModelsEngine
+    internal interface IPureLiveModelsEngine
     {
         void NotifyRebuilding();
         void NotifyRebuilt();

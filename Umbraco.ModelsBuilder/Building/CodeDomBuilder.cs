@@ -10,7 +10,7 @@ namespace Umbraco.ModelsBuilder.Building
     /// <summary>
     /// Implements a builder that works by using CodeDom
     /// </summary>
-    public class CodeDomBuilder : Builder
+    internal class CodeDomBuilder : Builder
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CodeDomBuilder"/> class with a list of models to generate.
@@ -43,17 +43,18 @@ namespace Umbraco.ModelsBuilder.Building
                 foreach (var mixinType in typeModel.DeclaringInterfaces)
                     i.BaseTypes.Add(mixinType.ClrName);
 
-                i.Comments.Add(new CodeCommentStatement(
-                    string.Format("Mixin content Type {0} with alias \"{1}\"", typeModel.Id, typeModel.Alias)));
+                i.Comments.Add(new CodeCommentStatement($"Mixin content Type {typeModel.Id} with alias \"{typeModel.Alias}\""));
 
                 foreach (var propertyModel in typeModel.Properties)
                 {
-                    var p = new CodeMemberProperty();
-                    p.Name = propertyModel.ClrName;
-                    p.Type = new CodeTypeReference(propertyModel.ClrType);
-                    p.Attributes = MemberAttributes.Public;
-                    p.HasGet = true;
-                    p.HasSet = false;
+                    var p = new CodeMemberProperty
+                    {
+                        Name = propertyModel.ClrName,
+                        Type = new CodeTypeReference(propertyModel.ClrType),
+                        Attributes = MemberAttributes.Public,
+                        HasGet = true,
+                        HasSet = false
+                    };
                     i.Members.Add(p);
                 }
             }
@@ -80,17 +81,18 @@ namespace Umbraco.ModelsBuilder.Building
             foreach (var mixin in typeModel.MixinTypes)
                 c.BaseTypes.Add("I" + mixin.ClrName);
 
-            c.Comments.Add(new CodeCommentStatement(
-                string.Format("Content Type {0} with alias \"{1}\"", typeModel.Id, typeModel.Alias)));
+            c.Comments.Add(new CodeCommentStatement($"Content Type {typeModel.Id} with alias \"{typeModel.Alias}\""));
 
             foreach (var propertyModel in typeModel.Properties)
             {
-                var p = new CodeMemberProperty();
-                p.Name = propertyModel.ClrName;
-                p.Type = new CodeTypeReference(propertyModel.ClrType);
-                p.Attributes = MemberAttributes.Public;
-                p.HasGet = true;
-                p.HasSet = false;
+                var p = new CodeMemberProperty
+                {
+                    Name = propertyModel.ClrName,
+                    Type = new CodeTypeReference(propertyModel.ClrType),
+                    Attributes = MemberAttributes.Public,
+                    HasGet = true,
+                    HasSet = false
+                };
                 p.GetStatements.Add(new CodeMethodReturnStatement( // return
                     new CodeMethodInvokeExpression(
                         new CodeMethodReferenceExpression(

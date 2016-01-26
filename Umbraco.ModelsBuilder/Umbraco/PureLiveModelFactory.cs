@@ -21,7 +21,7 @@ using File = System.IO.File;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
-    public class PureLiveModelFactory : IPublishedContentModelFactory
+    class PureLiveModelFactory : IPublishedContentModelFactory
     {
         private Dictionary<string, Func<IPublishedContent, IPublishedContent>> _constructors;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();

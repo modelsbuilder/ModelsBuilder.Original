@@ -5,7 +5,7 @@ namespace Umbraco.ModelsBuilder
 {
     /// <summary>
     /// Manages API version handshake between client and server.
-    /// </summary>    
+    /// </summary>
     public class ApiVersion
     {
         #region Configure
@@ -19,7 +19,7 @@ namespace Umbraco.ModelsBuilder
         //   eg our Version = 4.8 and we know we're compatible with website server down to version 3.2
         //   => as a client, we tell the server down to version ... that it should accept us
         private static readonly Version MinServerVersionSupportingClientConst = new Version(2, 1, 0, 0);
-        
+
         #endregion
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Umbraco.ModelsBuilder
         /// <param name="executingVersion">The currently executing version.</param>
         /// <param name="minClientVersionSupportedByServer">The min client version supported by the server.</param>
         /// <param name="minServerVersionSupportingClient">An opt min server version supporting the client.</param>
-        public ApiVersion(Version executingVersion, Version minClientVersionSupportedByServer, Version minServerVersionSupportingClient = null)
+        internal ApiVersion(Version executingVersion, Version minClientVersionSupportedByServer, Version minServerVersionSupportingClient = null)
         {
             if (executingVersion == null) throw new ArgumentNullException(nameof(executingVersion));
             if (minClientVersionSupportedByServer == null) throw new ArgumentNullException(nameof(minClientVersionSupportedByServer));
@@ -37,14 +37,14 @@ namespace Umbraco.ModelsBuilder
             MinClientVersionSupportedByServer = minClientVersionSupportedByServer;
             MinServerVersionSupportingClient = minServerVersionSupportingClient;
         }
-        
+
         /// <summary>
         /// Gets the currently executing API version.
         /// </summary>
         public static ApiVersion Current { get; }
             = new ApiVersion(Assembly.GetExecutingAssembly().GetName().Version,
                 MinClientVersionSupportedByServerConst, MinServerVersionSupportingClientConst);
-        
+
         /// <summary>
         /// Gets the executing version of the API.
         /// </summary>
@@ -75,11 +75,11 @@ namespace Umbraco.ModelsBuilder
             // client cannot be older than server's min supported version
             if (clientVersion < MinClientVersionSupportedByServer)
                 return false;
-            
+
             // if we know about this client (client is older than server), it is supported
             if (clientVersion <= Version) // if we know about this client (client older than server)
                 return true;
-            
+
             // if we don't know about this client (client is newer than server),
             // give server a chance to tell client it is, indeed, ok to support it
             return minServerVersionSupportingClient != null && minServerVersionSupportingClient <= Version;

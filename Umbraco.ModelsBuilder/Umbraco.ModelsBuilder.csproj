@@ -326,7 +326,6 @@
     <Compile Include="Configuration\ModelsModeExtensions.cs" />
     <Compile Include="Configuration\UmbracoConfigExtensions.cs" />
     <Compile Include="Dummy.cs" />
-    <Compile Include="FixReferences.cs" />
     <Compile Include="ImplementPropertyTypeAttribute.cs" />
     <Compile Include="ImplementContentTypeAttribute.cs" />
     <Compile Include="ModelsUsingAttribute.cs" />
@@ -339,7 +338,6 @@
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Building\PropertyModel.cs" />
     <Compile Include="AspNet\RoslynRazorViewCompiler.cs" />
-    <Compile Include="StringExtensions.cs" />
     <Compile Include="Building\TextBuilder.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Building\TypeModel.cs" />
@@ -352,7 +350,6 @@
     <Compile Include="Umbraco\IPureLiveModelsEngine.cs" />
     <Compile Include="Umbraco\PureLiveModelFactory.cs" />
     <Compile Include="Umbraco\PublishedContentModelUtility.cs" />
-    <Compile Include="Umbraco\RemoteApplication.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

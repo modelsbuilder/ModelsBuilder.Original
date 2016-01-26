@@ -2,7 +2,7 @@
 
 namespace Umbraco.ModelsBuilder
 {
-    public static class TypeExtensions
+    internal static class TypeExtensions
     {
         /// <summary>
         /// Creates a generic instance of a generic type with the proper actual type of an object.

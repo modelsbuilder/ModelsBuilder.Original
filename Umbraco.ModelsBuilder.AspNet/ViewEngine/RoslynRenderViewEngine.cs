@@ -22,7 +22,7 @@ namespace Umbraco.ModelsBuilder.AspNet.ViewEngine
     // care of by the standard RazorViewEngine - so no need to check anything
     // here
 
-    public class RoslynRenderViewEngine : RoslynViewEngineBase
+    class RoslynRenderViewEngine : RoslynViewEngineBase
     {
         private readonly IEnumerable<string> _supplementedViewLocations = new[] { "/{0}.cshtml" };
 

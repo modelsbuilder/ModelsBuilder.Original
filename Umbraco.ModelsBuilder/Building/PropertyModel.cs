@@ -5,7 +5,7 @@ namespace Umbraco.ModelsBuilder.Building
     /// <summary>
     /// Represents a model property.
     /// </summary>
-    public class PropertyModel
+    internal class PropertyModel
     {
         /// <summary>
         /// Gets the alias of the property.

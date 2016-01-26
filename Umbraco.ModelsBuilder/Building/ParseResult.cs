@@ -7,7 +7,7 @@ namespace Umbraco.ModelsBuilder.Building
     /// <summary>
     /// Contains the result of a code parsing.
     /// </summary>
-    public class ParseResult
+    internal class ParseResult
     {
         // "alias" is the umbraco alias
         // content "name" is the complete name eg Foo.Bar.Name

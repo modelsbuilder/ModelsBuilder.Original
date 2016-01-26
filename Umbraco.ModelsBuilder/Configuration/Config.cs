@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using Microsoft.CodeAnalysis.CSharp;
+using Umbraco.Core;
 
 namespace Umbraco.ModelsBuilder.Configuration
 {
