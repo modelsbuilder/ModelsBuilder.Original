@@ -215,10 +215,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.ModelsBuilder.AspNet\Umbraco.ModelsBuilder.AspNet.csproj">
-      <Project>{9670e426-0872-4a87-9dde-805828546de9}</Project>
-      <Name>Umbraco.ModelsBuilder.AspNet</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.ModelsBuilder\Umbraco.ModelsBuilder.csproj">
       <Project>{998fb014-303a-4146-b3e4-b927bab0210f}</Project>
       <Name>Umbraco.ModelsBuilder</Name>

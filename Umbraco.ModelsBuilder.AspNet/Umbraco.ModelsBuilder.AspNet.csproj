@@ -317,20 +317,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Api\TokenData.cs" />
-    <Compile Include="Dashboard\DashboardHelper.cs" />
-    <Compile Include="Api\GetModelsData.cs" />
-    <Compile Include="ModelsBuilderApplication.cs" />
-    <Compile Include="ModelsBuilderBackOfficeController.cs" />
-    <Compile Include="OutOfDateModelsStatus.cs" />
-    <Compile Include="LiveModelsProvider.cs" />
-    <Compile Include="Api\ModelsBuilderApiClient.cs" />
-    <Compile Include="Api\ModelsBuilderApiController.cs" />
-    <Compile Include="PackageActions\Configure.cs" />
-    <Compile Include="PackageActions\Configure2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Api\ValidateClientVersionData.cs" />
-    <Compile Include="Validation\ContentTypeModelValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.ModelsBuilder\Umbraco.ModelsBuilder.csproj">
@@ -339,14 +326,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Dashboard\modelsbuilder.resource.js" />
-    <Content Include="Dashboard\modelsbuilder.controller.js" />
-    <Content Include="Dashboard\modelsbuilder.htm" />
     <None Include="app.config" />
-    <None Include="Dashboard\package.manifest" />
-    <None Include="package.xml">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

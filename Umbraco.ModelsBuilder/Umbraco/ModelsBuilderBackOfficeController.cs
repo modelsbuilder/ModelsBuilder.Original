@@ -3,19 +3,16 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Web.Compilation;
 using System.Web.Hosting;
 using Umbraco.Core.Configuration;
-using Umbraco.ModelsBuilder.AspNet.Dashboard;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
-using Umbraco.ModelsBuilder.Umbraco;
+using Umbraco.ModelsBuilder.Dashboard;
 using Umbraco.Web.Editors;
 
-namespace Umbraco.ModelsBuilder.AspNet
+namespace Umbraco.ModelsBuilder.Umbraco
 {
     /// <summary>
     /// API controller for use in the Umbraco back office with Angular resources

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Umbraco.ModelsBuilder.AspNet.Api;
+using Umbraco.ModelsBuilder.Api;
 using Umbraco.ModelsBuilder.Building;
 using SysConsole = System.Console;
 

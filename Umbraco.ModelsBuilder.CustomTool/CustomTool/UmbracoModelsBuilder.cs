@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.VisualStudio.Shell.Interop;
-using Umbraco.ModelsBuilder.AspNet.Api;
+using Umbraco.ModelsBuilder.Api;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.CustomTool.VisualStudio;
 
@@ -12,7 +12,7 @@ namespace Umbraco.ModelsBuilder.CustomTool.CustomTool
 {
     [ComVisible(true)]
     public abstract class UmbracoModelsBuilder : BaseCodeGeneratorWithSite
-    { 
+    {
         #region IVsSingleFileGenerator Members
 
         protected override int Generate(string wszInputFilePath,
@@ -119,7 +119,7 @@ namespace Umbraco.ModelsBuilder.CustomTool.CustomTool
 
                 // we need to generate something
                 var code = new StringBuilder();
-                TextBuilder.WriteHeader(code);
+                TextHeaderWriter.WriteHeader(code);
                 code.Append("// Umbraco ModelsBuilder\n");
                 code.AppendFormat("// {0:yyyy-MM-ddTHH:mm:ssZ}", DateTime.UtcNow);
 

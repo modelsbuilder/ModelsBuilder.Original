@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 
-namespace Umbraco.ModelsBuilder.AspNet.Api
+namespace Umbraco.ModelsBuilder.Api
 {
     public class ModelsBuilderApiClient
     {

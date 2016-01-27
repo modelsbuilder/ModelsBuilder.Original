@@ -5,14 +5,14 @@ using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Cache;
-using Umbraco.ModelsBuilder.AspNet;
 using Umbraco.ModelsBuilder.Configuration;
+using Umbraco.ModelsBuilder.Umbraco;
+using Umbraco.Web.Cache;
 
 // will install only if configuration says it needs to be installed
 [assembly: PreApplicationStartMethod(typeof(LiveModelsProviderModule), "Install")]
 
-namespace Umbraco.ModelsBuilder.AspNet
+namespace Umbraco.ModelsBuilder.Umbraco
 {
     // supports LiveDll and LiveAppData - but not PureLive
     public sealed class LiveModelsProvider : ApplicationEventHandler

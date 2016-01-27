@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Umbraco.ModelsBuilder.AspNet.Api
+namespace Umbraco.ModelsBuilder.Api
 {
     [DataContract]
     public class GetModelsData : ValidateClientVersionData

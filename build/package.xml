@@ -56,11 +56,6 @@
 		  <orgPath>/bin</orgPath>
 		  <orgName>Umbraco.ModelsBuilder.dll</orgName>
 	  </file>
-	  <file>
-		  <guid>Umbraco.ModelsBuilder.AspNet.dll</guid>
-		  <orgPath>/bin</orgPath>
-		  <orgName>Umbraco.ModelsBuilder.AspNet.dll</orgName>
-	  </file>
     <!-- these files are NOT required to run, just to configure -->
     <file>
       <guid>web.config.install.xdt</guid>
@@ -130,6 +125,6 @@ A tool that can generate a complete set of strongly-typed published content mode
       </section>
     </Action>
     -->
-    <Action runat="install" undo="true" alias="Umbraco.ModelsBuilder.AspNet.PackageActions.Configure2" />
+    <Action runat="install" undo="true" alias="Umbraco.ModelsBuilder.PackageActions.Configure2" />
   </Actions>
 </umbPackage>

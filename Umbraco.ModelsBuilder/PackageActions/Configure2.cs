@@ -2,14 +2,14 @@
 using System.Web.Hosting;
 using System.Xml;
 using Microsoft.Web.XmlTransform;
-using Umbraco.Core.Logging;
 using umbraco.interfaces;
+using Umbraco.Core.Logging;
 
-namespace Umbraco.ModelsBuilder.AspNet.PackageActions
+namespace Umbraco.ModelsBuilder.PackageActions
 {
     public class Configure2 : IPackageAction
     {
-        private const string ActionAlias = "Umbraco.ModelsBuilder.AspNet.PackageActions.Configure2";
+        private const string ActionAlias = "Umbraco.ModelsBuilder.PackageActions.Configure2";
 
         public string Alias()
         {

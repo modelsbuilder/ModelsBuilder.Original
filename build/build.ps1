@@ -45,7 +45,6 @@ If ($FileExists -eq $False) {
 $packagesTargetDirectory = "..\packages\"
 Write-Host "Restoring NuGet packages, this may take a while depending on your package cache and connection speed"
 .\nuget.exe install ..\Umbraco.ModelsBuilder\packages.config -OutputDirectory $packagesTargetDirectory -Verbosity quiet
-.\nuget.exe install ..\Umbraco.ModelsBuilder.AspNet\packages.config -OutputDirectory $packagesTargetDirectory -Verbosity quiet
 .\nuget.exe install ..\Umbraco.ModelsBuilder.Console\packages.config -OutputDirectory $packagesTargetDirectory -Verbosity quiet
 .\nuget.exe install ..\Umbraco.ModelsBuilder.CustomTool\packages.config -OutputDirectory $packagesTargetDirectory -Verbosity quiet
 .\nuget.exe install ..\Umbraco.ModelsBuilder.Tests\packages.config -OutputDirectory $packagesTargetDirectory -Verbosity quiet
@@ -80,36 +79,24 @@ if (-not $?)
 }
 
 $CoreFolder = Join-Path -Path $ReleaseFolder -ChildPath "Umbraco.ModelsBuilder";
-$AspNetFolder = Join-Path -Path $ReleaseFolder -ChildPath "Umbraco.ModelsBuilder.AspNet";
 
 New-Item $CoreFolder -Type directory
-New-Item $AspNetFolder -Type directory
 
 $include = @('*Umbraco.ModelsBuilder.dll','*Umbraco.ModelsBuilder.pdb')
 $CoreBinFolder = Join-Path -Path $SolutionRoot -ChildPath "Umbraco.ModelsBuilder\bin\Release";
 Copy-Item "$CoreBinFolder\*.*" -Destination $CoreFolder -Include $include
 
-$include = @('*Umbraco.ModelsBuilder.AspNet.dll','*Umbraco.ModelsBuilder.AspNet.pdb')
-$AspNetBinFolder = Join-Path -Path $SolutionRoot -ChildPath "Umbraco.ModelsBuilder.AspNet\bin\Release";
-Copy-Item "$AspNetBinFolder\*.*" -Destination $AspNetFolder -Include $include
-
 #build core nuget
+# - first need to copy over some files
+$DashboardFiles = Join-Path -Path $SolutionRoot -ChildPath "Umbraco.ModelsBuilder\Dashboard"
+Copy-Item "$DashboardFiles\*.js" -Destination $AspNetFolder;
+Copy-Item "$DashboardFiles\*.htm" -Destination $AspNetFolder;
+Copy-Item "$DashboardFiles\*.manifest" -Destination $AspNetFolder;
+
 $CoreNuSpecSource = Join-Path -Path $BuildFolder -ChildPath "Nuspecs\ModelsBuilder\*";
 Copy-Item $CoreNuSpecSource -Destination $CoreFolder
 $CoreNuSpec = Join-Path -Path $CoreFolder -ChildPath "Umbraco.ModelsBuilder.nuspec";
 & $NuGet pack $CoreNuSpec -OutputDirectory $ReleaseFolder -Version $ReleaseVersionNumber$PreReleaseName -Properties copyright=$Copyright
-
-#build aspnet nuget
-# - first need to copy over some files
-$DashboardFiles = Join-Path -Path $SolutionRoot -ChildPath "Umbraco.ModelsBuilder.AspNet\Dashboard"
-Copy-Item "$DashboardFiles\*.js" -Destination $AspNetFolder;
-Copy-Item "$DashboardFiles\*.htm" -Destination $AspNetFolder;
-Copy-Item "$DashboardFiles\*.manifest" -Destination $AspNetFolder;
-$AspNetNuSpecSource = Join-Path -Path $BuildFolder -ChildPath "Nuspecs\ModelsBuilder.AspNet\*";
-Copy-Item $AspNetNuSpecSource -Destination $AspNetFolder
-$AspNetNuSpec = Join-Path -Path $AspNetFolder -ChildPath "Umbraco.ModelsBuilder.AspNet.nuspec";
-& $NuGet pack $AspNetNuSpec -OutputDirectory $ReleaseFolder -Version $ReleaseVersionNumber$PreReleaseName -Properties copyright=$Copyright
-
 
 ""
 "Build $ReleaseVersionNumber is done!"

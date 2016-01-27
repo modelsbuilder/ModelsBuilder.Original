@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Umbraco.ModelsBuilder
+namespace Umbraco.ModelsBuilder.Api
 {
     /// <summary>
     /// Manages API version handshake between client and server.

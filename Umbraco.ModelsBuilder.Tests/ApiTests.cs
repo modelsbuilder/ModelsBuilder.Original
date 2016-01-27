@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Umbraco.ModelsBuilder.AspNet;
-using Umbraco.ModelsBuilder.AspNet.Api;
+using Umbraco.ModelsBuilder.Api;
 
 namespace Umbraco.ModelsBuilder.Tests
 {

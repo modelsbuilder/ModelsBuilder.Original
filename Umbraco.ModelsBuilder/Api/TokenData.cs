@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Umbraco.ModelsBuilder.AspNet.Api
+namespace Umbraco.ModelsBuilder.Api
 {
     [DataContract]
     class TokenData

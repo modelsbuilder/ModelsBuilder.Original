@@ -3,21 +3,17 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Web;
-using System.Web.Mvc;
-using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
-using Umbraco.Web;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Application = Umbraco.ModelsBuilder.Umbraco.Application;
 using Constants = Umbraco.Core.Constants;
 
-namespace Umbraco.ModelsBuilder.AspNet.Api
+namespace Umbraco.ModelsBuilder.Api
 {
     // read http://umbraco.com/follow-us/blog-archive/2014/1/17/heads-up,-breaking-change-coming-in-702-and-62.aspx
     // read http://our.umbraco.org/forum/developers/api-questions/43025-Web-API-authentication

@@ -10,13 +10,12 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.ModelsBuilder.Configuration;
-using Umbraco.ModelsBuilder.Umbraco;
 using Umbraco.Web;
 using Umbraco.Web.UI.JavaScript;
 
-namespace Umbraco.ModelsBuilder.AspNet
+namespace Umbraco.ModelsBuilder.Umbraco
 {
-    public class ModelsBuilderApplication : ApplicationEventHandler
+    public class ModelsBuilderApplication2 : ApplicationEventHandler
     {
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {

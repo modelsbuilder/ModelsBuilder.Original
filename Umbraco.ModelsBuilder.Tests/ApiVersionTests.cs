@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using Umbraco.ModelsBuilder.Api;
 
 namespace Umbraco.ModelsBuilder.Tests
 {

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
@@ -11,7 +8,7 @@ using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.ModelsBuilder.AspNet.Validation
+namespace Umbraco.ModelsBuilder.Validation
 {
     /// <summary>
     /// Used to validate the aliases for the content type when MB is enabled to ensure that

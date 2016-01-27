@@ -3,10 +3,10 @@ using System.IO;
 using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Web.Cache;
 using Umbraco.ModelsBuilder.Configuration;
+using Umbraco.Web.Cache;
 
-namespace Umbraco.ModelsBuilder.AspNet
+namespace Umbraco.ModelsBuilder.Umbraco
 {
     public sealed class OutOfDateModelsStatus : ApplicationEventHandler
     {

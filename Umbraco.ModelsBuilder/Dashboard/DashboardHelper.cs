@@ -1,8 +1,9 @@
 ﻿using System.Text;
 using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
+using Umbraco.ModelsBuilder.Umbraco;
 
-namespace Umbraco.ModelsBuilder.AspNet.Dashboard
+namespace Umbraco.ModelsBuilder.Dashboard
 {
     internal static class DashboardHelper
     {

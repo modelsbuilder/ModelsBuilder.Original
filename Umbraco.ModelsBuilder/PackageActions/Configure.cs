@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Web;
 using System.Xml;
-using Umbraco.Core.Logging;
 using umbraco.interfaces;
+using Umbraco.Core.Logging;
 
-namespace Umbraco.ModelsBuilder.AspNet.PackageActions
+namespace Umbraco.ModelsBuilder.PackageActions
 {
     // see also http://our.umbraco.org/forum/umbraco-7/developing-umbraco-7-packages/46885-How-can-I-run-code-on-package-uninstall
     // see also http://packageactioncontrib.codeplex.com
@@ -15,7 +15,7 @@ namespace Umbraco.ModelsBuilder.AspNet.PackageActions
     public class Configure : IPackageAction
     {
         private const string WebConfig = "~/web.config";
-        private const string ActionAlias = "Umbraco.ModelsBuilder.Umbraco.PackageActions.Configure";
+        private const string ActionAlias = "Umbraco.ModelsBuilder.PackageActions.Configure";
         private const string AssemblyToAdd = "System.Runtime, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
 
         public string Alias()
