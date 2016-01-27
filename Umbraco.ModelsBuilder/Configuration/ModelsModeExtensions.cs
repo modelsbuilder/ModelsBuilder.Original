@@ -13,7 +13,6 @@
             return
                 modelsMode == ModelsMode.PureLive
                 || modelsMode == ModelsMode.LiveDll
-                || modelsMode == ModelsMode.LiveAppCode
                 || modelsMode == ModelsMode.LiveAppData;
         }
 
@@ -24,18 +23,7 @@
         {
             return
                 modelsMode == ModelsMode.LiveDll
-                || modelsMode == ModelsMode.LiveAppCode
                 || modelsMode == ModelsMode.LiveAppData;
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the mode is [Live]AppCode.
-        /// </summary>
-        public static bool IsAnyAppCode(this ModelsMode modelsMode)
-        {
-         return
-            modelsMode == ModelsMode.AppCode
-            || modelsMode == ModelsMode.LiveAppCode;
         }
 
         /// <summary>
@@ -56,8 +44,6 @@
             return 
                 modelsMode == ModelsMode.Dll
                || modelsMode == ModelsMode.LiveDll
-               || modelsMode == ModelsMode.AppCode
-               || modelsMode == ModelsMode.LiveAppCode
                || modelsMode == ModelsMode.AppData
                || modelsMode == ModelsMode.LiveAppData;
         }

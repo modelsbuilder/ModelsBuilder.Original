@@ -8,18 +8,12 @@ namespace Umbraco.ModelsBuilder.AspNet.Dashboard
     {
         public static bool CanGenerate()
         {
-            var config = UmbracoConfig.For.ModelsBuilder();
-            return config.ModelsMode.SupportsExplicitGeneration();
+            return UmbracoConfig.For.ModelsBuilder().ModelsMode.SupportsExplicitGeneration();
         }
 
         public static bool GenerateCausesRestart()
         {
-            var config = UmbracoConfig.For.ModelsBuilder();
-            return
-                config.ModelsMode == ModelsMode.AppCode
-                || config.ModelsMode == ModelsMode.LiveAppCode
-                || config.ModelsMode == ModelsMode.Dll
-                || config.ModelsMode == ModelsMode.LiveDll;
+            return UmbracoConfig.For.ModelsBuilder().ModelsMode.IsAnyDll();
         }
 
         public static bool AreModelsOutOfDate()

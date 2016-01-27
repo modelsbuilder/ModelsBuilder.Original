@@ -9,20 +9,12 @@ using Umbraco.Web.Cache;
 using Umbraco.ModelsBuilder.AspNet;
 using Umbraco.ModelsBuilder.Configuration;
 
-// note
-// we do not support pure LiveModels anymore - see notes in various places
-// this should provide live AppData, AppCode or Dll models - but we do not want to
-// restart the app anytime something changes, ?
-//
-// ideally we'd want something that does not generate models all the time, but
-// only after a while, and then restarts, but that is prone to too much confusion,
-// so we decide that ONLY live App_Data models are supported from now on.
-
 // will install only if configuration says it needs to be installed
 [assembly: PreApplicationStartMethod(typeof(LiveModelsProviderModule), "Install")]
 
 namespace Umbraco.ModelsBuilder.AspNet
 {
+    // supports LiveDll and LiveAppData - but not PureLive
     public sealed class LiveModelsProvider : ApplicationEventHandler
     {
         private static Mutex _mutex;
@@ -112,10 +104,6 @@ namespace Umbraco.ModelsBuilder.AspNet
             if (appData == null)
                 throw new Exception("Panic: appData is null.");
 
-            var appCode = HostingEnvironment.MapPath("~/App_Code");
-            if (appCode == null)
-                throw new Exception("Panic: appCode is null.");
-
             var bin = HostingEnvironment.MapPath("~/bin");
             if (bin == null)
                 throw new Exception("Panic: bin is null.");
@@ -124,10 +112,6 @@ namespace Umbraco.ModelsBuilder.AspNet
 
             // EnableDllModels will recycle the app domain - but this request will end properly
             ModelsBuilderBackOfficeController.GenerateModels(appData, config.ModelsMode.IsAnyDll() ? bin : null);
-
-            // will recycle the app domain - but this request will end properly
-            if (config.ModelsMode.IsAnyAppCode())
-                ModelsBuilderBackOfficeController.TouchModelsFile(appCode);
         }
     }
 

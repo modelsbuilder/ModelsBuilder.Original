@@ -45,20 +45,12 @@ namespace Umbraco.ModelsBuilder.AspNet
                 if (appData == null)
                     throw new Exception("Panic: appData is null.");
 
-                var appCode = HostingEnvironment.MapPath("~/App_Code");
-                if (appCode == null)
-                    throw new Exception("Panic: appCode is null.");
-
                 var bin = HostingEnvironment.MapPath("~/bin");
                 if (bin == null)
                     throw new Exception("Panic: bin is null.");
 
                 // EnableDllModels will recycle the app domain - but this request will end properly
                 GenerateModels(appData, UmbracoConfig.For.ModelsBuilder().ModelsMode.IsAnyDll() ? bin : null);
-
-                // will recycle the app domain - but this request will end properly
-                if (UmbracoConfig.For.ModelsBuilder().ModelsMode.IsAnyAppCode())
-                    TouchModelsFile(appCode);
 
                 var result = new BuildResult { Success = true };
                 return Request.CreateResponse(HttpStatusCode.OK, result, Configuration.Formatters.JsonFormatter);
@@ -101,18 +93,6 @@ namespace Umbraco.ModelsBuilder.AspNet
                 outOfDateModels = DashboardHelper.AreModelsOutOfDate(),
             };
             return Request.CreateResponse(HttpStatusCode.OK, dashboard, Configuration.Formatters.JsonFormatter);
-        }
-
-        internal static void TouchModelsFile(string appCode)
-        {
-            var modelsFile = Path.Combine(appCode, "build.models");
-
-            // touch the file & make sure it exists, will recycle the domain
-            var text = string.Format("Umbraco ModelsBuilder\r\n"
-                                     + "Actual models code in ~/App_Data/Models\r\n"
-                                     + "Removing this file disables all generated models\r\n"
-                                     + "{0:yyyy-MM-ddTHH:mm:ssZ}", DateTime.UtcNow);
-            File.WriteAllText(modelsFile, text);
         }
 
         internal static void GenerateModels(string appData, string bin)

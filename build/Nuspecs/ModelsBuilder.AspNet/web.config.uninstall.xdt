@@ -20,16 +20,7 @@
       <buildProviders>
         <add extension=".models" type="Umbraco.ModelsBuilder.AspNet.ModelsBuildProvider, Umbraco.ModelsBuilder.AspNet"
           xdt:Transform="Remove" xdt:Locator="Match(extension,type)"/>
-        <!-- remove our own remove, ie one having first following sibling being our own add -->
-        <!-- NOT see note in ConfigurePublishedContentModelFactory.cs -->
-        <!--
-        <remove
-          xdt:Transform="Remove"
-          xdt:Locator="Condition(@extension='.cshtml' and (following-sibling::add [position()=1 and @extension='.cshtml' and @type='Umbraco.ModelsBuilder.AspNet.RazorBuildProvider, Umbraco.ModelsBuilder.AspNet']))"/>
-        <add extension=".cshtml" type="Umbraco.ModelsBuilder.AspNet.RazorBuildProvider, Umbraco.ModelsBuilder.AspNet"
-          xdt:Transform="Remove" xdt:Locator="Match(extension,type)"/>
-        -->
       </buildProviders>
 		</compilation>
-	</system.web>  
+	</system.web>
 </configuration>

@@ -34,22 +34,6 @@
         LiveAppData,
 
         /// <summary>
-        /// Generate models in AppData and reference them in AppCode (the app restarts).
-        /// When: generation is triggered.
-        /// </summary>
-        /// <remarks>Generation can be triggered from the dashboard. The app does restart. Models
-        /// are available to the entire project.</remarks>
-        AppCode,
-
-        /// <summary>
-        /// Generate models in AppData and reference them in AppCode (the app restarts).
-        /// When: a content type change occurs, or generation is triggered.
-        /// </summary>
-        /// <remarks>Generation can be triggered from the dashboard. The app does restart. Models
-        /// are available to the entire project.</remarks>
-        LiveAppCode,
-
-        /// <summary>
         /// Generates models in AppData and compiles them into a Dll into ~/bin (the app restarts).
         /// When: generation is triggered.
         /// </summary>
