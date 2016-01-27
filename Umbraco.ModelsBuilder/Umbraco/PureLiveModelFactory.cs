@@ -15,7 +15,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Cache;
-using Umbraco.ModelsBuilder.AspNet;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
 using File = System.IO.File;
@@ -181,7 +180,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             // generate code
             var code = GenerateModelsCode(ourFiles, typeModels);
-            code = RoslynRazorViewCompiler.PrepareCodeForCompilation(code);
+            code = code.Replace("//ASSATTR", ""); // we don't have extra attributes
 
             // save code for debug purposes
             var modelsCodeFile = Path.Combine(modelsDirectory, "models.generated.cs");
