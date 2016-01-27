@@ -3,16 +3,12 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
-using System.Web.WebPages;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.Web.Mvc;
-using Umbraco.ModelsBuilder.AspNet.ViewEngine;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.ModelsBuilder.Umbraco;
 using Umbraco.Web;
@@ -85,25 +81,8 @@ namespace Umbraco.ModelsBuilder.AspNet
 
         private void ApplicationStartingLiveModels(ApplicationContext applicationContext)
         {
-            var renderViewEngine = new RoslynRenderViewEngine();
-            var pluginViewEngine = new RoslynPluginViewEngine();
-
-            // not! there are engines we don't want to remove
-            //ViewEngines.Engines.Clear();
-
-            // better substitute our engines
-            ViewEngines.Engines.Substitute<RenderViewEngine>(renderViewEngine);
-            ViewEngines.Engines.Substitute<PluginViewEngine>(pluginViewEngine);
-
-            // fixme - VirtualPathFactory?
-            // is what handles layouts for views - if we don't have it, then the layouts
-            // don't seem to see our models nor to be compiled by Roslyn - but then, is
-            // it taking care both of Umbraco templates, and regular MVC? should we filter
-            // the virtual paths in the view engine?
-            VirtualPathFactoryManager.RegisterVirtualPathFactory(renderViewEngine);
-
             var logger = applicationContext.ProfilingLogger;
-            var factory = new PureLiveModelFactory(logger, renderViewEngine, pluginViewEngine);
+            var factory = new PureLiveModelFactory(logger);
             PublishedContentModelFactoryResolver.Current.SetFactory(factory);
 
             // the following would add @using statement in every view so user's don't

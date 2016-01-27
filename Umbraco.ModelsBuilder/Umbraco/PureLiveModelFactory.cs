@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Web.Compilation;
 using System.Web.Hosting;
+using System.Web.WebPages.Razor;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -23,19 +24,19 @@ namespace Umbraco.ModelsBuilder.Umbraco
 {
     class PureLiveModelFactory : IPublishedContentModelFactory
     {
+        private Assembly _modelsAssembly;
         private Dictionary<string, Func<IPublishedContent, IPublishedContent>> _constructors;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
-        private readonly IPureLiveModelsEngine[] _engines;
         private bool _hasModels;
         private bool _pendingRebuild;
         private readonly ProfilingLogger _logger;
 
-        public PureLiveModelFactory(ProfilingLogger logger, params IPureLiveModelsEngine[] engines)
+        public PureLiveModelFactory(ProfilingLogger logger)
         {
             _logger = logger;
-            _engines = engines;
             ContentTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModels();
             DataTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModels();
+            RazorBuildProvider.CodeGenerationStarted += RazorBuildProvider_CodeGenerationStarted;
         }
 
         #region IPublishedContentModelFactory
@@ -62,6 +63,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         #region Compilation
 
+        private void RazorBuildProvider_CodeGenerationStarted(object sender, EventArgs e)
+        {
+            var provider = sender as RazorBuildProvider;
+            provider?.AssemblyBuilder.AddAssemblyReference(_modelsAssembly);
+        }
+
         // tells the factory that it should build a new generation of models
         private void ResetModels()
         {
@@ -79,7 +86,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         }
 
         // ensure that the factory is running with the lastest generation of models
-        private Dictionary<string, Func<IPublishedContent, IPublishedContent>> EnsureModels()
+        internal Dictionary<string, Func<IPublishedContent, IPublishedContent>> EnsureModels()
         {
             _logger.Logger.Debug<PureLiveModelFactory>("Ensuring models.");
             _locker.EnterReadLock();
@@ -101,25 +108,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 // either they haven't been loaded from the cache yet
                 // or they have been reseted and are pending a rebuild
 
-                // this will lock the engines - must take care that whatever happens,
-                // we unlock them - even if generation failed for some reason
-                foreach (var engine in _engines)
-                    engine.NotifyRebuilding();
-
-                try
+                using (_logger.DebugDuration<PureLiveModelFactory>("Get models.", "Got models."))
                 {
-                    using (_logger.DebugDuration<PureLiveModelFactory>("Get models.", "Got models."))
-                    {
-                        var assembly = GetModelsAssembly(_pendingRebuild);
-                        var types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>());
-                        _constructors = RegisterModels(types);
-                        _hasModels = true;
-                    }
-                }
-                finally
-                {
-                    foreach (var engine in _engines)
-                        engine.NotifyRebuilt();
+                    _modelsAssembly = GetModelsAssembly(_pendingRebuild);
+                    var types = _modelsAssembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>());
+                    _constructors = RegisterModels(types);
+                    _hasModels = true;
                 }
 
                 return _constructors;
@@ -151,14 +145,35 @@ namespace Umbraco.ModelsBuilder.Umbraco
             var typeModels = umbraco.GetAllTypes();
             var currentHash = Hash(ourFiles, typeModels);
             var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
-            var modelsDllFile = Path.Combine(modelsDirectory, "models.dll");
-            Assembly assembly;
+            var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
+            var modelsSrcVirt = "~/App_Data/Models/models.generated.cs";
+
+            // caching the generated models speeds up booting
+            // if you change your own partials, delete the .generated.cs file to force a rebuild
+
+            if (!forceRebuild)
+            {
+                _logger.Logger.Debug<PureLiveModelFactory>("Looking for cached models.");
+                if (File.Exists(modelsHashFile) && File.Exists(modelsSrcFile))
+                {
+                    var cachedHash = File.ReadAllText(modelsHashFile);
+                    if (currentHash != cachedHash)
+                    {
+                        _logger.Logger.Debug<PureLiveModelFactory>("Found obsolete cached models.");
+                        forceRebuild = true;
+                    }
+                }
+                else
+                {
+                    _logger.Logger.Debug<PureLiveModelFactory>("Could not find cached models.");
+                    forceRebuild = true;
+                }
+            }
 
             if (forceRebuild == false)
             {
-                assembly = TryToLoadCachedModelsAssembly(modelsHashFile, modelsDllFile, currentHash);
-                if (assembly != null)
-                    return assembly;
+                _logger.Logger.Debug<PureLiveModelFactory>("Loading cached models.");
+                return BuildManager.GetCompiledAssembly(modelsSrcVirt);
             }
 
             // need to rebuild
@@ -173,46 +188,13 @@ namespace Umbraco.ModelsBuilder.Umbraco
             File.WriteAllText(modelsCodeFile, code);
 
             // compile and register
-            byte[] bytes;
-            assembly = RoslynRazorViewCompiler.CompileAndRegisterModels(code, out bytes);
+            var assembly = BuildManager.GetCompiledAssembly(modelsSrcVirt);
 
             // assuming we can write and it's not going to cause exceptions...
-            File.WriteAllBytes(modelsDllFile, bytes);
             File.WriteAllText(modelsHashFile, currentHash);
 
             _logger.Logger.Debug<PureLiveModelFactory>("Done rebuilding.");
             return assembly;
-        }
-
-        private Assembly TryToLoadCachedModelsAssembly(string modelsHashFile, string modelsDllFile, string currentHash)
-        {
-            _logger.Logger.Debug<PureLiveModelFactory>("Looking for cached models.");
-
-            if (!File.Exists(modelsHashFile) || !File.Exists(modelsDllFile))
-            {
-                _logger.Logger.Debug<PureLiveModelFactory>("Could not find cached models.");
-                return null;
-            }
-
-            var cachedHash = File.ReadAllText(modelsHashFile);
-            if (currentHash != cachedHash)
-            {
-                _logger.Logger.Debug<PureLiveModelFactory>("Found obsolete cached models.");
-                return null;
-            }
-
-            _logger.Logger.Debug<PureLiveModelFactory>("Found cached models, loading.");
-            try
-            {
-                var rawAssembly = File.ReadAllBytes(modelsDllFile);
-                var assembly = RoslynRazorViewCompiler.RegisterModels(rawAssembly);
-                return assembly;
-            }
-            catch (Exception e)
-            {
-                _logger.Logger.Error<PureLiveModelFactory>("Failed to load cached models.", e);
-                return null;
-            }
         }
 
         private static Dictionary<string, Func<IPublishedContent, IPublishedContent>> RegisterModels(IEnumerable<Type> types)
