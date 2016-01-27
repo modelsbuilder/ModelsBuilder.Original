@@ -331,12 +331,6 @@
     <Compile Include="PackageActions\Configure2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Validation\ContentTypeModelValidator.cs" />
-    <Compile Include="ViewEngine\RoslynPluginViewEngine.cs" />
-    <Compile Include="ViewEngine\RoslynRazorView.cs" />
-    <Compile Include="ViewEngine\RoslynRenderViewEngine.cs" />
-    <Compile Include="ViewEngine\RoslynViewEngineBase.cs" />
-    <Compile Include="ViewEngine\UmbracoInternals.cs" />
-    <Compile Include="ViewEngine\ViewEngineCollectionExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.ModelsBuilder\Umbraco.ModelsBuilder.csproj">
