@@ -317,17 +317,19 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Api\TokenData.cs" />
     <Compile Include="Dashboard\DashboardHelper.cs" />
+    <Compile Include="Api\GetModelsData.cs" />
     <Compile Include="ModelsBuilderApplication.cs" />
     <Compile Include="ModelsBuilderBackOfficeController.cs" />
     <Compile Include="OutOfDateModelsStatus.cs" />
     <Compile Include="LiveModelsProvider.cs" />
-    <Compile Include="ModelsBuilderApi.cs" />
-    <Compile Include="ModelsBuilderAuthFilter.cs" />
-    <Compile Include="ModelsBuilderController.cs" />
+    <Compile Include="Api\ModelsBuilderApiClient.cs" />
+    <Compile Include="Api\ModelsBuilderApiController.cs" />
     <Compile Include="PackageActions\Configure.cs" />
     <Compile Include="PackageActions\Configure2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Api\ValidateClientVersionData.cs" />
     <Compile Include="Validation\ContentTypeModelValidator.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Umbraco.ModelsBuilder.AspNet.Api;
 using Umbraco.ModelsBuilder.Building;
 using SysConsole = System.Console;
 
@@ -135,7 +136,7 @@ namespace Umbraco.ModelsBuilder.Console
 
         private static void GenerateModels(string apiUrl, string apiUser, string apiPassword, string modelsDirectory, string modelsNamespace)
         {
-            var api = new AspNet.ModelsBuilderApi(apiUrl, apiUser, apiPassword);
+            var api = new ModelsBuilderApiClient(apiUrl, apiUser, apiPassword);
             api.ValidateClientVersion(); // so we get a meaningful error message first
 
             // exclude .generated.cs files but don't delete them now, should anything go wrong

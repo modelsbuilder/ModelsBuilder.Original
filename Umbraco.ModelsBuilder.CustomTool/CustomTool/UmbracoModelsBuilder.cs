@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.VisualStudio.Shell.Interop;
+using Umbraco.ModelsBuilder.AspNet.Api;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.CustomTool.VisualStudio;
 
@@ -88,7 +89,7 @@ namespace Umbraco.ModelsBuilder.CustomTool.CustomTool
                 var options = VisualStudioHelper.GetOptions();
                 options.Validate();
 
-                var api = new AspNet.ModelsBuilderApi(options.UmbracoUrl, options.UmbracoUser, options.UmbracoPassword);
+                var api = new ModelsBuilderApiClient(options.UmbracoUrl, options.UmbracoUser, options.UmbracoPassword);
                 api.ValidateClientVersion(); // so we get a meaningful error message first
 
                 // exclude .generated.cs files but don't delete them now, should anything go wrong
