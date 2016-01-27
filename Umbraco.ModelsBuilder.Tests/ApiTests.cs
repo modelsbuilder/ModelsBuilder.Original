@@ -42,7 +42,7 @@ using Umbraco.ModelsBuilder;
 [assembly:IgnoreContentType(""product"")]
 ";
 
-            var api = new ModelsBuilderApiClient("http://umbraco.local", "user", "password");
+            var api = new ApiClient("http://umbraco.local", "user", "password");
             var ourFiles = new Dictionary<string, string>
             {
                 {"file1", text1},
