@@ -13,12 +13,12 @@ namespace Umbraco.ModelsBuilder
         // indicate the minimum version of the client API that is supported by this server's API.
         //   eg our Version = 4.8 but we support connections from VSIX down to version 3.2
         //   => as a server, we accept connections from client down to version ...
-        private static readonly Version MinClientVersionSupportedByServerConst = new Version(2, 1, 0, 0);
+        private static readonly Version MinClientVersionSupportedByServerConst = new Version(3, 0, 0, 0);
 
         // indicate the minimum version of the server that can support the client API
         //   eg our Version = 4.8 and we know we're compatible with website server down to version 3.2
         //   => as a client, we tell the server down to version ... that it should accept us
-        private static readonly Version MinServerVersionSupportingClientConst = new Version(2, 1, 0, 0);
+        private static readonly Version MinServerVersionSupportingClientConst = new Version(3, 0, 0, 0);
 
         #endregion
 
