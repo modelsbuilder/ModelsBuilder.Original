@@ -12,6 +12,6 @@ namespace Umbraco.ModelsBuilder.Api
         [DataMember]
         public IDictionary<string, string> Files { get; set; }
 
-        public override bool IsValid => base.IsValid && !string.IsNullOrWhiteSpace(Namespace) && Files != null;
+        public override bool IsValid => base.IsValid && Files != null;
     }
 }
