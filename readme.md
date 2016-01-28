@@ -13,4 +13,31 @@ Requires Umbraco 7.1.4 or later.
 
 More infos, including a (hopefully) **complete documentation**, can be found in the [wiki](https://github.com/zpqrtbnk/Zbu.ModelsBuilder/wiki/Zbu.ModelsBuilder).
 
-To build, execute: /build/build.ps1
+**WARNING** the documentation has not been updated for version 3 (Umbraco.ModelsBuilder) yet.
+
+#### Building
+
+Simply building the solution (in Visual Studio) either in Debug or Release does NOT build
+any NuGet nor Umbraco package. Building in Debug mode does NOT build the VSIX package, but
+building in Release mode DOES build the VSIX package.
+
+In order to build the NuGet package, the Umbraco package, and the VSIX package,
+use the build.ps1 Powershell script:
+
+To build version 1.2.3.45 (aka release 1.2.3)
+build.ps1 1.2.3 45
+
+To build version 1.2.3.45 beta001 (aka pre-release 1.2.3-beta001)
+build.ps1 1.2.3 45 beta001
+
+The "45" number should be incremented each time we release, so that
+version 1.2.3-beta001 has assemblies with version 1.2.3.45
+version 1.2.3-beta002 has assemblies with version 1.2.3.46
+version 1.2.3 (final) has assemblies with version 1.2.3.47
+
+This will create directory build/Release/v1.2.3-whatever containing:
+- Umbraco.ModelsBuilder.1.2.3-whatever.nuget = NuGet package
+- Umbraco.ModelsBuilder.CustomTool-1.2.3-whatever.vsix = Visual Studio Extension
+- (missing) = Umbraco package
+
+  TODO: not building the Umbraco package at the moment
