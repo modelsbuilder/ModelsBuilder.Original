@@ -12,6 +12,8 @@ namespace Umbraco.ModelsBuilder.PackageActions
     // kept here for reference
     // not used anymore, we now use Configure2 which runs NuGet transforms
 
+    // no need to compile, then!
+    /*
     public class Configure : IPackageAction
     {
         private const string WebConfig = "~/web.config";
@@ -82,7 +84,7 @@ namespace Umbraco.ModelsBuilder.PackageActions
             }
             catch (Exception e)
             {
-                LogHelper.WarnWithException<Configure>("Failed to save web.config", e);                
+                LogHelper.WarnWithException<Configure>("Failed to save web.config", e);
             }
 
             return result;
@@ -146,4 +148,5 @@ namespace Umbraco.ModelsBuilder.PackageActions
             return result;
         }
     }
+    */
 }

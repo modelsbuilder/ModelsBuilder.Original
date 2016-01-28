@@ -35,7 +35,7 @@ if ((Get-Item $ReleaseFolder -ErrorAction SilentlyContinue) -ne $null)
 
 # Go get nuget.exe if we don't have it
 $NuGet = "$BuildFolder\nuget.exe"
-$FileExists = Test-Path $NuGet 
+$FileExists = Test-Path $NuGet
 If ($FileExists -eq $False) {
 	$SourceNugetExe = "http://nuget.org/nuget.exe"
 	Invoke-WebRequest $SourceNugetExe -OutFile $NuGet
@@ -89,14 +89,17 @@ Copy-Item "$CoreBinFolder\*.*" -Destination $CoreFolder -Include $include
 #build core nuget
 # - first need to copy over some files
 $DashboardFiles = Join-Path -Path $SolutionRoot -ChildPath "Umbraco.ModelsBuilder\Dashboard"
-Copy-Item "$DashboardFiles\*.js" -Destination $AspNetFolder;
-Copy-Item "$DashboardFiles\*.htm" -Destination $AspNetFolder;
-Copy-Item "$DashboardFiles\*.manifest" -Destination $AspNetFolder;
+Copy-Item "$DashboardFiles\*.js" -Destination $CoreFolder;
+Copy-Item "$DashboardFiles\*.htm" -Destination $CoreFolder;
+Copy-Item "$DashboardFiles\*.manifest" -Destination $CoreFolder;
 
 $CoreNuSpecSource = Join-Path -Path $BuildFolder -ChildPath "Nuspecs\ModelsBuilder\*";
 Copy-Item $CoreNuSpecSource -Destination $CoreFolder
 $CoreNuSpec = Join-Path -Path $CoreFolder -ChildPath "Umbraco.ModelsBuilder.nuspec";
 & $NuGet pack $CoreNuSpec -OutputDirectory $ReleaseFolder -Version $ReleaseVersionNumber$PreReleaseName -Properties copyright=$Copyright
+
+#copy vsix
+Copy-Item "$SolutionRoot\Umbraco.ModelsBuilder.CustomTool\bin\Release\Umbraco.ModelsBuilder.CustomTool.vsix" -Destination "$ReleaseFolder\Umbraco.ModelsBuilder.CustomTool-$ReleaseVersionNumber$PreReleaseName.vsix"
 
 ""
 "Build $ReleaseVersionNumber is done!"

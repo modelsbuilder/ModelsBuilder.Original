@@ -34,11 +34,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModelsBuilder", "ModelsBuil
 		build\Nuspecs\ModelsBuilder\web.config.uninstall.xdt = build\Nuspecs\ModelsBuilder\web.config.uninstall.xdt
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModelsBuilder.AspNet", "ModelsBuilder.AspNet", "{511083A0-88AE-4693-A66C-25CA43A5A2C5}"
-	ProjectSection(SolutionItems) = preProject
-		build\Nuspecs\ModelsBuilder.AspNet\Umbraco.ModelsBuilder.AspNet.nuspec = build\Nuspecs\ModelsBuilder.AspNet\Umbraco.ModelsBuilder.AspNet.nuspec
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuspecs", "Nuspecs", "{30368E85-95E0-4A26-AC5A-D8570DB16FDA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{D4003398-D4BF-4056-914F-57508E6BDD95}"
@@ -72,7 +67,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1FFB7043-4B35-4A92-80FC-A2306511C8D5} = {30368E85-95E0-4A26-AC5A-D8570DB16FDA}
-		{511083A0-88AE-4693-A66C-25CA43A5A2C5} = {30368E85-95E0-4A26-AC5A-D8570DB16FDA}
 		{30368E85-95E0-4A26-AC5A-D8570DB16FDA} = {42C3FC1A-26BA-4FAB-9585-AC8C25449B8F}
 		{D4003398-D4BF-4056-914F-57508E6BDD95} = {1FFB7043-4B35-4A92-80FC-A2306511C8D5}
 	EndGlobalSection

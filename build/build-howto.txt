@@ -5,7 +5,7 @@ Simply building the solution (in Visual Studio) either in Debug or Release does 
 
   TODO: ensure it's true
 
-In order to build the NuGet packages, the Umbraco package, and the VSIX package,
+In order to build the NuGet package, the Umbraco package, and the VSIX package,
 use the build.ps1 Powershell script:
 
 To build version 1.2.3.45 (aka release 1.2.3)
