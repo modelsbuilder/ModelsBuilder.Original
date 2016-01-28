@@ -365,7 +365,6 @@
     <Compile Include="Umbraco\HashCodeCombiner.cs" />
     <Compile Include="Umbraco\LiveModelsProvider.cs" />
     <Compile Include="Umbraco\ModelsBuilderApplication.cs" />
-    <Compile Include="Umbraco\ModelsBuilderApplication2.cs" />
     <Compile Include="Umbraco\ModelsBuilderBackOfficeController.cs" />
     <Compile Include="Umbraco\OutOfDateModelsStatus.cs" />
     <Compile Include="Umbraco\PureLiveModelFactory.cs" />

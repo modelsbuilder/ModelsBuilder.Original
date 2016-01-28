@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
-using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.ModelsBuilder.Configuration;
@@ -15,7 +14,7 @@ using Umbraco.Web.Cache;
 namespace Umbraco.ModelsBuilder.Umbraco
 {
     // supports LiveDll and LiveAppData - but not PureLive
-    public sealed class LiveModelsProvider : ApplicationEventHandler
+    public sealed class LiveModelsProvider
     {
         private static Mutex _mutex;
         private static int _req;
@@ -30,10 +29,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
         }
 
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        internal static void Install()
         {
-            base.ApplicationStarted(umbracoApplication, applicationContext);
-
+            // just be sure
             if (!IsEnabled)
                 return;
 

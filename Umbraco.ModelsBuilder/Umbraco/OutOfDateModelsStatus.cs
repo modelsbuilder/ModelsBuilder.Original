@@ -8,11 +8,14 @@ using Umbraco.Web.Cache;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
-    public sealed class OutOfDateModelsStatus : ApplicationEventHandler
+    public sealed class OutOfDateModelsStatus
     {
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        internal static void Install()
         {
-            if (UmbracoConfig.For.ModelsBuilder().FlagOutOfDateModels == false) return;
+            // just be sure
+            if (UmbracoConfig.For.ModelsBuilder().FlagOutOfDateModels == false)
+                return;
+
             ContentTypeCacheRefresher.CacheUpdated += (sender, args) => Write();
             DataTypeCacheRefresher.CacheUpdated += (sender, args) => Write();
         }
