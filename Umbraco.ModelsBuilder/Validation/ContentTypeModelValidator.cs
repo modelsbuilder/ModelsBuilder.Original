@@ -18,6 +18,8 @@ namespace Umbraco.ModelsBuilder.Validation
     {
         protected override IEnumerable<ValidationResult> PerformValidate(ContentTypeSave model)
         {
+            return Enumerable.Empty<ValidationResult>();
+            /*
             //don't do anything if we're not enabled
             if (UmbracoConfig.For.ModelsBuilder().Enable)
             {
@@ -39,6 +41,7 @@ namespace Umbraco.ModelsBuilder.Validation
                     }
                 }
             }
+            */
         }
 
         private ValidationResult ValidateProperty(PropertyTypeBasic property, int groupIndex, int propertyIndex)
