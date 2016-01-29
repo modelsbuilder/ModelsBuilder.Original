@@ -20,7 +20,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.Conso
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{42C3FC1A-26BA-4FAB-9585-AC8C25449B8F}"
 	ProjectSection(SolutionItems) = preProject
-		build\build-howto.txt = build\build-howto.txt
 		build\build.ps1 = build\build.ps1
 		build\package.xml = build\package.xml
 	EndProjectSection
@@ -35,11 +34,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModelsBuilder", "ModelsBuil
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuspecs", "Nuspecs", "{30368E85-95E0-4A26-AC5A-D8570DB16FDA}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{D4003398-D4BF-4056-914F-57508E6BDD95}"
-	ProjectSection(SolutionItems) = preProject
-		build\Nuspecs\ModelsBuilder\tools\Install.ps1 = build\Nuspecs\ModelsBuilder\tools\Install.ps1
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,6 +62,5 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{1FFB7043-4B35-4A92-80FC-A2306511C8D5} = {30368E85-95E0-4A26-AC5A-D8570DB16FDA}
 		{30368E85-95E0-4A26-AC5A-D8570DB16FDA} = {42C3FC1A-26BA-4FAB-9585-AC8C25449B8F}
-		{D4003398-D4BF-4056-914F-57508E6BDD95} = {1FFB7043-4B35-4A92-80FC-A2306511C8D5}
 	EndGlobalSection
 EndGlobal
