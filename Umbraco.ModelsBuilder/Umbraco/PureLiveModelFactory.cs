@@ -64,6 +64,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private void RazorBuildProvider_CodeGenerationStarted(object sender, EventArgs e)
         {
+            // just be safe - can happen if the first view is not an Umbraco view
+            if (_modelsAssembly == null) return;
+
             var provider = sender as RazorBuildProvider;
             provider?.AssemblyBuilder.AddAssemblyReference(_modelsAssembly);
         }
