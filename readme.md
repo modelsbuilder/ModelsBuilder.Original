@@ -18,10 +18,10 @@ More infos, including a (hopefully) **complete documentation**, can be found in 
 #### Building
 
 Simply building the solution (in Visual Studio) either in Debug or Release does NOT build
-any NuGet nor Umbraco package. Building in Debug mode does NOT build the VSIX package, but
-building in Release mode DOES build the VSIX package.
+any NuGet package. Building in Debug mode does NOT build the VSIX package, but building in
+Release mode DOES build the VSIX package.
 
-In order to build the NuGet package, the Umbraco package, and the VSIX package,
+In order to build the NuGet package and the VSIX package,
 use the build.ps1 Powershell script:
 
 To build version 1.2.3.45 (aka release 1.2.3)
@@ -38,6 +38,5 @@ version 1.2.3 (final) has assemblies with version 1.2.3.47
 This will create directory build/Release/v1.2.3-whatever containing:
 - Umbraco.ModelsBuilder.1.2.3-whatever.nuget = NuGet package
 - Umbraco.ModelsBuilder.CustomTool-1.2.3-whatever.vsix = Visual Studio Extension
-- (missing) = Umbraco package
 
-  TODO: not building the Umbraco package at the moment
+Note: we are not building an Umbraco package anymore.
