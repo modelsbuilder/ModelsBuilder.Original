@@ -14,12 +14,32 @@ namespace Umbraco.ModelsBuilder.Validation
     /// Used to validate the aliases for the content type when MB is enabled to ensure that
     /// no illegal aliases are used
     /// </summary>
-    internal class ContentTypeModelValidator : EditorValidator<ContentTypeSave>
+    internal class ContentTypeModelValidator : ContentTypeModelValidatorBase<DocumentTypeSave, PropertyTypeBasic>
     {
-        protected override IEnumerable<ValidationResult> PerformValidate(ContentTypeSave model)
+    }
+
+    /// <summary>
+    /// Used to validate the aliases for the content type when MB is enabled to ensure that
+    /// no illegal aliases are used
+    /// </summary>
+    internal class MediaTypeModelValidator : ContentTypeModelValidatorBase<MediaTypeSave, PropertyTypeBasic>
+    {
+    }
+
+    /// <summary>
+    /// Used to validate the aliases for the content type when MB is enabled to ensure that
+    /// no illegal aliases are used
+    /// </summary>
+    internal class MemberTypeModelValidator : ContentTypeModelValidatorBase<MemberTypeSave, MemberPropertyTypeBasic>
+    {
+    }
+
+    internal abstract class ContentTypeModelValidatorBase<TModel, TProperty> : EditorValidator<TModel>
+        where TModel: ContentTypeSave<TProperty>
+        where TProperty: PropertyTypeBasic
+    {
+        protected override IEnumerable<ValidationResult> PerformValidate(TModel model)
         {
-            return Enumerable.Empty<ValidationResult>();
-            /*
             //don't do anything if we're not enabled
             if (UmbracoConfig.For.ModelsBuilder().Enable)
             {
@@ -41,14 +61,13 @@ namespace Umbraco.ModelsBuilder.Validation
                     }
                 }
             }
-            */
         }
 
         private ValidationResult ValidateProperty(PropertyTypeBasic property, int groupIndex, int propertyIndex)
         {
             //don't let them match any properties or methods in IPublishedContent
             //TODO: There are probably more!
-            var reservedProperties = typeof (IPublishedContent).GetProperties().Select(x => x.Name).ToArray();
+            var reservedProperties = typeof(IPublishedContent).GetProperties().Select(x => x.Name).ToArray();
             var reservedMethods = typeof(IPublishedContent).GetMethods().Select(x => x.Name).ToArray();
 
             var alias = property.Alias;
