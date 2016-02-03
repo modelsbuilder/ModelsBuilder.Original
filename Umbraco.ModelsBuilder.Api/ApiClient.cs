@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
+using System.Text;
 
 namespace Umbraco.ModelsBuilder.Api
 {
@@ -99,8 +100,15 @@ namespace Umbraco.ModelsBuilder.Api
             throw new Exception($"Response status code does not indicate success ({result.StatusCode})\n{text}");
         }
 
-        // fixme - for the time being, we don't cache the token and we auth on each API call
         private void Authorize(HttpClient client)
+        {
+            AuthorizeBasic(client);
+        }
+
+        // fixme - for the time being, we don't cache the token and we auth on each API call
+        // not used at the moment
+        /*
+        private void AuthorizeIdentity(HttpClient client)
         {
             var formData = new FormUrlEncodedContent(new[]
             {
@@ -118,6 +126,13 @@ namespace Umbraco.ModelsBuilder.Api
                 throw new Exception($"Received invalid token type \"{token.TokenType}\", expected \"bearer\".");
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+        }
+        */
+
+        private void AuthorizeBasic(HttpClient client)
+        {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+                Convert.ToBase64String(Encoding.UTF8.GetBytes(_user + ':' + _password)));
         }
     }
 }

@@ -23,17 +23,18 @@ namespace Umbraco.ModelsBuilder.Api
 
     [PluginController(ControllerArea)]
     [IsBackOffice]
-    [UmbracoApplicationAuthorize(Constants.Applications.Developer)]
-    public class ModelsBuilderApiController : UmbracoAuthorizedApiController
+    //[UmbracoApplicationAuthorize(Constants.Applications.Developer)] // see ApiBasicAuthFilter - that one would be for ASP.NET identity
+    public class ModelsBuilderApiController : UmbracoApiController // UmbracoAuthorizedApiController - for ASP.NET identity
     {
         public const string ControllerArea = "ModelsBuilder";
 
         // invoked by the API
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
+        [ApiBasicAuthFilter("developer")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage ValidateClientVersion(ValidateClientVersionData data)
         {
-            if (!UmbracoConfig.For.ModelsBuilder().ApiCanRun)
-                return Request.CreateResponse(HttpStatusCode.Forbidden, "Access to the API is not possible.");
+            if (!UmbracoConfig.For.ModelsBuilder().ApiServer)
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "API server does not want to talk to you.");
 
             if (!ModelState.IsValid || data == null || !data.IsValid)
                 return Request.CreateResponse(HttpStatusCode.BadRequest, "Invalid data.");
@@ -46,10 +47,11 @@ namespace Umbraco.ModelsBuilder.Api
 
         // invoked by the API
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
+        [ApiBasicAuthFilter("developer")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage GetModels(GetModelsData data)
         {
-            if (!UmbracoConfig.For.ModelsBuilder().ApiCanRun)
-                return Request.CreateResponse(HttpStatusCode.Forbidden, "Access to the API is not possible.");
+            if (!UmbracoConfig.For.ModelsBuilder().ApiServer)
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "API server does not want to talk to you.");
 
             if (!ModelState.IsValid || data == null || !data.IsValid)
                 return Request.CreateResponse(HttpStatusCode.BadRequest, "Invalid data.");

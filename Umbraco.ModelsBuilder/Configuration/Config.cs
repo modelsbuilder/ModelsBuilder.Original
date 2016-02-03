@@ -161,9 +161,9 @@ namespace Umbraco.ModelsBuilder.Configuration
         public ModelsMode ModelsMode { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the API can run.
+        /// Gets a value indicating whether to serve the API.
         /// </summary>
-        public bool ApiCanRun => EnableApi && ApiInstalled && IsDebug;
+        public bool ApiServer => EnableApi && ApiInstalled && IsDebug;
 
         /// <summary>
         /// Gets a value indicating whether to enable the API.
@@ -195,7 +195,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         /// <summary>
         /// Gets a value indicating whether system.web/compilation/@debug is true.
         /// </summary>
-        public static bool IsDebug
+        public bool IsDebug
         {
             get
             {
