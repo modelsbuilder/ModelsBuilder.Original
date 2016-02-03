@@ -306,11 +306,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Api\GetModelsData.cs" />
-    <Compile Include="Api\ApiClient.cs" />
-    <Compile Include="Api\ModelsBuilderApiController.cs" />
-    <Compile Include="Api\TokenData.cs" />
-    <Compile Include="Api\ValidateClientVersionData.cs" />
+    <Compile Include="Api\ApiHelper.cs" />
     <Compile Include="Building\CompilerException.cs" />
     <Compile Include="Building\TextHeaderWriter.cs" />
     <Compile Include="Dashboard\DashboardHelper.cs" />

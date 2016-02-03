@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Configuration;
+using System.IO;
+using System.Reflection;
+using System.Web.Configuration;
 using Microsoft.CodeAnalysis.CSharp;
 using Umbraco.Core;
 
@@ -158,6 +161,11 @@ namespace Umbraco.ModelsBuilder.Configuration
         public ModelsMode ModelsMode { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the API can run.
+        /// </summary>
+        public bool ApiCanRun => EnableApi && ApiInstalled && IsDebug;
+
+        /// <summary>
         /// Gets a value indicating whether to enable the API.
         /// </summary>
         /// <remarks>
@@ -166,6 +174,35 @@ namespace Umbraco.ModelsBuilder.Configuration
         ///     and retrieve the content types. It needs to be enabled so the extension & tool can work.</para>
         /// </remarks>
         public bool EnableApi { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the API is installed.
+        /// </summary>
+        public bool ApiInstalled => _apiInstalled.Value;
+
+        private readonly Lazy<bool> _apiInstalled = new Lazy<bool>(() =>
+        {
+            try
+            {
+                return Assembly.Load("Umbraco.ModelsBuilder.Api") != null;
+            }
+            catch (FileNotFoundException)
+            {
+                return false;
+            }
+        });
+
+        /// <summary>
+        /// Gets a value indicating whether system.web/compilation/@debug is true.
+        /// </summary>
+        public static bool IsDebug
+        {
+            get
+            {
+                var section = (CompilationSection) ConfigurationManager.GetSection("system.web/compilation");
+                return section != null && section.Debug;
+            }
+        }
 
         /// <summary>
         /// Gets the models namespace.

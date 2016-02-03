@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.ModelsBuilder.Umbraco;
@@ -41,9 +42,13 @@ namespace Umbraco.ModelsBuilder.Dashboard
             sb.Append(".</li>");
 
             sb.Append("<li>The <strong>API</strong> is ");
-            sb.Append(config.EnableApi
-                ? "enabled"
-                : "not enabled. External tools such as Visual Studio <em>cannot</em> use the API");
+            if (config.ApiInstalled && config.EnableApi)
+                sb.Append("installed and enabled");
+            else if (config.ApiInstalled || config.EnableApi)
+                sb.Append(config.ApiInstalled ? "installed but not enabled" : "enabled but not installed");
+            else sb.Append("neither installed nor enabled");
+            if (!config.ApiInstalled || !config.EnableApi)
+                sb.Append(".<br />External tools such as Visual Studio <em>cannot</em> use the API");
             sb.Append(".</li>");
 
             sb.Append(config.ModelsMode != ModelsMode.Nothing

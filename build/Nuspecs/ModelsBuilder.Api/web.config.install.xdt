@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!-- prevent Visual Studio from complaining about missing schema information -->
+  <xs:schema>
+    <xs:element name="configuration">
+      <xs:complexType>
+        <xs:sequence>
+          <!-- just accept anything, we don't want a schema, really-->
+          <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <appSettings xdt:Transform="InsertIfMissing" />
+  <appSettings>
+    <add key="Umbraco.ModelsBuilder.EnableApi" value="true"
+      xdt:Transform="InsertIfMissing" xdt:Locator="Match(key)" />
+  </appSettings>
+</configuration>

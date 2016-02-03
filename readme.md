@@ -21,6 +21,9 @@ Simply building the solution (in Visual Studio) either in Debug or Release does 
 any NuGet package. Building in Debug mode does NOT build the VSIX package, but building in
 Release mode DOES build the VSIX package.
 
+**Important** before releasing a new version, ensure that Umbraco.ModelsBuilder.Api.ApiVersion
+contains the proper constants for API client/server version check.
+
 In order to build the NuGet package and the VSIX package,
 use the build.ps1 Powershell script:
 
@@ -40,3 +43,13 @@ This will create directory build/Release/v1.2.3-whatever containing:
 - Umbraco.ModelsBuilder.CustomTool-1.2.3-whatever.vsix = Visual Studio Extension
 
 Note: we are not building an Umbraco package anymore.
+
+#### Projects
+
+*Umbraco.ModelsBuilder - the main project, installed on the website
+*Umbraco.ModelsBuilder.Api - the api server
+*Umbraco.ModelsBuilder.Console - a console tool
+*Umbraco.ModelsBuilder.CustomTool - the Visual Studio extension
+*Umbraco.ModelsBuilder.Tests - the tests suite
+
+Both .Console and .CustomTool require that the .Api is installed on the website (not installed by default).
