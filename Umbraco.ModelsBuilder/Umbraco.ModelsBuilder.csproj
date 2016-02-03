@@ -159,10 +159,6 @@
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Web.XmlTransform, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Web.Xdt.2.1.1\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="MiniProfiler, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b44f9351044011a3, processorArchitecture=MSIL">
       <HintPath>..\packages\MiniProfiler.2.1.0\lib\net40\MiniProfiler.dll</HintPath>
       <Private>True</Private>
@@ -331,8 +327,6 @@
     <Compile Include="Building\CompilerException.cs" />
     <Compile Include="Building\TextHeaderWriter.cs" />
     <Compile Include="Dashboard\DashboardHelper.cs" />
-    <Compile Include="PackageActions\Configure.cs" />
-    <Compile Include="PackageActions\Configure2.cs" />
     <Compile Include="ReferencedAssemblies.cs" />
     <Compile Include="Building\Builder.cs" />
     <Compile Include="Building\CodeDomBuilder.cs" />
