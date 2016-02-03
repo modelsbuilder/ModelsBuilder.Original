@@ -5,7 +5,7 @@
 //     server=localhost;database=umbraco;user id=root;password=root;default command timeout=120;
 //     MySql.Data.MySqlClient
 //
-// Then on this file, 
+// Then on this file,
 //   set CustomToolNameSpace (in properties) to whatever
 //   set CustomTool (in properties) to UmbracoModelsBuilder
 // And save => will generate items underneath.
