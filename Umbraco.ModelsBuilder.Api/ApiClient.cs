@@ -19,7 +19,6 @@ namespace Umbraco.ModelsBuilder.Api
         // fixme hardcoded?
         // could be options - but we cannot "discover" them as the API client runs outside of the web app
         // in addition, anything that references the controller forces API clients to reference Umbraco.Core
-        private const string UmbracoOAuthTokenUrl = "/umbraco/oauth/token";
         private const string ApiControllerUrl = "/Umbraco/BackOffice/ModelsBuilder/ModelsBuilderApi/";
 
         public ApiClient(string url, string user, string password)
