@@ -10,7 +10,6 @@ using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using Application = Umbraco.ModelsBuilder.Umbraco.Application;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.ModelsBuilder.Api
@@ -24,17 +23,18 @@ namespace Umbraco.ModelsBuilder.Api
 
     [PluginController(ControllerArea)]
     [IsBackOffice]
-    [UmbracoApplicationAuthorize(Constants.Applications.Developer)]
-    public class ModelsBuilderApiController : UmbracoAuthorizedApiController
+    //[UmbracoApplicationAuthorize(Constants.Applications.Developer)] // see ApiBasicAuthFilter - that one would be for ASP.NET identity
+    public class ModelsBuilderApiController : UmbracoApiController // UmbracoAuthorizedApiController - for ASP.NET identity
     {
         public const string ControllerArea = "ModelsBuilder";
 
         // invoked by the API
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
+        [ApiBasicAuthFilter("developer")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage ValidateClientVersion(ValidateClientVersionData data)
         {
-            if (!UmbracoConfig.For.ModelsBuilder().EnableApi)
-                return Request.CreateResponse(HttpStatusCode.Forbidden, "API is not enabled.");
+            if (!UmbracoConfig.For.ModelsBuilder().ApiServer)
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "API server does not want to talk to you.");
 
             if (!ModelState.IsValid || data == null || !data.IsValid)
                 return Request.CreateResponse(HttpStatusCode.BadRequest, "Invalid data.");
@@ -47,10 +47,11 @@ namespace Umbraco.ModelsBuilder.Api
 
         // invoked by the API
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
+        [ApiBasicAuthFilter("developer")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage GetModels(GetModelsData data)
         {
-            if (!UmbracoConfig.For.ModelsBuilder().EnableApi)
-                return Request.CreateResponse(HttpStatusCode.Forbidden, "API is not enabled.");
+            if (!UmbracoConfig.For.ModelsBuilder().ApiServer)
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "API server does not want to talk to you.");
 
             if (!ModelState.IsValid || data == null || !data.IsValid)
                 return Request.CreateResponse(HttpStatusCode.BadRequest, "Invalid data.");
@@ -59,19 +60,7 @@ namespace Umbraco.ModelsBuilder.Api
             if (!checkResult.Success)
                 return checkResult.Result;
 
-            var umbraco = Application.GetApplication();
-            var typeModels = umbraco.GetAllTypes();
-
-            var parseResult = new CodeParser().ParseWithReferencedAssemblies(data.Files);
-            var builder = new TextBuilder(typeModels, parseResult, data.Namespace);
-
-            var models = new Dictionary<string, string>();
-            foreach (var typeModel in builder.GetModelsToGenerate())
-            {
-                var sb = new StringBuilder();
-                builder.Generate(sb, typeModel);
-                models[typeModel.ClrName] = sb.ToString();
-            }
+            var models = ApiHelper.Whatever(data.Namespace, data.Files);
 
             return Request.CreateResponse(HttpStatusCode.OK, models, Configuration.Formatters.JsonFormatter);
         }

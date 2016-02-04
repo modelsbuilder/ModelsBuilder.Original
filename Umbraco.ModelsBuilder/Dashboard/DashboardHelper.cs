@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.ModelsBuilder.Umbraco;
@@ -41,9 +42,19 @@ namespace Umbraco.ModelsBuilder.Dashboard
             sb.Append(".</li>");
 
             sb.Append("<li>The <strong>API</strong> is ");
-            sb.Append(config.EnableApi
-                ? "enabled"
-                : "not enabled. External tools such as Visual Studio <em>cannot</em> use the API");
+            if (config.ApiInstalled && config.EnableApi)
+            {
+                sb.Append("installed and enabled");
+                if (!config.IsDebug) sb.Append(".<br />However, the API runs only with <em>debug</em> compilation mode");
+            }
+            else if (config.ApiInstalled || config.EnableApi)
+                sb.Append(config.ApiInstalled ? "installed but not enabled" : "enabled but not installed");
+            else sb.Append("neither installed nor enabled");
+            sb.Append(".<br />");
+            if (!config.ApiServer)
+                sb.Append("External tools such as Visual Studio <em>cannot</em> use the API");
+            else
+                sb.Append("<span style=\"color:red;font-weight:bold;\">The API endpoint is open on this server</span>");
             sb.Append(".</li>");
 
             sb.Append(config.ModelsMode != ModelsMode.Nothing
