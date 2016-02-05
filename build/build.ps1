@@ -26,6 +26,17 @@ $SolutionRoot = $RepoRoot;
 $ProgFiles86 = [Environment]::GetEnvironmentVariable("ProgramFiles(x86)");
 $MSBuild = "$ProgFiles86\MSBuild\14.0\Bin\MSBuild.exe"
 
+# Edit VSIX
+$vsixFile = "$SolutionRoot\Umbraco.ModelsBuilder.CustomTool\source.extension.vsixmanifest"
+[xml] $vsixXml = Get-Content $vsixFile
+$xmlNameTable = New-Object System.Xml.NameTable
+$xmlNameSpace = New-Object System.Xml.XmlNamespaceManager($xmlNameTable)
+$xmlNameSpace.AddNamespace("vsx", "http://schemas.microsoft.com/developer/vsx-schema/2011")
+$xmlNameSpace.AddNamespace("d", "http://schemas.microsoft.com/developer/vsx-schema-design/2011")
+$versionNode = $vsixXml.SelectSingleNode("/vsx:PackageManifest/vsx:Metadata/vsx:Identity/@Version", $xmlNameSpace)
+$versionNode.InnerText = "$ReleaseVersionNumber.$BuildNumber"
+$vsixXml.Save($vsixFile)
+
 # Make sure we don't have a release folder for this version already
 if ((Get-Item $ReleaseFolder -ErrorAction SilentlyContinue) -ne $null)
 {

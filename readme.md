@@ -39,7 +39,8 @@ version 1.2.3-beta002 has assemblies with version 1.2.3.46
 version 1.2.3 (final) has assemblies with version 1.2.3.47
 
 This will create directory build/Release/v1.2.3-whatever containing:
-- Umbraco.ModelsBuilder.1.2.3-whatever.nuget = NuGet package
+- Umbraco.ModelsBuilder.1.2.3-whatever.nuget = main NuGet package
+- Umbraco.ModelsBuilder.Api.1.2.3-whatever.nuget = api server NuGet package
 - Umbraco.ModelsBuilder.CustomTool-1.2.3-whatever.vsix = Visual Studio Extension
 
 Note: we are not building an Umbraco package anymore.
