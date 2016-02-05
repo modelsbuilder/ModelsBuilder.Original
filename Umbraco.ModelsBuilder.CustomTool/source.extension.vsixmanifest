@@ -1,12 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<PackageManifest Version="2.0.0"
-                 xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011"
-                 xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="F5C32FC3-6672-4665-803D-6C5D2CAC556A"
-              Version="2.2.0.64"
-              Language="en-US"
-              Publisher="Umbraco HQ" />
+    <Identity Id="F5C32FC3-6672-4665-803D-6C5D2CAC556A" Version="3.0.0.80" Language="en-US" Publisher="Umbraco HQ" />
     <DisplayName>Umbraco ModelsBuilder Custom Tool</DisplayName>
     <Description xml:space="preserve">Umbraco Visual Studio Custom Tool for generating strongly typed IPublishedContent models.</Description>
     <MoreInfo>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</MoreInfo>
@@ -25,10 +20,7 @@
   </Installation>
   <Dependencies>
     <!-- [4.5-5.0) means "4.5 <= version < 5.0" -->
-    <Dependency Id="Microsoft.Framework.NDP"
-                DisplayName="Microsoft .NET Framework"
-                d:Source="Manual"
-                Version="[4.5,5.0)" />
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,5.0)" />
     <!--
       how should we target the proper version, depending on the Visual Studio
       version we are installing on? or should there be a VSIX per version?
@@ -42,9 +34,6 @@
     -->
   </Dependencies>
   <Assets>
-    <Asset Type="Microsoft.VisualStudio.VsPackage"
-           d:Source="Project"
-           d:ProjectName="%CurrentProject%"
-           Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
   </Assets>
 </PackageManifest>
