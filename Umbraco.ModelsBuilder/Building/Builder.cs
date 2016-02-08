@@ -165,6 +165,13 @@ namespace Umbraco.ModelsBuilder.Building
                         + $" is used for properties with alias {string.Join(", ", xx.Select(x => "\"" + x.Alias + "\""))}. Names have to be unique."
                         + " Consider using an attribute to assign different names to conflicting properties.");
 
+            // ensure content & property type don't have identical name (csharp hates it)
+            foreach (var typeModel in _typeModels.Where(x => !x.IsContentIgnored))
+                foreach (var xx in typeModel.Properties.Where(x => !x.IsIgnored && x.ClrName == typeModel.ClrName))
+                    throw new InvalidOperationException($"The model class for content type with alias \"{typeModel.Alias}\" is named \"{xx.ClrName}\"."
+                        + $" CSharp does not support using the same name for the property with alias \"{xx.Alias}\"."
+                        + " Consider using an attribute to assign a different name to the property.");
+
             // ensure we have no collision between base types
             // NO: we may want to define a base class in a partial, on a model that has a parent
             // we are NOT checking that the defined base type does maintain the inheritance chain
