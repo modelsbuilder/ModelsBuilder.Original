@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web.Compilation;
 using System.Web.Hosting;
@@ -148,7 +149,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
             var currentHash = Hash(ourFiles, typeModels);
             var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
             var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
-            var modelsSrcVirt = "~/App_Data/Models/models.generated.cs";
+            var projFile = Path.Combine(modelsDirectory, "all.generated.cs");
+            var projVirt = "~/App_Data/Models/all.generated.cs";
 
             // caching the generated models speeds up booting
             // if you change your own partials, delete the .generated.cs file to force a rebuild
@@ -156,7 +158,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             if (!forceRebuild)
             {
                 _logger.Logger.Debug<PureLiveModelFactory>("Looking for cached models.");
-                if (File.Exists(modelsHashFile) && File.Exists(modelsSrcFile))
+                if (File.Exists(modelsHashFile) && File.Exists(projFile))
                 {
                     var cachedHash = File.ReadAllText(modelsHashFile);
                     if (currentHash != cachedHash)
@@ -175,22 +177,24 @@ namespace Umbraco.ModelsBuilder.Umbraco
             if (forceRebuild == false)
             {
                 _logger.Logger.Debug<PureLiveModelFactory>("Loading cached models.");
-                return BuildManager.GetCompiledAssembly(modelsSrcVirt);
+                return BuildManager.GetCompiledAssembly(projVirt);
             }
 
             // need to rebuild
             _logger.Logger.Debug<PureLiveModelFactory>("Rebuilding models.");
 
-            // generate code
+            // generate code, save
             var code = GenerateModelsCode(ourFiles, typeModels);
             code = code.Replace("//ASSATTR", ""); // we don't have extra attributes
+            File.WriteAllText(modelsSrcFile, code);
 
-            // save code for debug purposes
-            var modelsCodeFile = Path.Combine(modelsDirectory, "models.generated.cs");
-            File.WriteAllText(modelsCodeFile, code);
+            // generate proj, save
+            ourFiles["models.generated.cs"] = code;
+            var proj = GenerateModelsProj(ourFiles);
+            File.WriteAllText(projFile, proj);
 
             // compile and register
-            var assembly = BuildManager.GetCompiledAssembly(modelsSrcVirt);
+            var assembly = BuildManager.GetCompiledAssembly(projVirt);
 
             // assuming we can write and it's not going to cause exceptions...
             File.WriteAllText(modelsHashFile, currentHash);
@@ -246,6 +250,59 @@ namespace Umbraco.ModelsBuilder.Umbraco
             var code = codeBuilder.ToString();
 
             return code;
+        }
+
+        private static readonly Regex UsingRegex = new Regex("^using(.*);", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static readonly Regex AattrRegex = new Regex("^\\[assembly:(.*)\\]", RegexOptions.Compiled | RegexOptions.Multiline);
+
+        private static string GenerateModelsProj(IDictionary<string, string> files)
+        {
+            // ideally we would generate a CSPROJ file but then we'd need a BuildProvider for csproj
+            // trying to keep things simple for the time being, just write everything to one big file
+
+            // group all 'using' at the top of the file (else fails)
+            var usings = new List<string>();
+            foreach (var k in files.Keys.ToList())
+                files[k] = UsingRegex.Replace(files[k], m =>
+                {
+                    usings.Add(m.Groups[1].Value);
+                    return string.Empty;
+                });
+
+            // group all '[assembly:...]' at the top of the file (else fails)
+            var aattrs = new List<string>();
+            foreach (var k in files.Keys.ToList())
+                files[k] = AattrRegex.Replace(files[k], m =>
+                {
+                    aattrs.Add(m.Groups[1].Value);
+                    return string.Empty;
+                });
+
+            var text = new StringBuilder();
+            foreach (var u in usings.Distinct())
+            {
+                text.Append("using ");
+                text.Append(u);
+                text.Append(";\r\n");
+            }
+            foreach (var a in aattrs)
+            {
+                text.Append("[assembly:");
+                text.Append(a);
+                text.Append("]\r\n");
+            }
+            text.Append("\r\n\r\n");
+            foreach (var f in files)
+            {
+                text.Append("// FILE: ");
+                text.Append(f.Key);
+                text.Append("\r\n\r\n");
+                text.Append(f.Value);
+                text.Append("\r\n\r\n\r\n");
+            }
+            text.Append("// EOF\r\n");
+
+            return text.ToString();
         }
 
         #endregion
