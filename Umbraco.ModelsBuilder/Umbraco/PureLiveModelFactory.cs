@@ -65,7 +65,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             // get models, rebuilding them if needed
             var constructors = EnsureModels();
             if (constructors == null)
-                return null;
+                return content;
 
             // be case-insensitive
             var contentTypeAlias = content.DocumentTypeAlias;
@@ -107,6 +107,13 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
         }
 
+        private Dictionary<string, Func<IPublishedContent, IPublishedContent>> WithWarning(Dictionary<string, Func<IPublishedContent, IPublishedContent>> ctors)
+        {
+            if (_constructors == null)
+                _logger.Logger.Warn<PureLiveModelFactory>("No models.");
+            return _constructors;
+        }
+
         // ensure that the factory is running with the lastest generation of models
         internal Dictionary<string, Func<IPublishedContent, IPublishedContent>> EnsureModels()
         {
@@ -114,7 +121,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             _locker.EnterReadLock();
             try
             {
-                if (_hasModels) return _constructors;
+                if (_hasModels) WithWarning(_constructors);
             }
             finally
             {
@@ -124,7 +131,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             _locker.EnterWriteLock();
             try
             {
-                if (_hasModels) return _constructors;
+                if (_hasModels) return WithWarning(_constructors);
 
                 // we don't have models,
                 // either they haven't been loaded from the cache yet
@@ -132,9 +139,18 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
                 using (_logger.DebugDuration<PureLiveModelFactory>("Get models.", "Got models."))
                 {
-                    _modelsAssembly = GetModelsAssembly(_pendingRebuild);
-                    var types = _modelsAssembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>());
-                    _constructors = RegisterModels(types);
+                    try
+                    {
+                        _modelsAssembly = GetModelsAssembly(_pendingRebuild);
+                        var types = _modelsAssembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>());
+                        _constructors = RegisterModels(types);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Logger.Error<PureLiveModelFactory>("Failed to build models.", e);
+                        _modelsAssembly = null;
+                        _constructors = null;
+                    }
                     _hasModels = true;
                 }
 
