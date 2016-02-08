@@ -22,14 +22,15 @@ using File = System.IO.File;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
-    class PureLiveModelFactory : IPublishedContentModelFactory
+    class PureLiveModelFactory : IPublishedContentModelFactory, IRegisteredObject
     {
         private Assembly _modelsAssembly;
         private Dictionary<string, Func<IPublishedContent, IPublishedContent>> _constructors;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
-        private bool _hasModels;
+        private volatile bool _hasModels; // volatile 'cos reading outside lock
         private bool _pendingRebuild;
         private readonly ProfilingLogger _logger;
+        private readonly FileSystemWatcher _watcher;
 
         public PureLiveModelFactory(ProfilingLogger logger)
         {
@@ -37,6 +38,24 @@ namespace Umbraco.ModelsBuilder.Umbraco
             ContentTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModels();
             DataTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModels();
             RazorBuildProvider.CodeGenerationStarted += RazorBuildProvider_CodeGenerationStarted;
+
+            if (!HostingEnvironment.IsHosted) return;
+
+            var appData = HostingEnvironment.MapPath("~/App_Data");
+            if (appData == null)
+                throw new Exception("Panic: appData is null.");
+
+            var modelsDirectory = Path.Combine(appData, "Models");
+            if (!Directory.Exists(modelsDirectory))
+                Directory.CreateDirectory(modelsDirectory);
+
+            // BEWARE! if the watcher is not properly released then for some reason the
+            // BuildManager will start confusing types - using a 'registered object' here
+            // though we should probably plug into Umbraco's MainDom - which is internal
+            HostingEnvironment.RegisterObject(this);
+            _watcher = new FileSystemWatcher(modelsDirectory);
+            _watcher.Changed += WatcherOnChanged;
+            _watcher.EnableRaisingEvents = true;
         }
 
         #region IPublishedContentModelFactory
@@ -343,6 +362,23 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
 
             return hash.GetCombinedHashCode();
+        }
+
+        #endregion
+
+        #region Watching
+
+        private void WatcherOnChanged(object sender, FileSystemEventArgs args)
+        {
+            if (_hasModels)
+                ResetModels();
+        }
+
+        public void Stop(bool immediate)
+        {
+            _watcher.EnableRaisingEvents = false;
+            _watcher.Dispose();
+            HostingEnvironment.UnregisterObject(this);
         }
 
         #endregion
