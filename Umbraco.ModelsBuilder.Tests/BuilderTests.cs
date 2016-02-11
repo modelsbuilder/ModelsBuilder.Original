@@ -36,7 +36,13 @@ public class Whatever
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
             
             Assert.IsTrue(parseResult.HasModelsBaseClassName);
             Assert.AreEqual("Dang.Whatever", parseResult.ModelsBaseClassName);
@@ -53,7 +59,13 @@ using Umbraco.ModelsBuilder;
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
 
             Assert.IsTrue(parseResult.HasModelsNamespace);
             Assert.AreEqual("Foo.Bar.Nil", parseResult.ModelsNamespace);
@@ -91,11 +103,17 @@ using Umbraco.ModelsBuilder;
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code1);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code1, refs);
             var builder = new TextBuilder(types, parseResult);
             var count = builder.Using.Count;
 
-            parseResult = new CodeParser().Parse(code2);
+            parseResult = new CodeParser().Parse(code2, refs);
             builder = new TextBuilder(types, parseResult);
 
             Assert.AreEqual(count + 1, builder.Using.Count);
@@ -127,7 +145,13 @@ using Umbraco.ModelsBuilder;
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
@@ -236,7 +260,13 @@ using Umbraco.ModelsBuilder;
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
@@ -285,7 +315,13 @@ using Umbraco.ModelsBuilder;
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
@@ -335,7 +371,13 @@ using Umbraco.ModelsBuilder;
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
@@ -386,7 +428,13 @@ using Umbraco.ModelsBuilder;
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
@@ -444,7 +492,13 @@ namespace Models
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
@@ -589,7 +643,13 @@ namespace Models
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
@@ -648,7 +708,13 @@ namespace Models
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
@@ -703,7 +769,13 @@ namespace Models
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
@@ -751,7 +823,13 @@ namespace Models
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
@@ -804,7 +882,13 @@ namespace Models
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
@@ -853,7 +937,13 @@ namespace Models
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
@@ -905,7 +995,13 @@ namespace Models
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
@@ -951,7 +1047,13 @@ namespace Dang
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
@@ -1057,7 +1159,13 @@ namespace Dang
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
@@ -1440,7 +1548,14 @@ public partial class Type1
 " }
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (Core.Models.IPublishedContent).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
 
             Assert.IsTrue(parseResult.HasCtor("Type1"));
 
@@ -1546,7 +1661,14 @@ public partial class Type2
 " }
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (Core.Models.IPublishedContent).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
 
             Assert.IsFalse(parseResult.HasCtor("Type1"));
             Assert.IsTrue(parseResult.HasCtor("Type2"));
