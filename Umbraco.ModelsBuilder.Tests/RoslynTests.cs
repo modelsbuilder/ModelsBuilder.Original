@@ -44,7 +44,7 @@ class Test
             SyntaxTree[] trees;
             Compiler compiler;
 
-            Assert.Throws<Exception>(() =>
+            Assert.Throws<CompilerException>(() =>
             {
                 compiler = new Compiler();
                 compiler.GetCompilation("Umbraco.ModelsBuilder.Generated", files, out trees);
@@ -67,9 +67,9 @@ using Umbraco.ModelsBuilder.Tests;
 [assembly:AsmAttribute]
 
 class SimpleClass
-{ 
+{
     public void SimpleMethod()
-    { 
+    {
         Console.WriteLine(""hop"");
     }
 }
@@ -135,7 +135,7 @@ namespace Foo
                 foreach (var diag in diags)
                 {
                     Console.WriteLine(diag);
-                }                
+                }
             }
 
             //var writer = new ConsoleDumpWalker();
@@ -181,7 +181,7 @@ namespace Foo
             const string code = @"
 using System.Collections.Generic;
 using Umbraco.ModelsBuilder.Building;
-public class MyBuilder : Umbraco.ModelsBuilder.Tests.TestBuilder
+class MyBuilder : Umbraco.ModelsBuilder.Tests.TestBuilder
 {
     public MyBuilder(IList<TypeModel> typeModels, ParseResult parseResult)
         : base(typeModels, parseResult)
@@ -190,13 +190,22 @@ public class MyBuilder : Umbraco.ModelsBuilder.Tests.TestBuilder
 ";
 
             var tree = CSharpSyntaxTree.ParseText(code);
-            var mscorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
-            var testslib = MetadataReference.CreateFromFile(typeof(RoslynTests).Assembly.Location);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                //MetadataReference.CreateFromFile(typeof(ReferencedAssemblies).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(RoslynTests).Assembly.Location)
+            };
+
+            var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                .WithAssemblyIdentityComparer(DesktopAssemblyIdentityComparer.Default)
+                .WithStrongNameProvider(new DesktopStrongNameProvider());
 
             var compilation = CSharpCompilation.Create(
-                "MyCompilation",
+                "Umbraco.ModelsBuilder.RunTests",
                 syntaxTrees: new[] { tree },
-                references: new MetadataReference[] { mscorlib, testslib });
+                references: refs,
+                options: options);
             var model = compilation.GetSemanticModel(tree);
 
             // CS0012: The type '...' is defined in an assembly that is not referenced
@@ -213,7 +222,7 @@ public class MyBuilder : Umbraco.ModelsBuilder.Tests.TestBuilder
 
             //Assert.AreEqual(1, diags.Length);
             Assert.GreaterOrEqual(diags.Length, 2);
-            
+
             Assert.AreEqual("CS0234", diags[0].Id);
             Assert.AreEqual("CS0012", diags[1].Id);
         }
@@ -224,7 +233,7 @@ public class MyBuilder : Umbraco.ModelsBuilder.Tests.TestBuilder
             const string code = @"
 using System.Collections.Generic;
 using Umbraco.ModelsBuilder.Building;
-public class MyBuilder : Umbraco.ModelsBuilder.Tests.TestBuilder
+class MyBuilder : Umbraco.ModelsBuilder.Tests.TestBuilder
 {
     public MyBuilder(IList<TypeModel> typeModels, ParseResult parseResult)
         : base(typeModels, parseResult)
@@ -233,12 +242,22 @@ public class MyBuilder : Umbraco.ModelsBuilder.Tests.TestBuilder
 ";
 
             var tree = CSharpSyntaxTree.ParseText(code);
-            var refs = ReferencedAssemblies.Locations.Select(x => MetadataReference.CreateFromFile(x));
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(ReferencedAssemblies).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(RoslynTests).Assembly.Location)
+            };
+
+            var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                .WithAssemblyIdentityComparer(DesktopAssemblyIdentityComparer.Default)
+                .WithStrongNameProvider(new DesktopStrongNameProvider());
 
             var compilation = CSharpCompilation.Create(
-                "MyCompilation",
+                "Umbraco.ModelsBuilder.RunTests",
                 syntaxTrees: new[] { tree },
-                references: refs);
+                references: refs,
+                options: options);
             var model = compilation.GetSemanticModel(tree);
 
             var diags = model.GetDiagnostics();
@@ -266,10 +285,10 @@ class Shmuit:Attribute
 
 [Fooxy(""yop"")]
 class SimpleClass
-{ 
+{
     [Funky(""yop"")]
     public void SimpleMethod()
-    { 
+    {
         var list = new List<string>();
         list.Add(""first"");
         list.Add(""second"");
@@ -305,10 +324,10 @@ class SimpleClass
 [assembly: Nevgyt(""yop"")]
 [Fooxy(""yop"")]
 class SimpleClass
-{ 
+{
     [Funky(""yop"")]
     public void SimpleMethod()
-    { 
+    {
         var list = new List<string>();
         list.Add(""first"");
         list.Add(""second"");
@@ -371,10 +390,10 @@ namespace Umbrco.Web.Models.User
         {
             const string code = @"
 class SimpleClass1 : BaseClass, ISomething, ISomethingElse
-{ 
+{
 }
 class SimpleClass2
-{ 
+{
 }";
 
             var tree = CSharpSyntaxTree.ParseText(code);
@@ -389,7 +408,7 @@ class SimpleClass2
 [SomeAttribute(""value1"", ""value2"")]
 [SomeOtherAttribute(Foo:""value1"", BaDang:""value2"")]
 class SimpleClass1
-{ 
+{
 }";
 
             var tree = CSharpSyntaxTree.ParseText(code);
@@ -407,7 +426,7 @@ class SimpleClass1
 [SomethingElse(Foo.Blue|Foo.Red|Foo.Pink)]
 [SomethingElse(Foo.Blue)]
 class SimpleClass1
-{ 
+{
     public const string Const = ""const"";
 }";
 

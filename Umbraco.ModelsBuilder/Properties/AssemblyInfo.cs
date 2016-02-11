@@ -8,3 +8,6 @@ using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.Tests")]
 [assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.Api")]
+
+// dynamic assembly that is built during tests - do not remove!
+[assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.RunTests")]
