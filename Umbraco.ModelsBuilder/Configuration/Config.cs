@@ -66,6 +66,9 @@ namespace Umbraco.ModelsBuilder.Configuration
             {
                 switch (modelsMode)
                 {
+                    case nameof(ModelsMode.Nothing):
+                        ModelsMode = ModelsMode.Nothing;
+                        break;
                     case nameof(ModelsMode.PureLive):
                         ModelsMode = ModelsMode.PureLive;
                         break;
