@@ -343,6 +343,7 @@
     <Compile Include="Umbraco\LiveModelsProvider.cs" />
     <Compile Include="Umbraco\ModelsBuilderApplication.cs" />
     <Compile Include="Umbraco\ModelsBuilderBackOfficeController.cs" />
+    <Compile Include="Umbraco\ModelsGenerationError.cs" />
     <Compile Include="Umbraco\OutOfDateModelsStatus.cs" />
     <Compile Include="Umbraco\PureLiveModelFactory.cs" />
     <Compile Include="Umbraco\PublishedContentModelUtility.cs" />

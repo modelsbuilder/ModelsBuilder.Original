@@ -49,16 +49,14 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 // EnableDllModels will recycle the app domain - but this request will end properly
                 GenerateModels(appData, UmbracoConfig.For.ModelsBuilder().ModelsMode.IsAnyDll() ? bin : null);
 
-                var result = new BuildResult { Success = true };
-                return Request.CreateResponse(HttpStatusCode.OK, result, Configuration.Formatters.JsonFormatter);
-
+                ModelsGenerationError.Clear();
             }
             catch (Exception e)
             {
-                var message = string.Format("{0}: {1}\r\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
-                var result = new BuildResult { Success = false, Message = message };
-                return Request.CreateResponse(HttpStatusCode.OK, result, Configuration.Formatters.JsonFormatter);
+                ModelsGenerationError.Report("Failed to build models.", e);
             }
+
+            return Request.CreateResponse(HttpStatusCode.OK, GetDashboardResult(), Configuration.Formatters.JsonFormatter);
         }
 
         // invoked by the back-office
@@ -81,15 +79,20 @@ namespace Umbraco.ModelsBuilder.Umbraco
         [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
         public HttpResponseMessage GetDashboard()
         {
-            var dashboard = new
+            return Request.CreateResponse(HttpStatusCode.OK, GetDashboardResult(), Configuration.Formatters.JsonFormatter);
+        }
+
+        private Dashboard GetDashboardResult()
+        {
+            return new Dashboard
             {
-                enable = UmbracoConfig.For.ModelsBuilder().Enable,
-                text = DashboardHelper.Text(),
-                canGenerate = DashboardHelper.CanGenerate(),
-                generateCausesRestart = DashboardHelper.GenerateCausesRestart(),
-                outOfDateModels = DashboardHelper.AreModelsOutOfDate(),
+                Enable = UmbracoConfig.For.ModelsBuilder().Enable,
+                Text = DashboardHelper.Text(),
+                CanGenerate = DashboardHelper.CanGenerate(),
+                GenerateCausesRestart = DashboardHelper.GenerateCausesRestart(),
+                OutOfDateModels = DashboardHelper.AreModelsOutOfDate(),
+                LastError = DashboardHelper.LastError(),
             };
-            return Request.CreateResponse(HttpStatusCode.OK, dashboard, Configuration.Formatters.JsonFormatter);
         }
 
         internal static void GenerateModels(string appData, string bin)
@@ -134,6 +137,23 @@ namespace Umbraco.ModelsBuilder.Umbraco
             public bool Success;
             [DataMember(Name = "message")]
             public string Message;
+        }
+
+        [DataContract]
+        internal class Dashboard
+        {
+            [DataMember(Name = "enable")]
+            public bool Enable;
+            [DataMember(Name = "text")]
+            public string Text;
+            [DataMember(Name = "canGenerate")]
+            public bool CanGenerate;
+            [DataMember(Name = "generateCausesRestart")]
+            public bool GenerateCausesRestart;
+            [DataMember(Name = "outOfDateModels")]
+            public bool OutOfDateModels;
+            [DataMember(Name = "lastError")]
+            public string LastError;
         }
 
         internal enum OutOfDateType

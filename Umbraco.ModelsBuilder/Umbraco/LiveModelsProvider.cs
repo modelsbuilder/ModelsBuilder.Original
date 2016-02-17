@@ -80,6 +80,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 _mutex.WaitOne(timeout); // wait until it is safe, and acquire
                 LogHelper.Info<LiveModelsProvider>("Generate models now.");
                 GenerateModels();
+                ModelsGenerationError.Clear();
                 LogHelper.Info<LiveModelsProvider>("Generated.");
             }
             catch (TimeoutException)
@@ -88,6 +89,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
             catch (Exception e)
             {
+                ModelsGenerationError.Report("Failed to build Live models.", e);
                 LogHelper.Error<LiveModelsProvider>("Failed to generate models.", e);
             }
             finally

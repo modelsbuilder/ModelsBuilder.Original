@@ -144,10 +144,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
                         _modelsAssembly = GetModelsAssembly(_pendingRebuild);
                         var types = _modelsAssembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>());
                         _constructors = RegisterModels(types);
+                        ModelsGenerationError.Clear();
                     }
                     catch (Exception e)
                     {
                         _logger.Logger.Error<PureLiveModelFactory>("Failed to build models.", e);
+                        ModelsGenerationError.Report("Failed to build PureLive models.", e);
                         _modelsAssembly = null;
                         _constructors = null;
                     }

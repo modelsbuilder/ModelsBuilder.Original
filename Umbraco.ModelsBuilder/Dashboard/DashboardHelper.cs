@@ -23,6 +23,11 @@ namespace Umbraco.ModelsBuilder.Dashboard
             return OutOfDateModelsStatus.IsOutOfDate;
         }
 
+        public static string LastError()
+        {
+            return ModelsGenerationError.GetLastError();
+        }
+
         public static string Text()
         {
             var config = UmbracoConfig.For.ModelsBuilder();
@@ -54,7 +59,7 @@ namespace Umbraco.ModelsBuilder.Dashboard
             if (!config.ApiServer)
                 sb.Append("External tools such as Visual Studio <em>cannot</em> use the API");
             else
-                sb.Append("<span style=\"color:red;font-weight:bold;\">The API endpoint is open on this server</span>");
+                sb.Append("<span style=\"color:orange;font-weight:bold;\">The API endpoint is open on this server</span>");
             sb.Append(".</li>");
 
             sb.Append(config.ModelsMode != ModelsMode.Nothing
