@@ -40,6 +40,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         internal const string DefaultStaticMixinGetterPattern = "Get{0}";
         internal const LanguageVersion DefaultLanguageVersion = LanguageVersion.CSharp5;
         internal const string DefaultModelsNamespace = "Umbraco.Web.PublishedContentModels";
+        internal const ClrNameSource DefaultClrNameSource = ClrNameSource.Alias; // for legacy reasons
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Config"/> class.
@@ -56,6 +57,7 @@ namespace Umbraco.ModelsBuilder.Configuration
             StaticMixinGetterPattern = DefaultStaticMixinGetterPattern;
             LanguageVersion = DefaultLanguageVersion;
             ModelsNamespace = DefaultModelsNamespace;
+            ClrNameSource = DefaultClrNameSource;
 
             // stop here, everything is false
             if (!Enable) return;
@@ -118,6 +120,30 @@ namespace Umbraco.ModelsBuilder.Configuration
                 LanguageVersion = lv;
             }
 
+            // default: initialized above with DefaultClrNameSource const
+            value = ConfigurationManager.AppSettings[prefix + "ClrNameSource"];
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                switch (value)
+                {
+                    case nameof(ClrNameSource.Nothing):
+                        ClrNameSource = ClrNameSource.Nothing;
+                        break;
+                    case nameof(ClrNameSource.Alias):
+                        ClrNameSource = ClrNameSource.Alias;
+                        break;
+                    case nameof(ClrNameSource.RawAlias):
+                        ClrNameSource = ClrNameSource.RawAlias;
+                        break;
+                    case nameof(ClrNameSource.Name):
+                        ClrNameSource = ClrNameSource.Name;
+                        break;
+                    default:
+                        throw new ConfigurationErrorsException($"ClrNameSource \"{value}\" is not a valid source."
+                            + " Note that sources are case-sensitive.");
+                }
+            }
+
             // not flagging if not generating, or live (incl. pure)
             if (ModelsMode == ModelsMode.Nothing || ModelsMode.IsLive())
                 FlagOutOfDateModels = false;
@@ -135,7 +161,8 @@ namespace Umbraco.ModelsBuilder.Configuration
             LanguageVersion languageVersion = DefaultLanguageVersion,
             bool staticMixinGetters = true,
             string staticMixinGetterPattern = null,
-            bool flagOutOfDateModels = true)
+            bool flagOutOfDateModels = true,
+            ClrNameSource clrNameSource = DefaultClrNameSource)
         {
             Enable = enable;
             ModelsMode = modelsMode;
@@ -147,6 +174,7 @@ namespace Umbraco.ModelsBuilder.Configuration
             StaticMixinGetters = staticMixinGetters;
             StaticMixinGetterPattern = string.IsNullOrWhiteSpace(staticMixinGetterPattern) ? DefaultStaticMixinGetterPattern : staticMixinGetterPattern;
             FlagOutOfDateModels = flagOutOfDateModels;
+            ClrNameSource = clrNameSource;
         }
 
         /// <summary>
@@ -244,5 +272,10 @@ namespace Umbraco.ModelsBuilder.Configuration
         /// setting is activated the ~/App_Data/Models/ood.txt file is then created. When models are
         /// generated through the dashboard, the files is cleared. Default value is <c>false</c>.</remarks>
         public bool FlagOutOfDateModels { get; }
+
+        /// <summary>
+        /// Gets the CLR name source.
+        /// </summary>
+        public ClrNameSource ClrNameSource { get; }
     }
 }

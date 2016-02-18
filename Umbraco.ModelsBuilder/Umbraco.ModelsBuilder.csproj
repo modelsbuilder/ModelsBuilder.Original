@@ -309,6 +309,7 @@
     <Compile Include="Api\ApiHelper.cs" />
     <Compile Include="Building\CompilerException.cs" />
     <Compile Include="Building\TextHeaderWriter.cs" />
+    <Compile Include="Configuration\ClrNameSource.cs" />
     <Compile Include="Dashboard\DashboardHelper.cs" />
     <Compile Include="ReferencedAssemblies.cs" />
     <Compile Include="Building\Builder.cs" />

@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using Umbraco.ModelsBuilder.Building;
+using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
@@ -88,6 +90,42 @@ namespace Umbraco.ModelsBuilder.Umbraco
             return GetTypes(PublishedItemType.Member, memberTypes); // aliases have to be unique here
         }
 
+        public static string GetClrName(string name, string alias)
+        {
+            // ideally we should just be able to re-use Umbraco's alias,
+            // just upper-casing the first letter, however in v7 for backward
+            // compatibility reasons aliases derive from names via ToSafeAlias which is
+            //   PreFilter = ApplyUrlReplaceCharacters,
+            //   IsTerm = (c, leading) => leading
+            //     ? char.IsLetter(c) // only letters
+            //     : (char.IsLetterOrDigit(c) || c == '_'), // letter, digit or underscore
+            //   StringType = CleanStringType.Ascii | CleanStringType.UmbracoCase,
+            //   BreakTermsOnUpper = false
+            //
+            // but that is not ideal with acronyms and casing
+            // however we CANNOT change Umbraco
+            // so, adding a way to "do it right" deriving from name, here
+
+            switch (UmbracoConfig.For.ModelsBuilder().ClrNameSource)
+            {
+                case ClrNameSource.RawAlias:
+                    // use Umbraco's alias
+                    return alias;
+
+                case ClrNameSource.Alias:
+                    // ModelsBuilder's legacy - but not ideal
+                    return alias.ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase);
+
+                case ClrNameSource.Name:
+                    // derive from name
+                    var source = name.TrimStart('_'); // because CleanStringType.ConvertCase accepts them
+                    return source.ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase | CleanStringType.Ascii);
+
+                default:
+                    throw new Exception("Invalid ClrNameSource.");
+            }
+        }
+
         private static IList<TypeModel> GetTypes(PublishedItemType itemType, IContentTypeBase[] contentTypes)
         {
             var typeModels = new List<TypeModel>();
@@ -99,7 +137,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 {
                     Id = contentType.Id,
                     Alias = contentType.Alias,
-                    ClrName = contentType.Alias.ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase),
+                    ClrName = GetClrName(contentType.Name, contentType.Alias),
                     ParentId = contentType.ParentId,
 
                     Name = contentType.Name,
@@ -130,7 +168,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     var propertyModel = new PropertyModel
                     {
                         Alias = propertyType.Alias,
-                        ClrName = propertyType.Alias.ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase),
+                        ClrName = GetClrName(propertyType.Name, propertyType.Alias),
 
                         Name = propertyType.Name,
                         Description = propertyType.Description

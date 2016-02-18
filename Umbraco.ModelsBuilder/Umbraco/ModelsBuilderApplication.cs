@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -145,7 +146,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 {
                     // ensure is safe and always pascal cased, per razor standard
                     // + this is how we get the default model name in Umbraco.ModelsBuilder.Umbraco.Application
-                    var className = e.AdditionalData["ContentTypeAlias"].ToString().ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase);
+                    var alias = e.AdditionalData["ContentTypeAlias"].ToString();
+                    var name = template.Name; // will be the name of the content type since we are creating
+                    var className = Application.GetClrName(name, alias);
 
                     var modelNamespace = UmbracoConfig.For.ModelsBuilder().ModelsNamespace;
 
