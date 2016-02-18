@@ -195,8 +195,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             {
                 throw new NotSupportedException($"Alias \"{group.Key}\" is used by types"
                     + $" {string.Join(", ", group.Select(x => x.ItemType + ":\"" + x.Alias + "\""))}. Aliases have to be unique."
-                    + " Consider disabling the ModelsBuilder by setting web.config appSettings Umbraco.ModelsBuilder.Enable to false."
-                    + " See also this issue: http://issues.umbraco.org/issue/U4-7731.");
+                    + " One of the aliases must be modified in order to use the ModelsBuilder.");
             }
             return typeModels;
         }
