@@ -11,9 +11,11 @@
             });
     };
 
-    $scope.reload = function() {
+    $scope.reload = function () {
+        $scope.ready = false;
         modelsBuilderResource.getDashboard().then(function (result) {
             $scope.dashboard = result;
+            $scope.ready = true;
         });
     };
 
