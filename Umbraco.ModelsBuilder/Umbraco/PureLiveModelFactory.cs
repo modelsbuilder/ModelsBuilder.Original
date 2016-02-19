@@ -107,13 +107,6 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
         }
 
-        private Dictionary<string, Func<IPublishedContent, IPublishedContent>> WithWarning(Dictionary<string, Func<IPublishedContent, IPublishedContent>> ctors)
-        {
-            if (_constructors == null)
-                _logger.Logger.Warn<PureLiveModelFactory>("No models.");
-            return _constructors;
-        }
-
         // ensure that the factory is running with the lastest generation of models
         internal Dictionary<string, Func<IPublishedContent, IPublishedContent>> EnsureModels()
         {
@@ -121,7 +114,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             _locker.EnterReadLock();
             try
             {
-                if (_hasModels) WithWarning(_constructors);
+                if (_hasModels) return _constructors;
             }
             finally
             {
@@ -131,7 +124,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             _locker.EnterWriteLock();
             try
             {
-                if (_hasModels) return WithWarning(_constructors);
+                if (_hasModels) return _constructors;
 
                 // we don't have models,
                 // either they haven't been loaded from the cache yet
@@ -149,6 +142,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     catch (Exception e)
                     {
                         _logger.Logger.Error<PureLiveModelFactory>("Failed to build models.", e);
+                        _logger.Logger.Warn<PureLiveModelFactory>("Running without models."); // be explicit
                         ModelsGenerationError.Report("Failed to build PureLive models.", e);
                         _modelsAssembly = null;
                         _constructors = null;
