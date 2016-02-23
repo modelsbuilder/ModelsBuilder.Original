@@ -60,5 +60,12 @@ namespace Umbraco.ModelsBuilder.Tests
             Config.Setup(new Config());
             Assert.AreEqual(Config.DefaultStaticMixinGetterPattern, UmbracoConfig.For.ModelsBuilder().StaticMixinGetterPattern);
         }
+
+        [Test]
+        public void DefaultModelsPath()
+        {
+            Config.Setup(new Config());
+            Assert.AreEqual(Config.DefaultModelsPath, UmbracoConfig.For.ModelsBuilder().ModelsPath);
+        }
     }
 }

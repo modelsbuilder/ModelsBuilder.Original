@@ -1204,7 +1204,7 @@ namespace Dang
         [Test]
         public void MixinPropertyStatic()
         {
-            Config.Setup(new Config(staticMixinGetters: true));
+            Config.Setup(new Config());
 
             var type1 = new TypeModel
             {
@@ -1741,7 +1741,7 @@ namespace Umbraco.Web.PublishedContentModels
         {
             // Umbraco returns nice, pascal-cased names
 
-            Config.Setup(new Config(staticMixinGetters: true));
+            Config.Setup(new Config());
 
             var type1 = new TypeModel
             {

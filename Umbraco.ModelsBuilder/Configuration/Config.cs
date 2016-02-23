@@ -40,6 +40,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         internal const string DefaultStaticMixinGetterPattern = "Get{0}";
         internal const LanguageVersion DefaultLanguageVersion = LanguageVersion.CSharp5;
         internal const string DefaultModelsNamespace = "Umbraco.Web.PublishedContentModels";
+        internal const string DefaultModelsPath = "~/App_Data";
         internal const ClrNameSource DefaultClrNameSource = ClrNameSource.Alias; // for legacy reasons
 
         /// <summary>
@@ -57,6 +58,7 @@ namespace Umbraco.ModelsBuilder.Configuration
             StaticMixinGetterPattern = DefaultStaticMixinGetterPattern;
             LanguageVersion = DefaultLanguageVersion;
             ModelsNamespace = DefaultModelsNamespace;
+            ModelsPath = DefaultModelsPath;
             ClrNameSource = DefaultClrNameSource;
 
             // stop here, everything is false
@@ -104,6 +106,11 @@ namespace Umbraco.ModelsBuilder.Configuration
             var value = ConfigurationManager.AppSettings[prefix + "ModelsNamespace"];
             if (!string.IsNullOrWhiteSpace(value))
                 ModelsNamespace = value;
+
+            // default: initialized above with DefaultModelsPath const
+            value = ConfigurationManager.AppSettings[prefix + "ModelsPath"];
+            if (!string.IsNullOrWhiteSpace(value))
+                ModelsPath = value;
 
             // default: initialized above with DefaultStaticMixinGetterPattern const
             value = ConfigurationManager.AppSettings[prefix + "StaticMixinGetterPattern"];
@@ -153,22 +160,24 @@ namespace Umbraco.ModelsBuilder.Configuration
         /// Initializes a new instance of the <see cref="Config"/> class.
         /// </summary>
         public Config(
-            bool enable = false,
-            ModelsMode modelsMode = ModelsMode.Nothing,
-            bool enableApi = true,
-            string modelsNamespace = null,
-            bool enableFactory = true,
-            LanguageVersion languageVersion = DefaultLanguageVersion,
-            bool staticMixinGetters = true,
-            string staticMixinGetterPattern = null,
-            bool flagOutOfDateModels = true,
-            ClrNameSource clrNameSource = DefaultClrNameSource)
+            bool enable = false, 
+            ModelsMode modelsMode = ModelsMode.Nothing, 
+            bool enableApi = true, 
+            string modelsNamespace = null, 
+            bool enableFactory = true, 
+            LanguageVersion languageVersion = DefaultLanguageVersion, 
+            bool staticMixinGetters = true, 
+            string staticMixinGetterPattern = null, 
+            bool flagOutOfDateModels = true, 
+            ClrNameSource clrNameSource = DefaultClrNameSource, 
+            string modelsPath = DefaultModelsPath)
         {
             Enable = enable;
             ModelsMode = modelsMode;
 
             EnableApi = enableApi;
             ModelsNamespace = string.IsNullOrWhiteSpace(modelsNamespace) ? DefaultModelsNamespace : modelsNamespace;
+            ModelsPath = string.IsNullOrWhiteSpace(modelsPath) ? DefaultModelsPath : modelsPath;
             EnableFactory = enableFactory;
             LanguageVersion = languageVersion;
             StaticMixinGetters = staticMixinGetters;
@@ -234,6 +243,8 @@ namespace Umbraco.ModelsBuilder.Configuration
                 return section != null && section.Debug;
             }
         }
+
+        public string ModelsPath { get; }
 
         /// <summary>
         /// Gets the models namespace.
