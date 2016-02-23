@@ -39,21 +39,25 @@ namespace Umbraco.ModelsBuilder.CustomTool
         //[Description("The directory containing the project's binaries. By default it is the project's OutputPath. Can be relative to project's root.")]
         //public string BinaryDirectory { get; set; }
 
+        // note: could not find a way to order the properties, and Visual Studio sorts them alphabetically, so adjusting
+        //       display names here so that we have the order that we want (url, user, password). Still need to figure
+        //       out how to do it properly, though...
+
         [Category(OptionsCategory)]
-        [DisplayName("Umbraco Url")]
-        [Description("The base url of the Umbraco website.")]
+        [DisplayName("Site Url")]
+        [Description("The base url of the Umbraco website, eg \"http://example.com\".")]
         public string UmbracoUrl { get; set; }
 
         [Category(OptionsCategory)]
-        [DisplayName("Umbraco User")]
-        [Description("The user to connect to Umbraco (must be dev).")]
+        [DisplayName("User Name")]
+        [Description("The name of a user to connect to Umbraco (must be dev).")]
         public string UmbracoUser { get; set; }
 
         [Category(OptionsCategory)]
-        [DisplayName("Umbraco Password")]
-        [Description("The password to connecto to Umbraco.")]
+        [DisplayName("User Password")]
+        [Description("The password of the user.")]
         public string UmbracoPassword { get; set; }
-        
+
         // by default "storage" is the registry
         // we want to write to our own settings file,
         // <solution>.sln.UmbracoModelsBuilder.user
@@ -65,7 +69,7 @@ namespace Umbraco.ModelsBuilder.CustomTool
             get
             {
                 var solution = VisualStudioHelper.GetSolution();
-                if (solution.EndsWith(".sln")) 
+                if (solution.EndsWith(".sln"))
                     solution = solution.Substring(0, solution.Length - ".sln".Length);
                 var filename = solution + ".UmbracoModelsBuilder.user";
                 return filename;
