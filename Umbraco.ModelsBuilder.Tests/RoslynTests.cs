@@ -470,8 +470,8 @@ class MyClass
         public void SymbolLookup_Ambiguous1()
         {
             const string code = @"
-using System.Text;
-using Umbraco.ModelsBuilder.Tests;
+using System.Text; // imports ASCIIEncoding
+using Umbraco.ModelsBuilder.Tests; // imports ASCIIEncoding
 namespace SomeCryptoNameThatDoesReallyNotExistEgAGuid
 { }
 ";
@@ -482,6 +482,8 @@ namespace SomeCryptoNameThatDoesReallyNotExistEgAGuid
 
             Assert.AreEqual(1, LookupSymbol(model, pos, null, "StringBuilder"));
             Assert.AreEqual(1, LookupSymbol(model, pos, null, "RoslynTests"));
+
+            // imported twice
             Assert.AreEqual(2, LookupSymbol(model, pos, null, "ASCIIEncoding"));
         }
 
@@ -489,9 +491,9 @@ namespace SomeCryptoNameThatDoesReallyNotExistEgAGuid
         public void SymbolLookup_Ambiguous2()
         {
             const string code = @"
-using System.Text;
-using Umbraco.ModelsBuilder.Tests;
-namespace Umbraco.ModelsBuilder.Tests.Models
+using System.Text; // imports ASCIIEncoding
+using Umbraco.ModelsBuilder.Tests; // imports ASCIIEncoding
+namespace Umbraco.ModelsBuilder.Tests.Models // forces Umbraco.ModelsBuilder.Tests.ASCIIEncoding
 { }
 ";
 
@@ -502,8 +504,96 @@ namespace Umbraco.ModelsBuilder.Tests.Models
             Assert.AreEqual(1, LookupSymbol(model, pos, null, "StringBuilder"));
             Assert.AreEqual(1, LookupSymbol(model, pos, null, "RoslynTests"));
 
-            // not ambiguous !
+            // imported twice, forced, NOT ambiguous !
             Assert.AreEqual(1, LookupSymbol(model, pos, null, "ASCIIEncoding"));
+        }
+
+        [Test]
+        public void SymbolLookup_AmbiguousNamespace1()
+        {
+            const string code = @"
+namespace SomeCryptoNameThatDoesReallyNotExistEgAGuid
+{ }
+";
+
+            SemanticModel model;
+            int pos;
+            GetSemantic(code, out model, out pos);
+
+            Assert.AreEqual(0, LookupSymbol(model, pos, null, "String"));
+        }
+
+        [Test]
+        public void SymbolLookup_AmbiguousNamespace2()
+        {
+            const string code = @"
+namespace System.Models
+{ }
+";
+
+            SemanticModel model;
+            int pos;
+            GetSemantic(code, out model, out pos);
+
+            // implicit using System
+            Assert.AreEqual(1, LookupSymbol(model, pos, null, "String"));
+        }
+
+        [Test]
+        public void SymbolLookup_AmbiguousNamespace3()
+        {
+            const string code = @"
+namespace System.Models
+{ }
+";
+
+            SemanticModel model;
+            int pos;
+            GetSemantic(code, out model, out pos);
+
+            // implicit using System
+            Assert.AreEqual(1, LookupSymbol(model, pos, null, "Collections"));
+        }
+
+        [Test]
+        public void SymbolLookup_AmbiguousNamespace4()
+        {
+            const string code = @"
+namespace Umbraco.ModelsBuilder
+{
+    public class Test
+    {
+        // this needs global:: to compile
+        public global::Umbraco.Core.Models.IPublishedContent Content;
+    }
+}
+";
+
+            SemanticModel model;
+            int pos;
+            GetSemantic(code, out model, out pos);
+
+            // implicit
+            // finds Umbraco.ModelsBuilder.Umbraco
+            // but we thought we'd find global Umbraco.Core.Models.IPublishedContent
+            // so it is NOT ambiguous but will not compile because Umbraco.ModelsBuilder.Umbraco.Core... does not exist
+            var lookup = model.LookupNamespacesAndTypes(pos, null, "Umbraco");
+            Assert.AreEqual(1, lookup.Length);
+            Assert.AreEqual("Umbraco.ModelsBuilder.Umbraco", lookup[0].ToDisplayString());
+
+            // fullName => "Umbraco" has to be the top-level namespace
+            //  so what the lookup returns must be exactly "Umbraco" else ambiguous
+            // non-fullName => must be a complete path to type
+            var match = "Umbraco";
+            Assert.AreNotEqual(match, lookup[0].ToDisplayString());
+
+            var files = new Dictionary<string, string> { { "source", code } };
+            SyntaxTree[] trees;
+
+            var compiler = new Compiler();
+            var compilation = compiler.GetCompilation("Umbraco.ModelsBuilder.Generated", files, out trees);
+            foreach (var diag in compilation.GetDiagnostics())
+                Console.WriteLine(diag);
         }
 
         [Test]
@@ -588,7 +678,7 @@ namespace MyNamespace
             var diags = model.GetDiagnostics();
             foreach (var diag in diags)
             {
-                if (diag.Id == "CS8019") continue;
+                if (diag.Id == "CS8019") continue; // Unnecessary using directive.
                 Console.WriteLine(diag);
                 Assert.Fail();
             }

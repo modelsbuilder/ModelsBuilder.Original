@@ -247,14 +247,24 @@ namespace Umbraco.ModelsBuilder.Building
             _ambiguousSymbolsPos = namespaceSyntax.OpenBraceToken.SpanStart;
         }
 
-        protected bool IsAmbiguousSymbol(string symbol)
+        // looking for a simple symbol eg 'Umbraco' or 'String'
+        // expecting to match eg 'Umbraco' or 'System.String'
+        // returns true if either
+        // - more than 1 symbol is found (explicitely ambiguous)
+        // - 1 symbol is found BUT not matching (implicitely ambiguous)
+        protected bool IsAmbiguousSymbol(string symbol, string match)
         {
             if (_ambiguousSymbolsModel == null)
                 PrepareAmbiguousSymbols();
             if (_ambiguousSymbolsModel == null)
                 throw new Exception("Could not prepare ambiguous symbols.");
             var symbols = _ambiguousSymbolsModel.LookupNamespacesAndTypes(_ambiguousSymbolsPos, null, symbol);
-            return symbols.Length > 1;
+
+            if (symbols.Length > 1) return true;
+            if (symbols.Length == 0) return false; // what else?
+
+            // only 1 - ensure it matches
+            return symbols[0].ToDisplayString() != match;
         }
 
         internal string ModelsNamespaceForTests;

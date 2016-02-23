@@ -1810,6 +1810,60 @@ namespace Umbraco.Web.PublishedContentModels
             //Assert.AreEqual(expected.ClearLf(), gen);
         }
 
+        [Test]
+        public void GenerateAmbiguous()
+        {
+            var type1 = new TypeModel
+            {
+                Id = 1,
+                Alias = "type1",
+                ClrName = "Type1",
+                ParentId = 0,
+                BaseType = null,
+                ItemType = TypeModel.ItemTypes.Content,
+                IsMixin = true,
+            };
+            type1.Properties.Add(new PropertyModel
+            {
+                Alias = "prop1",
+                ClrName = "Prop1",
+                ClrType = typeof(global::Umbraco.Core.Models.IPublishedContent),
+            });
+            type1.Properties.Add(new PropertyModel
+            {
+                Alias = "prop2",
+                ClrName = "Prop2",
+                ClrType = typeof(System.Text.StringBuilder),
+            });
+            type1.Properties.Add(new PropertyModel
+            {
+                Alias = "prop3",
+                ClrName = "Prop3",
+                ClrType = typeof(global::Umbraco.Core.IO.FileSecurityException),
+            });
+            var types = new[] { type1 };
+
+            var code = new Dictionary<string, string>
+            {
+            };
+
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
+            builder.ModelsNamespace = "Umbraco.ModelsBuilder.Models"; // forces conflict with Umbraco.ModelsBuilder.Umbraco
+            var btypes = builder.TypeModels;
+
+            var sb = new StringBuilder();
+            foreach (var model in builder.GetModelsToGenerate())
+                builder.Generate(sb, model);
+            var gen = sb.ToString();
+
+            Console.WriteLine(gen);
+
+            Assert.IsTrue(gen.Contains(" IPublishedContent Prop1"));
+            Assert.IsTrue(gen.Contains(" System.Text.StringBuilder Prop2"));
+            Assert.IsTrue(gen.Contains(" global::Umbraco.Core.IO.FileSecurityException Prop3"));
+        }
+
         [TestCase("int", typeof(int))]
         [TestCase("IEnumerable<int>", typeof(IEnumerable<int>))]
         [TestCase("Umbraco.ModelsBuilder.Tests.BuilderTestsClass1", typeof(BuilderTestsClass1))]

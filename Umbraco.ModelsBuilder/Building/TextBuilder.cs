@@ -366,20 +366,36 @@ namespace Umbraco.ModelsBuilder.Building
             if (!TypesMap.TryGetValue(s.ToLowerInvariant(), out typeName)) // takes care eg of "System.Int32" vs. "int"
             {
                 // if full type name matches a using clause, strip
+                // so if we want Umbraco.Core.Models.IPublishedContent
+                // and using Umbraco.Core.Models, then we just need IPublishedContent
                 typeName = s;
+                string typeUsing = null;
                 var p = typeName.LastIndexOf('.');
-                if (p > 0 && TypesUsing.Contains(typeName.Substring(0, p)))
-                    typeName = typeName.Substring(p + 1);
+                if (p > 0)
+                {
+                    var x = typeName.Substring(0, p);
+                    if (TypesUsing.Contains(x))
+                    {
+                        typeName = typeName.Substring(p + 1);
+                        typeUsing = x;
+                    }
+                }
 
                 // nested types *after* using
                 typeName = typeName.Replace("+", ".");
 
                 // symbol to test is the first part of the name
+                // so if type name is Foo.Bar.Nil we want to ensure that Foo is not ambiguous
                 p = typeName.IndexOf('.');
                 var symbol = p > 0 ? typeName.Substring(0, p) : typeName;
 
+                // what we should find
+                // no 'using' = the exact symbol
+                // a 'using' = using.symbol
+                var match = typeUsing == null ? symbol : (typeUsing + "." + symbol);
+
                 // globalize anything that is ambiguous
-                if (IsAmbiguousSymbol(symbol))
+                if (IsAmbiguousSymbol(symbol, match))
                     typeName = "global::" + s.Replace("+", ".");
             }
 
