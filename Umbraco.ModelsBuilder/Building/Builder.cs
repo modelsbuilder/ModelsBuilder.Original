@@ -20,7 +20,7 @@ namespace Umbraco.ModelsBuilder.Building
     /// <summary>
     /// Provides a base class for all builders.
     /// </summary>
-    internal abstract class Builder
+    public abstract class Builder
     {
         private readonly IList<TypeModel> _typeModels;
         protected ParseResult ParseResult { get; }

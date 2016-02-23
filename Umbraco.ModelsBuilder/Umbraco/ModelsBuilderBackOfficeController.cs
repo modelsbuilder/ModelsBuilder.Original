@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -110,7 +111,15 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
-            var builder = new TextBuilder(typeModels, parseResult, UmbracoConfig.For.ModelsBuilder().ModelsNamespace);
+
+            var builderTypeName = UmbracoConfig.For.ModelsBuilder().BuilderType;
+            var builderType = Type.GetType(builderTypeName);
+            if (builderType == null)
+                throw new Exception(String.Format("Builder type {0} not found", builderTypeName));
+            var builderCtor = builderType.GetConstructor(new[] { typeof(IList<TypeModel>), typeof(ParseResult), typeof(string) });
+            if (builderCtor == null)
+                throw new Exception(String.Format("Builder constructor with arguments (IList<TypeModel>, ParseResult, string) for {0} not found", builderTypeName));
+            var builder = (TextBuilderBase)builderCtor.Invoke(new object[] { typeModels, parseResult, UmbracoConfig.For.ModelsBuilder().ModelsNamespace });
 
             foreach (var typeModel in builder.GetModelsToGenerate())
             {

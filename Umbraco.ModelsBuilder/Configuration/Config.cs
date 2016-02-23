@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Web.Configuration;
 using Microsoft.CodeAnalysis.CSharp;
 using Umbraco.Core;
+using Umbraco.ModelsBuilder.Building;
 
 namespace Umbraco.ModelsBuilder.Configuration
 {
@@ -41,6 +42,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         internal const LanguageVersion DefaultLanguageVersion = LanguageVersion.CSharp5;
         internal const string DefaultModelsNamespace = "Umbraco.Web.PublishedContentModels";
         internal const string DefaultModelsPath = "~/App_Data";
+        internal const string DefaultBuilderType = "Umbraco.ModelsBuilder.Building.TextBuilder";
         internal const ClrNameSource DefaultClrNameSource = ClrNameSource.Alias; // for legacy reasons
 
         /// <summary>
@@ -60,6 +62,7 @@ namespace Umbraco.ModelsBuilder.Configuration
             ModelsNamespace = DefaultModelsNamespace;
             ModelsPath = DefaultModelsPath;
             ClrNameSource = DefaultClrNameSource;
+            BuilderType = DefaultBuilderType;
 
             // stop here, everything is false
             if (!Enable) return;
@@ -111,6 +114,11 @@ namespace Umbraco.ModelsBuilder.Configuration
             value = ConfigurationManager.AppSettings[prefix + "ModelsPath"];
             if (!string.IsNullOrWhiteSpace(value))
                 ModelsPath = value;
+
+            // default: initialized above with DefaultBuilderType const
+            value = ConfigurationManager.AppSettings[prefix + "BuilderType"];
+            if (!string.IsNullOrWhiteSpace(value))
+                BuilderType = value;
 
             // default: initialized above with DefaultStaticMixinGetterPattern const
             value = ConfigurationManager.AppSettings[prefix + "StaticMixinGetterPattern"];
@@ -170,7 +178,8 @@ namespace Umbraco.ModelsBuilder.Configuration
             string staticMixinGetterPattern = null, 
             bool flagOutOfDateModels = true, 
             ClrNameSource clrNameSource = DefaultClrNameSource, 
-            string modelsPath = DefaultModelsPath)
+            string modelsPath = DefaultModelsPath,
+            string builderType = DefaultBuilderType)
         {
             Enable = enable;
             ModelsMode = modelsMode;
@@ -243,6 +252,8 @@ namespace Umbraco.ModelsBuilder.Configuration
                 return section != null && section.Debug;
             }
         }
+
+        public string BuilderType { get; set; }
 
         public string ModelsPath { get; }
 

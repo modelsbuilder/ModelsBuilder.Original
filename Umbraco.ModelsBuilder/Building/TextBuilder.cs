@@ -11,7 +11,7 @@ namespace Umbraco.ModelsBuilder.Building
     /// <summary>
     /// Implements a builder that works by writing text.
     /// </summary>
-    internal class TextBuilder : Builder
+    internal class TextBuilder : TextBuilderBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TextBuilder"/> class with a list of models to generate
@@ -43,7 +43,7 @@ namespace Umbraco.ModelsBuilder.Building
         /// </summary>
         /// <param name="sb">The string builder.</param>
         /// <param name="typeModel">The model to generate.</param>
-        public void Generate(StringBuilder sb, TypeModel typeModel)
+        public override void Generate(StringBuilder sb, TypeModel typeModel)
         {
             WriteHeader(sb);
 
