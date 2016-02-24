@@ -60,7 +60,7 @@ namespace Umbraco.ModelsBuilder.Api
             if (!checkResult.Success)
                 return checkResult.Result;
 
-            var models = ApiHelper.Whatever(data.Namespace, data.Files);
+            var models = ApiHelper.GetModels(data.Namespace, data.Files);
 
             return Request.CreateResponse(HttpStatusCode.OK, models, Configuration.Formatters.JsonFormatter);
         }

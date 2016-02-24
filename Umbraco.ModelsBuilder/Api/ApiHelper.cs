@@ -8,7 +8,7 @@ namespace Umbraco.ModelsBuilder.Api
     // internal to be used by Umbraco.ModelsBuilder.Api project
     internal static class ApiHelper
     {
-        public static Dictionary<string, string> Whatever(string modelsNamespace, IDictionary<string, string> files)
+        public static Dictionary<string, string> GetModels(string modelsNamespace, IDictionary<string, string> files)
         {
             var umbraco = Application.GetApplication();
             var typeModels = umbraco.GetAllTypes();
