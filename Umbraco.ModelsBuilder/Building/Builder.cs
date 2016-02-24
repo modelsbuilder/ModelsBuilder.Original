@@ -264,7 +264,10 @@ namespace Umbraco.ModelsBuilder.Building
             if (symbols.Length == 0) return false; // what else?
 
             // only 1 - ensure it matches
-            return symbols[0].ToDisplayString() != match;
+            var found = symbols[0].ToDisplayString();
+            var pos = found.IndexOf('<'); // generic?
+            if (pos > 0) found = found.Substring(0, pos); // strip
+            return found != match; // and compare
         }
 
         internal string ModelsNamespaceForTests;

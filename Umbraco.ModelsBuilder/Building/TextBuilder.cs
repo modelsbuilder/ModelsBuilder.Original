@@ -108,7 +108,7 @@ namespace Umbraco.ModelsBuilder.Building
                     sb.AppendFormat("\t/// <summary>{0}</summary>\n", XmlCommentString(type.Name));
                 sb.AppendFormat("\tpublic partial interface I{0}", type.ClrName);
                 var implements = type.BaseType == null || type.BaseType.IsContentIgnored
-                    ? (type.HasBase ? null : "PublishedContent") 
+                    ? (type.HasBase ? null : "PublishedContent")
                     : type.BaseType.ClrName;
                 if (implements != null)
                     sb.AppendFormat(" : I{0}", implements);
@@ -145,7 +145,7 @@ namespace Umbraco.ModelsBuilder.Building
             //    sb.AppendFormat("\t[ImplementContentType(\"{0}\")]\n", type.Alias);
             sb.AppendFormat("\t[PublishedContentModel(\"{0}\")]\n", type.Alias);
             sb.AppendFormat("\tpublic partial class {0}", type.ClrName);
-            var inherits = type.HasBase 
+            var inherits = type.HasBase
                 ? null // has its own base already
                 : (type.BaseType == null || type.BaseType.IsContentIgnored
                     ? GetModelsBaseClassName()
@@ -228,7 +228,7 @@ namespace Umbraco.ModelsBuilder.Building
         private void WriteMixinProperty(StringBuilder sb, PropertyModel property, string mixinClrName)
         {
             sb.Append("\n");
-            
+
             // Adds xml summary to each property containing
             // property name and property description
             if (!string.IsNullOrWhiteSpace(property.Name) || !string.IsNullOrWhiteSpace(property.Description))
@@ -261,13 +261,13 @@ namespace Umbraco.ModelsBuilder.Building
             var mixinStatic = mixinClrName != null;
 
             sb.Append("\n");
-            
+
             // Adds xml summary to each property containing
             // property name and property description
             if (!string.IsNullOrWhiteSpace(property.Name) || !string.IsNullOrWhiteSpace(property.Description))
             {
                 sb.Append("\t\t///<summary>\n");
-                
+
                 if (!string.IsNullOrWhiteSpace(property.Description))
                     sb.AppendFormat("\t\t/// {0}: {1}\n", XmlCommentString(property.Name), XmlCommentString(property.Description));
                 else
@@ -363,41 +363,69 @@ namespace Umbraco.ModelsBuilder.Building
         private void WriteNonGenericClrType(StringBuilder sb, string s)
         {
             string typeName;
-            if (!TypesMap.TryGetValue(s.ToLowerInvariant(), out typeName)) // takes care eg of "System.Int32" vs. "int"
+
+            // takes care eg of "System.Int32" vs. "int"
+            if (TypesMap.TryGetValue(s.ToLowerInvariant(), out typeName))
             {
-                // if full type name matches a using clause, strip
-                // so if we want Umbraco.Core.Models.IPublishedContent
-                // and using Umbraco.Core.Models, then we just need IPublishedContent
-                typeName = s;
-                string typeUsing = null;
-                var p = typeName.LastIndexOf('.');
-                if (p > 0)
-                {
-                    var x = typeName.Substring(0, p);
-                    if (TypesUsing.Contains(x))
-                    {
-                        typeName = typeName.Substring(p + 1);
-                        typeUsing = x;
-                    }
-                }
-
-                // nested types *after* using
-                typeName = typeName.Replace("+", ".");
-
-                // symbol to test is the first part of the name
-                // so if type name is Foo.Bar.Nil we want to ensure that Foo is not ambiguous
-                p = typeName.IndexOf('.');
-                var symbol = p > 0 ? typeName.Substring(0, p) : typeName;
-
-                // what we should find
-                // no 'using' = the exact symbol
-                // a 'using' = using.symbol
-                var match = typeUsing == null ? symbol : (typeUsing + "." + symbol);
-
-                // globalize anything that is ambiguous
-                if (IsAmbiguousSymbol(symbol, match))
-                    typeName = "global::" + s.Replace("+", ".");
+                sb.Append(typeName);
+                return;
             }
+
+            // if full type name matches a using clause, strip
+            // so if we want Umbraco.Core.Models.IPublishedContent
+            // and using Umbraco.Core.Models, then we just need IPublishedContent
+            typeName = s;
+            string typeUsing = null;
+            var p = typeName.LastIndexOf('.');
+            if (p > 0)
+            {
+                var x = typeName.Substring(0, p);
+                if (Using.Contains(x))
+                {
+                    typeName = typeName.Substring(p + 1);
+                    typeUsing = x;
+                }
+            }
+
+            // nested types *after* using
+            typeName = typeName.Replace("+", ".");
+
+            // symbol to test is the first part of the name
+            // so if type name is Foo.Bar.Nil we want to ensure that Foo is not ambiguous
+            p = typeName.IndexOf('.');
+            var symbol = p > 0 ? typeName.Substring(0, p) : typeName;
+
+            // what we should find - WITHOUT any generic <T> thing - just the type
+            // no 'using' = the exact symbol
+            // a 'using' = using.symbol
+            var match = typeUsing == null ? symbol : (typeUsing + "." + symbol);
+
+            // if not ambiguous, be happy
+            if (!IsAmbiguousSymbol(symbol, match))
+            {
+                sb.Append(typeName);
+                return;
+            }
+
+            // symbol is ambiguous
+            // if no 'using', must prepend global::
+            if (typeUsing == null)
+            {
+                sb.Append("global::");
+                sb.Append(s.Replace("+", "."));
+                return;
+            }
+
+            // could fullname be non-ambiguous?
+            // note: all-or-nothing, not trying to segment the using clause
+            typeName = s.Replace("+", ".");
+            p = typeName.IndexOf('.');
+            symbol = typeName.Substring(0, p);
+            match = symbol;
+
+            // still ambiguous, must prepend global::
+            if (IsAmbiguousSymbol(symbol, match))
+                sb.Append("global::");
 
             sb.Append(typeName);
         }
