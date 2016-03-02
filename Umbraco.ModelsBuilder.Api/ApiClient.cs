@@ -31,6 +31,18 @@ namespace Umbraco.ModelsBuilder.Api
             _formatters = new MediaTypeFormatter[] { _formatter };
         }
 
+        private void SetBaseAddress(HttpClient client, string url)
+        {
+            try
+            {
+                client.BaseAddress = new Uri(url);
+            }
+            catch (Exception e)
+            {
+                throw new UriFormatException($"Invalid URI: the format of the URI \"{url}\" could not be determined.");
+            }
+        }
+
         public void ValidateClientVersion()
         {
             // FIXME - add proxys support
@@ -39,7 +51,7 @@ namespace Umbraco.ModelsBuilder.Api
 
             using (var client = new HttpClient(hch))
             {
-                client.BaseAddress = new Uri(_url);
+                SetBaseAddress(client, _url);
                 Authorize(client);
 
                 var data = new ValidateClientVersionData
@@ -68,7 +80,7 @@ namespace Umbraco.ModelsBuilder.Api
 
             using (var client = new HttpClient(hch))
             {
-                client.BaseAddress = new Uri(_url);
+                SetBaseAddress(client, _url);
                 Authorize(client);
 
                 var data = new GetModelsData
