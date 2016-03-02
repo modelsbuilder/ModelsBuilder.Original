@@ -1,7 +1,6 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using System.Xml;
+using System.Collections.Generic;
+using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -139,10 +138,10 @@ namespace Umbraco.ModelsBuilder.CustomTool.VisualStudio
 
             string projectGuid = null;
 
-            // DTE does not expose the project GUID that exists at in the msbuild project file.        
-            // Cannot use MSBuild object model because it uses a static instance of the Engine,        
-            // and using the Project will cause it to be unloaded from the engine when the         
-            // GC collects the variable that we declare.       
+            // DTE does not expose the project GUID that exists at in the msbuild project file.
+            // Cannot use MSBuild object model because it uses a static instance of the Engine,
+            // and using the Project will cause it to be unloaded from the engine when the
+            // GC collects the variable that we declare.
             using (var projectReader = XmlReader.Create(project.FileName))
             {
                 projectReader.MoveToContent();
@@ -155,7 +154,7 @@ namespace Umbraco.ModelsBuilder.CustomTool.VisualStudio
                 {
                     if (!Equals(projectReader.LocalName, nodeName)) continue;
 
-                    projectGuid = projectReader.ReadElementContentAsString(); 
+                    projectGuid = projectReader.ReadElementContentAsString();
                     break;
                 }
             }
@@ -294,16 +293,40 @@ namespace Umbraco.ModelsBuilder.CustomTool.VisualStudio
 
             public void Validate()
             {
-                var valid = true;
-                //valid &= !string.IsNullOrWhiteSpace(ConnectionString);
-                //valid &= !string.IsNullOrWhiteSpace(DatabaseProvider);
-                valid &= !string.IsNullOrWhiteSpace(UmbracoUrl);
-                valid &= !string.IsNullOrWhiteSpace(UmbracoUser);
-                valid &= !string.IsNullOrWhiteSpace(UmbracoPassword);
-                // don't validate the binary directory
+                StringBuilder message = null;
 
-                if (!valid)
-                    throw new Exception("Invalid configuration.");
+                var empty = new List<string>();
+                if (string.IsNullOrWhiteSpace(UmbracoUrl))
+                    empty.Add("Site Url");
+                if (string.IsNullOrWhiteSpace(UmbracoUser))
+                    empty.Add("User Name");
+                if (string.IsNullOrWhiteSpace(UmbracoPassword))
+                    empty.Add("User Password");
+                if (empty.Count > 0)
+                {
+                    message = new StringBuilder("Invalid configuration. ");
+                    for (var i = 0; i < empty.Count; i++)
+                    {
+                        if (i > 0)
+                            message.Append(i < empty.Count - 1 ? ", " : "nor ");
+                        message.Append(empty[i]);
+                    }
+                    message.Append(" cannot be empty.");
+                }
+
+                try
+                {
+                    var uri = new Uri(UmbracoUrl);
+                }
+                catch
+                {
+                    if (message == null) message = new StringBuilder("Invalid configuration. Site Url \"");
+                    message.Append(UmbracoUrl);
+                    message.Append("\" is not a valid Uri.");
+                }
+
+                if (message != null)
+                    throw new Exception(message.ToString());
             }
         }
 
