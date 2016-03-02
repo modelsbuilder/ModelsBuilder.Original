@@ -128,8 +128,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
         /// <param name="e"></param>
         private void FileService_SavingTemplate(IFileService sender, Core.Events.SaveEventArgs<Core.Models.ITemplate> e)
         {
-            // don't do anything if we're not enabled
-            if (!UmbracoConfig.For.ModelsBuilder().Enable) return;
+            // don't do anything if the factory is not enabled
+            // because, no factory = no models (even if generation is enabled)
+            if (!UmbracoConfig.For.ModelsBuilder().EnableFactory) return;
 
             // don't do anything if this special key is not found
             if (!e.AdditionalData.ContainsKey("CreateTemplateForContentType")) return;
