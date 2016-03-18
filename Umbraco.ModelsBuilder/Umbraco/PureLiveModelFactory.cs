@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Web;
 using System.Web.Compilation;
 using System.Web.Hosting;
 using System.Web.WebPages.Razor;
@@ -31,10 +32,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private bool _pendingRebuild;
         private readonly ProfilingLogger _logger;
         private readonly FileSystemWatcher _watcher;
+        private int _ver;
 
         public PureLiveModelFactory(ProfilingLogger logger)
         {
             _logger = logger;
+            _ver = 1; // zero is for when we had no version
             ContentTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModels();
             DataTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModels();
             RazorBuildProvider.CodeGenerationStarted += RazorBuildProvider_CodeGenerationStarted;
@@ -87,8 +90,17 @@ namespace Umbraco.ModelsBuilder.Umbraco
             // just be safe - can happen if the first view is not an Umbraco view
             if (_modelsAssembly == null) return;
 
-            var provider = sender as RazorBuildProvider;
-            provider?.AssemblyBuilder.AddAssemblyReference(_modelsAssembly);
+            _locker.EnterReadLock(); // that should ensure no race
+            try
+            {
+                _logger.Logger.Debug<PureLiveModelFactory>("RazorBuildProvider.CodeGenerationStarted");
+                var provider = sender as RazorBuildProvider;
+                provider?.AssemblyBuilder.AddAssemblyReference(_modelsAssembly);
+            }
+            finally
+            {
+                _locker.ExitReadLock();
+            }
         }
 
         // tells the factory that it should build a new generation of models
@@ -134,8 +146,17 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 {
                     try
                     {
-                        _modelsAssembly = GetModelsAssembly(_pendingRebuild);
-                        var types = _modelsAssembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>());
+                        var assembly = GetModelsAssembly(_pendingRebuild);
+
+                        // the one below can be used to simulate an issue with BuildManager, ie it will register
+                        // the models with the factory but NOT with the BuildManager, which will not recompile views.
+                        // this is for U4-8043 which is an obvious issue but I cannot replicate
+                        //_modelsAssembly = _modelsAssembly ?? assembly;
+
+                        // the one below is the normal one
+                        _modelsAssembly = assembly;
+
+                        var types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>());
                         _constructors = RegisterModels(types);
                         ModelsGenerationError.Clear();
                     }
@@ -157,6 +178,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 _locker.ExitWriteLock();
             }
         }
+
+        private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
 
         private Assembly GetModelsAssembly(bool forceRebuild)
         {
@@ -208,6 +231,17 @@ namespace Umbraco.ModelsBuilder.Umbraco
             if (forceRebuild == false)
             {
                 _logger.Logger.Debug<PureLiveModelFactory>("Loading cached models.");
+
+                // mmust reset the version in the file else it would keep growing
+                // loading cached modules only happens when the app restarts
+                var text = File.ReadAllText(projFile);
+                var match = AssemblyVersionRegex.Match(text);
+                if (match.Success)
+                {
+                    text = text.Replace(match.Value, "AssemblyVersion(\"0.0.0." + _ver++ + "\")");
+                    File.WriteAllText(projFile, text);
+                }
+
                 return BuildManager.GetCompiledAssembly(projVirt);
             }
 
@@ -216,7 +250,10 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             // generate code, save
             var code = GenerateModelsCode(ourFiles, typeModels);
-            code = code.Replace("//ASSATTR", ""); // we don't have extra attributes
+            // add extra attributes,
+            //  PureLiveAssembly helps identifying Assemblies that contain PureLive models
+            //  AssemblyVersion is so that we have a different version for each rebuild
+            code = code.Replace("//ASSATTR", "[assembly: PureLiveAssembly, System.Reflection.AssemblyVersion(\"0.0.0." + _ver++ + "\")]");
             File.WriteAllText(modelsSrcFile, code);
 
             // generate proj, save

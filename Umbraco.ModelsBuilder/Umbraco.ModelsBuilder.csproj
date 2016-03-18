@@ -311,6 +311,7 @@
     <Compile Include="Building\TextHeaderWriter.cs" />
     <Compile Include="Configuration\ClrNameSource.cs" />
     <Compile Include="Dashboard\DashboardHelper.cs" />
+    <Compile Include="PureLiveAssemblyAttribute.cs" />
     <Compile Include="ReferencedAssemblies.cs" />
     <Compile Include="Building\Builder.cs" />
     <Compile Include="Building\CodeDomBuilder.cs" />
