@@ -100,9 +100,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private static void GenerateModels()
         {
-            var appData = HostingEnvironment.MapPath("~/App_Data");
-            if (appData == null)
-                throw new Exception("Panic: appData is null.");
+            var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
 
             var bin = HostingEnvironment.MapPath("~/bin");
             if (bin == null)
@@ -111,7 +109,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             var config = UmbracoConfig.For.ModelsBuilder();
 
             // EnableDllModels will recycle the app domain - but this request will end properly
-            ModelsBuilderBackOfficeController.GenerateModels(appData, config.ModelsMode.IsAnyDll() ? bin : null);
+            ModelsBuilderBackOfficeController.GenerateModels(modelsDirectory, config.ModelsMode.IsAnyDll() ? bin : null);
         }
     }
 

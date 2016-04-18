@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Hosting;
+using Umbraco.Core.Configuration;
+using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
@@ -52,11 +54,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private static string GetErrFile()
         {
-            var appData = HostingEnvironment.MapPath("~/App_Data");
-            if (appData == null)
-                return null;
-
-            var modelsDirectory = Path.Combine(appData, "Models");
+            var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 return null;
 

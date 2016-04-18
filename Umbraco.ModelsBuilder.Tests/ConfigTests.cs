@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,6 +60,24 @@ namespace Umbraco.ModelsBuilder.Tests
         {
             Config.Setup(new Config());
             Assert.AreEqual(Config.DefaultStaticMixinGetterPattern, UmbracoConfig.For.ModelsBuilder().StaticMixinGetterPattern);
+        }
+
+        [TestCase("c:/path/to/root", "~/dir/models", false, "c:\\path\\to\\root\\dir\\models")]
+        [TestCase("c:/path/to/root", "~/../../dir/models", true, "c:\\path\\dir\\models")]
+        [TestCase("c:/path/to/root", "c:/another/path/to/elsewhere", true, "c:\\another\\path\\to\\elsewhere")]
+        public void GetModelsDirectoryTests(string root, string config, bool acceptUnsafe, string expected)
+        {
+            Assert.AreEqual(expected, Config.GetModelsDirectory(root, config, acceptUnsafe));
+        }
+
+        [TestCase("c:/path/to/root", "~/../../dir/models", false)]
+        [TestCase("c:/path/to/root", "c:/another/path/to/elsewhere", false)]
+        public void GetModelsDirectoryThrowsTests(string root, string config, bool acceptUnsafe)
+        {
+            Assert.Throws<ConfigurationErrorsException>(() =>
+            {
+                var modelsDirectory = Config.GetModelsDirectory(root, config, acceptUnsafe);
+            });
         }
     }
 }

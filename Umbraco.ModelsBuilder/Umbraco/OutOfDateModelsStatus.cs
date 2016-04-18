@@ -22,9 +22,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private static string GetFlagPath()
         {
-            var appData = HostingEnvironment.MapPath("~/App_Data");
-            if (appData == null) throw new Exception("Panic: appData is null.");
-            var modelsDirectory = Path.Combine(appData, "Models");
+            var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
             return Path.Combine(modelsDirectory, "ood.flag");

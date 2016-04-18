@@ -43,11 +43,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             if (!HostingEnvironment.IsHosted) return;
 
-            var appData = HostingEnvironment.MapPath("~/App_Data");
-            if (appData == null)
-                throw new Exception("Panic: appData is null.");
-
-            var modelsDirectory = Path.Combine(appData, "Models");
+            var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
@@ -190,11 +186,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private Assembly GetModelsAssembly(bool forceRebuild)
         {
-            var appData = HostingEnvironment.MapPath("~/App_Data");
-            if (appData == null)
-                throw new Exception("Panic: appData is null.");
-
-            var modelsDirectory = Path.Combine(appData, "Models");
+            var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
@@ -313,11 +305,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private static string GenerateModelsCode(IDictionary<string, string> ourFiles, IList<TypeModel> typeModels)
         {
-            var appData = HostingEnvironment.MapPath("~/App_Data");
-            if (appData == null)
-                throw new Exception("Panic: appData is null.");
-
-            var modelsDirectory = Path.Combine(appData, "Models");
+            var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
