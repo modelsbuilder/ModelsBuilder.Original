@@ -5,7 +5,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 {
     // because, of course, it's internal in Umbraco
     // see also System.Web.Util.HashCodeCombiner
-    class HashCodeCombiner
+    class HashCombiner
     {
         private long _combinedHash = 5381L;
 

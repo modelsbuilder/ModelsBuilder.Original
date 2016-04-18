@@ -119,6 +119,17 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 File.WriteAllText(filename, sb.ToString());
             }
 
+            // the idea was to calculate the current hash and to add it as an extra file to the compilation,
+            // in order to be able to detect whether a DLL is consistent with an environment - however the
+            // environment *might not* contain the local partial files, and thus it could be impossible to
+            // calculate the hash. So... maybe that's not a good idea after all?
+            /*
+            var currentHash = HashHelper.Hash(ourFiles, typeModels);
+            ourFiles["models.hash.cs"] = $@"using Umbraco.ModelsBuilder;
+[assembly:ModelsBuilderAssembly(SourceHash = ""{currentHash}"")]
+";
+            */
+
             if (bin != null)
             {
                 foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))

@@ -8,7 +8,8 @@ namespace Umbraco.ModelsBuilder
     /// <remarks>Though technically not required, ie models will work without it, the attribute
     /// can be used by Umbraco view models binder to figure out whether the model type comes
     /// from a PureLive Assembly.</remarks>
-    [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false, Inherited = false)]
-    public class PureLiveAssemblyAttribute : Attribute
+    [Obsolete("Should use ModelsBuilderAssemblyAttribute but that requires a change in Umbraco Core.")]
+    [AttributeUsage(AttributeTargets.Assembly /*, AllowMultiple = false, Inherited = false*/)]
+    public sealed class PureLiveAssemblyAttribute : Attribute
     { }
 }

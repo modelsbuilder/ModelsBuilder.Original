@@ -207,7 +207,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             var umbraco = Application.GetApplication();
             var typeModels = umbraco.GetAllTypes();
-            var currentHash = Hash(ourFiles, typeModels);
+            var currentHash = HashHelper.Hash(ourFiles, typeModels);
             var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
             var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
             var projFile = Path.Combine(modelsDirectory, "all.generated.cs");
@@ -265,7 +265,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
             // add extra attributes,
             //  PureLiveAssembly helps identifying Assemblies that contain PureLive models
             //  AssemblyVersion is so that we have a different version for each rebuild
-            code = code.Replace("//ASSATTR", "[assembly: PureLiveAssembly, System.Reflection.AssemblyVersion(\"0.0.0." + _ver++ + "\")]");
+            code = code.Replace("//ASSATTR", $@"[assembly: PureLiveAssembly]
+[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = ""{currentHash}"")]
+[assembly:System.Reflection.AssemblyVersion(""0.0.0.{_ver++}"")]");
             File.WriteAllText(modelsSrcFile, code);
 
             // generate proj, save
@@ -383,46 +385,6 @@ namespace Umbraco.ModelsBuilder.Umbraco
             text.Append("// EOF\r\n");
 
             return text.ToString();
-        }
-
-        #endregion
-
-        #region Hashing
-
-        private static string Hash(IDictionary<string, string> ourFiles, IEnumerable<TypeModel> typeModels)
-        {
-            var hash = new HashCodeCombiner();
-
-            foreach (var kvp in ourFiles)
-                hash.Add(kvp.Key + "::" + kvp.Value);
-
-            // see Umbraco.ModelsBuilder.Umbraco.Application for what's important to hash
-            // ie what comes from Umbraco (not computed by ModelsBuilder) and makes a difference
-
-            foreach (var typeModel in typeModels.OrderBy(x => x.Alias))
-            {
-                hash.Add("--- CONTENT TYPE MODEL ---");
-                hash.Add(typeModel.Id);
-                hash.Add(typeModel.Alias);
-                hash.Add(typeModel.ClrName);
-                hash.Add(typeModel.ParentId);
-                hash.Add(typeModel.Name);
-                hash.Add(typeModel.Description);
-                hash.Add(typeModel.ItemType.ToString());
-                hash.Add("MIXINS:" + string.Join(",", typeModel.MixinTypes.OrderBy(x => x.Id).Select(x => x.Id)));
-
-                foreach (var prop in typeModel.Properties.OrderBy(x => x.Alias))
-                {
-                    hash.Add("--- PROPERTY ---");
-                    hash.Add(prop.Alias);
-                    hash.Add(prop.ClrName);
-                    hash.Add(prop.Name);
-                    hash.Add(prop.Description);
-                    hash.Add(prop.ClrType.FullName);
-                }
-            }
-
-            return hash.GetCombinedHashCode();
         }
 
         #endregion
