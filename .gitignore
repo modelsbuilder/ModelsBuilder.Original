@@ -16,3 +16,4 @@ refs
 build/nuget.exe
 Umbraco.ModelsBuilder/App_Data/NuGetBackup/*
 .Umbraco.ModelsBuilder.boltdata/*
+*.pdb/
