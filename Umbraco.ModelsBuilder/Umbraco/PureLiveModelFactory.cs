@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Web;
 using System.Web.Compilation;
 using System.Web.Hosting;
 using System.Web.WebPages.Razor;
@@ -96,6 +95,13 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 _logger.Logger.Debug<PureLiveModelFactory>("RazorBuildProvider.CodeGenerationStarted");
                 var provider = sender as RazorBuildProvider;
                 provider?.AssemblyBuilder.AddAssemblyReference(_modelsAssembly);
+
+                // add a dependency to a text file that will change on each compilation
+                // as in some environments (could not figure which/why) the BuildManager
+                // would not re-compile the views when the models assembly is rebuilt.
+                //
+                //provider?.AddVirtualPathDependency("~/App_Data/Models/models.dep");
+                provider?.AddVirtualPathDependency(ProjVirt);
             }
             finally
             {
@@ -180,6 +186,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         }
 
         private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
+        private const string ProjVirt = "~/App_Data/Models/all.generated.cs";
 
         private Assembly GetModelsAssembly(bool forceRebuild)
         {
@@ -204,7 +211,6 @@ namespace Umbraco.ModelsBuilder.Umbraco
             var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
             var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
             var projFile = Path.Combine(modelsDirectory, "all.generated.cs");
-            var projVirt = "~/App_Data/Models/all.generated.cs";
 
             // caching the generated models speeds up booting
             // if you change your own partials, delete the .generated.cs file to force a rebuild
@@ -238,11 +244,17 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 var match = AssemblyVersionRegex.Match(text);
                 if (match.Success)
                 {
-                    text = text.Replace(match.Value, "AssemblyVersion(\"0.0.0." + _ver++ + "\")");
+                    text = text.Replace(match.Value, "AssemblyVersion(\"0.0.0." + _ver + "\")");
                     File.WriteAllText(projFile, text);
                 }
 
-                return BuildManager.GetCompiledAssembly(projVirt);
+                // generate a marker file that will be a dependency
+                // see note in RazorBuildProvider_CodeGenerationStarted
+                // NO: using all.generated.cs as a dependency
+                //File.WriteAllText(Path.Combine(modelsDirectory, "models.dep"), "VER:" + _ver);
+
+                _ver++;
+                return BuildManager.GetCompiledAssembly(ProjVirt);
             }
 
             // need to rebuild
@@ -262,7 +274,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             File.WriteAllText(projFile, proj);
 
             // compile and register
-            var assembly = BuildManager.GetCompiledAssembly(projVirt);
+            var assembly = BuildManager.GetCompiledAssembly(ProjVirt);
 
             // assuming we can write and it's not going to cause exceptions...
             File.WriteAllText(modelsHashFile, currentHash);
