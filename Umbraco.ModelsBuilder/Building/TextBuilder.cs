@@ -13,6 +13,8 @@ namespace Umbraco.ModelsBuilder.Building
     /// </summary>
     internal class TextBuilder : Builder
     {
+        private static string _generatedCodeAttribute = string.Format("\t\t[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"Umbraco.ModelsBuilder\", \"{0}\")]\n", ApiVersion.Current.Version);
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TextBuilder"/> class with a list of models to generate
         /// and the result of code parsing.
@@ -176,8 +178,10 @@ namespace Umbraco.ModelsBuilder.Building
             // write the constants
             // as 'new' since parent has its own - or maybe not - disable warning
             sb.Append("#pragma warning disable 0109 // new is redundant\n");
+            sb.Append(_generatedCodeAttribute);
             sb.AppendFormat("\t\tpublic new const string ModelTypeAlias = \"{0}\";\n",
                 type.Alias);
+            sb.Append(_generatedCodeAttribute);
             sb.AppendFormat("\t\tpublic new const PublishedItemType ModelItemType = PublishedItemType.{0};\n",
                 type.ItemType);
             sb.Append("#pragma warning restore 0109\n\n");
@@ -190,9 +194,11 @@ namespace Umbraco.ModelsBuilder.Building
             // write the static methods
             // as 'new' since parent has its own - or maybe not - disable warning
             sb.Append("#pragma warning disable 0109 // new is redundant\n");
+            sb.Append(_generatedCodeAttribute);
             sb.Append("\t\tpublic new static PublishedContentType GetModelContentType()\n");
             sb.Append("\t\t{\n\t\t\treturn PublishedContentType.Get(ModelItemType, ModelTypeAlias);\n\t\t}\n");
             sb.Append("#pragma warning restore 0109\n\n");
+            sb.Append(_generatedCodeAttribute);
             sb.AppendFormat("\t\tpublic static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<{0}, TValue>> selector)\n",
                 type.ClrName);
             sb.Append("\t\t{\n\t\t\treturn PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);\n\t\t}\n");
@@ -243,6 +249,7 @@ namespace Umbraco.ModelsBuilder.Building
                 sb.Append("\t\t///</summary>\n");
             }
 
+            sb.Append(_generatedCodeAttribute);
             sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
 
             sb.Append("\t\tpublic ");
@@ -276,6 +283,7 @@ namespace Umbraco.ModelsBuilder.Building
                 sb.Append("\t\t///</summary>\n");
             }
 
+            sb.Append(_generatedCodeAttribute);
             sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
 
             if (mixinStatic)
@@ -312,6 +320,7 @@ namespace Umbraco.ModelsBuilder.Building
             if (!string.IsNullOrWhiteSpace(property.Name))
                 sb.AppendFormat("\t\t/// <summary>Static getter for {0}</summary>\n", XmlCommentString(property.Name));
 
+            sb.Append(_generatedCodeAttribute);
             sb.Append("\t\tpublic static ");
             WriteClrType(sb, property.ClrType);
             sb.AppendFormat(" {0}(I{1} that) {{ return that.GetPropertyValue",
@@ -330,6 +339,7 @@ namespace Umbraco.ModelsBuilder.Building
         {
             if (!string.IsNullOrWhiteSpace(property.Name))
                 sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString(property.Name));
+            sb.Append(_generatedCodeAttribute);
             sb.Append("\t\t");
             WriteClrType(sb, property.ClrType);
             sb.AppendFormat(" {0} {{ get; }}\n",
@@ -428,7 +438,7 @@ namespace Umbraco.ModelsBuilder.Building
                 sb.Append("global::");
 
             sb.Append(typeName);
-        }
+        }        
 
         private static string XmlCommentString(string s)
         {
