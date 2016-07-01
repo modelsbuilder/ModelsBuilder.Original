@@ -32,7 +32,7 @@ namespace Umbraco.ModelsBuilder.Tests.Models
         // but don't include that property because I'm doing it
         // must do it because the legacy converter can't tell the type of the property
         [ImplementPropertyType("alternativeText")]
-        //public AlternateText AlternativeText { get { return this.GetPropertyValue<AlternateText>("alternativeText"); } }
-        public string AlternativeText { get { return this.GetPropertyValue<string>("alternativeText"); } } // fixme
+        //public AlternateText AlternativeText => this.GetPropertyValue<AlternateText>("alternativeText");
+        public string AlternativeText => this.Value<string>("alternativeText"); // fixme
     }
 }

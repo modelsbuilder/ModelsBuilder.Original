@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using LightInject;
+using Moq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
@@ -20,9 +22,11 @@ namespace Umbraco.ModelsBuilder.Tests
 
         public static void InitializeConverters()
         {
-            var serviceProvider = new MockServiceProvider();
-            var logger = new MockLogger();
-            var r = Ctor<PropertyValueConvertersResolver>(serviceProvider, logger, (IEnumerable<Type>)new Type[0]);
+            var serviceContainerMock = new Mock<IServiceContainer>();
+            var serviceContainer = serviceContainerMock.Object;
+
+            var logger = Mock.Of<ILogger>();
+            var r = Ctor<PropertyValueConvertersResolver>(serviceContainer, logger, (IEnumerable<Type>)new Type[0]);
             PropertyValueConvertersResolver.Current = r;
         }
 
@@ -37,64 +41,12 @@ namespace Umbraco.ModelsBuilder.Tests
 
         public static PublishedPropertyType CreatePublishedPropertyType(string alias, int definition, string editor)
         {
-            return Ctor<PublishedPropertyType>(alias, definition, editor);
+            return Ctor<PublishedPropertyType>(alias, definition, editor, false);
         }
 
         public static PublishedContentType CreatePublishedContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes)
         {
             return Ctor<PublishedContentType>(id, alias, propertyTypes);
         }
-
-        #region Mock
-
-        // we should use a mock framework
-
-        class MockServiceProvider : IServiceProvider
-        {
-            public object GetService(Type serviceType)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        class MockLogger : ILogger
-        {
-            public void Error(Type callingType, string message, Exception exception)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Warn(Type callingType, string message, params Func<object>[] formatItems)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void WarnWithException(Type callingType, string message, Exception e, params Func<object>[] formatItems)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Info(Type callingType, Func<string> generateMessage)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Info(Type type, string generateMessageFormat, params Func<object>[] formatItems)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Debug(Type callingType, Func<string> generateMessage)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Debug(Type type, string generateMessageFormat, params Func<object>[] formatItems)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        #endregion
     }
 }

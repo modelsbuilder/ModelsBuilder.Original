@@ -39,7 +39,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         }
 
         internal const string DefaultStaticMixinGetterPattern = "Get{0}";
-        internal const LanguageVersion DefaultLanguageVersion = LanguageVersion.CSharp5;
+        internal const LanguageVersion DefaultLanguageVersion = LanguageVersion.CSharp6;
         internal const string DefaultModelsNamespace = "Umbraco.Web.PublishedContentModels";
         internal const ClrNameSource DefaultClrNameSource = ClrNameSource.Alias; // for legacy reasons
         internal const string DefaultModelsDirectory = "~/App_Data/Models";
@@ -305,7 +305,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         /// <summary>
         /// Gets the Roslyn parser language version.
         /// </summary>
-        /// <remarks>Default value is <c>CSharp5</c>.</remarks>
+        /// <remarks>Default value is <c>CSharp6</c>.</remarks>
         public LanguageVersion LanguageVersion { get; }
 
         /// <summary>

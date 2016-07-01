@@ -97,7 +97,7 @@ namespace Umbraco.ModelsBuilder.Building
                     new CodeMethodInvokeExpression(
                         new CodeMethodReferenceExpression(
                             new CodeThisReferenceExpression(), // this
-                            "GetPropertyValue", // .GetPropertyValue
+                            "Value", // .Value
                             new[] // <T>
                             {
                                 new CodeTypeReference(propertyModel.ClrType)

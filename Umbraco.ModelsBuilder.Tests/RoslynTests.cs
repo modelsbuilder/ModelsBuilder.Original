@@ -46,12 +46,12 @@ class Test
 
             Assert.Throws<CompilerException>(() =>
             {
-                compiler = new Compiler();
+                compiler = new Compiler(LanguageVersion.CSharp5);
                 compiler.GetCompilation("Umbraco.ModelsBuilder.Generated", files, out trees);
             });
 
             // works
-            compiler = new Compiler(LanguageVersion.CSharp6);
+            compiler = new Compiler();
             compiler.GetCompilation("Umbraco.ModelsBuilder.Generated", files, out trees);
         }
 
@@ -375,7 +375,7 @@ namespace Umbrco.Web.Models.User
     {
         // but don't include that property because I'm doing it
         [Generator.IgnorePropertyType(""alternativeText"")]
-        public AlternateText AlternativeText { get { return this.GetPropertyValue<AlternateText>(""alternativeText""); } }
+        public AlternateText AlternativeText => this.Value<AlternateText>(""alternativeText"");
     }
 }
 ";
@@ -564,7 +564,7 @@ namespace Umbraco.ModelsBuilder
     public class Test
     {
         // this needs global:: to compile
-        public global::Umbraco.Core.Models.IPublishedContent Content;
+        public global::Umbraco.Core.Models.PublishedContent.IPublishedContent Content;
     }
 }
 ";

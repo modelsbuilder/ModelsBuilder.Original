@@ -76,7 +76,7 @@ namespace Umbraco.ModelsBuilder.Api
             var response = isOk ? null : Request.CreateResponse(HttpStatusCode.Forbidden,
                 $"API version conflict: client version ({clientVersion}) is not compatible with server version({ApiVersion.Current.Version}).");
 
-            return Attempt<HttpResponseMessage>.SucceedIf(isOk, response);
+            return Attempt<HttpResponseMessage>.If(isOk, response);
         }
     }
 }

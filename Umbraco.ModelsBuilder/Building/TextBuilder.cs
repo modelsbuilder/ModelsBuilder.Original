@@ -173,31 +173,28 @@ namespace Umbraco.ModelsBuilder.Building
             // begin class body
             sb.Append("\n\t{\n");
 
-            // write the constants
+            // write the constants & static methods
             // as 'new' since parent has its own - or maybe not - disable warning
+            sb.Append("\t\t// helpers\n");
             sb.Append("#pragma warning disable 0109 // new is redundant\n");
             sb.AppendFormat("\t\tpublic new const string ModelTypeAlias = \"{0}\";\n",
                 type.Alias);
             sb.AppendFormat("\t\tpublic new const PublishedItemType ModelItemType = PublishedItemType.{0};\n",
                 type.ItemType);
+            sb.Append("\t\tpublic new static PublishedContentType GetModelContentType()\n");
+            sb.Append("\t\t\t=> PublishedContentModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);\n");
+            sb.AppendFormat("\t\tpublic static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<{0}, TValue>> selector)\n",
+                type.ClrName);
+            sb.Append("\t\t\t=> PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);\n");
             sb.Append("#pragma warning restore 0109\n\n");
 
             // write the ctor
             if (!type.HasCtor)
-                sb.AppendFormat("\t\tpublic {0}(IPublishedContent content)\n\t\t\t: base(content)\n\t\t{{ }}\n\n",
+                sb.AppendFormat("\t\t// ctor\n\t\tpublic {0}(IPublishedContent content)\n\t\t\t: base(content)\n\t\t{{ }}\n\n",
                     type.ClrName);
 
-            // write the static methods
-            // as 'new' since parent has its own - or maybe not - disable warning
-            sb.Append("#pragma warning disable 0109 // new is redundant\n");
-            sb.Append("\t\tpublic new static PublishedContentType GetModelContentType()\n");
-            sb.Append("\t\t{\n\t\t\treturn PublishedContentType.Get(ModelItemType, ModelTypeAlias);\n\t\t}\n");
-            sb.Append("#pragma warning restore 0109\n\n");
-            sb.AppendFormat("\t\tpublic static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<{0}, TValue>> selector)\n",
-                type.ClrName);
-            sb.Append("\t\t{\n\t\t\treturn PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);\n\t\t}\n");
-
             // write the properties
+            sb.Append("\t\t// properties\n");
             WriteContentTypeProperties(sb, type);
 
             // close the class declaration
@@ -247,7 +244,7 @@ namespace Umbraco.ModelsBuilder.Building
 
             sb.Append("\t\tpublic ");
             WriteClrType(sb, property.ClrType);
-            sb.AppendFormat(" {0}\n\t\t{{\n\t\t\tget {{ return {1}.{2}(this); }}\n\t\t}}\n",
+            sb.AppendFormat(" {0} => {1}.{2}(this);\n",
                 property.ClrName, mixinClrName, MixinStaticGetterName(property.ClrName));
         }
 
@@ -282,14 +279,14 @@ namespace Umbraco.ModelsBuilder.Building
             {
                 sb.Append("\t\tpublic ");
                 WriteClrType(sb, property.ClrType);
-                sb.AppendFormat(" {0}\n\t\t{{\n\t\t\tget {{ return {1}(this); }}\n\t\t}}\n",
+                sb.AppendFormat(" {0} => {1}(this);\n",
                     property.ClrName, MixinStaticGetterName(property.ClrName));
             }
             else
             {
                 sb.Append("\t\tpublic ");
                 WriteClrType(sb, property.ClrType);
-                sb.AppendFormat(" {0}\n\t\t{{\n\t\t\tget {{ return this.GetPropertyValue",
+                sb.AppendFormat(" {0} => this.Value",
                     property.ClrName);
                 if (property.ClrType != typeof(object))
                 {
@@ -297,7 +294,7 @@ namespace Umbraco.ModelsBuilder.Building
                     WriteClrType(sb, property.ClrType);
                     sb.Append(">");
                 }
-                sb.AppendFormat("(\"{0}\"); }}\n\t\t}}\n",
+                sb.AppendFormat("(\"{0}\");\n",
                     property.Alias);
             }
 
@@ -314,7 +311,7 @@ namespace Umbraco.ModelsBuilder.Building
 
             sb.Append("\t\tpublic static ");
             WriteClrType(sb, property.ClrType);
-            sb.AppendFormat(" {0}(I{1} that) {{ return that.GetPropertyValue",
+            sb.AppendFormat(" {0}(I{1} that) => that.Value",
                 mixinStaticGetterName, mixinClrName);
             if (property.ClrType != typeof(object))
             {
@@ -322,7 +319,7 @@ namespace Umbraco.ModelsBuilder.Building
                 WriteClrType(sb, property.ClrType);
                 sb.Append(">");
             }
-            sb.AppendFormat("(\"{0}\"); }}\n",
+            sb.AppendFormat("(\"{0}\");\n",
                 property.Alias);
         }
 

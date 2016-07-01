@@ -24,7 +24,7 @@ namespace Umbraco.ModelsBuilder.Tests
                 new TestElements.PublishedProperty("prop", "val")
             });
 
-            var value = content.GetPropertyValue("prop");
+            var value = content.Value("prop");
             Assert.IsInstanceOf<string>(value);
             Assert.AreEqual("val", (string) value);
 
@@ -32,9 +32,9 @@ namespace Umbraco.ModelsBuilder.Tests
             Assert.AreEqual("val", model.Prop);
 
             IPublishedContent um = model;
-            var wrapped = um as PublishedContentExtended;
+            var wrapped = um as PublishedContentWrapped;
             while (wrapped != null /*&& ((IPublishedContentExtended) wrapped).HasAddedProperties == false*/)
-                wrapped = (um = wrapped.Unwrap()) as PublishedContentExtended;
+                wrapped = (um = wrapped.Unwrap()) as PublishedContentWrapped;
 
             Assert.AreSame(content, um);
 
@@ -48,7 +48,7 @@ namespace Umbraco.ModelsBuilder.Tests
                 : base(content)
             { }
 
-            public string Prop { get { return this.GetPropertyValue<string>("prop"); } }
+            public string Prop => this.Value<string>("prop");
         }
     }
 }

@@ -8,6 +8,8 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
+using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
@@ -51,8 +53,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
             var types = new List<TypeModel>();
 
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
-            types.AddRange(GetTypes(PublishedItemType.Content, contentTypeService.GetAllContentTypes().Cast<IContentTypeBase>().ToArray()));
-            types.AddRange(GetTypes(PublishedItemType.Media, contentTypeService.GetAllMediaTypes().Cast<IContentTypeBase>().ToArray()));
+            types.AddRange(GetTypes(PublishedItemType.Content, contentTypeService.GetAll().Cast<IContentTypeBase>().ToArray()));
+            var mediaTypeService = ApplicationContext.Current.Services.MediaTypeService;
+            types.AddRange(GetTypes(PublishedItemType.Media, mediaTypeService.GetAll().Cast<IContentTypeBase>().ToArray()));
 
             var memberTypeService = ApplicationContext.Current.Services.MemberTypeService;
             types.AddRange(GetTypes(PublishedItemType.Member, memberTypeService.GetAll().Cast<IContentTypeBase>().ToArray()));
@@ -66,7 +69,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             //    throw new InvalidOperationException("Application is not ready.");
 
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
-            var contentTypes = contentTypeService.GetAllContentTypes().Cast<IContentTypeBase>().ToArray();
+            var contentTypes = contentTypeService.GetAll().Cast<IContentTypeBase>().ToArray();
             return GetTypes(PublishedItemType.Content, contentTypes); // aliases have to be unique here
         }
 
@@ -75,8 +78,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
             //if (_standalone && _umbracoApplication == null)
             //    throw new InvalidOperationException("Application is not ready.");
 
-            var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
-            var contentTypes = contentTypeService.GetAllMediaTypes().Cast<IContentTypeBase>().ToArray();
+            var mediaTypeService = ApplicationContext.Current.Services.MediaTypeService;
+            var contentTypes = mediaTypeService.GetAll().Cast<IContentTypeBase>().ToArray();
             return GetTypes(PublishedItemType.Media, contentTypes); // aliases have to be unique here
         }
 
@@ -129,6 +132,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private static IList<TypeModel> GetTypes(PublishedItemType itemType, IContentTypeBase[] contentTypes)
         {
             var typeModels = new List<TypeModel>();
+            var facade = FacadeServiceResolver.Current.Service.CreateFacade(null); // fixme
 
             // get the types and the properties
             foreach (var contentType in contentTypes)
@@ -144,24 +148,26 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     Description = contentType.Description
                 };
 
+                PublishedContentType publishedContentType;
                 switch (itemType)
                 {
                     case PublishedItemType.Content:
                         typeModel.ItemType = TypeModel.ItemTypes.Content;
+                        publishedContentType = facade.ContentCache.GetContentType(contentType.Alias);
                         break;
                     case PublishedItemType.Media:
                         typeModel.ItemType = TypeModel.ItemTypes.Media;
+                        publishedContentType = facade.MediaCache.GetContentType(contentType.Alias);
                         break;
                     case PublishedItemType.Member:
                         typeModel.ItemType = TypeModel.ItemTypes.Member;
+                        publishedContentType = facade.MemberCache.GetContentType(contentType.Alias);
                         break;
                     default:
                         throw new InvalidOperationException(string.Format("Unsupported PublishedItemType \"{0}\".", itemType));
                 }
 
                 typeModels.Add(typeModel);
-
-                var publishedContentType = PublishedContentType.Get(itemType, contentType.Alias);
 
                 foreach (var propertyType in contentType.PropertyTypes)
                 {

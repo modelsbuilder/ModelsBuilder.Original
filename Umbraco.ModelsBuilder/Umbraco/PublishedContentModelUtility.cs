@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
@@ -22,6 +23,22 @@ namespace Umbraco.ModelsBuilder.Umbraco
         //    var contentType = PublishedContentType.Get(itemType, alias);
         //    // etc...
         //}
+
+        public static PublishedContentType GetModelContentType(PublishedItemType itemType, string alias)
+        {
+            var facade = Current.UmbracoContext.Facade; // fixme inject!
+            switch (itemType)
+            {
+                case PublishedItemType.Content:
+                    return facade.ContentCache.GetContentType(alias);
+                case PublishedItemType.Media:
+                    return facade.MediaCache.GetContentType(alias);
+                case PublishedItemType.Member:
+                    return facade.MemberCache.GetContentType(alias);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(itemType));
+            }
+        }
 
         public static PublishedPropertyType GetModelPropertyType<TModel, TValue>(PublishedContentType contentType, Expression<Func<TModel, TValue>> selector)
             where TModel : PublishedContentModel

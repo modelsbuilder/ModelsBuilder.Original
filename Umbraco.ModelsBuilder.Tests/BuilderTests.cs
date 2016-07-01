@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using NUnit.Framework;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
 
@@ -43,7 +44,7 @@ public class Whatever
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            
+
             Assert.IsTrue(parseResult.HasModelsBaseClassName);
             Assert.AreEqual("Dang.Whatever", parseResult.ModelsBaseClassName);
         }
@@ -249,7 +250,7 @@ public partial class Type1 : IHasXmlNode
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
-            
+
             var types = new[] { type1, type2, type3 };
 
             var code = new Dictionary<string, string>
@@ -451,7 +452,7 @@ using Umbraco.ModelsBuilder;
             Assert.AreEqual("Renamed1", btypes[0].ClrName);
             Assert.AreEqual("Type2", btypes[1].ClrName);
         }
-        
+
         [Test]
         public void ContentTypeRenameOnClass()
         {
@@ -563,7 +564,7 @@ namespace Dang
     }
 
     public abstract class MyType1 : Type1
-    { 
+    {
         public MyType1(IPublishedContent content)
             : base(content)
         { }
@@ -1257,10 +1258,7 @@ namespace Test
 {
     public partial class Type1
     {
-        public static int GetProp1a(IType1 that)
-        {
-            return that.GetPropertyValue<int>(""prop1a"");
-        }
+        public static int GetProp1a(IType1 that) => that.Value<int>(""prop1a"");
     }
 }
 "}
@@ -1309,40 +1307,30 @@ namespace Umbraco.Web.PublishedContentModels
 	[PublishedContentModel(""type1"")]
 	public partial class Type1 : PublishedContentModel, IType1
 	{
+		// helpers
 #pragma warning disable 0109 // new is redundant
 		public new const string ModelTypeAlias = ""type1"";
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedContentModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
+			=> PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
+		// ctor
 		public Type1(IPublishedContent content)
 			: base(content)
 		{ }
 
-#pragma warning disable 0109 // new is redundant
-		public new static PublishedContentType GetModelContentType()
-		{
-			return PublishedContentType.Get(ModelItemType, ModelTypeAlias);
-		}
-#pragma warning restore 0109
-
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
-		{
-			return PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
-		}
+		// properties
 
 		[ImplementPropertyType(""prop1a"")]
-		public string Prop1a
-		{
-			get { return GetProp1a(this); }
-		}
+		public string Prop1a => GetProp1a(this);
 
 		[ImplementPropertyType(""prop1b"")]
-		public string Prop1b
-		{
-			get { return GetProp1b(this); }
-		}
+		public string Prop1b => GetProp1b(this);
 
-		public static string GetProp1b(IType1 that) { return that.GetPropertyValue<string>(""prop1b""); }
+		public static string GetProp1b(IType1 that) => that.Value<string>(""prop1b"");
 	}
 }
 //------------------------------------------------------------------------------
@@ -1370,44 +1358,31 @@ namespace Umbraco.Web.PublishedContentModels
 	[PublishedContentModel(""type2"")]
 	public partial class Type2 : PublishedContentModel, IType1
 	{
+		// helpers
 #pragma warning disable 0109 // new is redundant
 		public new const string ModelTypeAlias = ""type2"";
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedContentModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
+			=> PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
+		// ctor
 		public Type2(IPublishedContent content)
 			: base(content)
 		{ }
 
-#pragma warning disable 0109 // new is redundant
-		public new static PublishedContentType GetModelContentType()
-		{
-			return PublishedContentType.Get(ModelItemType, ModelTypeAlias);
-		}
-#pragma warning restore 0109
-
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
-		{
-			return PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
-		}
+		// properties
 
 		[ImplementPropertyType(""prop2"")]
-		public int Prop2
-		{
-			get { return this.GetPropertyValue<int>(""prop2""); }
-		}
+		public int Prop2 => this.Value<int>(""prop2"");
 
 		[ImplementPropertyType(""prop1a"")]
-		public string Prop1a
-		{
-			get { return Type1.GetProp1a(this); }
-		}
+		public string Prop1a => Type1.GetProp1a(this);
 
 		[ImplementPropertyType(""prop1b"")]
-		public string Prop1b
-		{
-			get { return Type1.GetProp1b(this); }
-		}
+		public string Prop1b => Type1.GetProp1b(this);
 	}
 }
 ";
@@ -1477,32 +1452,25 @@ namespace Umbraco.Web.PublishedContentModels
 	[PublishedContentModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
+		// helpers
 #pragma warning disable 0109 // new is redundant
 		public new const string ModelTypeAlias = ""type1"";
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedContentModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
+			=> PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
+		// ctor
 		public Type1(IPublishedContent content)
 			: base(content)
 		{ }
 
-#pragma warning disable 0109 // new is redundant
-		public new static PublishedContentType GetModelContentType()
-		{
-			return PublishedContentType.Get(ModelItemType, ModelTypeAlias);
-		}
-#pragma warning restore 0109
-
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
-		{
-			return PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
-		}
+		// properties
 
 		[ImplementPropertyType(""prop1"")]
-		public string Prop1
-		{
-			get { return this.GetPropertyValue<string>(""prop1""); }
-		}
+		public string Prop1 => this.Value<string>(""prop1"");
 	}
 }
 ";
@@ -1536,6 +1504,7 @@ namespace Umbraco.Web.PublishedContentModels
                 { "assembly", @"
 using Umbraco.ModelsBuilder;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 
 public partial class Type1
 {
@@ -1551,7 +1520,7 @@ public partial class Type1
             var refs = new[]
             {
                 MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof (Core.Models.IPublishedContent).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (IPublishedContent).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
             };
 
@@ -1592,28 +1561,20 @@ namespace Umbraco.Web.PublishedContentModels
 	[PublishedContentModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
+		// helpers
 #pragma warning disable 0109 // new is redundant
 		public new const string ModelTypeAlias = ""type1"";
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-#pragma warning restore 0109
-
-#pragma warning disable 0109 // new is redundant
 		public new static PublishedContentType GetModelContentType()
-		{
-			return PublishedContentType.Get(ModelItemType, ModelTypeAlias);
-		}
+			=> PublishedContentModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
+			=> PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
-		{
-			return PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
-		}
+		// properties
 
 		[ImplementPropertyType(""prop1"")]
-		public string Prop1
-		{
-			get { return this.GetPropertyValue<string>(""prop1""); }
-		}
+		public string Prop1 => this.Value<string>(""prop1"");
 	}
 }
 ";
@@ -1647,6 +1608,7 @@ namespace Umbraco.Web.PublishedContentModels
                 { "assembly", @"
 using Umbraco.ModelsBuilder;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 
 [assembly:RenameContentType(""type1"", ""Type2"")]
 
@@ -1664,7 +1626,7 @@ public partial class Type2
             var refs = new[]
             {
                 MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof (Core.Models.IPublishedContent).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (IPublishedContent).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
             };
 
@@ -1707,28 +1669,20 @@ namespace Umbraco.Web.PublishedContentModels
 	[PublishedContentModel(""type1"")]
 	public partial class Type2 : PublishedContentModel
 	{
+		// helpers
 #pragma warning disable 0109 // new is redundant
 		public new const string ModelTypeAlias = ""type1"";
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-#pragma warning restore 0109
-
-#pragma warning disable 0109 // new is redundant
 		public new static PublishedContentType GetModelContentType()
-		{
-			return PublishedContentType.Get(ModelItemType, ModelTypeAlias);
-		}
+			=> PublishedContentModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
+			=> PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
-		{
-			return PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
-		}
+		// properties
 
 		[ImplementPropertyType(""prop1"")]
-		public string Prop1
-		{
-			get { return this.GetPropertyValue<string>(""prop1""); }
-		}
+		public string Prop1 => this.Value<string>(""prop1"");
 	}
 }
 ";
@@ -1827,7 +1781,7 @@ namespace Umbraco.Web.PublishedContentModels
             {
                 Alias = "prop1",
                 ClrName = "Prop1",
-                ClrType = typeof(global::Umbraco.Core.Models.IPublishedContent),
+                ClrType = typeof(IPublishedContent),
             });
             type1.Properties.Add(new PropertyModel
             {
@@ -1913,7 +1867,7 @@ namespace Umbraco.Web.PublishedContentModels
         }
 
         [Test]
-        public void WriteClrType_Ambiguous()
+        public void WriteClrType_Ambiguous1()
         {
             var builder = new TextBuilder();
             builder.Using.Add("System.Text");
@@ -1921,7 +1875,37 @@ namespace Umbraco.Web.PublishedContentModels
             builder.ModelsNamespaceForTests = "SomeRandomNamespace";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, typeof(System.Text.ASCIIEncoding));
+
+            // full type name is needed but not global::
+            Assert.AreEqual("System.Text.ASCIIEncoding", sb.ToString());
+        }
+
+        [Test]
+        public void WriteClrType_Ambiguous()
+        {
+            var builder = new TextBuilder();
+            builder.Using.Add("System.Text");
+            builder.Using.Add("Umbraco.ModelsBuilder.Tests");
+            builder.ModelsNamespaceForTests = "SomeBorkedNamespace";
+            var sb = new StringBuilder();
+            builder.WriteClrType(sb, typeof(System.Text.ASCIIEncoding));
+
+            // global:: is required
             Assert.AreEqual("global::System.Text.ASCIIEncoding", sb.ToString());
+        }
+
+        [Test]
+        public void WriteClrType_Ambiguous2()
+        {
+            var builder = new TextBuilder();
+            builder.Using.Add("System.Text");
+            builder.Using.Add("Umbraco.ModelsBuilder.Tests");
+            builder.ModelsNamespaceForTests = "SomeRandomNamespace";
+            var sb = new StringBuilder();
+            builder.WriteClrType(sb, typeof(ASCIIEncoding));
+
+            // full type name is needed but not global::
+            Assert.AreEqual("Umbraco.ModelsBuilder.Tests.ASCIIEncoding", sb.ToString());
         }
 
         [Test]
@@ -1932,7 +1916,9 @@ namespace Umbraco.Web.PublishedContentModels
             builder.Using.Add("Umbraco.ModelsBuilder.Tests");
             builder.ModelsNamespaceForTests = "Umbraco.ModelsBuilder.Tests.Models";
             var sb = new StringBuilder();
-            builder.WriteClrType(sb, typeof(System.Text.ASCIIEncoding));
+            builder.WriteClrType(sb, typeof(ASCIIEncoding));
+
+            // type name is ok because of the namespace
             Assert.AreEqual("ASCIIEncoding", sb.ToString());
         }
 
@@ -1945,7 +1931,9 @@ namespace Umbraco.Web.PublishedContentModels
             builder.ModelsNamespaceForTests = "SomeRandomNamespace";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, typeof(ASCIIEncoding.Nested));
-            Assert.AreEqual("global::Umbraco.ModelsBuilder.Tests.ASCIIEncoding.Nested", sb.ToString());
+
+            // full type name is needed but not global::
+            Assert.AreEqual("Umbraco.ModelsBuilder.Tests.ASCIIEncoding.Nested", sb.ToString());
         }
 
         public class Class1 { }
@@ -1959,4 +1947,9 @@ namespace Umbraco.Web.PublishedContentModels
     }
 
     class BuilderTestsClass1 {}
+}
+
+namespace SomeBorkedNamespace
+{
+    public class System { }
 }

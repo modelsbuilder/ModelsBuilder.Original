@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.ModelsBuilder.Building
 {
@@ -76,7 +77,7 @@ namespace Umbraco.ModelsBuilder.Building
                         if (x.IsStatic) return false;
                         if (x.Parameters.Length != 1) return false;
                         var type1 = x.Parameters[0].Type;
-                        var type2 = typeof (Core.Models.IPublishedContent);
+                        var type2 = typeof (IPublishedContent);
                         return type1.ToDisplayString() == type2.FullName;
                     });
 

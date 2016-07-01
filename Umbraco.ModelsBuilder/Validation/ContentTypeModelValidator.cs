@@ -4,6 +4,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;

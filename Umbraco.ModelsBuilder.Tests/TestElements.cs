@@ -13,34 +13,19 @@ namespace Umbraco.ModelsBuilder.Tests
     {
         public class PublishedProperty : IPublishedProperty
         {
-            private readonly string _alias;
-            private readonly object _dataValue;
-
-            public PublishedProperty(string alias, object dataValue)
+            public PublishedProperty(string alias, object sourceValue)
             {
-                _alias = alias;
-                _dataValue = dataValue;
+                PropertyTypeAlias = alias;
+                SourceValue = sourceValue;
             }
 
-            public object DataValue
-            {
-                get { return _dataValue; }
-            }
+            public object SourceValue { get; }
 
-            public bool HasValue
-            {
-                get { return _dataValue != null; }
-            }
+            public bool HasValue => SourceValue != null;
 
-            public string PropertyTypeAlias
-            {
-                get { return _alias; }
-            }
+            public string PropertyTypeAlias { get; }
 
-            public object Value
-            {
-                get { return _dataValue; }
-            }
+            public object Value => SourceValue;
 
             public object XPathValue
             {
@@ -50,12 +35,11 @@ namespace Umbraco.ModelsBuilder.Tests
 
         public class PublishedContent : IPublishedContent
         {
-            private readonly PublishedContentType _contentType;
             private readonly PublishedProperty[] _properties;
 
             public PublishedContent(PublishedContentType contentType, PublishedProperty[] properties)
             {
-                _contentType = contentType;
+                ContentType = contentType;
                 _properties = properties;
             }
 
@@ -64,15 +48,7 @@ namespace Umbraco.ModelsBuilder.Tests
                 get { throw new NotImplementedException(); }
             }
 
-            public IEnumerable<IPublishedContent> ContentSet
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public PublishedContentType ContentType
-            {
-                get { return _contentType; }
-            }
+            public PublishedContentType ContentType { get; }
 
             public DateTime CreateDate
             {
@@ -99,11 +75,6 @@ namespace Umbraco.ModelsBuilder.Tests
                 get { throw new NotImplementedException(); }
             }
 
-            public int GetIndex()
-            {
-                throw new NotImplementedException();
-            }
-
             public IPublishedProperty GetProperty(string alias, bool recurse)
             {
                 return GetProperty(alias);
@@ -115,6 +86,11 @@ namespace Umbraco.ModelsBuilder.Tests
             }
 
             public int Id
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            public Guid Key
             {
                 get { throw new NotImplementedException(); }
             }
@@ -149,10 +125,7 @@ namespace Umbraco.ModelsBuilder.Tests
                 get { throw new NotImplementedException(); }
             }
 
-            public ICollection<IPublishedProperty> Properties
-            {
-                get { return _properties; }
-            }
+            public IEnumerable<IPublishedProperty> Properties => _properties;
 
             public int SortOrder
             {

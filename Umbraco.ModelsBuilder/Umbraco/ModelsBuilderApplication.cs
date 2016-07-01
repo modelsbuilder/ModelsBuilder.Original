@@ -9,6 +9,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Plugins;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.ModelsBuilder.Configuration;

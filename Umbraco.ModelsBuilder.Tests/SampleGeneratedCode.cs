@@ -10,9 +10,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Web;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.ModelsBuilder.Umbraco;
 using Umbraco.Web;
 
 namespace Umbraco.ModelsBuilder.Tests.Models
@@ -26,32 +28,32 @@ namespace Umbraco.ModelsBuilder.Tests.Models
 
         public string UmbracoUrlName
         {
-            get { return this.GetPropertyValue<string>("umbracoUrlName"); }
+            get { return this.Value<string>("umbracoUrlName"); }
         }
 
         public int UmbracoInternalRedirectId
         {
-            get { return this.GetPropertyValue<int>("umbracoInternalRedirectId"); }
+            get { return this.Value<int>("umbracoInternalRedirectId"); }
         }
 
         public int UmbracoRedirect
         {
-            get { return this.GetPropertyValue<int>("umbracoRedirect"); }
+            get { return this.Value<int>("umbracoRedirect"); }
         }
 
         public string PageKey
         {
-            get { return this.GetPropertyValue<string>("pageKey"); }
+            get { return this.Value<string>("pageKey"); }
         }
 
         public object Mntp1
         {
-            get { return this.GetPropertyValue("mntp1"); }
+            get { return this.Value("mntp1"); }
         }
 
         public object Mntp2
         {
-            get { return this.GetPropertyValue("mntp2"); }
+            get { return this.Value("mntp2"); }
         }
     }
 
@@ -64,12 +66,12 @@ namespace Umbraco.ModelsBuilder.Tests.Models
 
         public string UmbracoUrlAlias
         {
-            get { return this.GetPropertyValue<string>("umbracoUrlAlias"); }
+            get { return this.Value<string>("umbracoUrlAlias"); }
         }
 
         public string Nothing
         {
-            get { return this.GetPropertyValue<string>("nothing"); }
+            get { return this.Value<string>("nothing"); }
         }
     }
 
@@ -90,7 +92,7 @@ namespace Umbraco.ModelsBuilder.Tests.Models
 
         public string Prop1
         {
-            get { return this.GetPropertyValue<string>("prop1"); }
+            get { return this.Value<string>("prop1"); }
         }
     }
 
@@ -103,7 +105,7 @@ namespace Umbraco.ModelsBuilder.Tests.Models
 
         public string Prop2
         {
-            get { return this.GetPropertyValue<string>("prop2"); }
+            get { return this.Value<string>("prop2"); }
         }
     }
 
@@ -132,12 +134,12 @@ namespace Umbraco.ModelsBuilder.Tests.Models
 
         public IHtmlString Rte
         {
-            get { return this.GetPropertyValue<IHtmlString>("rte"); }
+            get { return this.Value<IHtmlString>("rte"); }
         }
 
         public IHtmlString SimpleText
         {
-            get { return this.GetPropertyValue<IHtmlString>("simpleText"); }
+            get { return this.Value<IHtmlString>("simpleText"); }
         }
     }
 
@@ -158,7 +160,7 @@ namespace Umbraco.ModelsBuilder.Tests.Models
 
         public string MixinProp
         {
-            get { return this.GetPropertyValue<string>("MixinProp"); }
+            get { return this.Value<string>("MixinProp"); }
         }
     }
 
@@ -177,8 +179,30 @@ namespace Umbraco.ModelsBuilder.Tests.Models
 
         public string MixinProp
         {
-            get { return this.GetPropertyValue<string>("MixinProp"); }
+            get { return this.Value<string>("MixinProp"); }
         }
+    }
+
+    /// <summary>DebugTextBuilder</summary>
+    [PublishedContentModel("debugTextBuilder")]
+    public partial class DebugTextBuilder : PublishedContentModel
+    {
+        // helpers
+#pragma warning disable 0109 // new is redundant
+        public new const string ModelTypeAlias = "debugTextBuilder";
+        public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+        public new static PublishedContentType GetModelContentType()
+            => PublishedContentModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+        public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<DebugTextBuilder, TValue>> selector)
+            => PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+#pragma warning restore 0109
+
+        // ctor
+        public DebugTextBuilder(IPublishedContent content)
+            : base(content)
+        { }
+
+        // properties
     }
 }
 
