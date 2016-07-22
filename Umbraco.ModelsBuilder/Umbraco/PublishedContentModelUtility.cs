@@ -26,6 +26,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
         public static PublishedPropertyType GetModelPropertyType<TModel, TValue>(PublishedContentType contentType, Expression<Func<TModel, TValue>> selector)
             where TModel : PublishedContentModel
         {
+            return contentType.GetPropertyType(GetModelPropertyAlias(selector));
+        }
+
+        public static string GetModelPropertyAlias<TModel, TValue>(Expression<Func<TModel, TValue>> selector)
+            where TModel : PublishedContentModel
+        {
             var expr = selector.Body as MemberExpression;
 
             if (expr == null)
@@ -35,14 +41,14 @@ namespace Umbraco.ModelsBuilder.Umbraco
             // see note above : accepted risk...
 
             var attr = expr.Member
-                .GetCustomAttributes(typeof (ImplementPropertyTypeAttribute), false)
+                .GetCustomAttributes(typeof(ImplementPropertyTypeAttribute), false)
                 .OfType<ImplementPropertyTypeAttribute>()
                 .SingleOrDefault();
 
             if (string.IsNullOrWhiteSpace(attr?.Alias))
                 throw new InvalidOperationException($"Could not figure out property alias for property \"{expr.Member.Name}\".");
 
-            return contentType.GetPropertyType(attr.Alias);
+            return attr.Alias;
         }
     }
 }
