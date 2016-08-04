@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="F5C32FC3-6672-4665-803D-6C5D2CAC556A" Version="3.0.3.94" Language="en-US" Publisher="Umbraco HQ" />
+    <Identity Id="F5C32FC3-6672-4665-803D-6C5D2CAC556A" Version="3.0.4.0" Language="en-US" Publisher="Umbraco HQ" />
     <DisplayName>Umbraco ModelsBuilder Custom Tool</DisplayName>
     <Description xml:space="preserve">Umbraco Visual Studio Custom Tool for generating strongly typed IPublishedContent models.</Description>
     <MoreInfo>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</MoreInfo>
