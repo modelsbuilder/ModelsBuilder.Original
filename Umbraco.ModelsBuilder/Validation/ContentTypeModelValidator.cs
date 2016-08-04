@@ -49,8 +49,15 @@ namespace Umbraco.ModelsBuilder.Validation
 
                 foreach (var prop in properties)
                 {
-                    //we need to return the field name with an index so it's wired up correctly
                     var propertyGroup = model.Groups.Single(x => x.Properties.Contains(prop));
+                    
+                    if (model.Alias.ToLowerInvariant() == prop.Alias.ToLowerInvariant())
+                        yield return new ValidationResult(string.Format("With Models Builder enabled, you can't have a property with a the alias \"{0}\" when the content type alias is also \"{0}\".", prop.Alias), new[]
+                    {
+                        string.Format("Groups[{0}].Properties[{1}].Alias", model.Groups.IndexOf(propertyGroup), propertyGroup.Properties.IndexOf(prop))
+                    });
+
+                    //we need to return the field name with an index so it's wired up correctly
                     var groupIndex = model.Groups.IndexOf(propertyGroup);
                     var propertyIndex = propertyGroup.Properties.IndexOf(prop);
 
