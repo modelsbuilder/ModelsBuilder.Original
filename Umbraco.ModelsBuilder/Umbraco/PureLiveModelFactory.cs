@@ -22,7 +22,7 @@ using File = System.IO.File;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
-    class PureLiveModelFactory : IPublishedContentModelFactory, IRegisteredObject
+    internal class PureLiveModelFactory : IPublishedContentModelFactory, IRegisteredObject
     {
         private Assembly _modelsAssembly;
         private Dictionary<string, Func<IPublishedContent, IPublishedContent>> _constructors;
@@ -31,12 +31,13 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private bool _pendingRebuild;
         private readonly ProfilingLogger _logger;
         private readonly FileSystemWatcher _watcher;
-        private int _ver;
+        private int _ver, _skipver;
 
         public PureLiveModelFactory(ProfilingLogger logger)
         {
             _logger = logger;
             _ver = 1; // zero is for when we had no version
+            _skipver = -1; // nothing to skip
             ContentTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModels();
             DataTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModels();
             RazorBuildProvider.CodeGenerationStarted += RazorBuildProvider_CodeGenerationStarted;
@@ -203,9 +204,10 @@ namespace Umbraco.ModelsBuilder.Umbraco
             var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
             var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
             var projFile = Path.Combine(modelsDirectory, "all.generated.cs");
+            var dllPathFile = Path.Combine(modelsDirectory, "all.dll.path");
 
             // caching the generated models speeds up booting
-            // if you change your own partials, delete the .generated.cs file to force a rebuild
+            // currentHash hashes both the types & the user's partials
 
             if (!forceRebuild)
             {
@@ -226,9 +228,30 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 }
             }
 
+            Assembly assembly;
             if (forceRebuild == false)
             {
-                _logger.Logger.Debug<PureLiveModelFactory>("Loading cached models.");
+                // try to load the dll directly (avoid rebuilding)
+                if (File.Exists(dllPathFile))
+                {
+                    var dllPath = File.ReadAllText(dllPathFile);
+                    if (File.Exists(dllPath))
+                    {
+                        assembly = Assembly.LoadFile(dllPath);
+                        var attr = assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
+                        if (attr != null && attr.PureLive && attr.SourceHash == currentHash)
+                        {
+                            // if we were to resume at that revision, then _ver would keep increasing
+                            // and that is probably a bad idea - so, we'll always rebuild starting at
+                            // ver 1, but we remember we want to skip that one - so we never end up
+                            // with the "same but different" version of the assembly in memory
+                            _skipver = assembly.GetName().Version.Revision;
+
+                            _logger.Logger.Debug<PureLiveModelFactory>("Loading cached models (dll).");
+                            return assembly;
+                        }
+                    }
+                }
 
                 // mmust reset the version in the file else it would keep growing
                 // loading cached modules only happens when the app restarts
@@ -246,7 +269,11 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 //File.WriteAllText(Path.Combine(modelsDirectory, "models.dep"), "VER:" + _ver);
 
                 _ver++;
-                return BuildManager.GetCompiledAssembly(ProjVirt);
+                assembly = BuildManager.GetCompiledAssembly(ProjVirt);
+                File.WriteAllText(dllPathFile, assembly.Location);
+
+                _logger.Logger.Debug<PureLiveModelFactory>("Loading cached models (source).");
+                return assembly;
             }
 
             // need to rebuild
@@ -257,9 +284,11 @@ namespace Umbraco.ModelsBuilder.Umbraco
             // add extra attributes,
             //  PureLiveAssembly helps identifying Assemblies that contain PureLive models
             //  AssemblyVersion is so that we have a different version for each rebuild
+            var ver = _ver == _skipver ? ++_ver : _ver;
+            _ver++;
             code = code.Replace("//ASSATTR", $@"[assembly: PureLiveAssembly]
 [assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = ""{currentHash}"")]
-[assembly:System.Reflection.AssemblyVersion(""0.0.0.{_ver++}"")]");
+[assembly:System.Reflection.AssemblyVersion(""0.0.0.{ver}"")]");
             File.WriteAllText(modelsSrcFile, code);
 
             // generate proj, save
@@ -268,7 +297,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
             File.WriteAllText(projFile, proj);
 
             // compile and register
-            var assembly = BuildManager.GetCompiledAssembly(ProjVirt);
+            assembly = BuildManager.GetCompiledAssembly(ProjVirt);
+            File.WriteAllText(dllPathFile, assembly.Location);
 
             // assuming we can write and it's not going to cause exceptions...
             File.WriteAllText(modelsHashFile, currentHash);
