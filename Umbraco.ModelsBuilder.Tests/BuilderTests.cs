@@ -1259,8 +1259,9 @@ namespace Test
     {
         public static int GetProp1a(IType1 that)
         {
-            return that.GetPropertyValue<int>(""prop1a"");
+            return that.GetPropertyValue<int>(GetProp1aAlias);
         }
+		public new const string GetProp1aAlias = ""prop1a"";
     }
 }
 "}
@@ -1330,19 +1331,21 @@ namespace Umbraco.Web.PublishedContentModels
 			return PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 		}
 
-		[ImplementPropertyType(""prop1a"")]
+		[ImplementPropertyType(Prop1aAlias)]
 		public string Prop1a
 		{
 			get { return GetProp1a(this); }
 		}
+		public new const string Prop1aAlias = ""prop1a"";
 
-		[ImplementPropertyType(""prop1b"")]
+		[ImplementPropertyType(Prop1bAlias)]
 		public string Prop1b
 		{
 			get { return GetProp1b(this); }
 		}
+		public new const string Prop1bAlias = ""prop1b"";
 
-		public static string GetProp1b(IType1 that) { return that.GetPropertyValue<string>(""prop1b""); }
+		public static string GetProp1b(IType1 that) { return that.GetPropertyValue<string>(Prop1bAlias); }
 	}
 }
 //------------------------------------------------------------------------------
@@ -1391,23 +1394,26 @@ namespace Umbraco.Web.PublishedContentModels
 			return PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 		}
 
-		[ImplementPropertyType(""prop2"")]
+		[ImplementPropertyType(Prop2Alias)]
 		public int Prop2
 		{
-			get { return this.GetPropertyValue<int>(""prop2""); }
+			get { return this.GetPropertyValue<int>(Prop2Alias); }
 		}
+		public new const string Prop2Alias = ""prop2"";
 
-		[ImplementPropertyType(""prop1a"")]
+		[ImplementPropertyType(Prop1aAlias)]
 		public string Prop1a
 		{
 			get { return Type1.GetProp1a(this); }
 		}
+		public new const string Prop1aAlias = ""prop1a"";
 
-		[ImplementPropertyType(""prop1b"")]
+		[ImplementPropertyType(Prop1bAlias)]
 		public string Prop1b
 		{
 			get { return Type1.GetProp1b(this); }
 		}
+		public new const string Prop1bAlias = ""prop1b"";
 	}
 }
 ";
@@ -1498,11 +1504,12 @@ namespace Umbraco.Web.PublishedContentModels
 			return PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 		}
 
-		[ImplementPropertyType(""prop1"")]
+		[ImplementPropertyType(Prop1Alias)]
 		public string Prop1
 		{
-			get { return this.GetPropertyValue<string>(""prop1""); }
+			get { return this.GetPropertyValue<string>(Prop1Alias); }
 		}
+		public new const string Prop1Alias = ""prop1"";
 	}
 }
 ";
@@ -1609,11 +1616,12 @@ namespace Umbraco.Web.PublishedContentModels
 			return PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 		}
 
-		[ImplementPropertyType(""prop1"")]
+		[ImplementPropertyType(Prop1Alias)]
 		public string Prop1
 		{
-			get { return this.GetPropertyValue<string>(""prop1""); }
+			get { return this.GetPropertyValue<string>(Prop1Alias); }
 		}
+		public new const string Prop1Alias = ""prop1"";
 	}
 }
 ";
@@ -1724,11 +1732,12 @@ namespace Umbraco.Web.PublishedContentModels
 			return PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 		}
 
-		[ImplementPropertyType(""prop1"")]
+		[ImplementPropertyType(Prop1Alias)]
 		public string Prop1
 		{
-			get { return this.GetPropertyValue<string>(""prop1""); }
+			get { return this.GetPropertyValue<string>(Prop1Alias); }
 		}
+		public new const string Prop1Alias = ""prop1"";
 	}
 }
 ";

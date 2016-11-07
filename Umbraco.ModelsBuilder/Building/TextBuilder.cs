@@ -243,12 +243,13 @@ namespace Umbraco.ModelsBuilder.Building
                 sb.Append("\t\t///</summary>\n");
             }
 
-            sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
+            sb.AppendFormat("\t\t[ImplementPropertyType({0}Alias)]\n", property.ClrName);
 
             sb.Append("\t\tpublic ");
             WriteClrType(sb, property.ClrType);
             sb.AppendFormat(" {0}\n\t\t{{\n\t\t\tget {{ return {1}.{2}(this); }}\n\t\t}}\n",
                 property.ClrName, mixinClrName, MixinStaticGetterName(property.ClrName));
+            sb.AppendFormat("\t\tpublic new const string {0}Alias = \"{1}\";\n", property.ClrName, property.Alias);
         }
 
         private static string MixinStaticGetterName(string clrName)
@@ -276,7 +277,7 @@ namespace Umbraco.ModelsBuilder.Building
                 sb.Append("\t\t///</summary>\n");
             }
 
-            sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
+            sb.AppendFormat("\t\t[ImplementPropertyType({0}Alias)]\n", property.ClrName);
 
             if (mixinStatic)
             {
@@ -297,9 +298,10 @@ namespace Umbraco.ModelsBuilder.Building
                     WriteClrType(sb, property.ClrType);
                     sb.Append(">");
                 }
-                sb.AppendFormat("(\"{0}\"); }}\n\t\t}}\n",
-                    property.Alias);
+                sb.AppendFormat("({0}Alias); }}\n\t\t}}\n", 
+                    property.ClrName);
             }
+            sb.AppendFormat("\t\tpublic new const string {0}Alias = \"{1}\";\n", property.ClrName, property.Alias);
 
             if (!mixinStatic) return;
 
@@ -322,8 +324,8 @@ namespace Umbraco.ModelsBuilder.Building
                 WriteClrType(sb, property.ClrType);
                 sb.Append(">");
             }
-            sb.AppendFormat("(\"{0}\"); }}\n",
-                property.Alias);
+            sb.AppendFormat("({0}Alias); }}\n", 
+                property.ClrName);
         }
 
         private void WriteInterfaceProperty(StringBuilder sb, PropertyModel property)
