@@ -1307,7 +1307,7 @@ namespace Umbraco.Web.PublishedContentModels
 		string Prop1b { get; }
 	}
 
-	[PublishedContentModel(""type1"")]
+	[PublishedContentModel(ModelTypeAlias)]
 	public partial class Type1 : PublishedContentModel, IType1
 	{
 #pragma warning disable 0109 // new is redundant
@@ -1370,7 +1370,7 @@ using Umbraco.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedContentModels
 {
-	[PublishedContentModel(""type2"")]
+	[PublishedContentModel(ModelTypeAlias)]
 	public partial class Type2 : PublishedContentModel, IType1
 	{
 #pragma warning disable 0109 // new is redundant
@@ -1480,7 +1480,7 @@ using Umbraco.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedContentModels
 {
-	[PublishedContentModel(""type1"")]
+	[PublishedContentModel(ModelTypeAlias)]
 	public partial class Type1 : PublishedContentModel
 	{
 #pragma warning disable 0109 // new is redundant
@@ -1596,7 +1596,7 @@ using Umbraco.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedContentModels
 {
-	[PublishedContentModel(""type1"")]
+	[PublishedContentModel(ModelTypeAlias)]
 	public partial class Type1 : PublishedContentModel
 	{
 #pragma warning disable 0109 // new is redundant
@@ -1712,7 +1712,7 @@ using Umbraco.ModelsBuilder.Umbraco;
 namespace Umbraco.Web.PublishedContentModels
 {
 	// Content Type 1 with alias ""type1""
-	[PublishedContentModel(""type1"")]
+	[PublishedContentModel(ModelTypeAlias)]
 	public partial class Type2 : PublishedContentModel
 	{
 #pragma warning disable 0109 // new is redundant
