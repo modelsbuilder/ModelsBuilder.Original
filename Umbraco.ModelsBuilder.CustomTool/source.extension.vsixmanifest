@@ -17,7 +17,7 @@
       14.0 is Visual Studio 2015
       15.0 is Visual Studio 2017
     -->
-    <InstallationTarget Version="[14.0,15.0]" Id="Microsoft.VisualStudio.IntegratedShell" />
+    <InstallationTarget Version="[11.0,15.0]" Id="Microsoft.VisualStudio.IntegratedShell" />
   </Installation>
   <Prerequisites>
     <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" />
