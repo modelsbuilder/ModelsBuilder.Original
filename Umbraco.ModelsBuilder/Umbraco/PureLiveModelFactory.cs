@@ -32,7 +32,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private readonly ProfilingLogger _logger;
         private readonly FileSystemWatcher _watcher;
         private int _ver, _skipver;
-        private bool _building;
+        private volatile bool _building; // volatile 'cos reading outside a lock
 
         public PureLiveModelFactory(ProfilingLogger logger)
         {
