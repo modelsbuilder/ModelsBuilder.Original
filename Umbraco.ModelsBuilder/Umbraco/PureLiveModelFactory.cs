@@ -33,6 +33,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private readonly FileSystemWatcher _watcher;
         private int _ver, _skipver;
         private volatile bool _building; // volatile 'cos reading outside a lock
+        private readonly int _debugLevel;
 
         public PureLiveModelFactory(ProfilingLogger logger)
         {
@@ -56,6 +57,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
             _watcher = new FileSystemWatcher(modelsDirectory);
             _watcher.Changed += WatcherOnChanged;
             _watcher.EnableRaisingEvents = true;
+
+            // get it here, this need to be fast
+            _debugLevel = UmbracoConfig.For.ModelsBuilder().DebugLevel;
         }
 
         #region IPublishedContentModelFactory
@@ -92,7 +96,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 // or if something went wrong and we don't have an assembly at all
                 if (_modelsAssembly == null) return;
 
-                _logger.Logger.Debug<PureLiveModelFactory>("RazorBuildProvider.CodeGenerationStarted");
+                if (_debugLevel > 0)
+                    _logger.Logger.Debug<PureLiveModelFactory>("RazorBuildProvider.CodeGenerationStarted");
                 var provider = sender as RazorBuildProvider;
                 if (provider == null) return;
 
@@ -131,7 +136,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
         // ensure that the factory is running with the lastest generation of models
         internal Dictionary<string, Func<IPublishedContent, IPublishedContent>> EnsureModels()
         {
-            _logger.Logger.Debug<PureLiveModelFactory>("Ensuring models.");
+            if (_debugLevel > 0)
+                _logger.Logger.Debug<PureLiveModelFactory>("Ensuring models.");
 
             // don't use an upgradeable lock here because only 1 thread at a time could enter it
             try
