@@ -23,8 +23,21 @@ $RepoRoot = $PSScriptFilePath.Directory.Parent.FullName
 $BuildFolder = Join-Path -Path $RepoRoot -ChildPath "build";
 $ReleaseFolder = Join-Path -Path $BuildFolder -ChildPath "Release\v$ReleaseVersionNumber$PreReleaseName";
 $SolutionRoot = $RepoRoot;
-$ProgFiles86 = [Environment]::GetEnvironmentVariable("ProgramFiles(x86)");
-$MSBuild = "$ProgFiles86\MSBuild\14.0\Bin\MSBuild.exe"
+
+# Locate visual studio 2017
+# using vswhere from https://github.com/Microsoft/vswhere
+$vsloc = ./vswhere -latest -requires Microsoft.Component.MSBuild
+$vspath = ""
+$vsloc | ForEach {
+	if ($_.StartsWith("installationPath: ")) {
+		$vspath = $_.SubString("installationPath: ".Length)
+	}
+}
+if ($vspath -eq "") {
+	Write-Warning "Could not find VS 2017"
+	Exit
+}
+$MSBuild = "$vspath\MSBuild\15.0\Bin\MSBuild.exe"
 
 # Edit VSIX
 $vsixFile = "$SolutionRoot\Umbraco.ModelsBuilder.CustomTool\source.extension.vsixmanifest"
@@ -85,7 +98,7 @@ if (-not $?)
 }
 
 #build
-& $MSBuild "$SolutionPath" /p:Configuration=Release /maxcpucount
+& $MSBuild "$SolutionPath" /p:Configuration=Release /maxcpucount /p:VisualStudioVersion=15.0
 if (-not $?)
 {
 	throw "The MSBuild process returned an error code."
