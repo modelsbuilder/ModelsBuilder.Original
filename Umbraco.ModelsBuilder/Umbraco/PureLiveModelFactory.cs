@@ -34,6 +34,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private int _ver, _skipver;
         private volatile bool _building; // volatile 'cos reading outside a lock
         private readonly int _debugLevel;
+        private BuildManager _theBuildManager;
 
         public PureLiveModelFactory(ProfilingLogger logger)
         {
@@ -86,6 +87,35 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         #region Compilation
 
+        // deadlock note
+        //
+        // when RazorBuildProvider_CodeGenerationStarted runs, the thread has Monitor.Enter-ed the BuildManager
+        // singleton instance, through a call to CompilationLock.GetLock in BuildManager.GetVPathBuildResultInternal,
+        // and now wants to lock _locker.
+        // when EnsureModels runs, the thread locks _locker and then wants BuildManager to compile, which in turns
+        // requires that the BuildManager can Monitor.Enter-ed itself.
+        // so:
+        //
+        // T1 - needs to ensure models, locks _locker
+        // T2 - needs to compile a view, locks BuildManager
+        //      hits RazorBuildProvider_CodeGenerationStarted
+        //      wants to lock _locker, wait
+        // T1 - needs to compile models, using BuildManager
+        //      wants to lock itself, wait
+        // <deadlock>
+        //
+        // until ASP.NET kills the long-running request (thread abort)
+        //
+        // problem is, we *want* to suspend views compilation while the models assembly is being changed else we
+        // end up with views compiled and cached with the old assembly, while models come from the new assembly,
+        // which gives more YSOD. so we *have* to lock _locker in RazorBuildProvider_CodeGenerationStarted.
+        //
+        // one "easy" solution consists in locking the BuildManager *before* _locker in EnsureModels, thus ensuring
+        // we always lock in the same order, and getting rid of deadlocks - but that requires having access to the
+        // current BuildManager instance, which is BuildManager.TheBuildManager, which is an internal property.
+        //
+        // well, that's what we are doing in this class' TheBuildManager property, using reflection.
+
         private void RazorBuildProvider_CodeGenerationStarted(object sender, EventArgs e)
         {
             try
@@ -133,6 +163,20 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
         }
 
+        // gets "the" build manager
+        private BuildManager TheBuildManager
+        {
+            get
+            {
+                if (_theBuildManager != null) return _theBuildManager;
+                var prop = typeof (BuildManager).GetProperty("TheBuildManager", BindingFlags.NonPublic | BindingFlags.Static);
+                if (prop == null)
+                    throw new InvalidOperationException("Could not get BuildManager.TheBuildManager property.");
+                _theBuildManager = (BuildManager) prop.GetValue(null);
+                return _theBuildManager;
+            }
+        }
+
         // ensure that the factory is running with the lastest generation of models
         internal Dictionary<string, Func<IPublishedContent, IPublishedContent>> EnsureModels()
         {
@@ -152,8 +196,13 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     _locker.ExitReadLock();
             }
 
+            var buildManagerLocked = false;
             try
             {
+                // always take the BuildManager lock *before* taking the _locker lock
+                // to avoid possible deadlock situations (see notes above)
+                Monitor.Enter(TheBuildManager, ref buildManagerLocked);
+
                 _locker.EnterUpgradeableReadLock();
 
                 if (_hasModels) return _constructors;
@@ -214,6 +263,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     _locker.ExitWriteLock();
                 if (_locker.IsUpgradeableReadLockHeld)
                     _locker.ExitUpgradeableReadLock();
+                if (buildManagerLocked)
+                    Monitor.Exit(TheBuildManager);
             }
         }
 
@@ -450,9 +501,20 @@ namespace Umbraco.ModelsBuilder.Umbraco
             var changed = args.Name;
 
             // don't reset when our files change because we are building!
-            // this is not perfect, race conditions are possible, ie if events trigger
-            // a bit too later after we are done building, but better + we log
-            if (_building && OurFiles.Contains(changed)) return;
+            //
+            // comment it out, and always ignore our files, because it seems that some
+            // race conditions can occur on slow Cloud filesystems and then we keep
+            // rebuilding
+
+            //if (_building && OurFiles.Contains(changed))
+            //{
+            //    //_logger.Logger.Info<PureLiveModelFactory>("Ignoring files self-changes.");
+            //    return;
+            //}
+
+            // always ignore our own file changes
+            if (OurFiles.Contains(changed))
+                return;
 
             _logger.Logger.Info<PureLiveModelFactory>("Detected files changes.");
 
