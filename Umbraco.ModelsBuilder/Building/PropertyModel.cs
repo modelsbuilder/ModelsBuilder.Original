@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Umbraco.ModelsBuilder.Building
 {
@@ -39,5 +40,22 @@ namespace Umbraco.ModelsBuilder.Building
         /// Gets a value indicating whether this property should be excluded from generation.
         /// </summary>
         public bool IsIgnored;
+
+        /// <summary>
+        /// Gets the generation errors for the property.
+        /// </summary>
+        /// <remarks>This should be null, unless something prevents the property from being
+        /// generated, and then the value should explain what. This can be used to generate
+        /// commented out code eg in PureLive.</remarks>
+        public List<string> Errors;
+
+        /// <summary>
+        /// Adds an error.
+        /// </summary>
+        public void AddError(string error)
+        {
+            if (Errors == null) Errors = new List<string>();
+            Errors.Add(error);
+        }
     }
 }
