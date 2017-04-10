@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using Lucene.Net.Util;
 using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Api;
 using Umbraco.ModelsBuilder.Configuration;
@@ -247,8 +249,12 @@ namespace Umbraco.ModelsBuilder.Building
 
             sb.Append("\t\tpublic ");
             WriteClrType(sb, property.ClrType);
-            sb.AppendFormat(" {0}\n\t\t{{\n\t\t\tget {{ return {1}.{2}(this); }}\n\t\t}}\n",
-                property.ClrName, mixinClrName, MixinStaticGetterName(property.ClrName));
+
+            sb.AppendFormat(" {0}\n\t\t{{\n\t\t\tget {{ return ",
+                property.ClrName);
+            WriteNonGenericClrType(sb, GetModelsNamespace() + "." + mixinClrName);
+            sb.AppendFormat(".{0}(this); }}\n\t\t}}\n",
+                MixinStaticGetterName(property.ClrName));
         }
 
         private static string MixinStaticGetterName(string clrName)
@@ -261,6 +267,27 @@ namespace Umbraco.ModelsBuilder.Building
             var mixinStatic = mixinClrName != null;
 
             sb.Append("\n");
+
+            if (property.Errors != null)
+            {
+                sb.Append("\t\t/*\n");
+                sb.Append("\t\t * THIS PROPERTY CANNOT BE IMPLEMENTED, BECAUSE:\n");
+                sb.Append("\t\t *\n");
+                var first = true;
+                foreach (var error in property.Errors)
+                {
+                    if (first) first = false;
+                    else sb.Append("\t\t *\n");
+                    foreach (var s in SplitError(error))
+                    {
+                        sb.Append("\t\t * ");
+                        sb.Append(s);
+                        sb.Append("\n");
+                    }
+                }
+                sb.Append("\t\t *\n");
+                sb.Append("\n");
+            }
 
             // Adds xml summary to each property containing
             // property name and property description
@@ -301,11 +328,11 @@ namespace Umbraco.ModelsBuilder.Building
                     property.Alias);
             }
 
-            if (!mixinStatic) return;
+            if (!mixinStatic) goto close;
 
             var mixinStaticGetterName = MixinStaticGetterName(property.ClrName);
 
-            if (type.StaticMixinMethods.Contains(mixinStaticGetterName)) return;
+            if (type.StaticMixinMethods.Contains(mixinStaticGetterName)) goto close;
 
             sb.Append("\n");
 
@@ -324,6 +351,29 @@ namespace Umbraco.ModelsBuilder.Building
             }
             sb.AppendFormat("(\"{0}\"); }}\n",
                 property.Alias);
+
+            close:
+            if (property.Errors != null)
+            {
+                sb.Append("\n");
+                sb.Append("\t\t *\n");
+                sb.Append("\t\t */\n");
+            }
+        }
+
+        private static IEnumerable<string> SplitError(string error)
+        {
+            var p = 0;
+            while (p < error.Length)
+            {
+                var n = p + 50;
+                while (n < error.Length && error[n] != ' ') n++;
+                if (n >= error.Length) break;
+                yield return error.Substring(p, n - p);
+                p = n + 1;
+            }
+            if (p < error.Length)
+                yield return error.Substring(p);
         }
 
         private void WriteInterfaceProperty(StringBuilder sb, PropertyModel property)
