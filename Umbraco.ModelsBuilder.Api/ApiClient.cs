@@ -37,7 +37,7 @@ namespace Umbraco.ModelsBuilder.Api
             {
                 client.BaseAddress = new Uri(url);
             }
-            catch (Exception e)
+            catch
             {
                 throw new UriFormatException($"Invalid URI: the format of the URI \"{url}\" could not be determined.");
             }

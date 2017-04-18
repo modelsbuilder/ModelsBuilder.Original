@@ -7,11 +7,14 @@ param (
 	[ValidatePattern("\d")]
 	[string]
 	$BuildNumber,
-	[Parameter(Mandatory=$true)]
+	[Parameter(Mandatory=$false)]
 	[string]
-	[AllowEmptyString()]
+	#[AllowEmptyString()]
 	$PreReleaseName
 )
+
+# see http://stackoverflow.com/questions/22906520/powershell-string-default-parameter-value-does-not-work-as-expected
+# for default string param value
 
 if (-not [System.String]::IsNullOrWhitespace($PreReleaseName) -and -not $PreReleaseName.StartsWith("-"))
 {
