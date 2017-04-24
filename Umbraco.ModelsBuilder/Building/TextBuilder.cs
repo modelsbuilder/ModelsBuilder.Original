@@ -412,10 +412,9 @@ namespace Umbraco.ModelsBuilder.Building
 
         private void WriteNonGenericClrType(StringBuilder sb, string s)
         {
-            string typeName;
 
             // takes care eg of "System.Int32" vs. "int"
-            if (TypesMap.TryGetValue(s.ToLowerInvariant(), out typeName))
+            if (TypesMap.TryGetValue(s.ToLowerInvariant(), out string typeName))
             {
                 sb.Append(typeName);
                 return;

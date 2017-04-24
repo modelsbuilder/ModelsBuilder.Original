@@ -32,7 +32,6 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private readonly ProfilingLogger _logger;
         private readonly FileSystemWatcher _watcher;
         private int _ver, _skipver;
-        private volatile bool _building; // volatile 'cos reading outside a lock
         private readonly int _debugLevel;
         private BuildManager _theBuildManager;
 
@@ -76,8 +75,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             var contentTypeAlias = content.DocumentTypeAlias;
 
             // lookup model constructor (else null)
-            Func<IPublishedContent, IPublishedContent> constructor;
-            constructors.TryGetValue(contentTypeAlias, out constructor);
+            constructors.TryGetValue(contentTypeAlias, out Func<IPublishedContent, IPublishedContent> constructor);
 
             // create model
             return constructor == null ? content : constructor(content);
@@ -217,7 +215,6 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 {
                     try
                     {
-                        _building = true;
                         var assembly = GetModelsAssembly(_pendingRebuild);
 
                         // the one below can be used to simulate an issue with BuildManager, ie it will register
@@ -245,10 +242,6 @@ namespace Umbraco.ModelsBuilder.Umbraco
                             _modelsAssembly = null;
                             _constructors = null;
                         }
-                    }
-                    finally
-                    {
-                        _building = false;
                     }
 
                     // don't even try again
