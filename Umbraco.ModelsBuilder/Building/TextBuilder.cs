@@ -328,11 +328,18 @@ namespace Umbraco.ModelsBuilder.Building
                     property.Alias);
             }
 
-            if (!mixinStatic) goto close;
+            if (property.Errors != null)
+            {
+                sb.Append("\n");
+                sb.Append("\t\t *\n");
+                sb.Append("\t\t */\n");
+            }
+
+            if (!mixinStatic) return;
 
             var mixinStaticGetterName = MixinStaticGetterName(property.ClrName);
 
-            if (type.StaticMixinMethods.Contains(mixinStaticGetterName)) goto close;
+            if (type.StaticMixinMethods.Contains(mixinStaticGetterName)) return;
 
             sb.Append("\n");
 
@@ -351,14 +358,6 @@ namespace Umbraco.ModelsBuilder.Building
             }
             sb.AppendFormat("(\"{0}\"); }}\n",
                 property.Alias);
-
-            close:
-            if (property.Errors != null)
-            {
-                sb.Append("\n");
-                sb.Append("\t\t *\n");
-                sb.Append("\t\t */\n");
-            }
         }
 
         private static IEnumerable<string> SplitError(string error)
@@ -378,12 +377,40 @@ namespace Umbraco.ModelsBuilder.Building
 
         private void WriteInterfaceProperty(StringBuilder sb, PropertyModel property)
         {
+            if (property.Errors != null)
+            {
+                sb.Append("\t\t/*\n");
+                sb.Append("\t\t * THIS PROPERTY CANNOT BE IMPLEMENTED, BECAUSE:\n");
+                sb.Append("\t\t *\n");
+                var first = true;
+                foreach (var error in property.Errors)
+                {
+                    if (first) first = false;
+                    else sb.Append("\t\t *\n");
+                    foreach (var s in SplitError(error))
+                    {
+                        sb.Append("\t\t * ");
+                        sb.Append(s);
+                        sb.Append("\n");
+                    }
+                }
+                sb.Append("\t\t *\n");
+                sb.Append("\n");
+            }
+
             if (!string.IsNullOrWhiteSpace(property.Name))
                 sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString(property.Name));
             sb.Append("\t\t");
             WriteClrType(sb, property.ClrType);
             sb.AppendFormat(" {0} {{ get; }}\n",
                 property.ClrName);
+
+            if (property.Errors != null)
+            {
+                sb.Append("\n");
+                sb.Append("\t\t *\n");
+                sb.Append("\t\t */\n");
+            }
         }
 
         // internal for unit tests

@@ -174,6 +174,7 @@ namespace Umbraco.ModelsBuilder.Building
 
             // ensure content & property type don't have identical name (csharp hates it)
             foreach (var typeModel in _typeModels.Where(x => !x.IsContentIgnored))
+            {
                 foreach (var xx in typeModel.Properties.Where(x => !x.IsIgnored && x.ClrName == typeModel.ClrName))
                 {
                     if (!pureLive)
@@ -183,9 +184,14 @@ namespace Umbraco.ModelsBuilder.Building
 
                     // for purelive, will we generate a commented out properties with an error message,
                     // instead of throwing, because then it kills the sites and ppl don't understand why
-                    xx.AddError($"CSharp does not support naming the property with alias \"{xx.Alias}\" with the same name as content type with alias \"{typeModel.Alias}\"."
-                                + " Consider using an attribute to assign a different name to the property.");
+                    xx.AddError($"The class {typeModel.ClrName} cannot implement this property, because"
+                        + $" CSharp does not support naming the property with alias \"{xx.Alias}\" with the same name as content type with alias \"{typeModel.Alias}\"."
+                        + " Consider using an attribute to assign a different name to the property.");
+
+                    // will not be implemented on interface nor class
+                    // note: we will still create the static getter, and implement the property on other classes...
                 }
+            }
 
             // ensure we have no collision between base types
             // NO: we may want to define a base class in a partial, on a model that has a parent
