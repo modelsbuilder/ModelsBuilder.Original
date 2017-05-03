@@ -129,6 +129,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private static IList<TypeModel> GetTypes(PublishedItemType itemType, IContentTypeBase[] contentTypes)
         {
             var typeModels = new List<TypeModel>();
+            var uniqueTypes = new HashSet<string>();
 
             // get the types and the properties
             foreach (var contentType in contentTypes)
@@ -143,6 +144,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     Name = contentType.Name,
                     Description = contentType.Description
                 };
+
+                // of course this should never happen, but when it happens, better detect it
+                // else we end up with weird nullrefs everywhere
+                if (uniqueTypes.Contains(typeModel.ClrName))
+                    throw new Exception($"Panic: duplicate type ClrName \"{typeModel.ClrName}\".");
+                uniqueTypes.Add(typeModel.ClrName);
 
                 switch (itemType)
                 {
@@ -175,6 +182,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     };
 
                     var publishedPropertyType = publishedContentType.GetPropertyType(propertyType.Alias);
+                    if (publishedPropertyType == null)
+                        throw new Exception($"Panic: could not get published property type {contentType.Alias}.{propertyType.Alias}.");
+
                     propertyModel.ClrType = publishedPropertyType.ClrType;
 
                     typeModel.Properties.Add(propertyModel);

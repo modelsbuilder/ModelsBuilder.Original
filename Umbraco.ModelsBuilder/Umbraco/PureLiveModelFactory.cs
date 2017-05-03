@@ -35,6 +35,10 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private readonly int _debugLevel;
         private BuildManager _theBuildManager;
 
+        private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
+        private const string ProjVirt = "~/App_Data/Models/all.generated.cs";
+        private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err" };
+
         public PureLiveModelFactory(ProfilingLogger logger)
         {
             _logger = logger;
@@ -260,10 +264,6 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     Monitor.Exit(TheBuildManager);
             }
         }
-
-        private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
-        private const string ProjVirt = "~/App_Data/Models/all.generated.cs";
-        private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path" };
 
         private Assembly GetModelsAssembly(bool forceRebuild)
         {
