@@ -5,13 +5,12 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Plugins;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.Web;
 using Umbraco.Web.UI.JavaScript;
@@ -53,7 +52,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private void InstallDefaultModelsFactory()
         {
-            var types = Current.PluginManager.ResolveTypes<PublishedContentModel>();
+            var types = Current.TypeLoader.GetTypes<PublishedContentModel>();
             var factory = new PublishedContentModelFactory(types);
             PublishedContentModelFactoryResolver.Current.SetFactory(factory);
         }

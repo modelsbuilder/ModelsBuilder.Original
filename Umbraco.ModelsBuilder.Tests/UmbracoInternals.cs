@@ -20,15 +20,15 @@ namespace Umbraco.ModelsBuilder.Tests
             return (T)ctor.Invoke(args);
         }
 
-        public static void InitializeConverters()
-        {
-            var serviceContainerMock = new Mock<IServiceContainer>();
-            var serviceContainer = serviceContainerMock.Object;
+        //public static void InitializeConverters()
+        //{
+        //    var serviceContainerMock = new Mock<IServiceContainer>();
+        //    var serviceContainer = serviceContainerMock.Object;
 
-            var logger = Mock.Of<ILogger>();
-            var r = Ctor<PropertyValueConvertersResolver>(serviceContainer, logger, (IEnumerable<Type>)new Type[0]);
-            PropertyValueConvertersResolver.Current = r;
-        }
+        //    var logger = Mock.Of<ILogger>();
+        //    var r = Ctor<PropertyValueConvertersResolver>(serviceContainer, logger, (IEnumerable<Type>)new Type[0]);
+        //    PropertyValueConvertersResolver.Current = r;
+        //}
 
         public static void FreezeResolution()
         {

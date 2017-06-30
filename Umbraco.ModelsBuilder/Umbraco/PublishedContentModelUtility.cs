@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {

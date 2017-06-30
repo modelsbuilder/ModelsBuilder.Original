@@ -11,7 +11,7 @@ namespace Umbraco.ModelsBuilder.Tests
         [Test]
         public void Test()
         {
-            UmbracoInternals.InitializeConverters();
+            //UmbracoInternals.InitializeConverters();
             UmbracoInternals.FreezeResolution();
 
             var type = UmbracoInternals.CreatePublishedContentType(1, "typ", new[]
