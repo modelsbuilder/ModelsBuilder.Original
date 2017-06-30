@@ -30,14 +30,14 @@ namespace Umbraco.ModelsBuilder.Tests
         //    PropertyValueConvertersResolver.Current = r;
         //}
 
-        public static void FreezeResolution()
-        {
-            var t = typeof(ApplicationContext)
-                .Assembly
-                .GetType("Umbraco.Core.ObjectResolution.Resolution");
-            var m = t.GetMethod("Freeze");
-            m.Invoke(null, new object[0]);
-        }
+        //public static void FreezeResolution()
+        //{
+        //    var t = typeof(ApplicationContext)
+        //        .Assembly
+        //        .GetType("Umbraco.Core.ObjectResolution.Resolution");
+        //    var m = t.GetMethod("Freeze");
+        //    m.Invoke(null, new object[0]);
+        //}
 
         public static PublishedPropertyType CreatePublishedPropertyType(string alias, int definition, string editor)
         {

@@ -1379,15 +1379,15 @@ namespace Umbraco.Web.PublishedContentModels
 		public int Prop2 => this.Value<int>(""prop2"");
 
 		[ImplementPropertyType(""prop1a"")]
-		public string Prop1a => Type1.GetProp1a(this);
+		public string Prop1a => Umbraco.Web.PublishedContentModels.Type1.GetProp1a(this);
 
 		[ImplementPropertyType(""prop1b"")]
-		public string Prop1b => Type1.GetProp1b(this);
+		public string Prop1b => Umbraco.Web.PublishedContentModels.Type1.GetProp1b(this);
 	}
 }
 ";
 
-            //Console.WriteLine(gen);
+            Console.WriteLine(gen);
             Assert.AreEqual(expected.ClearLf(), gen);
         }
 

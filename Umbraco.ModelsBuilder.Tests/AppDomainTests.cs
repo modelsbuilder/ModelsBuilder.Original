@@ -13,20 +13,22 @@ namespace Umbraco.ModelsBuilder.Tests
     public class AppDomainTests
     {
         [Test]
+        [Ignore("no idea what we're testing here?")]
         public void Test()
         {
             // read http://msdn.microsoft.com/en-us/library/ms173139%28v=vs.90%29.aspx
 
             // test executes in project/bin/Debug or /Release
-            Console.WriteLine(AppDomain.CurrentDomain.FriendlyName);
-            Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory); // project's bin
-            Console.WriteLine(AppDomain.CurrentDomain.RelativeSearchPath);
-            Console.WriteLine(Assembly.GetExecutingAssembly().CodeBase);
+            Console.WriteLine("FriendlyName " + AppDomain.CurrentDomain.FriendlyName);
+            Console.WriteLine("BaseDirectory " + AppDomain.CurrentDomain.BaseDirectory); // project's bin
+            Console.WriteLine("SearchPath " + AppDomain.CurrentDomain.RelativeSearchPath);
+            Console.WriteLine("CodeBase " + Assembly.GetExecutingAssembly().CodeBase);
+            Console.WriteLine("CurrentDirectory " + Directory.GetCurrentDirectory());
 
             var domainSetup = new AppDomainSetup();
 
             var bzzt = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bzzt");
-            Console.WriteLine(bzzt);
+            Console.WriteLine("Bzzt " + bzzt);
             if (Directory.Exists(bzzt))
                 Directory.Delete(bzzt, true);
             Directory.CreateDirectory(bzzt);
@@ -91,7 +93,7 @@ namespace Umbraco.ModelsBuilder.Tests
 
         public string GetAppDomainDetails()
         {
-            return AppDomain.CurrentDomain.FriendlyName 
+            return AppDomain.CurrentDomain.FriendlyName
                 + Environment.NewLine + AppDomain.CurrentDomain.BaseDirectory
                 + Environment.NewLine + AppDomain.CurrentDomain.RelativeSearchPath
                 + Environment.NewLine + Assembly.GetExecutingAssembly().CodeBase;
