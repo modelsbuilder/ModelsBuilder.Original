@@ -63,6 +63,7 @@ namespace Umbraco.ModelsBuilder.Configuration
             ModelsDirectory = HostingEnvironment.IsHosted
                 ? HostingEnvironment.MapPath(DefaultModelsDirectory)
                 : DefaultModelsDirectory.TrimStart("~/");
+            DebugLevel = 0;
 
             // stop here, everything is false
             if (!Enable) return;
@@ -164,6 +165,16 @@ namespace Umbraco.ModelsBuilder.Configuration
                 ModelsDirectory = GetModelsDirectory(root, value, AcceptUnsafeModelsDirectory);
             }
 
+            // default: 0
+            value = ConfigurationManager.AppSettings[prefix + "DebugLevel"];
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                int debugLevel;
+                if (!int.TryParse(value, out debugLevel))
+                    throw new ConfigurationErrorsException($"Invalid debug level \"{value}\".");
+                DebugLevel = debugLevel;
+            }
+
             // not flagging if not generating, or live (incl. pure)
             if (ModelsMode == ModelsMode.Nothing || ModelsMode.IsLive())
                 FlagOutOfDateModels = false;
@@ -184,7 +195,8 @@ namespace Umbraco.ModelsBuilder.Configuration
             bool flagOutOfDateModels = true,
             ClrNameSource clrNameSource = DefaultClrNameSource,
             string modelsDirectory = null,
-            bool acceptUnsafeModelsDirectory = false)
+            bool acceptUnsafeModelsDirectory = false,
+            int debugLevel = 0)
         {
             Enable = enable;
             ModelsMode = modelsMode;
@@ -199,6 +211,7 @@ namespace Umbraco.ModelsBuilder.Configuration
             ClrNameSource = clrNameSource;
             ModelsDirectory = string.IsNullOrWhiteSpace(modelsDirectory) ? DefaultModelsDirectory : modelsDirectory;
             AcceptUnsafeModelsDirectory = acceptUnsafeModelsDirectory;
+            DebugLevel = debugLevel;
         }
 
         // internal for tests
@@ -345,5 +358,11 @@ namespace Umbraco.ModelsBuilder.Configuration
         /// <remarks>An unsafe value is an absolute path, or a relative path pointing outside
         /// of the website root.</remarks>
         public bool AcceptUnsafeModelsDirectory { get; }
+
+        /// <summary>
+        /// Gets a value indicating the debug log level.
+        /// </summary>
+        /// <remarks>0 means minimal (safe on live site), anything else means more and more details (maybe not safe).</remarks>
+        public int DebugLevel { get; }
     }
 }

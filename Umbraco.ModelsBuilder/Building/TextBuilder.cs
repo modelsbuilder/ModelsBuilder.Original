@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using Lucene.Net.Util;
 using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Api;
 using Umbraco.ModelsBuilder.Configuration;
@@ -244,8 +246,12 @@ namespace Umbraco.ModelsBuilder.Building
 
             sb.Append("\t\tpublic ");
             WriteClrType(sb, property.ClrType);
-            sb.AppendFormat(" {0} => {1}.{2}(this);\n",
-                property.ClrName, mixinClrName, MixinStaticGetterName(property.ClrName));
+
+            sb.AppendFormat(" {0} => ",
+                property.ClrName);
+            WriteNonGenericClrType(sb, GetModelsNamespace() + "." + mixinClrName);
+            sb.AppendFormat(".{0}(this);\n",
+                MixinStaticGetterName(property.ClrName));
         }
 
         private static string MixinStaticGetterName(string clrName)
@@ -258,6 +264,27 @@ namespace Umbraco.ModelsBuilder.Building
             var mixinStatic = mixinClrName != null;
 
             sb.Append("\n");
+
+            if (property.Errors != null)
+            {
+                sb.Append("\t\t/*\n");
+                sb.Append("\t\t * THIS PROPERTY CANNOT BE IMPLEMENTED, BECAUSE:\n");
+                sb.Append("\t\t *\n");
+                var first = true;
+                foreach (var error in property.Errors)
+                {
+                    if (first) first = false;
+                    else sb.Append("\t\t *\n");
+                    foreach (var s in SplitError(error))
+                    {
+                        sb.Append("\t\t * ");
+                        sb.Append(s);
+                        sb.Append("\n");
+                    }
+                }
+                sb.Append("\t\t *\n");
+                sb.Append("\n");
+            }
 
             // Adds xml summary to each property containing
             // property name and property description
@@ -298,6 +325,13 @@ namespace Umbraco.ModelsBuilder.Building
                     property.Alias);
             }
 
+            if (property.Errors != null)
+            {
+                sb.Append("\n");
+                sb.Append("\t\t *\n");
+                sb.Append("\t\t */\n");
+            }
+
             if (!mixinStatic) return;
 
             var mixinStaticGetterName = MixinStaticGetterName(property.ClrName);
@@ -323,14 +357,57 @@ namespace Umbraco.ModelsBuilder.Building
                 property.Alias);
         }
 
+        private static IEnumerable<string> SplitError(string error)
+        {
+            var p = 0;
+            while (p < error.Length)
+            {
+                var n = p + 50;
+                while (n < error.Length && error[n] != ' ') n++;
+                if (n >= error.Length) break;
+                yield return error.Substring(p, n - p);
+                p = n + 1;
+            }
+            if (p < error.Length)
+                yield return error.Substring(p);
+        }
+
         private void WriteInterfaceProperty(StringBuilder sb, PropertyModel property)
         {
+            if (property.Errors != null)
+            {
+                sb.Append("\t\t/*\n");
+                sb.Append("\t\t * THIS PROPERTY CANNOT BE IMPLEMENTED, BECAUSE:\n");
+                sb.Append("\t\t *\n");
+                var first = true;
+                foreach (var error in property.Errors)
+                {
+                    if (first) first = false;
+                    else sb.Append("\t\t *\n");
+                    foreach (var s in SplitError(error))
+                    {
+                        sb.Append("\t\t * ");
+                        sb.Append(s);
+                        sb.Append("\n");
+                    }
+                }
+                sb.Append("\t\t *\n");
+                sb.Append("\n");
+            }
+
             if (!string.IsNullOrWhiteSpace(property.Name))
                 sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString(property.Name));
             sb.Append("\t\t");
             WriteClrType(sb, property.ClrType);
             sb.AppendFormat(" {0} {{ get; }}\n",
                 property.ClrName);
+
+            if (property.Errors != null)
+            {
+                sb.Append("\n");
+                sb.Append("\t\t *\n");
+                sb.Append("\t\t */\n");
+            }
         }
 
         // internal for unit tests
@@ -359,10 +436,9 @@ namespace Umbraco.ModelsBuilder.Building
 
         private void WriteNonGenericClrType(StringBuilder sb, string s)
         {
-            string typeName;
 
             // takes care eg of "System.Int32" vs. "int"
-            if (TypesMap.TryGetValue(s.ToLowerInvariant(), out typeName))
+            if (TypesMap.TryGetValue(s.ToLowerInvariant(), out string typeName))
             {
                 sb.Append(typeName);
                 return;

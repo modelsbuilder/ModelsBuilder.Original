@@ -111,6 +111,8 @@ namespace Umbraco.ModelsBuilder.Building
         /// </remarks>
         private void Prepare()
         {
+            var pureLive = UmbracoConfig.For.ModelsBuilder().ModelsMode == ModelsMode.PureLive;
+
             // mark IsContentIgnored models that we discovered should be ignored
             // then propagate / ignore children of ignored contents
             // ignore content = don't generate a class for it, don't generate children
@@ -152,6 +154,11 @@ namespace Umbraco.ModelsBuilder.Building
                     property.ClrName = ParseResult.PropertyClrName(ParseResult.ContentClrName(typeModel.Alias) ?? typeModel.ClrName, property.Alias) ?? property.ClrName;
             }
 
+            // for the first two of these two tests,
+            //  always throw, even in purelive: cannot happen unless ppl start fidling with attributes to rename
+            //  things, and then they should pay attention to the generation error log - there's no magic here
+            // for the last one, don't throw in purelive, see comment
+
             // ensure we have no duplicates type names
             foreach (var xx in _typeModels.Where(x => !x.IsContentIgnored).GroupBy(x => x.ClrName).Where(x => x.Count() > 1))
                 throw new InvalidOperationException($"Type name \"{xx.Key}\" is used"
@@ -167,10 +174,24 @@ namespace Umbraco.ModelsBuilder.Building
 
             // ensure content & property type don't have identical name (csharp hates it)
             foreach (var typeModel in _typeModels.Where(x => !x.IsContentIgnored))
+            {
                 foreach (var xx in typeModel.Properties.Where(x => !x.IsIgnored && x.ClrName == typeModel.ClrName))
-                    throw new InvalidOperationException($"The model class for content type with alias \"{typeModel.Alias}\" is named \"{xx.ClrName}\"."
-                        + $" CSharp does not support using the same name for the property with alias \"{xx.Alias}\"."
+                {
+                    if (!pureLive)
+                        throw new InvalidOperationException($"The model class for content type with alias \"{typeModel.Alias}\" is named \"{xx.ClrName}\"."
+                            + $" CSharp does not support using the same name for the property with alias \"{xx.Alias}\"."
+                            + " Consider using an attribute to assign a different name to the property.");
+
+                    // for purelive, will we generate a commented out properties with an error message,
+                    // instead of throwing, because then it kills the sites and ppl don't understand why
+                    xx.AddError($"The class {typeModel.ClrName} cannot implement this property, because"
+                        + $" CSharp does not support naming the property with alias \"{xx.Alias}\" with the same name as content type with alias \"{typeModel.Alias}\"."
                         + " Consider using an attribute to assign a different name to the property.");
+
+                    // will not be implemented on interface nor class
+                    // note: we will still create the static getter, and implement the property on other classes...
+                }
+            }
 
             // ensure we have no collision between base types
             // NO: we may want to define a base class in a partial, on a model that has a parent

@@ -22,7 +22,7 @@ using File = System.IO.File;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
-    class PureLiveModelFactory : IPublishedContentModelFactory, IRegisteredObject
+    internal class PureLiveModelFactory : IPublishedContentModelFactory, IRegisteredObject
     {
         private Assembly _modelsAssembly;
         private Dictionary<string, Func<IPublishedContent, IPublishedContent>> _constructors;
@@ -31,12 +31,19 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private bool _pendingRebuild;
         private readonly ProfilingLogger _logger;
         private readonly FileSystemWatcher _watcher;
-        private int _ver;
+        private int _ver, _skipver;
+        private readonly int _debugLevel;
+        private BuildManager _theBuildManager;
+
+        private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
+        private const string ProjVirt = "~/App_Data/Models/all.generated.cs";
+        private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err" };
 
         public PureLiveModelFactory(ProfilingLogger logger)
         {
             _logger = logger;
             _ver = 1; // zero is for when we had no version
+            _skipver = -1; // nothing to skip
             ContentTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModels();
             DataTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModels();
             RazorBuildProvider.CodeGenerationStarted += RazorBuildProvider_CodeGenerationStarted;
@@ -54,6 +61,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
             _watcher = new FileSystemWatcher(modelsDirectory);
             _watcher.Changed += WatcherOnChanged;
             _watcher.EnableRaisingEvents = true;
+
+            // get it here, this need to be fast
+            _debugLevel = UmbracoConfig.For.ModelsBuilder().DebugLevel;
         }
 
         #region IPublishedContentModelFactory
@@ -69,8 +79,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             var contentTypeAlias = content.DocumentTypeAlias;
 
             // lookup model constructor (else null)
-            Func<IPublishedContent, IPublishedContent> constructor;
-            constructors.TryGetValue(contentTypeAlias, out constructor);
+            constructors.TryGetValue(contentTypeAlias, out Func<IPublishedContent, IPublishedContent> constructor);
 
             // create model
             return constructor == null ? content : constructor(content);
@@ -80,28 +89,60 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         #region Compilation
 
+        // deadlock note
+        //
+        // when RazorBuildProvider_CodeGenerationStarted runs, the thread has Monitor.Enter-ed the BuildManager
+        // singleton instance, through a call to CompilationLock.GetLock in BuildManager.GetVPathBuildResultInternal,
+        // and now wants to lock _locker.
+        // when EnsureModels runs, the thread locks _locker and then wants BuildManager to compile, which in turns
+        // requires that the BuildManager can Monitor.Enter-ed itself.
+        // so:
+        //
+        // T1 - needs to ensure models, locks _locker
+        // T2 - needs to compile a view, locks BuildManager
+        //      hits RazorBuildProvider_CodeGenerationStarted
+        //      wants to lock _locker, wait
+        // T1 - needs to compile models, using BuildManager
+        //      wants to lock itself, wait
+        // <deadlock>
+        //
+        // until ASP.NET kills the long-running request (thread abort)
+        //
+        // problem is, we *want* to suspend views compilation while the models assembly is being changed else we
+        // end up with views compiled and cached with the old assembly, while models come from the new assembly,
+        // which gives more YSOD. so we *have* to lock _locker in RazorBuildProvider_CodeGenerationStarted.
+        //
+        // one "easy" solution consists in locking the BuildManager *before* _locker in EnsureModels, thus ensuring
+        // we always lock in the same order, and getting rid of deadlocks - but that requires having access to the
+        // current BuildManager instance, which is BuildManager.TheBuildManager, which is an internal property.
+        //
+        // well, that's what we are doing in this class' TheBuildManager property, using reflection.
+
         private void RazorBuildProvider_CodeGenerationStarted(object sender, EventArgs e)
         {
-            // just be safe - can happen if the first view is not an Umbraco view
-            if (_modelsAssembly == null) return;
-
-            _locker.EnterReadLock(); // that should ensure no race
             try
             {
-                _logger.Logger.Debug<PureLiveModelFactory>("RazorBuildProvider.CodeGenerationStarted");
-                var provider = sender as RazorBuildProvider;
-                provider?.AssemblyBuilder.AddAssemblyReference(_modelsAssembly);
+                _locker.EnterReadLock();
 
-                // add a dependency to a text file that will change on each compilation
-                // as in some environments (could not figure which/why) the BuildManager
+                // just be safe - can happen if the first view is not an Umbraco view,
+                // or if something went wrong and we don't have an assembly at all
+                if (_modelsAssembly == null) return;
+
+                if (_debugLevel > 0)
+                    _logger.Logger.Debug<PureLiveModelFactory>("RazorBuildProvider.CodeGenerationStarted");
+                var provider = sender as RazorBuildProvider;
+                if (provider == null) return;
+
+                // add the assembly, and add a dependency to a text file that will change on each
+                // compilation as in some environments (could not figure which/why) the BuildManager
                 // would not re-compile the views when the models assembly is rebuilt.
-                //
-                //provider?.AddVirtualPathDependency("~/App_Data/Models/models.dep");
-                provider?.AddVirtualPathDependency(ProjVirt);
+                provider.AssemblyBuilder.AddAssemblyReference(_modelsAssembly);
+                provider.AddVirtualPathDependency(ProjVirt);
             }
             finally
             {
-                _locker.ExitReadLock();
+                if (_locker.IsReadLockHeld)
+                    _locker.ExitReadLock();
             }
         }
 
@@ -109,36 +150,66 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private void ResetModels()
         {
             _logger.Logger.Debug<PureLiveModelFactory>("Resetting models.");
-            _locker.EnterWriteLock();
+
             try
             {
+                _locker.EnterWriteLock();
+
                 _hasModels = false;
                 _pendingRebuild = true;
             }
             finally
             {
-                _locker.ExitWriteLock();
+                if (_locker.IsWriteLockHeld)
+                    _locker.ExitWriteLock();
+            }
+        }
+
+        // gets "the" build manager
+        private BuildManager TheBuildManager
+        {
+            get
+            {
+                if (_theBuildManager != null) return _theBuildManager;
+                var prop = typeof (BuildManager).GetProperty("TheBuildManager", BindingFlags.NonPublic | BindingFlags.Static);
+                if (prop == null)
+                    throw new InvalidOperationException("Could not get BuildManager.TheBuildManager property.");
+                _theBuildManager = (BuildManager) prop.GetValue(null);
+                return _theBuildManager;
             }
         }
 
         // ensure that the factory is running with the lastest generation of models
         internal Dictionary<string, Func<IPublishedContent, IPublishedContent>> EnsureModels()
         {
-            _logger.Logger.Debug<PureLiveModelFactory>("Ensuring models.");
-            _locker.EnterReadLock();
+            if (_debugLevel > 0)
+                _logger.Logger.Debug<PureLiveModelFactory>("Ensuring models.");
+
+            // don't use an upgradeable lock here because only 1 thread at a time could enter it
             try
             {
-                if (_hasModels) return _constructors;
+                _locker.EnterReadLock();
+                if (_hasModels)
+                    return _constructors;
             }
             finally
             {
-                _locker.ExitReadLock();
+                if (_locker.IsReadLockHeld)
+                    _locker.ExitReadLock();
             }
 
-            _locker.EnterWriteLock();
+            var buildManagerLocked = false;
             try
             {
+                // always take the BuildManager lock *before* taking the _locker lock
+                // to avoid possible deadlock situations (see notes above)
+                Monitor.Enter(TheBuildManager, ref buildManagerLocked);
+
+                _locker.EnterUpgradeableReadLock();
+
                 if (_hasModels) return _constructors;
+
+                _locker.EnterWriteLock();
 
                 // we don't have models,
                 // either they haven't been loaded from the cache yet
@@ -164,12 +235,20 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     }
                     catch (Exception e)
                     {
-                        _logger.Logger.Error<PureLiveModelFactory>("Failed to build models.", e);
-                        _logger.Logger.Warn<PureLiveModelFactory>("Running without models."); // be explicit
-                        ModelsGenerationError.Report("Failed to build PureLive models.", e);
-                        _modelsAssembly = null;
-                        _constructors = null;
+                        try
+                        {
+                            _logger.Logger.Error<PureLiveModelFactory>("Failed to build models.", e);
+                            _logger.Logger.Warn<PureLiveModelFactory>("Running without models."); // be explicit
+                            ModelsGenerationError.Report("Failed to build PureLive models.", e);
+                        }
+                        finally
+                        {
+                            _modelsAssembly = null;
+                            _constructors = null;
+                        }
                     }
+
+                    // don't even try again
                     _hasModels = true;
                 }
 
@@ -177,12 +256,14 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
             finally
             {
-                _locker.ExitWriteLock();
+                if (_locker.IsWriteLockHeld)
+                    _locker.ExitWriteLock();
+                if (_locker.IsUpgradeableReadLockHeld)
+                    _locker.ExitUpgradeableReadLock();
+                if (buildManagerLocked)
+                    Monitor.Exit(TheBuildManager);
             }
         }
-
-        private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
-        private const string ProjVirt = "~/App_Data/Models/all.generated.cs";
 
         private Assembly GetModelsAssembly(bool forceRebuild)
         {
@@ -203,9 +284,10 @@ namespace Umbraco.ModelsBuilder.Umbraco
             var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
             var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
             var projFile = Path.Combine(modelsDirectory, "all.generated.cs");
+            var dllPathFile = Path.Combine(modelsDirectory, "all.dll.path");
 
             // caching the generated models speeds up booting
-            // if you change your own partials, delete the .generated.cs file to force a rebuild
+            // currentHash hashes both the types & the user's partials
 
             if (!forceRebuild)
             {
@@ -226,9 +308,30 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 }
             }
 
+            Assembly assembly;
             if (forceRebuild == false)
             {
-                _logger.Logger.Debug<PureLiveModelFactory>("Loading cached models.");
+                // try to load the dll directly (avoid rebuilding)
+                if (File.Exists(dllPathFile))
+                {
+                    var dllPath = File.ReadAllText(dllPathFile);
+                    if (File.Exists(dllPath))
+                    {
+                        assembly = Assembly.LoadFile(dllPath);
+                        var attr = assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
+                        if (attr != null && attr.PureLive && attr.SourceHash == currentHash)
+                        {
+                            // if we were to resume at that revision, then _ver would keep increasing
+                            // and that is probably a bad idea - so, we'll always rebuild starting at
+                            // ver 1, but we remember we want to skip that one - so we never end up
+                            // with the "same but different" version of the assembly in memory
+                            _skipver = assembly.GetName().Version.Revision;
+
+                            _logger.Logger.Debug<PureLiveModelFactory>("Loading cached models (dll).");
+                            return assembly;
+                        }
+                    }
+                }
 
                 // mmust reset the version in the file else it would keep growing
                 // loading cached modules only happens when the app restarts
@@ -246,7 +349,11 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 //File.WriteAllText(Path.Combine(modelsDirectory, "models.dep"), "VER:" + _ver);
 
                 _ver++;
-                return BuildManager.GetCompiledAssembly(ProjVirt);
+                assembly = BuildManager.GetCompiledAssembly(ProjVirt);
+                File.WriteAllText(dllPathFile, assembly.Location);
+
+                _logger.Logger.Debug<PureLiveModelFactory>("Loading cached models (source).");
+                return assembly;
             }
 
             // need to rebuild
@@ -257,9 +364,11 @@ namespace Umbraco.ModelsBuilder.Umbraco
             // add extra attributes,
             //  PureLiveAssembly helps identifying Assemblies that contain PureLive models
             //  AssemblyVersion is so that we have a different version for each rebuild
+            var ver = _ver == _skipver ? ++_ver : _ver;
+            _ver++;
             code = code.Replace("//ASSATTR", $@"[assembly: PureLiveAssembly]
 [assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = ""{currentHash}"")]
-[assembly:System.Reflection.AssemblyVersion(""0.0.0.{_ver++}"")]");
+[assembly:System.Reflection.AssemblyVersion(""0.0.0.{ver}"")]");
             File.WriteAllText(modelsSrcFile, code);
 
             // generate proj, save
@@ -268,7 +377,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
             File.WriteAllText(projFile, proj);
 
             // compile and register
-            var assembly = BuildManager.GetCompiledAssembly(ProjVirt);
+            assembly = BuildManager.GetCompiledAssembly(ProjVirt);
+            File.WriteAllText(dllPathFile, assembly.Location);
 
             // assuming we can write and it's not going to cause exceptions...
             File.WriteAllText(modelsHashFile, currentHash);
@@ -381,8 +491,27 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private void WatcherOnChanged(object sender, FileSystemEventArgs args)
         {
-            if (_hasModels)
-                ResetModels();
+            var changed = args.Name;
+
+            // don't reset when our files change because we are building!
+            //
+            // comment it out, and always ignore our files, because it seems that some
+            // race conditions can occur on slow Cloud filesystems and then we keep
+            // rebuilding
+
+            //if (_building && OurFiles.Contains(changed))
+            //{
+            //    //_logger.Logger.Info<PureLiveModelFactory>("Ignoring files self-changes.");
+            //    return;
+            //}
+
+            // always ignore our own file changes
+            if (OurFiles.Contains(changed))
+                return;
+
+            _logger.Logger.Info<PureLiveModelFactory>("Detected files changes.");
+
+            ResetModels();
         }
 
         public void Stop(bool immediate)
