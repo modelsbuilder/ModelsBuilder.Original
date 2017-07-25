@@ -30,11 +30,16 @@ namespace Umbraco.ModelsBuilder.Building
         public string ClrName;
 
         /// <summary>
-        /// Gets the CLR type of the property values.
+        /// Gets the Model Clr type of the property values.
         /// </summary>
         /// <remarks>As indicated by the <c>PublishedPropertyType</c>, ie by the <c>IPropertyValueConverter</c>
-        /// if any, else <c>object</c>.</remarks>
-        public Type ClrType;
+        /// if any, else <c>object</c>. May include some ModelType that will need to be mapped.</remarks>
+        public Type ModelClrType;
+
+        /// <summary>
+        /// Gets the CLR type of the property values.
+        /// </summary>
+        //public Type ClrType;
 
         /// <summary>
         /// Gets a value indicating whether this property should be excluded from generation.

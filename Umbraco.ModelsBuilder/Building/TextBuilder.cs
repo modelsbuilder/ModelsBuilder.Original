@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
-using Lucene.Net.Util;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Configuration;
-using Umbraco.ModelsBuilder.Api;
 using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Building
@@ -245,7 +243,7 @@ namespace Umbraco.ModelsBuilder.Building
             sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
 
             sb.Append("\t\tpublic ");
-            WriteClrType(sb, property.ClrType);
+            WriteClrType(sb, property.ModelClrType);
 
             sb.AppendFormat(" {0} => ",
                 property.ClrName);
@@ -305,20 +303,20 @@ namespace Umbraco.ModelsBuilder.Building
             if (mixinStatic)
             {
                 sb.Append("\t\tpublic ");
-                WriteClrType(sb, property.ClrType);
+                WriteClrType(sb, property.ModelClrType);
                 sb.AppendFormat(" {0} => {1}(this);\n",
                     property.ClrName, MixinStaticGetterName(property.ClrName));
             }
             else
             {
                 sb.Append("\t\tpublic ");
-                WriteClrType(sb, property.ClrType);
+                WriteClrType(sb, property.ModelClrType);
                 sb.AppendFormat(" {0} => this.Value",
                     property.ClrName);
-                if (property.ClrType != typeof(object))
+                if (property.ModelClrType != typeof(object))
                 {
                     sb.Append("<");
-                    WriteClrType(sb, property.ClrType);
+                    WriteClrType(sb, property.ModelClrType);
                     sb.Append(">");
                 }
                 sb.AppendFormat("(\"{0}\");\n",
@@ -344,13 +342,13 @@ namespace Umbraco.ModelsBuilder.Building
                 sb.AppendFormat("\t\t/// <summary>Static getter for {0}</summary>\n", XmlCommentString(property.Name));
 
             sb.Append("\t\tpublic static ");
-            WriteClrType(sb, property.ClrType);
+            WriteClrType(sb, property.ModelClrType);
             sb.AppendFormat(" {0}(I{1} that) => that.Value",
                 mixinStaticGetterName, mixinClrName);
-            if (property.ClrType != typeof(object))
+            if (property.ModelClrType != typeof(object))
             {
                 sb.Append("<");
-                WriteClrType(sb, property.ClrType);
+                WriteClrType(sb, property.ModelClrType);
                 sb.Append(">");
             }
             sb.AppendFormat("(\"{0}\");\n",
@@ -398,7 +396,7 @@ namespace Umbraco.ModelsBuilder.Building
             if (!string.IsNullOrWhiteSpace(property.Name))
                 sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString(property.Name));
             sb.Append("\t\t");
-            WriteClrType(sb, property.ClrType);
+            WriteClrType(sb, property.ModelClrType);
             sb.AppendFormat(" {0} {{ get; }}\n",
                 property.ClrName);
 
@@ -436,6 +434,8 @@ namespace Umbraco.ModelsBuilder.Building
 
         private void WriteNonGenericClrType(StringBuilder sb, string s)
         {
+            // map model types
+            s = Regex.Replace(s, @"\{(.*)\}\[\*\]", m => ModelsMap[m.Groups[1].Value + "[]"]);
 
             // takes care eg of "System.Int32" vs. "int"
             if (TypesMap.TryGetValue(s.ToLowerInvariant(), out string typeName))

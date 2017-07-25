@@ -625,7 +625,7 @@ namespace Dang
             {
                 Alias = "prop1",
                 ClrName = "Prop1",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
 
             var types = new[] { type1 };
@@ -678,19 +678,19 @@ namespace Models
             {
                 Alias = "prop1",
                 ClrName = "Prop1",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop2",
                 ClrName = "Prop2",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "pprop3",
                 ClrName = "Pprop3",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
 
             var types = new[] { type1 };
@@ -747,7 +747,7 @@ namespace Models
             {
                 Alias = "prop1",
                 ClrName = "Prop1",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
 
             var types = new[] { type1 };
@@ -804,7 +804,7 @@ namespace Models
             {
                 Alias = "prop1",
                 ClrName = "Prop1",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
 
             var types = new[] { type1 };
@@ -859,7 +859,7 @@ namespace Models
             {
                 Alias = "prop1",
                 ClrName = "Prop1",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
 
             var types = new[] { type1 };
@@ -918,7 +918,7 @@ namespace Models
             {
                 Alias = "prop1",
                 ClrName = "Prop1",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
 
             var types = new[] { type1 };
@@ -972,7 +972,7 @@ namespace Models
             {
                 Alias = "prop1",
                 ClrName = "Prop1",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
 
             var types = new[] { type1 };
@@ -1028,7 +1028,7 @@ namespace Models
             {
                 Alias = "prop1",
                 ClrName = "Prop1",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
             var types = new[] { type1 };
 
@@ -1086,19 +1086,19 @@ namespace Dang
             {
                 Alias = "prop1a",
                 ClrName = "Prop1a",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1b",
                 ClrName = "Prop1b",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1c",
                 ClrName = "Prop1c",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
             var type2 = new TypeModel
             {
@@ -1113,7 +1113,7 @@ namespace Dang
             {
                 Alias = "prop2",
                 ClrName = "Prop2",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
             var types = new[] { type1, type2 };
 
@@ -1221,13 +1221,13 @@ namespace Dang
             {
                 Alias = "prop1a",
                 ClrName = "Prop1a",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1b",
                 ClrName = "Prop1b",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
 
             var type2 = new TypeModel
@@ -1244,7 +1244,7 @@ namespace Dang
             {
                 Alias = "prop2",
                 ClrName = "Prop2",
-                ClrType = typeof(int),
+                ModelClrType = typeof(int),
             });
 
             var types = new[] { type1, type2 };
@@ -1409,7 +1409,7 @@ namespace Umbraco.Web.PublishedContentModels
             {
                 Alias = "prop1",
                 ClrName = "Prop1",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
 
             var types = new[] { type1 };
@@ -1494,7 +1494,7 @@ namespace Umbraco.Web.PublishedContentModels
             {
                 Alias = "prop1",
                 ClrName = "Prop1",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
 
             var types = new[] { type1 };
@@ -1598,7 +1598,7 @@ namespace Umbraco.Web.PublishedContentModels
             {
                 Alias = "prop1",
                 ClrName = "Prop1",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
 
             var types = new[] { type1 };
@@ -1711,7 +1711,7 @@ namespace Umbraco.Web.PublishedContentModels
             {
                 Alias = "prop1",
                 ClrName = "Prop1",
-                ClrType = typeof(string),
+                ModelClrType = typeof(string),
             });
 
             var type2 = new TypeModel
@@ -1728,7 +1728,7 @@ namespace Umbraco.Web.PublishedContentModels
             {
                 Alias = "prop2",
                 ClrName = "Prop2",
-                ClrType = typeof(int),
+                ModelClrType = typeof(int),
             });
 
             var types = new[] { type1, type2 };
@@ -1781,19 +1781,19 @@ namespace Umbraco.Web.PublishedContentModels
             {
                 Alias = "prop1",
                 ClrName = "Prop1",
-                ClrType = typeof(IPublishedContent),
+                ModelClrType = typeof(IPublishedContent),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop2",
                 ClrName = "Prop2",
-                ClrType = typeof(System.Text.StringBuilder),
+                ModelClrType = typeof(System.Text.StringBuilder),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop3",
                 ClrName = "Prop3",
-                ClrType = typeof(global::Umbraco.Core.IO.FileSecurityException),
+                ModelClrType = typeof(global::Umbraco.Core.IO.FileSecurityException),
             });
             var types = new[] { type1 };
 

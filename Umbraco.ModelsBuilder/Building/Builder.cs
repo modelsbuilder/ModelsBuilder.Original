@@ -23,6 +23,8 @@ namespace Umbraco.ModelsBuilder.Building
     internal abstract class Builder
     {
         private readonly IList<TypeModel> _typeModels;
+
+        protected Dictionary<string, string> ModelsMap { get; } = new Dictionary<string, string>();
         protected ParseResult ParseResult { get; }
 
         // the list of assemblies that will be 'using' by default
@@ -73,13 +75,8 @@ namespace Umbraco.ModelsBuilder.Building
         /// <param name="parseResult">The result of code parsing.</param>
         protected Builder(IList<TypeModel> typeModels, ParseResult parseResult)
         {
-            if (typeModels == null)
-                throw new ArgumentNullException(nameof(typeModels));
-            if (parseResult == null)
-                throw new ArgumentNullException(nameof(parseResult));
-
-            _typeModels = typeModels;
-            ParseResult = parseResult;
+            _typeModels = typeModels ?? throw new ArgumentNullException(nameof(typeModels));
+            ParseResult = parseResult ?? throw new ArgumentNullException(nameof(parseResult));
 
             Prepare();
         }
@@ -126,6 +123,7 @@ namespace Umbraco.ModelsBuilder.Building
             {
                 typeModel.ClrName = ParseResult.ContentClrName(typeModel.Alias);
                 typeModel.IsRenamed = true;
+                ModelsMap[typeModel.Alias] = typeModel.ClrName;
             }
 
             // handle implement

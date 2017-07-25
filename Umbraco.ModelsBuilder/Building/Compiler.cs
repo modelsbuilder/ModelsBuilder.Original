@@ -149,6 +149,9 @@ namespace Umbraco.ModelsBuilder.Building
         private static void ThrowExceptionFromDiagnostic(IDictionary<string, string> files, Diagnostic diagnostic)
         {
             var message = diagnostic.GetMessage();
+            if (diagnostic.Location == Location.None)
+                throw new CompilerException(message);
+
             var position = diagnostic.Location.GetLineSpan().StartLinePosition.Line + 1;
             var path = diagnostic.Location.SourceTree.FilePath;
             var code = files.ContainsKey(path) ? files[path] : string.Empty;
@@ -158,6 +161,9 @@ namespace Umbraco.ModelsBuilder.Building
         private static void ThrowExceptionFromDiagnostic(string path, string code, Diagnostic diagnostic)
         {
             var message = diagnostic.GetMessage();
+            if (diagnostic.Location == Location.None)
+                throw new CompilerException(message);
+
             var position = diagnostic.Location.GetLineSpan().StartLinePosition.Line + 1;
             throw new CompilerException(message, path, code, position);
         }

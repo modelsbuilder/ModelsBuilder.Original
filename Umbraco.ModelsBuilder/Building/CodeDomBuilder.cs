@@ -50,7 +50,7 @@ namespace Umbraco.ModelsBuilder.Building
                     var p = new CodeMemberProperty
                     {
                         Name = propertyModel.ClrName,
-                        Type = new CodeTypeReference(propertyModel.ClrType),
+                        Type = new CodeTypeReference(propertyModel.ModelClrType),
                         Attributes = MemberAttributes.Public,
                         HasGet = true,
                         HasSet = false
@@ -88,7 +88,7 @@ namespace Umbraco.ModelsBuilder.Building
                 var p = new CodeMemberProperty
                 {
                     Name = propertyModel.ClrName,
-                    Type = new CodeTypeReference(propertyModel.ClrType),
+                    Type = new CodeTypeReference(propertyModel.ModelClrType),
                     Attributes = MemberAttributes.Public,
                     HasGet = true,
                     HasSet = false
@@ -100,7 +100,7 @@ namespace Umbraco.ModelsBuilder.Building
                             "Value", // .Value
                             new[] // <T>
                             {
-                                new CodeTypeReference(propertyModel.ClrType)
+                                new CodeTypeReference(propertyModel.ModelClrType)
                             }),
                             new CodeExpression[] // ("alias")
                             {

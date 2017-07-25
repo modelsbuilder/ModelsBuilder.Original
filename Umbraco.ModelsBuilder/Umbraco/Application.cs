@@ -191,7 +191,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     if (publishedPropertyType == null)
                         throw new Exception($"Panic: could not get published property type {contentType.Alias}.{propertyType.Alias}.");
 
-                    propertyModel.ClrType = publishedPropertyType.ClrType;
+                    propertyModel.ModelClrType = publishedPropertyType.ModelClrType;
 
                     typeModel.Properties.Add(propertyModel);
                 }

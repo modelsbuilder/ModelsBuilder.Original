@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -25,7 +26,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
     internal class PureLiveModelFactory : IPublishedContentModelFactory, IRegisteredObject
     {
         private Assembly _modelsAssembly;
-        private Dictionary<string, Func<IPublishedContent, IPublishedContent>> _constructors;
+        private Infos _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
         private volatile bool _hasModels; // volatile 'cos reading outside lock
         private bool _pendingRebuild;
@@ -68,21 +69,30 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         #region IPublishedContentModelFactory
 
-        public IPublishedContent CreateModel(IPublishedContent content)
+        public IPropertySet CreateModel(IPropertySet set)
         {
             // get models, rebuilding them if needed
-            var constructors = EnsureModels();
-            if (constructors == null)
-                return content;
+            var infos = EnsureModels();
+            if (infos == null)
+                return set;
 
             // be case-insensitive
-            var contentTypeAlias = content.DocumentTypeAlias;
+            var contentTypeAlias = set.ContentType.Alias;
 
             // lookup model constructor (else null)
-            constructors.TryGetValue(contentTypeAlias, out Func<IPublishedContent, IPublishedContent> constructor);
+            infos.ModelInfos.TryGetValue(contentTypeAlias, out ModelInfo info);
 
             // create model
-            return constructor == null ? content : constructor(content);
+            return info == null ? set : info.Ctor(set);
+        }
+
+        public Dictionary<string, Type> ModelTypeMap
+        {
+            get
+            {
+                var infos = EnsureModels();
+                return infos.ModelTypeMap;
+            }
         }
 
         #endregion
@@ -180,7 +190,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         }
 
         // ensure that the factory is running with the lastest generation of models
-        internal Dictionary<string, Func<IPublishedContent, IPublishedContent>> EnsureModels()
+        internal Infos EnsureModels()
         {
             if (_debugLevel > 0)
                 _logger.Logger.Debug<PureLiveModelFactory>("Ensuring models.");
@@ -190,7 +200,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             {
                 _locker.EnterReadLock();
                 if (_hasModels)
-                    return _constructors;
+                    return _infos;
             }
             finally
             {
@@ -207,7 +217,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
                 _locker.EnterUpgradeableReadLock();
 
-                if (_hasModels) return _constructors;
+                if (_hasModels) return _infos;
 
                 _locker.EnterWriteLock();
 
@@ -230,7 +240,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                         _modelsAssembly = assembly;
 
                         var types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>());
-                        _constructors = RegisterModels(types);
+                        _infos = RegisterModels(types);
                         ModelsGenerationError.Clear();
                     }
                     catch (Exception e)
@@ -244,7 +254,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                         finally
                         {
                             _modelsAssembly = null;
-                            _constructors = null;
+                            _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
                         }
                     }
 
@@ -252,7 +262,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     _hasModels = true;
                 }
 
-                return _constructors;
+                return _infos;
             }
             finally
             {
@@ -387,30 +397,50 @@ namespace Umbraco.ModelsBuilder.Umbraco
             return assembly;
         }
 
-        private static Dictionary<string, Func<IPublishedContent, IPublishedContent>> RegisterModels(IEnumerable<Type> types)
+        private static Infos RegisterModels(IEnumerable<Type> types)
         {
-            var ctorArgTypes = new[] { typeof(IPublishedContent) };
-            var constructors = new Dictionary<string, Func<IPublishedContent, IPublishedContent>>(StringComparer.InvariantCultureIgnoreCase);
+            var ctorArgTypes = new[] { typeof(IPropertySet) };
+            var modelInfos = new Dictionary<string, ModelInfo>(StringComparer.InvariantCultureIgnoreCase);
+            var map = new Dictionary<string, Type>();
 
             foreach (var type in types)
             {
-                var constructor = type.GetConstructor(ctorArgTypes);
+                ConstructorInfo constructor = null;
+                Type parameterType = null;
+
+                foreach (var ctor in type.GetConstructors())
+                {
+                    var parms = ctor.GetParameters();
+                    if (parms.Length == 1 && typeof(IPropertySet).IsAssignableFrom(parms[0].ParameterType))
+                    {
+                        if (constructor != null)
+                            throw new InvalidOperationException($"Type {type.FullName} has more than one public constructor with one argument of type, or implementing, IPropertySet.");
+                        constructor = ctor;
+                        parameterType = parms[0].ParameterType;
+                    }
+                }
+
                 if (constructor == null)
-                    throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type IPublishedContent.");
+                    throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type, or implementing, IPropertySet.");
+
                 var attribute = type.GetCustomAttribute<PublishedContentModelAttribute>(false);
                 var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
 
-                if (constructors.ContainsKey(typeName))
-                    throw new InvalidOperationException($"More that one type want to be a model for content type {typeName}.");
+                if (modelInfos.TryGetValue(typeName, out ModelInfo modelInfo))
+                    throw new InvalidOperationException($"Both types {type.FullName} and {modelInfo.ModelType.FullName} want to be a model type for content type with alias \"{typeName}\".");
 
-                var exprArg = Expression.Parameter(typeof(IPublishedContent), "content");
-                var exprNew = Expression.New(constructor, exprArg);
-                var expr = Expression.Lambda<Func<IPublishedContent, IPublishedContent>>(exprNew, exprArg);
-                var func = expr.Compile();
-                constructors[typeName] = func;
+                var meth = new DynamicMethod(string.Empty, typeof(IPropertySet), ctorArgTypes, type.Module, true);
+                var gen = meth.GetILGenerator();
+                gen.Emit(OpCodes.Ldarg_0);
+                gen.Emit(OpCodes.Newobj, constructor);
+                gen.Emit(OpCodes.Ret);
+                var func = (Func<IPropertySet, IPropertySet>)meth.CreateDelegate(typeof(Func<IPropertySet, IPropertySet>));
+
+                modelInfos[typeName] = new ModelInfo { ParameterType = parameterType, Ctor = func, ModelType = type };
+                map[typeName] = type;
             }
 
-            return constructors.Count > 0 ? constructors : null;
+            return new Infos { ModelInfos = modelInfos.Count > 0 ? modelInfos : null, ModelTypeMap = map };
         }
 
         private static string GenerateModelsCode(IDictionary<string, string> ourFiles, IList<TypeModel> typeModels)
@@ -483,6 +513,19 @@ namespace Umbraco.ModelsBuilder.Umbraco
             text.Append("// EOF\r\n");
 
             return text.ToString();
+        }
+
+        internal class Infos
+        {
+            public Dictionary<string, Type> ModelTypeMap { get; set; }
+            public Dictionary<string, ModelInfo> ModelInfos { get; set; }
+        }
+
+        internal class ModelInfo
+        {
+            public Type ParameterType { get; set; }
+            public Func<IPropertySet, IPropertySet> Ctor { get; set; }
+            public Type ModelType { get; set; }
         }
 
         #endregion
