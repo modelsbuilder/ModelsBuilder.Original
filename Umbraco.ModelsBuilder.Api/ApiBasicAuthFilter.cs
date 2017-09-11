@@ -69,8 +69,8 @@ namespace Umbraco.ModelsBuilder.Api
             if (credentials.Length != 2)
                 return null;
 
-            var username = credentials[0];
-            var password = credentials[1];
+            var username = ApiClient.DecodeTokenElement(credentials[0]);
+            var password = ApiClient.DecodeTokenElement(credentials[1]);
 
             var providerKey = UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider;
             var provider = Membership.Providers[providerKey];
