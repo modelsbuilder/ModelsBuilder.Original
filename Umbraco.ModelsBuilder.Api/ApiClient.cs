@@ -143,7 +143,17 @@ namespace Umbraco.ModelsBuilder.Api
         private void AuthorizeBasic(HttpClient client)
         {
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                Convert.ToBase64String(Encoding.UTF8.GetBytes(_user + ':' + _password)));
+                Convert.ToBase64String(Encoding.UTF8.GetBytes(EncodeTokenElement(_user) + ':' + EncodeTokenElement(_password))));
+        }
+
+        public static string EncodeTokenElement(string s)
+        {
+            return s.Replace("%", "%a").Replace(":", "%b");
+        }
+
+        public static string DecodeTokenElement(string s)
+        {
+            return s.Replace("%b", ":").Replace("%a", "%");
         }
     }
 }
