@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="F5C32FC3-6672-4665-803D-6C5D2CAC556A" Version="8.0.0.7" Language="en-US" Publisher="Umbraco HQ" />
+    <DisplayName>Umbraco ModelsBuilder Custom Tool</DisplayName>
+    <Description xml:space="preserve">Umbraco Visual Studio Custom Tool for generating strongly typed IPublishedContent models.</Description>
+    <MoreInfo>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</MoreInfo>
+    <License>license.txt</License>
+    <Icon>u32.png</Icon>
+    <Tags>umbraco</Tags>
+  </Metadata>
+  <Installation InstalledByMsi="false">
+    <!--
+      11.0 is Visual Studio 2012
+      12.0 is Visual Studio 2013
+      13.0 does not exist
+      14.0 is Visual Studio 2015
+      15.0 is Visual Studio 2017
+    -->
+    <InstallationTarget Version="[11.0,15.0]" Id="Microsoft.VisualStudio.IntegratedShell" />
+  </Installation>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" />
+  </Prerequisites>
+  <Dependencies>
+    <!-- [4.5-5.0) means "4.5 <= version < 5.0" -->
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,5.0)" />
+    <!--
+      how should we target the proper version, depending on the Visual Studio
+      version we are installing on? or should there be a VSIX per version?
+      temp fixing by removing the dependency...
+    -->
+    <!--
+    <Dependency Id="Microsoft.VisualStudio.MPF.11.0"
+                DisplayName="Visual Studio MPF 11.0"
+                d:Source="Installed"
+                Version="11.0" />
+    -->
+  </Dependencies>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+  </Assets>
+</PackageManifest>
