@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,7 +24,7 @@ using File = System.IO.File;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
-    internal class PureLiveModelFactory : IPublishedContentModelFactory, IRegisteredObject
+    internal class PureLiveModelFactory : IPublishedModelFactory, IRegisteredObject
     {
         private Assembly _modelsAssembly;
         private Infos _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
@@ -67,32 +68,48 @@ namespace Umbraco.ModelsBuilder.Umbraco
             _debugLevel = UmbracoConfig.For.ModelsBuilder().DebugLevel;
         }
 
-        #region IPublishedContentModelFactory
+        #region IPublishedModelFactory
 
-        public IPropertySet CreateModel(IPropertySet set)
+        public IPublishedElement CreateModel(IPublishedElement element)
         {
             // get models, rebuilding them if needed
-            var infos = EnsureModels();
+            var infos = EnsureModels()?.ModelInfos;
             if (infos == null)
-                return set;
+                return element;
 
             // be case-insensitive
-            var contentTypeAlias = set.ContentType.Alias;
+            var contentTypeAlias = element.ContentType.Alias;
 
             // lookup model constructor (else null)
-            infos.ModelInfos.TryGetValue(contentTypeAlias, out ModelInfo info);
+            infos.TryGetValue(contentTypeAlias, out ModelInfo info);
 
             // create model
-            return info == null ? set : info.Ctor(set);
+            return info == null ? element : info.Ctor(element);
         }
 
-        public Dictionary<string, Type> ModelTypeMap
+        public Type MapModelType(Type type)
         {
-            get
-            {
-                var infos = EnsureModels();
-                return infos.ModelTypeMap;
-            }
+            var infos = EnsureModels();
+            return ModelType.Map(type, infos.ModelTypeMap);
+        }
+
+        public IList CreateModelList(string alias)
+        {
+            var infos = EnsureModels();
+
+            // fail fast
+            if (infos == null)
+                return new List<IPublishedElement>();
+
+            if (!infos.ModelInfos.TryGetValue(alias, out var modelInfo))
+                return new List<IPublishedElement>();
+
+            var ctor = modelInfo.ListCtor;
+            if (ctor != null) return ctor();
+
+            var listType = typeof(List<>).MakeGenericType(modelInfo.ModelType);
+            ctor = modelInfo.ListCtor = ReflectionUtilities.EmitCtor<Func<IList>>(declaring: listType);
+            return ctor();
         }
 
         #endregion
@@ -399,7 +416,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private static Infos RegisterModels(IEnumerable<Type> types)
         {
-            var ctorArgTypes = new[] { typeof(IPropertySet) };
+            var ctorArgTypes = new[] { typeof (IPublishedElement) };
             var modelInfos = new Dictionary<string, ModelInfo>(StringComparer.InvariantCultureIgnoreCase);
             var map = new Dictionary<string, Type>();
 
@@ -411,7 +428,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 foreach (var ctor in type.GetConstructors())
                 {
                     var parms = ctor.GetParameters();
-                    if (parms.Length == 1 && typeof(IPropertySet).IsAssignableFrom(parms[0].ParameterType))
+                    if (parms.Length == 1 && typeof (IPublishedElement).IsAssignableFrom(parms[0].ParameterType))
                     {
                         if (constructor != null)
                             throw new InvalidOperationException($"Type {type.FullName} has more than one public constructor with one argument of type, or implementing, IPropertySet.");
@@ -429,12 +446,13 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 if (modelInfos.TryGetValue(typeName, out ModelInfo modelInfo))
                     throw new InvalidOperationException($"Both types {type.FullName} and {modelInfo.ModelType.FullName} want to be a model type for content type with alias \"{typeName}\".");
 
-                var meth = new DynamicMethod(string.Empty, typeof(IPropertySet), ctorArgTypes, type.Module, true);
+                // fixme use Core's ReflectionUtilities.EmitCtor !!
+                var meth = new DynamicMethod(string.Empty, typeof (IPublishedElement), ctorArgTypes, type.Module, true);
                 var gen = meth.GetILGenerator();
                 gen.Emit(OpCodes.Ldarg_0);
                 gen.Emit(OpCodes.Newobj, constructor);
                 gen.Emit(OpCodes.Ret);
-                var func = (Func<IPropertySet, IPropertySet>)meth.CreateDelegate(typeof(Func<IPropertySet, IPropertySet>));
+                var func = (Func<IPublishedElement, IPublishedElement>) meth.CreateDelegate(typeof (Func<IPublishedElement, IPublishedElement>));
 
                 modelInfos[typeName] = new ModelInfo { ParameterType = parameterType, Ctor = func, ModelType = type };
                 map[typeName] = type;
@@ -524,8 +542,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
         internal class ModelInfo
         {
             public Type ParameterType { get; set; }
-            public Func<IPropertySet, IPropertySet> Ctor { get; set; }
+            public Func<IPublishedElement, IPublishedElement> Ctor { get; set; }
             public Type ModelType { get; set; }
+            public Func<IList> ListCtor { get; set; }
         }
 
         #endregion

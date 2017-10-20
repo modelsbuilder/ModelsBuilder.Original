@@ -182,10 +182,10 @@ namespace Umbraco.ModelsBuilder.Building
             sb.AppendFormat("\t\tpublic new const PublishedItemType ModelItemType = PublishedItemType.{0};\n",
                 type.ItemType);
             sb.Append("\t\tpublic new static PublishedContentType GetModelContentType()\n");
-            sb.Append("\t\t\t=> PublishedContentModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);\n");
+            sb.Append("\t\t\t=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);\n");
             sb.AppendFormat("\t\tpublic static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<{0}, TValue>> selector)\n",
                 type.ClrName);
-            sb.Append("\t\t\t=> PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);\n");
+            sb.Append("\t\t\t=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);\n");
             sb.Append("#pragma warning restore 0109\n\n");
 
             // write the ctor

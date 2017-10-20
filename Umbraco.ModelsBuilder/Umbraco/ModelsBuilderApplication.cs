@@ -53,7 +53,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private void InstallDefaultModelsFactory()
         {
             var types = Current.TypeLoader.GetTypes<PublishedContentModel>();
-            var factory = new PublishedContentModelFactory(types);
+            var factory = new PublishedModelFactory(types);
             PublishedContentModelFactoryResolver.Current.SetFactory(factory);
         }
 

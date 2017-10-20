@@ -3,7 +3,7 @@
 namespace Umbraco.ModelsBuilder
 {
     // NOTE
-    // that attribute should inherit from PublishedContentModelAttribute
+    // that attribute should inherit from PublishedModelAttribute
     // so we do not have different syntaxes
     // but... is sealed at the moment.
 

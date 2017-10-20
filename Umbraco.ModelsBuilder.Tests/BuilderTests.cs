@@ -1294,7 +1294,7 @@ using Umbraco.Web;
 using Umbraco.ModelsBuilder;
 using Umbraco.ModelsBuilder.Umbraco;
 
-namespace Umbraco.Web.PublishedContentModels
+namespace Umbraco.Web.PublishedModels
 {
 	// Mixin content Type 1 with alias ""type1""
 	public partial interface IType1 : IPublishedContent
@@ -1353,7 +1353,7 @@ using Umbraco.Web;
 using Umbraco.ModelsBuilder;
 using Umbraco.ModelsBuilder.Umbraco;
 
-namespace Umbraco.Web.PublishedContentModels
+namespace Umbraco.Web.PublishedModels
 {
 	[PublishedContentModel(""type2"")]
 	public partial class Type2 : PublishedContentModel, IType1
@@ -1379,10 +1379,10 @@ namespace Umbraco.Web.PublishedContentModels
 		public int Prop2 => this.Value<int>(""prop2"");
 
 		[ImplementPropertyType(""prop1a"")]
-		public string Prop1a => Umbraco.Web.PublishedContentModels.Type1.GetProp1a(this);
+		public string Prop1a => Umbraco.Web.PublishedModels.Type1.GetProp1a(this);
 
 		[ImplementPropertyType(""prop1b"")]
-		public string Prop1b => Umbraco.Web.PublishedContentModels.Type1.GetProp1b(this);
+		public string Prop1b => Umbraco.Web.PublishedModels.Type1.GetProp1b(this);
 	}
 }
 ";
@@ -1447,7 +1447,7 @@ using Umbraco.Web;
 using Umbraco.ModelsBuilder;
 using Umbraco.ModelsBuilder.Umbraco;
 
-namespace Umbraco.Web.PublishedContentModels
+namespace Umbraco.Web.PublishedModels
 {
 	[PublishedContentModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
@@ -1556,7 +1556,7 @@ using Umbraco.Web;
 using Umbraco.ModelsBuilder;
 using Umbraco.ModelsBuilder.Umbraco;
 
-namespace Umbraco.Web.PublishedContentModels
+namespace Umbraco.Web.PublishedModels
 {
 	[PublishedContentModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
@@ -1663,7 +1663,7 @@ using Umbraco.Web;
 using Umbraco.ModelsBuilder;
 using Umbraco.ModelsBuilder.Umbraco;
 
-namespace Umbraco.Web.PublishedContentModels
+namespace Umbraco.Web.PublishedModels
 {
 	// Content Type 1 with alias ""type1""
 	[PublishedContentModel(""type1"")]

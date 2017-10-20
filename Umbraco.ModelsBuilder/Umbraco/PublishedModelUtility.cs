@@ -6,7 +6,7 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
-    public static class PublishedContentModelUtility
+    public static class PublishedModelUtility
     {
         // looks safer but probably useless... ppl should not call these methods directly
         // and if they do... they have to take care about not doing stupid things

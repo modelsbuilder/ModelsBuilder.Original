@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
@@ -133,7 +134,15 @@ namespace Umbraco.ModelsBuilder.Umbraco
         {
             var typeModels = new List<TypeModel>();
             var uniqueTypes = new HashSet<string>();
-            var facade = FacadeServiceResolver.Current.Service.CreateFacade(null); // fixme
+
+            // fixme - we cannot require a facade when building models
+            // the facade may depend on models! so instead we should have a way to retrieve
+            // the current published types, maybe directly from the facade service indeed
+            //var facade = FacadeServiceResolver.Current.Service.CreateFacade(null);
+            // fixme - then, ReflectionUtilities has issues accessing that ctor, how come?
+            var ctor1 = typeof (PublishedContentType).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof (IContentType) }, null);
+            var ctor2 = typeof (PublishedContentType).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof (IMediaType) }, null);
+            var ctor3 = typeof (PublishedContentType).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof (IMemberType) }, null);
 
             // get the types and the properties
             foreach (var contentType in contentTypes)
@@ -160,15 +169,18 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 {
                     case PublishedItemType.Content:
                         typeModel.ItemType = TypeModel.ItemTypes.Content;
-                        publishedContentType = facade.ContentCache.GetContentType(contentType.Alias);
+                        //publishedContentType = facade.ContentCache.GetContentType(contentType.Alias);
+                        publishedContentType = (PublishedContentType) ctor1.Invoke(new[] { contentType });
                         break;
                     case PublishedItemType.Media:
                         typeModel.ItemType = TypeModel.ItemTypes.Media;
-                        publishedContentType = facade.MediaCache.GetContentType(contentType.Alias);
+                        //publishedContentType = facade.MediaCache.GetContentType(contentType.Alias);
+                        publishedContentType = (PublishedContentType) ctor2.Invoke(new[] { contentType });
                         break;
                     case PublishedItemType.Member:
                         typeModel.ItemType = TypeModel.ItemTypes.Member;
-                        publishedContentType = facade.MemberCache.GetContentType(contentType.Alias);
+                        //publishedContentType = facade.MemberCache.GetContentType(contentType.Alias);
+                        publishedContentType = (PublishedContentType) ctor3.Invoke(new[] { contentType });
                         break;
                     default:
                         throw new InvalidOperationException(string.Format("Unsupported PublishedItemType \"{0}\".", itemType));

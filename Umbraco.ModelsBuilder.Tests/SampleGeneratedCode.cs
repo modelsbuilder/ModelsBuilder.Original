@@ -192,9 +192,9 @@ namespace Umbraco.ModelsBuilder.Tests.Models
         public new const string ModelTypeAlias = "debugTextBuilder";
         public new const PublishedItemType ModelItemType = PublishedItemType.Content;
         public new static PublishedContentType GetModelContentType()
-            => PublishedContentModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+            => PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
         public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<DebugTextBuilder, TValue>> selector)
-            => PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+            => PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
         // ctor

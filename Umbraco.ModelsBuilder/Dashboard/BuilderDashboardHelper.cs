@@ -6,7 +6,7 @@ using Umbraco.ModelsBuilder.Umbraco;
 
 namespace Umbraco.ModelsBuilder.Dashboard
 {
-    internal static class DashboardHelper
+    internal static class BuilderDashboardHelper
     {
         public static bool CanGenerate()
         {

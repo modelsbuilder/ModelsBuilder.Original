@@ -79,10 +79,13 @@ Write-Host "Restoring NuGet packages, this may take a while depending on your pa
 # Set the version number in SolutionInfo.cs
 $SolutionInfoPath = Join-Path -Path $SolutionRoot -ChildPath "SolutionInfo.cs"
 (gc -Path $SolutionInfoPath) `
-	-replace "(?<=Version\(`")[.\d]*(?=`"\))", "$ReleaseVersionNumber.$BuildNumber" |
+	-replace "(?<=AssemblyVersion\(`")[.\d]*(?=`"\))", "$ReleaseVersionNumber" |
 	sc -Path $SolutionInfoPath -Encoding UTF8
 (gc -Path $SolutionInfoPath) `
-	-replace "(?<=AssemblyInformationalVersion\(`")[.\w-]*(?=`"\))", "$ReleaseVersionNumber.$BuildNumber$PreReleaseName" |
+	-replace "(?<=AssemblyFileVersion\(`")[.\d]*(?=`"\))", "$ReleaseVersionNumber.$BuildNumber" |
+	sc -Path $SolutionInfoPath -Encoding UTF8
+(gc -Path $SolutionInfoPath) `
+	-replace "(?<=AssemblyInformationalVersion\(`")[.\w-]*(?=`"\))", "$ReleaseVersionNumber$PreReleaseName" |
 	sc -Path $SolutionInfoPath -Encoding UTF8
 # Set the copyright
 $Copyright = "Copyright © Umbraco HQ " + (Get-Date).year;
