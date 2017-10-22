@@ -18,3 +18,8 @@ Umbraco.ModelsBuilder/App_Data/NuGetBackup/*
 .Umbraco.ModelsBuilder.boltdata/*
 *.pdb/
 _ReSharper.Caches/*
+
+build/temp/
+build/hooks/
+build.tmp/
+build.out/

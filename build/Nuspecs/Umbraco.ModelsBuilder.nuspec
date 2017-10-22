@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata minClientVersion="2.8.1">
+    <id>Umbraco.ModelsBuilder</id>
+    <version>$version$</version>
+    <title>Umbraco ModelsBuilder</title>
+    <authors>Umbraco HQ</authors>
+    <owners>Umbraco HQ</owners>
+    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
+    <description>Umbraco ModelsBuilder.</description>
+    <projectUrl>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</projectUrl>
+    <copyright>$copyright$</copyright>
+    <language>en-US</language>
+    <tags>umbraco</tags>
+    <dependencies>
+        <dependency id="Microsoft.CodeAnalysis.CSharp" version="2.3.0" />
+    </dependencies>
+	</metadata>
+	<files>
+        <!-- our dlls -->
+        <file src="$solution$\build.tmp\bin\Umbraco.ModelsBuilder.dll" target="lib\Umbraco.ModelsBuilder.dll" />
+        <file src="$solution$\build.tmp\bin\Umbraco.ModelsBuilder.pdb" target="lib\Umbraco.ModelsBuilder.pdb" />
+
+        <!-- content for the dashboard -->
+        <file src="$solution$\src\Umbraco.ModelsBuilder\Dashboard\modelsbuilder.htm" target="content\App_Plugins\ModelsBuilder\modelsbuilder.htm" />
+        <file src="$solution$\src\Umbraco.ModelsBuilder\Dashboardmodelsbuilder.controller.js" target="content\App_Plugins\ModelsBuilder\modelsbuilder.controller.js" />
+        <file src="$solution$\src\Umbraco.ModelsBuilder\Dashboardmodelsbuilder.resource.js" target="content\App_Plugins\ModelsBuilder\modelsbuilder.resource.js" />
+        <file src="$solution$\src\Umbraco.ModelsBuilder\Dashboardpackage.manifest" target="content\App_Plugins\ModelsBuilder\package.manifest" />
+
+        <!-- transforms -->
+        <file src="$solution$\build\nuspecs\ModelsBuilder\web.config.install.xdt" target="content" />
+        <file src="$solution$\build\nuspecs\ModelsBuilder\web.config.uninstall.xdt" target="content" />
+        <file src="$solution$\build\nuspecs\ModelsBuilder\dashboard.config.install.xdt" target="content\config" />
+        <file src="$solution$\build\nuspecs\ModelsBuilder\dashboard.config.uninstall.xdt" target="content\config" />
+  </files>
+</package>

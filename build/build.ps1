@@ -1,150 +1,169 @@
-param (
-	[Parameter(Mandatory=$true)]
-	[ValidatePattern("\d+?\.\d+?\.\d")]
-	[string]
-	$ReleaseVersionNumber,
-	[Parameter(Mandatory=$true)]
-	[ValidatePattern("\d")]
-	[string]
-	$BuildNumber,
-	[Parameter(Mandatory=$false)]
-	[string]
-	#[AllowEmptyString()]
-	$PreReleaseName
-)
 
-# see http://stackoverflow.com/questions/22906520/powershell-string-default-parameter-value-does-not-work-as-expected
-# for default string param value
+  param (
+    # get, don't execute
+    [Parameter(Mandatory=$false)]
+    [Alias("g")]
+    [switch] $get = $false,
 
-if (-not [System.String]::IsNullOrWhitespace($PreReleaseName) -and -not $PreReleaseName.StartsWith("-"))
-{
-    $PreReleaseName = "-" + $PreReleaseName
-}
+    # run local, don't download, assume everything is ready
+    [Parameter(Mandatory=$false)]
+    [Alias("l")]
+    [Alias("loc")]
+    [switch] $local = $false,
 
-$PSScriptFilePath = Get-Item $MyInvocation.MyCommand.Path
-$RepoRoot = $PSScriptFilePath.Directory.Parent.FullName
-$BuildFolder = Join-Path -Path $RepoRoot -ChildPath "build";
-$ReleaseFolder = Join-Path -Path $BuildFolder -ChildPath "Release\v$ReleaseVersionNumber$PreReleaseName";
-$SolutionRoot = $RepoRoot;
+    # keep the build directories, don't clear them
+    [Parameter(Mandatory=$false)]
+    [Alias("c")]
+    [Alias("cont")]
+    [switch] $continue = $false
+  )
 
-# Locate visual studio 2017
-# using vswhere from https://github.com/Microsoft/vswhere
-$vsloc = ./vswhere -latest -requires Microsoft.Component.MSBuild
-$vspath = ""
-$vsloc | ForEach {
-	if ($_.StartsWith("installationPath: ")) {
-		$vspath = $_.SubString("installationPath: ".Length)
-	}
-}
-if ($vspath -eq "") {
-	Write-Warning "Could not find VS 2017"
-	Exit
-}
-$MSBuild = "$vspath\MSBuild\15.0\Bin\MSBuild.exe"
+  # ################################################################
+  # BOOTSTRAP
+  # ################################################################
 
-# Edit VSIX
-$vsixFile = "$SolutionRoot\Umbraco.ModelsBuilder.CustomTool\source.extension.vsixmanifest"
-[xml] $vsixXml = Get-Content $vsixFile
-$xmlNameTable = New-Object System.Xml.NameTable
-$xmlNameSpace = New-Object System.Xml.XmlNamespaceManager($xmlNameTable)
-$xmlNameSpace.AddNamespace("vsx", "http://schemas.microsoft.com/developer/vsx-schema/2011")
-$xmlNameSpace.AddNamespace("d", "http://schemas.microsoft.com/developer/vsx-schema-design/2011")
-$versionNode = $vsixXml.SelectSingleNode("/vsx:PackageManifest/vsx:Metadata/vsx:Identity/@Version", $xmlNameSpace)
-$versionNode.InnerText = "$ReleaseVersionNumber.$BuildNumber"
-$vsixXml.Save($vsixFile)
+  # create and boot the buildsystem
+  $ubuild = &"$PSScriptRoot\build-bootstrap.ps1"
+  if (-not $?) { return }
+  $ubuild.Boot($PSScriptRoot, 
+    @{ Local = $local; With7Zip = $false; WithNode = $false },
+    @{ Continue = $continue })
+  if ($ubuild.OnError()) { return }
 
-# Make sure we don't have a release folder for this version already
-if ((Get-Item $ReleaseFolder -ErrorAction SilentlyContinue) -ne $null)
-{
-	Write-Warning "$ReleaseFolder already exists on your local machine. It will now be deleted."
-	Remove-Item $ReleaseFolder -Recurse
-}
+  Write-Host "Zbu.ModelsBuilder Build"
+  Write-Host "Umbraco.Build v$($ubuild.BuildVersion)"
 
-# Go get nuget.exe if we don't have it
-$NuGet = "$BuildFolder\nuget.exe"
-$FileExists = Test-Path $NuGet
-If ($FileExists -eq $False) {
-	$SourceNugetExe = "http://nuget.org/nuget.exe"
-	Invoke-WebRequest $SourceNugetExe -OutFile $NuGet
-}
+  # ################################################################
+  # TASKS
+  # ################################################################
 
-# Restore packages (if they don't exist the build will fail)
-$packagesTargetDirectory = "..\packages\"
-Write-Host "Restoring NuGet packages, this may take a while depending on your package cache and connection speed"
-.\nuget.exe install ..\Umbraco.ModelsBuilder\packages.config -OutputDirectory $packagesTargetDirectory -Verbosity quiet
-.\nuget.exe install ..\Umbraco.ModelsBuilder.Console\packages.config -OutputDirectory $packagesTargetDirectory -Verbosity quiet
-.\nuget.exe install ..\Umbraco.ModelsBuilder.CustomTool\packages.config -OutputDirectory $packagesTargetDirectory -Verbosity quiet
-.\nuget.exe install ..\Umbraco.ModelsBuilder.Tests\packages.config -OutputDirectory $packagesTargetDirectory -Verbosity quiet
+  $ubuild.DefineMethod("SetMoreUmbracoVersion",
+  {
+    param ( $semver )
 
-# Set the version number in SolutionInfo.cs
-$SolutionInfoPath = Join-Path -Path $SolutionRoot -ChildPath "SolutionInfo.cs"
-(gc -Path $SolutionInfoPath) `
-	-replace "(?<=AssemblyVersion\(`")[.\d]*(?=`"\))", "$ReleaseVersionNumber" |
-	sc -Path $SolutionInfoPath -Encoding UTF8
-(gc -Path $SolutionInfoPath) `
-	-replace "(?<=AssemblyFileVersion\(`")[.\d]*(?=`"\))", "$ReleaseVersionNumber.$BuildNumber" |
-	sc -Path $SolutionInfoPath -Encoding UTF8
-(gc -Path $SolutionInfoPath) `
-	-replace "(?<=AssemblyInformationalVersion\(`")[.\w-]*(?=`"\))", "$ReleaseVersionNumber$PreReleaseName" |
-	sc -Path $SolutionInfoPath -Encoding UTF8
-# Set the copyright
-$Copyright = "Copyright � Umbraco HQ " + (Get-Date).year;
-(gc -Path $SolutionInfoPath) `
-	-replace "(?<=AssemblyCopyright\(`").*(?=`"\))", $Copyright |
-	sc -Path $SolutionInfoPath -Encoding UTF8;
+    # Edit VSIX
+    $vsixFile = "$($this.SolutionRoot)\src\Umbraco.ModelsBuilder.CustomTool\source.extension.vsixmanifest"
+    [xml] $vsixXml = Get-Content $vsixFile
+    $xmlNameTable = New-Object System.Xml.NameTable
+    $xmlNameSpace = New-Object System.Xml.XmlNamespaceManager($xmlNameTable)
+    $xmlNameSpace.AddNamespace("vsx", "http://schemas.microsoft.com/developer/vsx-schema/2011")
+    $xmlNameSpace.AddNamespace("d", "http://schemas.microsoft.com/developer/vsx-schema-design/2011")
+    $versionNode = $vsixXml.SelectSingleNode("/vsx:PackageManifest/vsx:Metadata/vsx:Identity/@Version", $xmlNameSpace)
+	  #$versionNode.InnerText = "$ReleaseVersionNumber.$BuildNumber"
+	  $versionNode.InnerText = "$semver.Release"
+    $vsixXml.Save($vsixFile)
+  })
 
-# Build the solution in release mode
-$SolutionPath = Join-Path -Path $SolutionRoot -ChildPath "Umbraco.ModelsBuilder.sln";
+  $ubuild.DefineMethod("RestoreNuGet",
+  {
+    Write-Host "Restore NuGet"
+    Write-Host "Logging to $($this.BuildTemp)\nuget.restore.log"
+    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\Umbraco.ModelsBuilder.sln" -ConfigFile $this.BuildEnv.NuGetConfig > "$($this.BuildTemp)\nuget.restore.log"
+    if (-not $?) { throw "Failed to restore NuGet packages." }   
+  })
 
-# clean sln for all deploys
-& $MSBuild "$SolutionPath" /p:Configuration=Release /maxcpucount /t:Clean
-if (-not $?)
-{
-	throw "The MSBuild process returned an error code."
-}
+  $ubuild.DefineMethod("Compile",
+  {
+    $buildConfiguration = "Release"
 
-#build
-& $MSBuild "$SolutionPath" /p:Configuration=Release /maxcpucount /p:VisualStudioVersion=15.0
-if (-not $?)
-{
-	throw "The MSBuild process returned an error code."
-}
+    $src = "$($this.SolutionRoot)\src"
+    $log = "$($this.BuildTemp)\msbuild.log"
+    
+    if ($this.BuildEnv.VisualStudio -eq $null)
+    {
+      throw "Build environment does not provide VisualStudio."
+    }
+    
+    Write-Host "Compile"
+    Write-Host "Logging to $log"
+  
+    # beware of the weird double \\ at the end of paths
+    # see http://edgylogic.com/blog/powershell-and-external-commands-done-right/
+    &$this.BuildEnv.VisualStudio.MsBuild "$src\Umbraco.ModelsBuilder.sln" `
+      /p:WarningLevel=0 `
+      /p:Configuration=$buildConfiguration `
+      /p:Platform=AnyCPU `
+      /p:UseWPP_CopyWebApplication=True `
+      /p:PipelineDependsOnBuild=False `
+      /p:OutDir="$($this.BuildTemp)\bin\\" `
+      /p:WebProjectOutputDir="$($this.BuildTemp)\WebApp\\" `
+      /p:Verbosity=minimal `
+      /t:Clean`;Rebuild `
+      /tv:"$($ubuild.BuildEnv.VisualStudio.ToolsVersion)" `
+      /p:UmbracoBuild=True `
+      > $log
 
-#prepare core
-$CoreFolder = Join-Path -Path $ReleaseFolder -ChildPath "Umbraco.ModelsBuilder";
-New-Item $CoreFolder -Type directory
+    if (-not $?) { throw "Failed to compile." }
+    
+    # /p:UmbracoBuild tells the csproj that we are building from PS, not VS
+  })
 
-$include = @('*Umbraco.ModelsBuilder.dll','*Umbraco.ModelsBuilder.pdb')
-$CoreBinFolder = Join-Path -Path $SolutionRoot -ChildPath "Umbraco.ModelsBuilder\bin\Release";
-Copy-Item "$CoreBinFolder\*.*" -Destination $CoreFolder -Include $include
+  $ubuild.DefineMethod("PackageCore",
+  {
+    $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
+    $copyright = "Copyright © Umbraco $((Get-Date).Year)"
+	  &$this.BuildEnv.NuGet pack "$nuspecs\Umbraco.ModelsBuilder.nuspec" `
+	    -Properties copyright=$Copyright solution="$($this.SolutionRoot)" `
+	    -Version "$($this.Version.Semver.ToString())" `
+	    -Verbosity quiet -OutputDirectory "$($this.BuildOutput)"
+  	if (-not $?) { throw "Failed to pack NuGet Umbraco.ModelsBuilder." }
+  })
 
-$DashboardFiles = Join-Path -Path $SolutionRoot -ChildPath "Umbraco.ModelsBuilder\Dashboard"
-Copy-Item "$DashboardFiles\*.js" -Destination $CoreFolder;
-Copy-Item "$DashboardFiles\*.htm" -Destination $CoreFolder;
-Copy-Item "$DashboardFiles\*.manifest" -Destination $CoreFolder;
+  $ubuild.DefineMethod("PackageApi",
+  {
+    $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
+    $copyright = "Copyright © Umbraco $((Get-Date).Year)"
+	  &$this.BuildEnv.NuGet pack "$nuspecs\Umbraco.ModelsBuilder.Api.nuspec" `
+      -Properties copyright=$Copyright solution="$($this.SolutionRoot)" `
+	    -Version "$($this.Version.Semver.ToString())" `
+	    -Verbosity quiet -OutputDirectory "$($this.BuildOutput)"
+  	if (-not $?) { throw "Failed to pack NuGet Umbraco.ModelsBuilder.Api." }
+  })
 
-#build core nuget
-$CoreNuSpecSource = Join-Path -Path $BuildFolder -ChildPath "Nuspecs\ModelsBuilder\*";
-Copy-Item $CoreNuSpecSource -Destination $CoreFolder
-$CoreNuSpec = Join-Path -Path $CoreFolder -ChildPath "Umbraco.ModelsBuilder.nuspec";
-& $NuGet pack $CoreNuSpec -OutputDirectory $ReleaseFolder -Version $ReleaseVersionNumber$PreReleaseName -Properties copyright=$Copyright
+  $ubuild.DefineMethod("PackageVsix",
+  {
+    #copy vsix
+  	$this.CopyFile("$($this.SolutionRoot)\build.tmp\Umbraco.ModelsBuilder.CustomTool.vsix",
+	    "$($this.BuildOutput)\Umbraco.ModelsBuilder.CustomTool-$($this.Version.Semver.ToString()).vsix")
+  })
 
-#prepare api
-$ApiFolder = Join-Path -Path $ReleaseFolder -ChildPath "Umbraco.ModelsBuilder.Api";
-New-Item $ApiFolder -Type directory
+  $ubuild.DefineMethod("VerifyNuGet",
+  {
+    $this.VerifyNuGetConsistency(
+      ("Umbraco.ModelsBuilder", "Umbraco.ModelsBuilder.Api"),
+      ("Umbraco.ModelsBuilder", "Umbraco.ModelsBuilder.Api", "Umbraco.ModelsBuilder.CustomTool", "Umbraco.ModelsBuilder.Console"))      
+  })
 
-$include = @('*Umbraco.ModelsBuilder.Api.dll','*Umbraco.ModelsBuilder.Api.pdb')
-$ApiBinFolder = Join-Path -Path $SolutionRoot -ChildPath "Umbraco.ModelsBuilder.Api\bin\Release";
-Copy-Item "$ApiBinFolder\*.*" -Destination $ApiFolder -Include $include
+  $ubuild.DefineMethod("Build",
+  {
+    $this.RestoreNuGet()
+    if ($this.OnError()) { return }
+    $this.Compile()
+    if ($this.OnError()) { return }
+    #$this.CompileTests()
+    # not running tests
+    $this.VerifyNuGet()
+    if ($this.OnError()) { return }
+    $this.PackageCore()
+    if ($this.OnError()) { return }
+    $this.PackageApi()
+    if ($this.OnError()) { return }
+    $this.PackageVsix()
+    if ($this.OnError()) { return }
+  })
 
-#build api nuget
-$ApiNuSpecSource = Join-Path -Path $BuildFolder -ChildPath "Nuspecs\ModelsBuilder.Api\*";
-Copy-Item $ApiNuSpecSource -Destination $ApiFolder
-$ApiNuSpec = Join-Path -Path $ApiFolder -ChildPath "Umbraco.ModelsBuilder.Api.nuspec";
-& $NuGet pack $ApiNuSpec -OutputDirectory $ReleaseFolder -Version $ReleaseVersionNumber$PreReleaseName -Properties copyright=$Copyright
+  # ################################################################
+  # RUN
+  # ################################################################
 
-#copy vsix
-Copy-Item "$SolutionRoot\Umbraco.ModelsBuilder.CustomTool\bin\Release\Umbraco.ModelsBuilder.CustomTool.vsix" -Destination "$ReleaseFolder\Umbraco.ModelsBuilder.CustomTool-$ReleaseVersionNumber$PreReleaseName.vsix"
+  # configure
+  $ubuild.ReleaseBranches = @( "master" )
 
-""
-"Build $ReleaseVersionNumber is done!"
+  # run
+  if (-not $get) 
+  {
+    $ubuild.Build() 
+    if ($ubuild.OnError()) { return }
+  }
+  Write-Host "Done"
+  if ($get) { return $ubuild }

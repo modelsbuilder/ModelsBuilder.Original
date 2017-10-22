@@ -1,8 +1,0 @@
-﻿read http://stackoverflow.com/questions/17625752/cannot-run-vspackage-when-developing-on-multiple-machines
-
-the debug config of a package tool is saved in the .user file that is not versionned
-to enable it:
-edit the properties / Debug for the project
-set Start action to external program 
-set Command line arguments to /rootsuffix Exp
-
