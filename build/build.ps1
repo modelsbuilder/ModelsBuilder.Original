@@ -42,6 +42,7 @@
     param ( $semver )
 
     # Edit VSIX
+    Write-Host "Update VSIX manifest."
     $vsixFile = "$($this.SolutionRoot)\src\Umbraco.ModelsBuilder.CustomTool\source.extension.vsixmanifest"
     [xml] $vsixXml = Get-Content $vsixFile
     $xmlNameTable = New-Object System.Xml.NameTable
@@ -49,8 +50,40 @@
     $xmlNameSpace.AddNamespace("vsx", "http://schemas.microsoft.com/developer/vsx-schema/2011")
     $xmlNameSpace.AddNamespace("d", "http://schemas.microsoft.com/developer/vsx-schema-design/2011")
     $versionNode = $vsixXml.SelectSingleNode("/vsx:PackageManifest/vsx:Metadata/vsx:Identity/@Version", $xmlNameSpace)
-	  #$versionNode.InnerText = "$ReleaseVersionNumber.$BuildNumber"
-	  $versionNode.InnerText = "$semver.Release"
+
+    # cannot be semver because it has to be a.b.c.d format
+    # so we have to invent some sort of "build" - the spaghetti way
+    $current = $versionNode.Value
+    $pos = $current.LastIndexOf('.')
+    $current = $current.Substring($pos + 1)
+    $now = [DateTime]::Now.ToString("yyMMdd")    
+    if ($current.Length -ne 9)
+    {
+      $build = $now + "001"
+    }
+    else
+    {
+      if (-not $current.StartsWith($now))
+      {
+        $build = $now + "001"
+      }
+      else
+      {
+        $i = 0
+        if ([int]::TryParse($current.Substring(6), [ref]$i))
+        {
+          $i += 1
+          $build = $now + $i.ToString("000")
+        }
+        else
+        {
+          $build = $now + "666"
+        }
+      }
+    }
+
+    $release = "" + $semver.Major + "." + $semver.Minor + "." + $semver.Patch
+	  $versionNode.Value = "$release.$build"
     $vsixXml.Save($vsixFile)
   })
 
