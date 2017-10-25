@@ -87,12 +87,16 @@ namespace Umbraco.ModelsBuilder.Umbraco
             return info == null ? element : info.Ctor(element);
         }
 
+        // this runs only once the factory is ready
+        // NOT when building models
         public Type MapModelType(Type type)
         {
             var infos = EnsureModels();
             return ModelType.Map(type, infos.ModelTypeMap);
         }
 
+        // this runs only once the factory is ready
+        // NOT when building models
         public IList CreateModelList(string alias)
         {
             var infos = EnsureModels();
@@ -256,7 +260,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                         // the one below is the normal one
                         _modelsAssembly = assembly;
 
-                        var types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>());
+                        var types = assembly.ExportedTypes.Where(x => x.Inherits<PublishedContentModel>() || x.Inherits<PublishedElementModel>());
                         _infos = RegisterModels(types);
                         ModelsGenerationError.Clear();
                     }
@@ -305,7 +309,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     .ToDictionary(x => x, File.ReadAllText)
                 : new Dictionary<string, string>();
 
-            var umbraco = Application.GetApplication();
+            var umbraco = ModelsBuilderComponent.Umbraco;
             var typeModels = umbraco.GetAllTypes();
             var currentHash = HashHelper.Hash(ourFiles, typeModels);
             var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
@@ -461,6 +465,36 @@ namespace Umbraco.ModelsBuilder.Umbraco
             return new Infos { ModelInfos = modelInfos.Count > 0 ? modelInfos : null, ModelTypeMap = map };
         }
 
+        // fixme move to Core
+        // map contains the qualified name eg Foo.Bar.Model
+        // returns qualified names too eg Foo.Bar.Model - in a usable format eg List<Foo, Bar>
+        private static string MapToName(Type type, Dictionary<string, string> map)
+        {
+            if (type is ModelType modelType)
+            {
+                if (map.TryGetValue(modelType.ContentTypeAlias, out var actualTypeName))
+                    return actualTypeName;
+                throw new InvalidOperationException($"Don't know how to map ModelType with content type alias \"{modelType.ContentTypeAlias}\".");
+            }
+
+            //if (type is ModelTypeArrayType arrayType)
+            //{
+            //    if (map.TryGetValue(arrayType.ContentTypeAlias, out var actualTypeName))
+            //        return actualTypeName + "[]";
+            //    throw new InvalidOperationException($"Don't know how to map ModelType with content type alias \"{arrayType.ContentTypeAlias}\".");
+            //}
+
+            if (type.IsGenericType == false)
+                return type.FullName;
+            var def = type.GetGenericTypeDefinition();
+            if (def == null)
+                throw new InvalidOperationException("panic");
+
+            var args = type.GetGenericArguments().Select(x => MapToName(x, map)).ToArray();
+            var defFullName = def.FullName.Substring(0, def.FullName.IndexOf('`'));
+            return defFullName + "<" + string.Join(", ", args) + ">";
+        }
+
         private static string GenerateModelsCode(IDictionary<string, string> ourFiles, IList<TypeModel> typeModels)
         {
             var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
@@ -469,6 +503,16 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                 File.Delete(file);
+
+            // fixme is this the place to do it?
+            var map = typeModels.ToDictionary(x => x.Alias, x => x.ClrName);
+            foreach (var typeModel in typeModels)
+            {
+                foreach (var propertyModel in typeModel.Properties)
+                {
+                    propertyModel.ClrTypeName = MapToName(propertyModel.ModelClrType, map);
+                }
+            }
 
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
             var builder = new TextBuilder(typeModels, parseResult, UmbracoConfig.For.ModelsBuilder().ModelsNamespace);

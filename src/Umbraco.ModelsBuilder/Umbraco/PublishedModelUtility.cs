@@ -41,8 +41,10 @@ namespace Umbraco.ModelsBuilder.Umbraco
         }
 
         public static PublishedPropertyType GetModelPropertyType<TModel, TValue>(PublishedContentType contentType, Expression<Func<TModel, TValue>> selector)
-            where TModel : PublishedContentModel
+            //where TModel : PublishedContentModel // fixme PublishedContentModel _or_ PublishedElementModel
         {
+            // fixme therefore, missing a check on TModel here
+
             var expr = selector.Body as MemberExpression;
 
             if (expr == null)

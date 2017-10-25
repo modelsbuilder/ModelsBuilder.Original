@@ -82,14 +82,15 @@
     &$this.BuildEnv.VisualStudio.MsBuild "$src\Umbraco.ModelsBuilder.sln" `
       /p:WarningLevel=0 `
       /p:Configuration=$buildConfiguration `
-      /p:Platform=AnyCPU `
+      /p:Platform="Any CPU" `
       /p:UseWPP_CopyWebApplication=True `
       /p:PipelineDependsOnBuild=False `
       /p:OutDir="$($this.BuildTemp)\bin\\" `
       /p:WebProjectOutputDir="$($this.BuildTemp)\WebApp\\" `
+      /p:VisualStudioVersion="$($this.BuildEnv.VisualStudio.Major).0" `
       /p:Verbosity=minimal `
       /t:Clean`;Rebuild `
-      /tv:"$($ubuild.BuildEnv.VisualStudio.ToolsVersion)" `
+      /tv:"$($this.BuildEnv.VisualStudio.ToolsVersion)" `
       /p:UmbracoBuild=True `
       > $log
 
@@ -100,30 +101,32 @@
 
   $ubuild.DefineMethod("PackageCore",
   {
+    Write-Host "Package Umbraco.ModelsBuilder"
     $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
     $copyright = "Copyright © Umbraco $((Get-Date).Year)"
 	  &$this.BuildEnv.NuGet pack "$nuspecs\Umbraco.ModelsBuilder.nuspec" `
-	    -Properties copyright=$Copyright solution="$($this.SolutionRoot)" `
+	    -Properties copyright="$Copyright"`;solution="$($this.SolutionRoot)" `
 	    -Version "$($this.Version.Semver.ToString())" `
-	    -Verbosity quiet -OutputDirectory "$($this.BuildOutput)"
+	    -Verbosity detailed -OutputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.core.log"
   	if (-not $?) { throw "Failed to pack NuGet Umbraco.ModelsBuilder." }
   })
 
   $ubuild.DefineMethod("PackageApi",
   {
+    Write-Host "Package Umbraco.ModelsBuilder.Api"
     $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
     $copyright = "Copyright © Umbraco $((Get-Date).Year)"
 	  &$this.BuildEnv.NuGet pack "$nuspecs\Umbraco.ModelsBuilder.Api.nuspec" `
-      -Properties copyright=$Copyright solution="$($this.SolutionRoot)" `
+      -Properties copyright="$Copyright"`;solution="$($this.SolutionRoot)" `
 	    -Version "$($this.Version.Semver.ToString())" `
-	    -Verbosity quiet -OutputDirectory "$($this.BuildOutput)"
+	    -Verbosity detailed -OutputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.api.log"
   	if (-not $?) { throw "Failed to pack NuGet Umbraco.ModelsBuilder.Api." }
   })
 
   $ubuild.DefineMethod("PackageVsix",
   {
-    #copy vsix
-  	$this.CopyFile("$($this.SolutionRoot)\build.tmp\Umbraco.ModelsBuilder.CustomTool.vsix",
+    Write-Host "Package Umbraco.ModelsBuilder.CustomTool"
+  	$this.CopyFile("$($this.SolutionRoot)\build.tmp\bin\Umbraco.ModelsBuilder.CustomTool.vsix",
 	    "$($this.BuildOutput)\Umbraco.ModelsBuilder.CustomTool-$($this.Version.Semver.ToString()).vsix")
   })
 
@@ -132,6 +135,17 @@
     $this.VerifyNuGetConsistency(
       ("Umbraco.ModelsBuilder", "Umbraco.ModelsBuilder.Api"),
       ("Umbraco.ModelsBuilder", "Umbraco.ModelsBuilder.Api", "Umbraco.ModelsBuilder.CustomTool", "Umbraco.ModelsBuilder.Console"))      
+  })
+
+  $ubuild.DefineMethod("PostPackageHook",
+  {
+    # run hook
+    if ($this.HasMethod("PostPackage"))
+    {
+      Write-Host "Run PostPackage hook"
+      $this.PostPackage();
+      if (-not $?) { throw "Failed to run hook." }
+    }
   })
 
   $ubuild.DefineMethod("Build",
@@ -149,6 +163,8 @@
     $this.PackageApi()
     if ($this.OnError()) { return }
     $this.PackageVsix()
+    if ($this.OnError()) { return }
+    $this.PostPackageHook()
     if ($this.OnError()) { return }
   })
 

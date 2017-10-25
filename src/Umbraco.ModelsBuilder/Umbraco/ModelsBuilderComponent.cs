@@ -1,43 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using LightInject;
 using Umbraco.Core;
+using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.UI.JavaScript;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
-    /// <summary>
-    /// Installs ModelsBuilder into the Umbraco site.
-    /// </summary>
-    public class ModelsBuilderApplication : ApplicationEventHandler // fixme this all should become a component
+    // fixme
+    // nucache components wants models so we need to setup models before
+    // however for some reason, this creates a cyclic dependency? => need better debugging info
+    // cos nucache is Core so we need to be Core too
+
+    [RequiredComponent(typeof(NuCacheComponent))]
+    public class ModelsBuilderComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
-        protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        public override void Compose(Composition composition)
         {
+            base.Compose(composition);
+            composition.Container.Register<Application>(new PerContainerLifetime());
+
             var config = UmbracoConfig.For.ModelsBuilder();
 
             if (config.ModelsMode == ModelsMode.PureLive)
-                InstallLiveModels(applicationContext.ProfilingLogger);
+                InstallLiveModels(composition.Container);
             else if (config.EnableFactory)
-                InstallDefaultModelsFactory();
+                InstallDefaultModelsFactory(composition.Container);
 
             // always setup the dashboard
-            InstallServerVars();
+            InstallServerVars(composition.Container.GetInstance<IRuntimeState>().Level);
 
+            // need to do it here 'cos NuCache wants it during compose?
+            Umbraco = composition.Container.GetInstance<Application>();
         }
 
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        public void Initialize(Application application)
         {
+            Umbraco = application;
+
             var config = UmbracoConfig.For.ModelsBuilder();
 
             if (config.Enable)
@@ -50,17 +61,17 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 OutOfDateModelsStatus.Install();
         }
 
-        private void InstallDefaultModelsFactory()
+        public static Application Umbraco { get; private set; }
+
+        private void InstallDefaultModelsFactory(IServiceContainer container)
         {
-            var types = Current.TypeLoader.GetTypes<PublishedContentModel>();
-            var factory = new PublishedModelFactory(types);
-            PublishedContentModelFactoryResolver.Current.SetFactory(factory);
+            container.RegisterSingleton<IPublishedModelFactory>(factory 
+                => new PublishedModelFactory(factory.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
         }
 
-        private void InstallLiveModels(ProfilingLogger logger)
+        private void InstallLiveModels(IServiceContainer container)
         {
-            var factory = new PureLiveModelFactory(logger);
-            PublishedContentModelFactoryResolver.Current.SetFactory(factory);
+            container.RegisterSingleton<IPublishedModelFactory, PureLiveModelFactory>();
 
             // the following would add @using statement in every view so user's don't
             // have to do it - however, then noone understands where the @using statement
@@ -79,7 +90,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             */
         }
 
-        private void InstallServerVars()
+        private void InstallServerVars(RuntimeLevel level)
         {
             // register our url - for the backoffice api
             ServerVariablesParser.Parsing += (sender, serverVars) =>
@@ -103,19 +114,19 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
 
                 umbracoUrls["modelsBuilderBaseUrl"] = urlHelper.GetUmbracoApiServiceBaseUrl<ModelsBuilderBackOfficeController>(controller => controller.BuildModels());
-                umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings();
+                umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings(level);
             };
         }
 
-        private Dictionary<string, object> GetModelsBuilderSettings()
+        private Dictionary<string, object> GetModelsBuilderSettings(RuntimeLevel level)
         {
-            if (ApplicationContext.Current.IsConfigured == false)
+            if (level != RuntimeLevel.Run)
                 return null;
 
             var settings = new Dictionary<string, object>
-                {
-                    {"enabled", UmbracoConfig.For.ModelsBuilder().Enable}
-                };
+            {
+                {"enabled", UmbracoConfig.For.ModelsBuilder().Enable}
+            };
 
             return settings;
         }
@@ -143,7 +154,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             {
                 // if it is in fact a new entity (not been saved yet) and the "CreateTemplateForContentType" key
                 // is found, then it means a new template is being created based on the creation of a document type
-                if (!template.HasIdentity && template.Content.IsNullOrWhiteSpace())
+                if (!template.HasIdentity && string.IsNullOrWhiteSpace(template.Content))
                 {
                     // ensure is safe and always pascal cased, per razor standard
                     // + this is how we get the default model name in Umbraco.ModelsBuilder.Umbraco.Application

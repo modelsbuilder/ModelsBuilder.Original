@@ -240,8 +240,10 @@
   <Target Name="BeforeBuild">
   </Target>
   -->
+  <!--
   <Target Name="AfterBuild" DependsOnTargets="CopyVsix">
   </Target>
+  -->
   <Target Name="CopyVsix" Condition=" '$(Configuration)' == 'Release' ">
     <!-- get the assembly version -->
     <GetAssemblyIdentity AssemblyFiles="$(OutputPath)Umbraco.ModelsBuilder.dll">

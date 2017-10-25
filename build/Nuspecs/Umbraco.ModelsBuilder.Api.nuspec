@@ -19,11 +19,11 @@
     </dependencies>
 	</metadata>
 	<files>
-    <!-- our dlls -->
-    <file src="Umbraco.ModelsBuilder.Api.dll" target="lib\Umbraco.ModelsBuilder.Api.dll" />
-    <file src="Umbraco.ModelsBuilder.Api.pdb" target="lib\Umbraco.ModelsBuilder.Api.pdb" />
+        <!-- our dlls -->
+        <file src="$solution$\build.tmp\bin\Umbraco.ModelsBuilder.Api.dll" target="lib\Umbraco.ModelsBuilder.Api.dll" />
+        <file src="$solution$\build.tmp\bin\Umbraco.ModelsBuilder.Api.pdb" target="lib\Umbraco.ModelsBuilder.Api.pdb" />
 
-    <!-- transforms -->
-    <file src="web.config.install.xdt" target="content" />
+        <!-- transforms -->
+        <file src="$solution$\build\nuspecs\ModelsBuilder.Api\web.config.install.xdt" target="content" />
   </files>
 </package>

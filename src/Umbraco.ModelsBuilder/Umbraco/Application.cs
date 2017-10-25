@@ -1,96 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
-using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
-    internal class Application
+    public class Application
     {
-        #region Applicationmanagement
+        private readonly IContentTypeService _contentTypeService;
+        private readonly IMediaTypeService _mediaTypeService;
+        private readonly IMemberTypeService _memberTypeService;
+        private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
 
-        //private bool _installedConfigSystem;
-        private static readonly object LockO = new object();
-        private static Application _application;
-        //private global::Umbraco.Web.Standalone.StandaloneApplication _umbracoApplication;
-
-        private Application()
+        public Application(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory)
         {
-            //_standalone = false;
+            _contentTypeService = contentTypeService;
+            _mediaTypeService = mediaTypeService;
+            _memberTypeService = memberTypeService;
+            _publishedContentTypeFactory = publishedContentTypeFactory;
         }
-
-        // get app in ASP.NET context ie it already exists, not standalone, don't start anything
-        public static Application GetApplication()
-        {
-            lock (LockO)
-            {
-                if (_application == null)
-                {
-                    _application = new Application();
-                    // do NOT start it!
-                }
-                return _application;
-            }
-        }
-
-        #endregion
 
         #region Services
 
         public IList<TypeModel> GetAllTypes()
         {
-            //if (_standalone && _umbracoApplication == null)
-            //    throw new InvalidOperationException("Application is not ready.");
-
             var types = new List<TypeModel>();
 
-            var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
-            types.AddRange(GetTypes(PublishedItemType.Content, contentTypeService.GetAll().Cast<IContentTypeBase>().ToArray()));
-            var mediaTypeService = ApplicationContext.Current.Services.MediaTypeService;
-            types.AddRange(GetTypes(PublishedItemType.Media, mediaTypeService.GetAll().Cast<IContentTypeBase>().ToArray()));
-
-            var memberTypeService = ApplicationContext.Current.Services.MemberTypeService;
-            types.AddRange(GetTypes(PublishedItemType.Member, memberTypeService.GetAll().Cast<IContentTypeBase>().ToArray()));
+            types.AddRange(GetTypes(PublishedItemType.Content, _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray()));
+            types.AddRange(GetTypes(PublishedItemType.Media, _mediaTypeService.GetAll().Cast<IContentTypeComposition>().ToArray()));
+            types.AddRange(GetTypes(PublishedItemType.Member, _memberTypeService.GetAll().Cast<IContentTypeComposition>().ToArray()));
 
             return EnsureDistinctAliases(types);
         }
 
         public IList<TypeModel> GetContentTypes()
         {
-            //if (_standalone && _umbracoApplication == null)
-            //    throw new InvalidOperationException("Application is not ready.");
-
-            var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
-            var contentTypes = contentTypeService.GetAll().Cast<IContentTypeBase>().ToArray();
+            var contentTypes = _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
             return GetTypes(PublishedItemType.Content, contentTypes); // aliases have to be unique here
         }
 
         public IList<TypeModel> GetMediaTypes()
         {
-            //if (_standalone && _umbracoApplication == null)
-            //    throw new InvalidOperationException("Application is not ready.");
-
-            var mediaTypeService = ApplicationContext.Current.Services.MediaTypeService;
-            var contentTypes = mediaTypeService.GetAll().Cast<IContentTypeBase>().ToArray();
+            var contentTypes = _mediaTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
             return GetTypes(PublishedItemType.Media, contentTypes); // aliases have to be unique here
         }
 
         public IList<TypeModel> GetMemberTypes()
         {
-            //if (_standalone && _umbracoApplication == null)
-            //    throw new InvalidOperationException("Application is not ready.");
-
-            var memberTypeService = ApplicationContext.Current.Services.MemberTypeService;
-            var memberTypes = memberTypeService.GetAll().Cast<IContentTypeBase>().ToArray();
+            var memberTypes = _memberTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
             return GetTypes(PublishedItemType.Member, memberTypes); // aliases have to be unique here
         }
 
@@ -130,19 +94,10 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
         }
 
-        private static IList<TypeModel> GetTypes(PublishedItemType itemType, IContentTypeBase[] contentTypes)
+        private IList<TypeModel> GetTypes(PublishedItemType itemType, IContentTypeComposition[] contentTypes)
         {
             var typeModels = new List<TypeModel>();
             var uniqueTypes = new HashSet<string>();
-
-            // fixme - we cannot require a facade when building models
-            // the facade may depend on models! so instead we should have a way to retrieve
-            // the current published types, maybe directly from the facade service indeed
-            //var facade = FacadeServiceResolver.Current.Service.CreateFacade(null);
-            // fixme - then, ReflectionUtilities has issues accessing that ctor, how come?
-            var ctor1 = typeof (PublishedContentType).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof (IContentType) }, null);
-            var ctor2 = typeof (PublishedContentType).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof (IMediaType) }, null);
-            var ctor3 = typeof (PublishedContentType).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof (IMemberType) }, null);
 
             // get the types and the properties
             foreach (var contentType in contentTypes)
@@ -164,23 +119,32 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     throw new Exception($"Panic: duplicate type ClrName \"{typeModel.ClrName}\".");
                 uniqueTypes.Add(typeModel.ClrName);
 
-                PublishedContentType publishedContentType;
+                // fixme - we need a better way at figuring out what's an element type!
+                bool IsElement(PublishedContentType x)
+                {
+                    return x.Alias.InvariantEndsWith("Element");
+                }
+
+                var publishedContentType = _publishedContentTypeFactory.CreateContentType(itemType, contentType);
                 switch (itemType)
                 {
                     case PublishedItemType.Content:
-                        typeModel.ItemType = TypeModel.ItemTypes.Content;
-                        //publishedContentType = facade.ContentCache.GetContentType(contentType.Alias);
-                        publishedContentType = (PublishedContentType) ctor1.Invoke(new[] { contentType });
+                        if (IsElement(publishedContentType))
+                        {
+                            typeModel.ItemType = TypeModel.ItemTypes.Element;
+                            if (typeModel.ClrName.InvariantEndsWith("Element"))
+                                typeModel.ClrName = typeModel.ClrName.Substring(0, typeModel.ClrName.Length - "Element".Length);
+                        }
+                        else
+                        {
+                            typeModel.ItemType = TypeModel.ItemTypes.Content;
+                        }
                         break;
                     case PublishedItemType.Media:
                         typeModel.ItemType = TypeModel.ItemTypes.Media;
-                        //publishedContentType = facade.MediaCache.GetContentType(contentType.Alias);
-                        publishedContentType = (PublishedContentType) ctor2.Invoke(new[] { contentType });
                         break;
                     case PublishedItemType.Member:
                         typeModel.ItemType = TypeModel.ItemTypes.Member;
-                        //publishedContentType = facade.MemberCache.GetContentType(contentType.Alias);
-                        publishedContentType = (PublishedContentType) ctor3.Invoke(new[] { contentType });
                         break;
                     default:
                         throw new InvalidOperationException(string.Format("Unsupported PublishedItemType \"{0}\".", itemType));

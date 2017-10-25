@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Building
@@ -108,7 +109,7 @@ namespace Umbraco.ModelsBuilder.Building
                     sb.AppendFormat("\t/// <summary>{0}</summary>\n", XmlCommentString(type.Name));
                 sb.AppendFormat("\tpublic partial interface I{0}", type.ClrName);
                 var implements = type.BaseType == null || type.BaseType.IsContentIgnored
-                    ? (type.HasBase ? null : "PublishedContent")
+                    ? (type.HasBase ? null : (type.IsElement ? "PublishedElement" : "PublishedContent"))
                     : type.BaseType.ClrName;
                 if (implements != null)
                     sb.AppendFormat(" : I{0}", implements);
@@ -148,7 +149,7 @@ namespace Umbraco.ModelsBuilder.Building
             var inherits = type.HasBase
                 ? null // has its own base already
                 : (type.BaseType == null || type.BaseType.IsContentIgnored
-                    ? GetModelsBaseClassName()
+                    ? GetModelsBaseClassName(type)
                     : type.BaseType.ClrName);
             if (inherits != null)
                 sb.AppendFormat(" : {0}", inherits);
@@ -179,8 +180,9 @@ namespace Umbraco.ModelsBuilder.Building
             sb.Append("#pragma warning disable 0109 // new is redundant\n");
             sb.AppendFormat("\t\tpublic new const string ModelTypeAlias = \"{0}\";\n",
                 type.Alias);
+            var itemType = type.IsElement ? TypeModel.ItemTypes.Content : type.ItemType; // fixme
             sb.AppendFormat("\t\tpublic new const PublishedItemType ModelItemType = PublishedItemType.{0};\n",
-                type.ItemType);
+                itemType);
             sb.Append("\t\tpublic new static PublishedContentType GetModelContentType()\n");
             sb.Append("\t\t\t=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);\n");
             sb.AppendFormat("\t\tpublic static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<{0}, TValue>> selector)\n",
@@ -190,8 +192,8 @@ namespace Umbraco.ModelsBuilder.Building
 
             // write the ctor
             if (!type.HasCtor)
-                sb.AppendFormat("\t\t// ctor\n\t\tpublic {0}(IPublishedContent content)\n\t\t\t: base(content)\n\t\t{{ }}\n\n",
-                    type.ClrName);
+                sb.AppendFormat("\t\t// ctor\n\t\tpublic {0}(IPublished{1} content)\n\t\t\t: base(content)\n\t\t{{ }}\n\n",
+                    type.ClrName, type.IsElement ? "Element" : "Content");
 
             // write the properties
             sb.Append("\t\t// properties\n");
@@ -243,7 +245,7 @@ namespace Umbraco.ModelsBuilder.Building
             sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
 
             sb.Append("\t\tpublic ");
-            WriteClrType(sb, property.ModelClrType);
+            WriteClrType(sb, property.ClrTypeName);
 
             sb.AppendFormat(" {0} => ",
                 property.ClrName);
@@ -303,20 +305,20 @@ namespace Umbraco.ModelsBuilder.Building
             if (mixinStatic)
             {
                 sb.Append("\t\tpublic ");
-                WriteClrType(sb, property.ModelClrType);
+                WriteClrType(sb, property.ClrTypeName);
                 sb.AppendFormat(" {0} => {1}(this);\n",
                     property.ClrName, MixinStaticGetterName(property.ClrName));
             }
             else
             {
                 sb.Append("\t\tpublic ");
-                WriteClrType(sb, property.ModelClrType);
+                WriteClrType(sb, property.ClrTypeName);
                 sb.AppendFormat(" {0} => this.Value",
                     property.ClrName);
                 if (property.ModelClrType != typeof(object))
                 {
                     sb.Append("<");
-                    WriteClrType(sb, property.ModelClrType);
+                    WriteClrType(sb, property.ClrTypeName);
                     sb.Append(">");
                 }
                 sb.AppendFormat("(\"{0}\");\n",
@@ -342,13 +344,13 @@ namespace Umbraco.ModelsBuilder.Building
                 sb.AppendFormat("\t\t/// <summary>Static getter for {0}</summary>\n", XmlCommentString(property.Name));
 
             sb.Append("\t\tpublic static ");
-            WriteClrType(sb, property.ModelClrType);
+            WriteClrType(sb, property.ClrTypeName);
             sb.AppendFormat(" {0}(I{1} that) => that.Value",
                 mixinStaticGetterName, mixinClrName);
             if (property.ModelClrType != typeof(object))
             {
                 sb.Append("<");
-                WriteClrType(sb, property.ModelClrType);
+                WriteClrType(sb, property.ClrTypeName);
                 sb.Append(">");
             }
             sb.AppendFormat("(\"{0}\");\n",
@@ -396,7 +398,7 @@ namespace Umbraco.ModelsBuilder.Building
             if (!string.IsNullOrWhiteSpace(property.Name))
                 sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString(property.Name));
             sb.Append("\t\t");
-            WriteClrType(sb, property.ModelClrType);
+            WriteClrType(sb, property.ClrTypeName);
             sb.AppendFormat(" {0} {{ get; }}\n",
                 property.ClrName);
 
@@ -429,6 +431,27 @@ namespace Umbraco.ModelsBuilder.Building
             else
             {
                 WriteNonGenericClrType(sb, s);
+            }
+        }
+
+        internal void WriteClrType(StringBuilder sb, string type)
+        {
+            var p = type.IndexOf('<');
+            if (type.Contains('<'))
+            {
+                WriteNonGenericClrType(sb, type.Substring(0, p));
+                sb.Append("<");
+                var args = type.Substring(p + 1).TrimEnd('>').Split(','); // fixme will NOT work with nested generic types
+                for (var i = 0; i < args.Length; i++)
+                {
+                    if (i > 0) sb.Append(", ");
+                    WriteClrType(sb, args[i]);
+                }
+                sb.Append(">");
+            }
+            else
+            {
+                WriteNonGenericClrType(sb, type);
             }
         }
 

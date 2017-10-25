@@ -101,7 +101,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                 File.Delete(file);
 
-            var umbraco = Application.GetApplication();
+            var umbraco = ModelsBuilderComponent.Umbraco;
             var typeModels = umbraco.GetAllTypes();
 
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);

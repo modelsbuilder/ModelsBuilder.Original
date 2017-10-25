@@ -10,7 +10,7 @@ namespace Umbraco.ModelsBuilder.Api
     {
         public static Dictionary<string, string> GetModels(string modelsNamespace, IDictionary<string, string> files)
         {
-            var umbraco = Application.GetApplication();
+            var umbraco = ModelsBuilderComponent.Umbraco;
             var typeModels = umbraco.GetAllTypes();
 
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(files);

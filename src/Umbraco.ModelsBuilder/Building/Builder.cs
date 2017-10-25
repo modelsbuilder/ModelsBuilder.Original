@@ -309,14 +309,14 @@ namespace Umbraco.ModelsBuilder.Building
             return UmbracoConfig.For.ModelsBuilder().ModelsNamespace;
         }
 
-        protected string GetModelsBaseClassName()
+        protected string GetModelsBaseClassName(TypeModel type)
         {
             // code attribute overrides everything
             if (ParseResult.HasModelsBaseClassName)
                 return ParseResult.ModelsBaseClassName;
 
             // default
-            return "PublishedContentModel";
+            return type.IsElement ? "PublishedElementModel" : "PublishedContentModel";
         }
     }
 }

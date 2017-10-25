@@ -6,7 +6,7 @@ namespace Umbraco.ModelsBuilder.Building
     /// <summary>
     /// Represents a model property.
     /// </summary>
-    internal class PropertyModel
+    public class PropertyModel
     {
         /// <summary>
         /// Gets the alias of the property.
@@ -37,9 +37,9 @@ namespace Umbraco.ModelsBuilder.Building
         public Type ModelClrType;
 
         /// <summary>
-        /// Gets the CLR type of the property values.
+        /// Gets the CLR type name of the property values.
         /// </summary>
-        //public Type ClrType;
+        public string ClrTypeName;
 
         /// <summary>
         /// Gets a value indicating whether this property should be excluded from generation.

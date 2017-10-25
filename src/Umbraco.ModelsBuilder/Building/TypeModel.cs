@@ -7,7 +7,7 @@ namespace Umbraco.ModelsBuilder.Building
     /// <summary>
     /// Represents a model.
     /// </summary>
-    internal class TypeModel
+    public class TypeModel
     {
         /// <summary>
         /// Gets the unique identifier of the corresponding content type.
@@ -119,10 +119,20 @@ namespace Umbraco.ModelsBuilder.Building
         public bool HasCtor;
 
         /// <summary>
+        /// Gets a value indicating whether the type is an element.
+        /// </summary>
+        public bool IsElement => ItemType == ItemTypes.Element;
+
+        /// <summary>
         /// Represents the different model item types.
         /// </summary>
         public enum ItemTypes
         {
+            /// <summary>
+            /// Element.
+            /// </summary>
+            Element,
+
             /// <summary>
             /// Content.
             /// </summary>
@@ -151,6 +161,7 @@ namespace Umbraco.ModelsBuilder.Building
             {
                 switch (value)
                 {
+                    case ItemTypes.Element:
                     case ItemTypes.Content:
                     case ItemTypes.Media:
                     case ItemTypes.Member:
