@@ -355,12 +355,12 @@ namespace Umbrco.Web.Models.User
     [assembly: Generator.IgnoreContentType(""ddd"")]
 
     // create a mixin for MixinTest but with a different class name
-    [PublishedContentModel(""MixinTest"")]
+    [PublishedModel(""MixinTest"")]
     public partial interface IMixinTestRenamed
     { }
 
     // create a model for bbb but with a different class name
-    [PublishedContentModel(""bbb"")]
+    [PublishedModel(""bbb"")]
     public partial class SpecialBbb
     { }
 
@@ -723,7 +723,7 @@ namespace MyNamespace
                         className = _classNames.Peek();
                         Console.WriteLine("Ignore PropertyType {0}.{1}", className, node.Token.ValueText);
                         break;
-                    case "PublishedContentModel":
+                    case "PublishedModel":
                         className = _classNames.Peek();
                         Console.WriteLine("Name {0} for ContentType {1}", className, node.Token.ValueText);
                         break;

@@ -1304,7 +1304,7 @@ namespace Umbraco.Web.PublishedModels
 		string Prop1b { get; }
 	}
 
-	[PublishedContentModel(""type1"")]
+	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel, IType1
 	{
 		// helpers
@@ -1355,7 +1355,7 @@ using Umbraco.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedModels
 {
-	[PublishedContentModel(""type2"")]
+	[PublishedModel(""type2"")]
 	public partial class Type2 : PublishedContentModel, IType1
 	{
 		// helpers
@@ -1449,7 +1449,7 @@ using Umbraco.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedModels
 {
-	[PublishedContentModel(""type1"")]
+	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
 		// helpers
@@ -1558,7 +1558,7 @@ using Umbraco.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedModels
 {
-	[PublishedContentModel(""type1"")]
+	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
 		// helpers
@@ -1666,7 +1666,7 @@ using Umbraco.ModelsBuilder.Umbraco;
 namespace Umbraco.Web.PublishedModels
 {
 	// Content Type 1 with alias ""type1""
-	[PublishedContentModel(""type1"")]
+	[PublishedModel(""type1"")]
 	public partial class Type2 : PublishedContentModel
 	{
 		// helpers

@@ -444,7 +444,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 if (constructor == null)
                     throw new InvalidOperationException($"Type {type.FullName} is missing a public constructor with one argument of type, or implementing, IPropertySet.");
 
-                var attribute = type.GetCustomAttribute<PublishedContentModelAttribute>(false);
+                var attribute = type.GetCustomAttribute<PublishedModelAttribute>(false);
                 var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
 
                 if (modelInfos.TryGetValue(typeName, out ModelInfo modelInfo))
@@ -465,36 +465,6 @@ namespace Umbraco.ModelsBuilder.Umbraco
             return new Infos { ModelInfos = modelInfos.Count > 0 ? modelInfos : null, ModelTypeMap = map };
         }
 
-        // fixme move to Core
-        // map contains the qualified name eg Foo.Bar.Model
-        // returns qualified names too eg Foo.Bar.Model - in a usable format eg List<Foo, Bar>
-        private static string MapToName(Type type, Dictionary<string, string> map)
-        {
-            if (type is ModelType modelType)
-            {
-                if (map.TryGetValue(modelType.ContentTypeAlias, out var actualTypeName))
-                    return actualTypeName;
-                throw new InvalidOperationException($"Don't know how to map ModelType with content type alias \"{modelType.ContentTypeAlias}\".");
-            }
-
-            //if (type is ModelTypeArrayType arrayType)
-            //{
-            //    if (map.TryGetValue(arrayType.ContentTypeAlias, out var actualTypeName))
-            //        return actualTypeName + "[]";
-            //    throw new InvalidOperationException($"Don't know how to map ModelType with content type alias \"{arrayType.ContentTypeAlias}\".");
-            //}
-
-            if (type.IsGenericType == false)
-                return type.FullName;
-            var def = type.GetGenericTypeDefinition();
-            if (def == null)
-                throw new InvalidOperationException("panic");
-
-            var args = type.GetGenericArguments().Select(x => MapToName(x, map)).ToArray();
-            var defFullName = def.FullName.Substring(0, def.FullName.IndexOf('`'));
-            return defFullName + "<" + string.Join(", ", args) + ">";
-        }
-
         private static string GenerateModelsCode(IDictionary<string, string> ourFiles, IList<TypeModel> typeModels)
         {
             var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
@@ -504,13 +474,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                 File.Delete(file);
 
-            // fixme is this the place to do it?
             var map = typeModels.ToDictionary(x => x.Alias, x => x.ClrName);
             foreach (var typeModel in typeModels)
             {
                 foreach (var propertyModel in typeModel.Properties)
                 {
-                    propertyModel.ClrTypeName = MapToName(propertyModel.ModelClrType, map);
+                    propertyModel.ClrTypeName = ModelType.MapToName(propertyModel.ModelClrType, map);
                 }
             }
 

@@ -144,7 +144,7 @@ namespace Umbraco.ModelsBuilder.Building
             // cannot do it now. see note in ImplementContentTypeAttribute
             //if (!type.HasImplement)
             //    sb.AppendFormat("\t[ImplementContentType(\"{0}\")]\n", type.Alias);
-            sb.AppendFormat("\t[PublishedContentModel(\"{0}\")]\n", type.Alias);
+            sb.AppendFormat("\t[PublishedModel(\"{0}\")]\n", type.Alias);
             sb.AppendFormat("\tpublic partial class {0}", type.ClrName);
             var inherits = type.HasBase
                 ? null // has its own base already

@@ -35,7 +35,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     hash.Add(prop.ClrName);
                     hash.Add(prop.Name);
                     hash.Add(prop.Description);
-                    hash.Add(prop.ModelClrType.FullName);
+                    hash.Add(prop.ModelClrType.ToString()); // see ModelType tests, want ToString() not FullName
                 }
             }
 

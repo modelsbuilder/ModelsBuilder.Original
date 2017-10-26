@@ -120,6 +120,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 uniqueTypes.Add(typeModel.ClrName);
 
                 // fixme - we need a better way at figuring out what's an element type!
+                // and then we should not do the alias filtering below
                 bool IsElement(PublishedContentType x)
                 {
                     return x.Alias.InvariantEndsWith("Element");

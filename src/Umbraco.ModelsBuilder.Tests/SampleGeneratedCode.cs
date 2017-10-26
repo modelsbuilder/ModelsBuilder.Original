@@ -184,7 +184,7 @@ namespace Umbraco.ModelsBuilder.Tests.Models
     }
 
     /// <summary>DebugTextBuilder</summary>
-    [PublishedContentModel("debugTextBuilder")]
+    [PublishedModel("debugTextBuilder")]
     public partial class DebugTextBuilder : PublishedContentModel
     {
         // helpers
