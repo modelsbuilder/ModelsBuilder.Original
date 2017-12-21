@@ -312,10 +312,13 @@ namespace Umbraco.ModelsBuilder.Umbraco
             if (forceRebuild == false)
             {
                 // try to load the dll directly (avoid rebuilding)
+                // ensure that the .dll file does not have a corresponding .dll.delete file
+                // as that would mean the the .dll file is going to be deleted and should not
+                // be re-used - that should not happen in theory, but better be safe
                 if (File.Exists(dllPathFile))
                 {
                     var dllPath = File.ReadAllText(dllPathFile);
-                    if (File.Exists(dllPath))
+                    if (File.Exists(dllPath) && !File.Exists(dllPath + ".delete"))
                     {
                         assembly = Assembly.LoadFile(dllPath);
                         var attr = assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
@@ -349,8 +352,25 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 //File.WriteAllText(Path.Combine(modelsDirectory, "models.dep"), "VER:" + _ver);
 
                 _ver++;
-                assembly = BuildManager.GetCompiledAssembly(ProjVirt);
-                File.WriteAllText(dllPathFile, assembly.Location);
+                try
+                {
+                    assembly = BuildManager.GetCompiledAssembly(ProjVirt);
+                    File.WriteAllText(dllPathFile, assembly.Location);
+                }
+                catch
+                {
+                    // the dll file reference still points to the previous dll, which is obsolete
+                    // now and will be deleted by ASP.NET eventually, so better clear that reference.
+                    // also touch the proj file to force views to recompile - don't delete as it's
+                    // useful to have the source around for debuggin.
+                    try
+                    {
+                        if (File.Exists(dllPathFile)) File.Delete(dllPathFile);
+                        if (File.Exists(ProjVirt)) File.SetLastWriteTime(ProjVirt, DateTime.Now);
+                    }
+                    catch { /* enough */ }
+                    throw;
+                }
 
                 _logger.Logger.Debug<PureLiveModelFactory>("Loading cached models (source).");
                 return assembly;
@@ -377,11 +397,27 @@ namespace Umbraco.ModelsBuilder.Umbraco
             File.WriteAllText(projFile, proj);
 
             // compile and register
-            assembly = BuildManager.GetCompiledAssembly(ProjVirt);
-            File.WriteAllText(dllPathFile, assembly.Location);
+            try
+            {
+                assembly = BuildManager.GetCompiledAssembly(ProjVirt);
+                File.WriteAllText(dllPathFile, assembly.Location);
+                File.WriteAllText(modelsHashFile, currentHash);
 
-            // assuming we can write and it's not going to cause exceptions...
-            File.WriteAllText(modelsHashFile, currentHash);
+            }
+            catch
+            {
+                // the dll file reference still points to the previous dll, which is obsolete
+                // now and will be deleted by ASP.NET eventually, so better clear that reference.
+                // also clear hash.
+                // because we just rewrote the source files, views will be recompiled.
+                try
+                {
+                    if (File.Exists(dllPathFile)) File.Delete(dllPathFile);
+                    if (File.Exists(modelsHashFile)) File.Delete(modelsHashFile);
+                }
+                catch { /* enough */ }
+                throw;
+            }
 
             _logger.Logger.Debug<PureLiveModelFactory>("Done rebuilding.");
             return assembly;
