@@ -366,7 +366,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     try
                     {
                         if (File.Exists(dllPathFile)) File.Delete(dllPathFile);
-                        if (File.Exists(ProjVirt)) File.SetLastWriteTime(ProjVirt, DateTime.Now);
+                        if (File.Exists(modelsHashFile)) File.Delete(modelsHashFile);
+                        if (File.Exists(projFile)) File.SetLastWriteTime(projFile, DateTime.Now);
                     }
                     catch { /* enough */ }
                     throw;
@@ -402,18 +403,18 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 assembly = BuildManager.GetCompiledAssembly(ProjVirt);
                 File.WriteAllText(dllPathFile, assembly.Location);
                 File.WriteAllText(modelsHashFile, currentHash);
-
             }
             catch
             {
                 // the dll file reference still points to the previous dll, which is obsolete
                 // now and will be deleted by ASP.NET eventually, so better clear that reference.
-                // also clear hash.
-                // because we just rewrote the source files, views will be recompiled.
+                // also touch the proj file to force views to recompile - don't delete as it's
+                // useful to have the source around for debuggin.
                 try
                 {
                     if (File.Exists(dllPathFile)) File.Delete(dllPathFile);
                     if (File.Exists(modelsHashFile)) File.Delete(modelsHashFile);
+                    if (File.Exists(projFile)) File.SetLastWriteTime(projFile, DateTime.Now);
                 }
                 catch { /* enough */ }
                 throw;
