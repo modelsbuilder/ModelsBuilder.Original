@@ -157,6 +157,19 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
                 _hasModels = false;
                 _pendingRebuild = true;
+
+                var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
+                if (!Directory.Exists(modelsDirectory))
+                    Directory.CreateDirectory(modelsDirectory);
+
+                // clear stuff
+                var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
+                //var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
+                //var projFile = Path.Combine(modelsDirectory, "all.generated.cs");
+                var dllPathFile = Path.Combine(modelsDirectory, "all.dll.path");
+
+                if (File.Exists(dllPathFile)) File.Delete(dllPathFile);
+                if (File.Exists(modelsHashFile)) File.Delete(modelsHashFile);
             }
             finally
             {
@@ -300,6 +313,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
                         _logger.Logger.Debug<PureLiveModelFactory>("Found obsolete cached models.");
                         forceRebuild = true;
                     }
+
+                    // else cachedHash matches currentHash, we can try to load an existing dll
                 }
                 else
                 {
@@ -309,7 +324,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
 
             Assembly assembly;
-            if (forceRebuild == false)
+            if (!forceRebuild)
             {
                 // try to load the dll directly (avoid rebuilding)
                 // ensure that the .dll file does not have a corresponding .dll.delete file
@@ -359,6 +374,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 }
                 catch
                 {
+                    _logger.Logger.Debug<PureLiveModelFactory>("Failed to compile.");
+
                     // the dll file reference still points to the previous dll, which is obsolete
                     // now and will be deleted by ASP.NET eventually, so better clear that reference.
                     // also touch the proj file to force views to recompile - don't delete as it's
@@ -406,6 +423,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
             catch
             {
+                _logger.Logger.Debug<PureLiveModelFactory>("Failed to compile.");
+
                 // the dll file reference still points to the previous dll, which is obsolete
                 // now and will be deleted by ASP.NET eventually, so better clear that reference.
                 // also touch the proj file to force views to recompile - don't delete as it's
