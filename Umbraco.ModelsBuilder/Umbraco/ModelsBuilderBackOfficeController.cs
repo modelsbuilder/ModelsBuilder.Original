@@ -85,11 +85,11 @@ namespace Umbraco.ModelsBuilder.Umbraco
             return new Dashboard
             {
                 Enable = UmbracoConfig.For.ModelsBuilder().Enable,
-                Text = DashboardHelper.Text(),
-                CanGenerate = DashboardHelper.CanGenerate(),
-                GenerateCausesRestart = DashboardHelper.GenerateCausesRestart(),
-                OutOfDateModels = DashboardHelper.AreModelsOutOfDate(),
-                LastError = DashboardHelper.LastError(),
+                Text = ModelsBuilder.Dashboard.DashboardHelper.Text(),
+                CanGenerate = ModelsBuilder.Dashboard.DashboardHelper.CanGenerate(),
+                GenerateCausesRestart = ModelsBuilder.Dashboard.DashboardHelper.GenerateCausesRestart(),
+                OutOfDateModels = ModelsBuilder.Dashboard.DashboardHelper.AreModelsOutOfDate(),
+                LastError = ModelsBuilder.Dashboard.DashboardHelper.LastError(),
             };
         }
 
