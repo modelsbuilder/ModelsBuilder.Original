@@ -34,6 +34,14 @@ namespace Umbraco.ModelsBuilder.Umbraco
             // always setup the dashboard
             InstallServerVars();
 
+            // do NOT try to do this when running 7.7.8 or below,
+            // as the RenderModelBinder.ModelBindingException does not exist
+            if (UmbracoVersion.Current >= new Version(7, 7, 9))
+                BindModelBindingException();
+        }
+
+        private void BindModelBindingException()
+        {
             // always setup the binder errors handler
             RenderModelBinder.ModelBindingException += HandleModelBindingException;
         }
