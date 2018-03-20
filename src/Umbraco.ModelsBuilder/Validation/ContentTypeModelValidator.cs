@@ -39,7 +39,7 @@ namespace Umbraco.ModelsBuilder.Validation
         where TModel: ContentTypeSave<TProperty>
         where TProperty: PropertyTypeBasic
     {
-        protected override IEnumerable<ValidationResult> PerformValidate(TModel model)
+        protected override IEnumerable<ValidationResult> Validate(TModel model)
         {
             //don't do anything if we're not enabled
             if (UmbracoConfig.For.ModelsBuilder().Enable)
