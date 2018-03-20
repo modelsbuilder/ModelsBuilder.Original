@@ -11,6 +11,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache.NuCache;
@@ -22,6 +23,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
     // nucache components wants models so we need to setup models before
     // however for some reason, this creates a cyclic dependency? => need better debugging info
     // cos nucache is Core so we need to be Core too
+    // also... should have a generic "modelsbuilder" and "contentcache" components for dependencies!
 
     [RequiredComponent(typeof(NuCacheComponent))]
     public class ModelsBuilderComponent : UmbracoComponentBase, IUmbracoCoreComponent
@@ -65,7 +67,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private void InstallDefaultModelsFactory(IServiceContainer container)
         {
-            container.RegisterSingleton<IPublishedModelFactory>(factory 
+            container.RegisterSingleton<IPublishedModelFactory>(factory
                 => new PublishedModelFactory(factory.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
         }
 

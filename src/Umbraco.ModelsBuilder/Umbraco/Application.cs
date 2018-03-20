@@ -126,7 +126,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     return x.Alias.InvariantEndsWith("Element");
                 }
 
-                var publishedContentType = _publishedContentTypeFactory.CreateContentType(itemType, contentType);
+                var publishedContentType = _publishedContentTypeFactory.CreateContentType(contentType);
                 switch (itemType)
                 {
                     case PublishedItemType.Content:

@@ -38,5 +38,5 @@ using System.Runtime.InteropServices;
 // Note: could not release "1.8.0" because it was depending on pre-release NuGet packages
 //  for Roslyn, so had to release 1.8.0-final... starting with 2.1.3 Roslyn has a released
 //  1.0 version, so now we can release "2.1.3" without the "-final" extension.
-[assembly: AssemblyInformationalVersion("8.0.0-alpha.13")]
+[assembly: AssemblyInformationalVersion("8.0.0-alpha.14")]
 // Do not remove this line.

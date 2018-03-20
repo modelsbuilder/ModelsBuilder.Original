@@ -15,7 +15,7 @@ namespace Umbraco.ModelsBuilder.Tests
         {
             public PublishedProperty(string alias, object sourceValue)
             {
-                PropertyTypeAlias = alias;
+                Alias = alias;
                 SourceValue = sourceValue;
             }
 
@@ -23,14 +23,34 @@ namespace Umbraco.ModelsBuilder.Tests
 
             public bool HasValue => SourceValue != null;
 
-            public string PropertyTypeAlias { get; }
-
             public object Value => SourceValue;
 
             public object XPathValue
             {
                 get { throw new NotImplementedException(); }
             }
+
+            bool IPublishedProperty.HasValue(int? languageId, string segment)
+            {
+                throw new NotImplementedException();
+            }
+
+            public object GetSourceValue(int? languageId = null, string segment = null)
+            {
+                throw new NotImplementedException();
+            }
+
+            public object GetValue(int? languageId = null, string segment = null)
+            {
+                throw new NotImplementedException();
+            }
+
+            public object GetXPathValue(int? languageId = null, string segment = null)
+            {
+                throw new NotImplementedException();
+            }
+
+            public string Alias { get; }
         }
 
         public class PublishedContent : IPublishedContent
@@ -82,7 +102,7 @@ namespace Umbraco.ModelsBuilder.Tests
 
             public IPublishedProperty GetProperty(string alias)
             {
-                return Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
+                return Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
             }
 
             public int Id
