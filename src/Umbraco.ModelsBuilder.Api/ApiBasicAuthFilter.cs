@@ -6,6 +6,7 @@ using System.Text;
 using System.Web.Http.Controllers;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 
@@ -76,7 +77,7 @@ namespace Umbraco.ModelsBuilder.Api
             var provider = Membership.Providers[providerKey];
             if (provider == null || !provider.ValidateUser(username, password))
                 return null;
-            var user = ApplicationContext.Current.Services.UserService.GetByUsername(username);
+            var user = Current.Services.UserService.GetByUsername(username);
             if (!user.IsApproved || user.IsLockedOut)
                 return null;
             return user;

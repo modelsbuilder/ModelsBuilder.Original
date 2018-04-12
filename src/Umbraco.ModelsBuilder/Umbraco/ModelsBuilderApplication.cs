@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using LightInject;
 using Umbraco.Core;
+using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
@@ -21,24 +21,31 @@ namespace Umbraco.ModelsBuilder.Umbraco
     /// <summary>
     /// Installs ModelsBuilder into the Umbraco site.
     /// </summary>
-    public class ModelsBuilderApplication : ApplicationEventHandler // fixme this all should become a component
+    /// <remarks>
+    /// <para>Don't bother installing at all, if not RuntimeLevel.Run.</para>
+    /// </remarks>
+    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
+    public class ModelsBuilderApplication : UmbracoComponentBase, IUmbracoCoreComponent
     {
-        protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        private IRuntimeState _runtimeState;
+
+        public override void Compose(Composition composition)
         {
             var config = UmbracoConfig.For.ModelsBuilder();
 
             if (config.ModelsMode == ModelsMode.PureLive)
-                InstallLiveModels(applicationContext.ProfilingLogger);
+                InstallLiveModels(composition.Container);
             else if (config.EnableFactory)
-                InstallDefaultModelsFactory();
+                InstallDefaultModelsFactory(composition.Container);
 
             // always setup the dashboard
             InstallServerVars();
-
         }
 
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        public void Initialize(IRuntimeState runtimeState)
         {
+            _runtimeState = runtimeState;
+
             var config = UmbracoConfig.For.ModelsBuilder();
 
             if (config.Enable)
@@ -51,17 +58,16 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 OutOfDateModelsStatus.Install();
         }
 
-        private void InstallDefaultModelsFactory()
+        private void InstallDefaultModelsFactory(IServiceContainer container)
         {
             var types = Current.TypeLoader.GetTypes<PublishedContentModel>();
             var factory = new PublishedModelFactory(types);
-            PublishedContentModelFactoryResolver.Current.SetFactory(factory);
+            container.RegisterSingleton<IPublishedModelFactory>(_ => factory);
         }
 
-        private void InstallLiveModels(ProfilingLogger logger)
+        private void InstallLiveModels(IServiceContainer container)
         {
-            var factory = new PureLiveModelFactory(logger);
-            PublishedContentModelFactoryResolver.Current.SetFactory(factory);
+            container.RegisterSingleton<IPublishedModelFactory, PureLiveModelFactory>();
 
             // the following would add @using statement in every view so user's don't
             // have to do it - however, then noone understands where the @using statement
@@ -90,14 +96,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 var umbracoUrlsObject = serverVars["umbracoUrls"];
                 if (umbracoUrlsObject == null)
                     throw new Exception("Null umbracoUrls");
-                var umbracoUrls = umbracoUrlsObject as Dictionary<string, object>;
-                if (umbracoUrls == null)
+                if (!(umbracoUrlsObject is Dictionary<string, object> umbracoUrls))
                     throw new Exception("Invalid umbracoUrls");
 
                 if (!serverVars.ContainsKey("umbracoPlugins"))
                     throw new Exception("Missing umbracoPlugins.");
-                var umbracoPlugins = serverVars["umbracoPlugins"] as Dictionary<string, object>;
-                if (umbracoPlugins == null)
+                if (!(serverVars["umbracoPlugins"] is Dictionary<string, object> umbracoPlugins))
                     throw new Exception("Invalid umbracoPlugins");
 
                 if (HttpContext.Current == null) throw new InvalidOperationException("HttpContext is null");
@@ -110,7 +114,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private Dictionary<string, object> GetModelsBuilderSettings()
         {
-            if (ApplicationContext.Current.IsConfigured == false)
+            if (_runtimeState.Level != RuntimeLevel.Run)
                 return null;
 
             var settings = new Dictionary<string, object>

@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.ModelsBuilder.Configuration;
@@ -61,7 +62,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private static void RequestModelsGeneration(object sender, EventArgs args)
         {
             //HttpContext.Current.Items[this] = true;
-            LogHelper.Debug<LiveModelsProvider>("Requested to generate models.");
+            Current.Logger.Debug<LiveModelsProvider>("Requested to generate models.");
             Interlocked.Exchange(ref _req, 1);
         }
 
@@ -75,22 +76,22 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             try
             {
-                LogHelper.Debug<LiveModelsProvider>("Generate models...");
+                Current.Logger.Debug<LiveModelsProvider>("Generate models...");
                 const int timeout = 2*60*1000; // 2 mins
                 _mutex.WaitOne(timeout); // wait until it is safe, and acquire
-                LogHelper.Info<LiveModelsProvider>("Generate models now.");
+                Current.Logger.Info<LiveModelsProvider>("Generate models now.");
                 GenerateModels();
                 ModelsGenerationError.Clear();
-                LogHelper.Info<LiveModelsProvider>("Generated.");
+                Current.Logger.Info<LiveModelsProvider>("Generated.");
             }
             catch (TimeoutException)
             {
-                LogHelper.Warn<LiveModelsProvider>("Timeout, models were NOT generated.");
+                Current.Logger.Warn<LiveModelsProvider>("Timeout, models were NOT generated.");
             }
             catch (Exception e)
             {
                 ModelsGenerationError.Report("Failed to build Live models.", e);
-                LogHelper.Error<LiveModelsProvider>("Failed to generate models.", e);
+                Current.Logger.Error<LiveModelsProvider>("Failed to generate models.", e);
             }
             finally
             {
