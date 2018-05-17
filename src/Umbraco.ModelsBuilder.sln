@@ -12,7 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{C7
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{42C3FC1A-26BA-4FAB-9585-AC8C25449B8F}"
 	ProjectSection(SolutionItems) = preProject
-		build\build.ps1 = build\build.ps1
+		..\build\build-bootstrap.ps1 = ..\build\build-bootstrap.ps1
+		..\build\build.ps1 = ..\build\build.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModelsBuilder", "ModelsBuilder", "{1FFB7043-4B35-4A92-80FC-A2306511C8D5}"
