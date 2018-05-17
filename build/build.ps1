@@ -25,7 +25,7 @@
   # create and boot the buildsystem
   $ubuild = &"$PSScriptRoot\build-bootstrap.ps1"
   if (-not $?) { return }
-  $ubuild.Boot($PSScriptRoot, 
+  $ubuild.Boot($PSScriptRoot,
     @{ Local = $local; With7Zip = $false; WithNode = $false },
     @{ Continue = $continue })
   if ($ubuild.OnError()) { return }
@@ -56,7 +56,7 @@
     $current = $versionNode.Value
     $pos = $current.LastIndexOf('.')
     $current = $current.Substring($pos + 1)
-    $now = [DateTime]::Now.ToString("yyMMdd")    
+    $now = [DateTime]::Now.ToString("yyMMdd")
     if ($current.Length -ne 9)
     {
       $build = $now + "001"
@@ -91,8 +91,12 @@
   {
     Write-Host "Restore NuGet"
     Write-Host "Logging to $($this.BuildTemp)\nuget.restore.log"
-    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\Umbraco.ModelsBuilder.sln" -ConfigFile $this.BuildEnv.NuGetConfig > "$($this.BuildTemp)\nuget.restore.log"
-    if (-not $?) { throw "Failed to restore NuGet packages." }   
+    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\Umbraco.ModelsBuilder.sln" > "$($this.BuildTemp)\nuget.restore.log"
+    # temp - ignore errors, because of a circular dependency between U and MB
+    #   we'll eventually move Umbraco.ModelsBuilder (and only that one) into Core,
+    #   once I have decided what to do with the work-in-progress stuff
+    #if (-not $?) { throw "Failed to restore NuGet packages." }
+    $error.Clear()
   })
 
   $ubuild.DefineMethod("Compile",
@@ -101,15 +105,15 @@
 
     $src = "$($this.SolutionRoot)\src"
     $log = "$($this.BuildTemp)\msbuild.log"
-    
+
     if ($this.BuildEnv.VisualStudio -eq $null)
     {
       throw "Build environment does not provide VisualStudio."
     }
-    
+
     Write-Host "Compile"
     Write-Host "Logging to $log"
-  
+
     # beware of the weird double \\ at the end of paths
     # see http://edgylogic.com/blog/powershell-and-external-commands-done-right/
     &$this.BuildEnv.VisualStudio.MsBuild "$src\Umbraco.ModelsBuilder.sln" `
@@ -119,8 +123,6 @@
       /p:UseWPP_CopyWebApplication=True `
       /p:PipelineDependsOnBuild=False `
       /p:OutDir="$($this.BuildTemp)\bin\\" `
-      /p:WebProjectOutputDir="$($this.BuildTemp)\WebApp\\" `
-      /p:VisualStudioVersion="$($this.BuildEnv.VisualStudio.Major).0" `
       /p:Verbosity=minimal `
       /t:Clean`;Rebuild `
       /tv:"$($this.BuildEnv.VisualStudio.ToolsVersion)" `
@@ -128,7 +130,7 @@
       > $log
 
     if (-not $?) { throw "Failed to compile." }
-    
+
     # /p:UmbracoBuild tells the csproj that we are building from PS, not VS
   })
 
@@ -167,7 +169,7 @@
   {
     $this.VerifyNuGetConsistency(
       ("Umbraco.ModelsBuilder", "Umbraco.ModelsBuilder.Api"),
-      ("Umbraco.ModelsBuilder", "Umbraco.ModelsBuilder.Api", "Umbraco.ModelsBuilder.CustomTool", "Umbraco.ModelsBuilder.Console"))      
+      ("Umbraco.ModelsBuilder", "Umbraco.ModelsBuilder.Api", "Umbraco.ModelsBuilder.CustomTool", "Umbraco.ModelsBuilder.Console"))
   })
 
   $ubuild.DefineMethod("PostPackageHook",
@@ -209,9 +211,9 @@
   $ubuild.ReleaseBranches = @( "master" )
 
   # run
-  if (-not $get) 
+  if (-not $get)
   {
-    $ubuild.Build() 
+    $ubuild.Build()
     if ($ubuild.OnError()) { return }
   }
   Write-Host "Done"

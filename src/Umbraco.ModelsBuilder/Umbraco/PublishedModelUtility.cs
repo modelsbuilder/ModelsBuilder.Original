@@ -26,7 +26,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         public static PublishedContentType GetModelContentType(PublishedItemType itemType, string alias)
         {
-            var facade = Current.UmbracoContext.PublishedShapshot; // fixme inject!
+            var facade = Current.UmbracoContext.PublishedSnapshot; // fixme inject!
             switch (itemType)
             {
                 case PublishedItemType.Content:
