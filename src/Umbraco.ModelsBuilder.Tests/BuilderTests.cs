@@ -1312,9 +1312,9 @@ namespace Umbraco.Web.PublishedModels
 		public new const string ModelTypeAlias = ""type1"";
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		public new static PublishedContentType GetModelContentType()
-			=> PublishedContentModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
 		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
-			=> PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
 		// ctor
@@ -1363,9 +1363,9 @@ namespace Umbraco.Web.PublishedModels
 		public new const string ModelTypeAlias = ""type2"";
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		public new static PublishedContentType GetModelContentType()
-			=> PublishedContentModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
 		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
-			=> PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
 		// ctor
@@ -1457,9 +1457,9 @@ namespace Umbraco.Web.PublishedModels
 		public new const string ModelTypeAlias = ""type1"";
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		public new static PublishedContentType GetModelContentType()
-			=> PublishedContentModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
 		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
-			=> PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
 		// ctor
@@ -1566,9 +1566,9 @@ namespace Umbraco.Web.PublishedModels
 		public new const string ModelTypeAlias = ""type1"";
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		public new static PublishedContentType GetModelContentType()
-			=> PublishedContentModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
 		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
-			=> PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
 		// properties
@@ -1674,9 +1674,9 @@ namespace Umbraco.Web.PublishedModels
 		public new const string ModelTypeAlias = ""type1"";
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		public new static PublishedContentType GetModelContentType()
-			=> PublishedContentModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
 		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
-			=> PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
 		// properties

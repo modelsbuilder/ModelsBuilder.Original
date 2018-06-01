@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.ModelsBuilder.Building
 {
@@ -202,6 +203,21 @@ namespace Umbraco.ModelsBuilder.Building
             {
                 yield return typeModel;
                 typeModel = typeModel.BaseType;
+            }
+        }
+
+        /// <summary>
+        /// Maps ModelType.
+        /// </summary>
+        public static void MapModelTypes(IList<TypeModel> typeModels)
+        {
+            var map = typeModels.ToDictionary(x => x.Alias, x => x.ClrName);
+            foreach (var typeModel in typeModels)
+            {
+                foreach (var propertyModel in typeModel.Properties)
+                {
+                    propertyModel.ClrTypeName = ModelType.MapToName(propertyModel.ModelClrType, map);
+                }
             }
         }
     }

@@ -8,6 +8,9 @@ namespace Umbraco.ModelsBuilder.Api
     /// </summary>
     public class ApiVersion
     {
+        // FIXME this should all become SemVer !!
+        #error must do + adjust versions
+
         #region Configure
 
         // indicate the minimum version of the client API that is supported by this server's API.

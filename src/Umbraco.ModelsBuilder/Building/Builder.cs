@@ -108,6 +108,8 @@ namespace Umbraco.ModelsBuilder.Building
         /// </remarks>
         private void Prepare()
         {
+            TypeModel.MapModelTypes(_typeModels);
+
             var pureLive = UmbracoConfig.For.ModelsBuilder().ModelsMode == ModelsMode.PureLive;
 
             // mark IsContentIgnored models that we discovered should be ignored

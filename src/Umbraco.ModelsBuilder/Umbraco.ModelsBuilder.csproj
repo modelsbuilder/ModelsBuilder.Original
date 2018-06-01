@@ -21,7 +21,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -30,16 +29,16 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <Prefer32Bit>false</Prefer32Bit>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Umbraco.ModelsBuilder.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Xml" />
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="UmbracoCms.Core" Version="8.0.0-alpha.35" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.8.0" />
+    <PackageReference Include="UmbracoCms.Core" Version="8.0.0-alpha.42" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionInfo.cs">
@@ -68,7 +67,6 @@
     <Compile Include="ModelsUsingAttribute.cs" />
     <Compile Include="ModelsBaseClassAttribute.cs" />
     <Compile Include="ModelsNamespaceAttribute.cs" />
-    <Compile Include="PublishedPropertyTypeExtensions.cs" />
     <Compile Include="RenameContentTypeAttribute.cs" />
     <Compile Include="Building\ParseResult.cs" />
     <Compile Include="RenamePropertyTypeAttribute.cs" />
@@ -80,11 +78,10 @@
     <Compile Include="IgnoreContentTypeAttribute.cs" />
     <Compile Include="IgnorePropertyTypeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Umbraco\Application.cs" />
+    <Compile Include="Umbraco\UmbracoServices.cs" />
     <Compile Include="Umbraco\HashCombiner.cs" />
     <Compile Include="Umbraco\HashHelper.cs" />
     <Compile Include="Umbraco\LiveModelsProvider.cs" />
-    <Compile Include="Umbraco\ModelsBuilderApplication.cs" />
     <Compile Include="Umbraco\ModelsBuilderBackOfficeController.cs" />
     <Compile Include="Umbraco\ModelsBuilderComponent.cs" />
     <Compile Include="Umbraco\ModelsGenerationError.cs" />

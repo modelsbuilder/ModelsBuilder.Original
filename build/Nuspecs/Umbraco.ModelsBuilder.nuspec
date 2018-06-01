@@ -15,24 +15,12 @@
     <language>en-US</language>
     <tags>umbraco</tags>
     <dependencies>
-        <dependency id="Microsoft.CodeAnalysis.CSharp" version="2.7.0" />
+        <dependency id="Microsoft.CodeAnalysis.CSharp" version="2.8.0" />
     </dependencies>
 	</metadata>
 	<files>
         <!-- our dlls -->
         <file src="$solution$\build.tmp\bin\Umbraco.ModelsBuilder.dll" target="lib\Umbraco.ModelsBuilder.dll" />
         <file src="$solution$\build.tmp\bin\Umbraco.ModelsBuilder.pdb" target="lib\Umbraco.ModelsBuilder.pdb" />
-
-        <!-- content for the dashboard -->
-        <file src="$solution$\src\Umbraco.ModelsBuilder\Dashboard\modelsbuilder.htm" target="content\App_Plugins\ModelsBuilder\modelsbuilder.htm" />
-        <file src="$solution$\src\Umbraco.ModelsBuilder\Dashboard\modelsbuilder.controller.js" target="content\App_Plugins\ModelsBuilder\modelsbuilder.controller.js" />
-        <file src="$solution$\src\Umbraco.ModelsBuilder\Dashboard\modelsbuilder.resource.js" target="content\App_Plugins\ModelsBuilder\modelsbuilder.resource.js" />
-        <file src="$solution$\src\Umbraco.ModelsBuilder\Dashboard\package.manifest" target="content\App_Plugins\ModelsBuilder\package.manifest" />
-
-        <!-- transforms -->
-        <file src="$solution$\build\nuspecs\ModelsBuilder\web.config.install.xdt" target="content" />
-        <file src="$solution$\build\nuspecs\ModelsBuilder\web.config.uninstall.xdt" target="content" />
-        <file src="$solution$\build\nuspecs\ModelsBuilder\dashboard.config.install.xdt" target="content\config" />
-        <file src="$solution$\build\nuspecs\ModelsBuilder\dashboard.config.uninstall.xdt" target="content\config" />
   </files>
 </package>

@@ -28,6 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuspecs", "Nuspecs", "{3036
 	ProjectSection(SolutionItems) = preProject
 		..\build\Nuspecs\Umbraco.ModelsBuilder.Api.nuspec = ..\build\Nuspecs\Umbraco.ModelsBuilder.Api.nuspec
 		..\build\Nuspecs\Umbraco.ModelsBuilder.nuspec = ..\build\Nuspecs\Umbraco.ModelsBuilder.nuspec
+		..\build\Nuspecs\Umbraco.ModelsBuilder.Ui.nuspec = ..\build\Nuspecs\Umbraco.ModelsBuilder.Ui.nuspec
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModelsBuilder.Api", "ModelsBuilder.Api", "{FC57764D-873F-4B6E-AC70-E29FAAFBBBF4}"

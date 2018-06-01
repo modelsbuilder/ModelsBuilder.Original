@@ -21,31 +21,18 @@ namespace Umbraco.ModelsBuilder.Tests
 
             public object SourceValue { get; }
 
-            public bool HasValue => SourceValue != null;
+            public PublishedPropertyType PropertyType => throw new NotImplementedException();
 
-            public object Value => SourceValue;
+            bool IPublishedProperty.HasValue(string culture, string segment) => SourceValue != null;
 
-            public object XPathValue
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            bool IPublishedProperty.HasValue(int? languageId, string segment)
+            public object GetSourceValue(string culture = null, string segment = null)
             {
                 throw new NotImplementedException();
             }
 
-            public object GetSourceValue(int? languageId = null, string segment = null)
-            {
-                throw new NotImplementedException();
-            }
+            public object GetValue(string culture = null, string segment = null) => SourceValue;
 
-            public object GetValue(int? languageId = null, string segment = null)
-            {
-                throw new NotImplementedException();
-            }
-
-            public object GetXPathValue(int? languageId = null, string segment = null)
+            public object GetXPathValue(string culture = null, string segment = null)
             {
                 throw new NotImplementedException();
             }
@@ -63,134 +50,64 @@ namespace Umbraco.ModelsBuilder.Tests
                 _properties = properties;
             }
 
-            public IEnumerable<IPublishedContent> Children
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public IEnumerable<IPublishedContent> Children => throw new NotImplementedException();
 
             public PublishedContentType ContentType { get; }
 
-            public DateTime CreateDate
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public DateTime CreateDate => throw new NotImplementedException();
 
-            public int CreatorId
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public int CreatorId => throw new NotImplementedException();
 
-            public string CreatorName
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public string DocumentTypeAlias
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public int DocumentTypeId
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public IPublishedProperty GetProperty(string alias, bool recurse)
-            {
-                return GetProperty(alias);
-            }
+            public string CreatorName => throw new NotImplementedException();
 
             public IPublishedProperty GetProperty(string alias)
             {
                 return Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
             }
 
-            public int Id
+            public string GetUrl(string culture = null)
             {
-                get { throw new NotImplementedException(); }
+                throw new NotImplementedException();
             }
 
-            public Guid Key
+            public PublishedCultureInfo GetCulture(string culture = null)
             {
-                get { throw new NotImplementedException(); }
+                throw new NotImplementedException();
             }
 
-            public bool IsDraft
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public int Id => throw new NotImplementedException();
 
-            public PublishedItemType ItemType
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public Guid Key => throw new NotImplementedException();
 
-            public int Level
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public bool IsDraft => throw new NotImplementedException();
 
-            public string Name
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; }
+            public PublishedItemType ItemType => throw new NotImplementedException();
 
-            public IPublishedContent Parent
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public int Level => throw new NotImplementedException();
 
-            public string Path
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public string Name => throw new NotImplementedException();
+            public string UrlSegment { get; }
+
+            public IPublishedContent Parent => throw new NotImplementedException();
+
+            public string Path => throw new NotImplementedException();
 
             public IEnumerable<IPublishedProperty> Properties => _properties;
 
-            public int SortOrder
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public int SortOrder => throw new NotImplementedException();
 
-            public int TemplateId
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public int TemplateId => throw new NotImplementedException();
 
-            public DateTime UpdateDate
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public DateTime UpdateDate => throw new NotImplementedException();
 
-            public string Url
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public string Url => throw new NotImplementedException();
 
-            public string UrlName
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public int WriterId => throw new NotImplementedException();
 
-            public Guid Version
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public string WriterName => throw new NotImplementedException();
 
-            public int WriterId
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public string WriterName
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public object this[string alias]
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public object this[string alias] => throw new NotImplementedException();
         }
     }
 }

@@ -146,6 +146,18 @@
   	if (-not $?) { throw "Failed to pack NuGet Umbraco.ModelsBuilder." }
   })
 
+  $ubuild.DefineMethod("PackageUi",
+  {
+    Write-Host "Package Umbraco.ModelsBuilder.Ui"
+    $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
+    $copyright = "Copyright © Umbraco $((Get-Date).Year)"
+	  &$this.BuildEnv.NuGet pack "$nuspecs\Umbraco.ModelsBuilder.Ui.nuspec" `
+	    -Properties copyright="$Copyright"`;solution="$($this.SolutionRoot)" `
+	    -Version "$($this.Version.Semver.ToString())" `
+	    -Verbosity detailed -OutputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.ui.log"
+  	if (-not $?) { throw "Failed to pack NuGet Umbraco.ModelsBuilder.Ui." }
+  })
+
   $ubuild.DefineMethod("PackageApi",
   {
     Write-Host "Package Umbraco.ModelsBuilder.Api"
