@@ -209,6 +209,8 @@
     if ($this.OnError()) { return }
     $this.PackageApi()
     if ($this.OnError()) { return }
+    $this.PackageUi()
+    if ($this.OnError()) { return }
     $this.PackageVsix()
     if ($this.OnError()) { return }
     $this.PostPackageHook()
