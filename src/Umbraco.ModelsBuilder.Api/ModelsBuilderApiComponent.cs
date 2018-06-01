@@ -1,4 +1,5 @@
 ﻿using LightInject;
+using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
@@ -7,6 +8,7 @@ using Umbraco.ModelsBuilder.Umbraco;
 namespace Umbraco.ModelsBuilder.Api
 {
     [RequireComponent(typeof(ModelsBuilderComponent))]
+    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public class ModelsBuilderApiComponent : UmbracoComponentBase, IUmbracoUserComponent
     {
         public override void Compose(Composition composition)
