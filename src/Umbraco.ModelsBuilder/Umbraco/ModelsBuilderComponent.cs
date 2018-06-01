@@ -39,11 +39,6 @@ namespace Umbraco.ModelsBuilder.Umbraco
             // always setup the dashboard
             InstallServerVars(composition.Container.GetInstance<IRuntimeState>().Level);
             composition.Container.Register(typeof(ModelsBuilderBackOfficeController), new PerRequestLifeTime());
-
-            // setup the API if enabled (and in debug mode)
-            #error or in API?
-            if (config.ApiServer)
-                composition.Container.Register(typeof(ModelsBuilderApiController), new PerRequestLifeTime());
         }
 
         public void Initialize(UmbracoServices umbracoServices)

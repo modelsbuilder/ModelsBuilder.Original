@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Semver;
 
 namespace Umbraco.ModelsBuilder.Api
 {
@@ -8,20 +9,17 @@ namespace Umbraco.ModelsBuilder.Api
     /// </summary>
     public class ApiVersion
     {
-        // FIXME this should all become SemVer !!
-        #error must do + adjust versions
-
         #region Configure
 
         // indicate the minimum version of the client API that is supported by this server's API.
         //   eg our Version = 4.8 but we support connections from VSIX down to version 3.2
         //   => as a server, we accept connections from client down to version ...
-        private static readonly Version MinClientVersionSupportedByServerConst = new Version(3, 0, 0, 0);
+        private static readonly SemVersion MinClientVersionSupportedByServerConst = SemVersion.Parse("8.0.0-alpha.19");
 
         // indicate the minimum version of the server that can support the client API
         //   eg our Version = 4.8 and we know we're compatible with website server down to version 3.2
         //   => as a client, we tell the server down to version ... that it should accept us
-        private static readonly Version MinServerVersionSupportingClientConst = new Version(3, 0, 0, 0);
+        private static readonly SemVersion MinServerVersionSupportingClientConst = SemVersion.Parse("8.0.0-alpha.19");
 
         #endregion
 
@@ -31,37 +29,37 @@ namespace Umbraco.ModelsBuilder.Api
         /// <param name="executingVersion">The currently executing version.</param>
         /// <param name="minClientVersionSupportedByServer">The min client version supported by the server.</param>
         /// <param name="minServerVersionSupportingClient">An opt min server version supporting the client.</param>
-        internal ApiVersion(Version executingVersion, Version minClientVersionSupportedByServer, Version minServerVersionSupportingClient = null)
+        /// <exception cref="ArgumentNullException"></exception>
+        internal ApiVersion(SemVersion executingVersion, SemVersion minClientVersionSupportedByServer, SemVersion minServerVersionSupportingClient = null)
         {
-            if (executingVersion == null) throw new ArgumentNullException(nameof(executingVersion));
-            if (minClientVersionSupportedByServer == null) throw new ArgumentNullException(nameof(minClientVersionSupportedByServer));
-
-            Version = executingVersion;
-            MinClientVersionSupportedByServer = minClientVersionSupportedByServer;
+            Version = executingVersion ?? throw new ArgumentNullException(nameof(executingVersion));
+            MinClientVersionSupportedByServer = minClientVersionSupportedByServer ?? throw new ArgumentNullException(nameof(minClientVersionSupportedByServer));
             MinServerVersionSupportingClient = minServerVersionSupportingClient;
         }
+
+        private static SemVersion CurrentAssemblyVersion 
+            => SemVersion.Parse(Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
 
         /// <summary>
         /// Gets the currently executing API version.
         /// </summary>
         public static ApiVersion Current { get; }
-            = new ApiVersion(Assembly.GetExecutingAssembly().GetName().Version,
-                MinClientVersionSupportedByServerConst, MinServerVersionSupportingClientConst);
+            = new ApiVersion(CurrentAssemblyVersion, MinClientVersionSupportedByServerConst, MinServerVersionSupportingClientConst);
 
         /// <summary>
         /// Gets the executing version of the API.
         /// </summary>
-        public Version Version { get; }
+        public SemVersion Version { get; }
 
         /// <summary>
         /// Gets the min client version supported by the server.
         /// </summary>
-        public Version MinClientVersionSupportedByServer { get; }
+        public SemVersion MinClientVersionSupportedByServer { get; }
 
         /// <summary>
         /// Gets the min server version supporting the client.
         /// </summary>
-        public Version MinServerVersionSupportingClient { get; }
+        public SemVersion MinServerVersionSupportingClient { get; }
 
         /// <summary>
         /// Gets a value indicating whether the API server is compatible with a client.
@@ -73,7 +71,7 @@ namespace Umbraco.ModelsBuilder.Api
         /// (ie client can be older than server, up to a point) AND the client version is lower-or-equal the server version
         /// (ie client cannot be more recent than server) UNLESS the server .</para>
         /// </remarks>
-        public bool IsCompatibleWith(Version clientVersion, Version minServerVersionSupportingClient = null)
+        public bool IsCompatibleWith(SemVersion clientVersion, SemVersion minServerVersionSupportingClient = null)
         {
             // client cannot be older than server's min supported version
             if (clientVersion < MinClientVersionSupportedByServer)

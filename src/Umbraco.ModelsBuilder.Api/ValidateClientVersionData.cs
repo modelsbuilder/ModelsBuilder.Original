@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.Serialization;
+using Semver;
 
 namespace Umbraco.ModelsBuilder.Api
 {
@@ -20,33 +21,32 @@ namespace Umbraco.ModelsBuilder.Api
         [DataMember]
         public string ClientVersionString
         {
-            get { return VersionToString(ClientVersion); }
-            set { ClientVersion = ParseVersion(value, false, "client"); }
+            get => VersionToString(ClientVersion);
+            set => ClientVersion = ParseVersion(value, false, "client");
         }
 
         [DataMember]
         public string MinServerVersionSupportingClientString
         {
-            get { return VersionToString(MinServerVersionSupportingClient); }
-            set { MinServerVersionSupportingClient = ParseVersion(value, true, "minServer"); }
+            get => VersionToString(MinServerVersionSupportingClient);
+            set => MinServerVersionSupportingClient = ParseVersion(value, true, "minServer");
         }
 
         // not serialized
-        public Version ClientVersion { get; set; }
-        public Version MinServerVersionSupportingClient { get; set; }
+        public SemVersion ClientVersion { get; set; }
+        public SemVersion MinServerVersionSupportingClient { get; set; }
 
-        private static string VersionToString(Version version)
+        private static string VersionToString(SemVersion version)
         {
             return version?.ToString() ?? "0.0.0.0";
         }
 
-        private static Version ParseVersion(string value, bool canBeNull, string name)
+        private static SemVersion ParseVersion(string value, bool canBeNull, string name)
         {
             if (string.IsNullOrWhiteSpace(value) && canBeNull)
                 return null;
 
-            Version version;
-            if (Version.TryParse(value, out version))
+            if (SemVersion.TryParse(value, out var version))
                 return version;
 
             throw new ArgumentException($"Failed to parse \"{value}\" as {name} version.");

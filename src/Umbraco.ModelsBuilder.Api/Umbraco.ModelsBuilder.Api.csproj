@@ -41,6 +41,7 @@
     <Compile Include="ApiBasicAuthFilter.cs" />
     <Compile Include="ApiClient.cs" />
     <Compile Include="GetModelsData.cs" />
+    <Compile Include="ModelsBuilderApiComponent.cs" />
     <Compile Include="ModelsBuilderApiController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TokenData.cs" />
