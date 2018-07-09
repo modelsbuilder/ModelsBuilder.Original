@@ -77,6 +77,7 @@ namespace Umbraco.ModelsBuilder.Api
 
             //hch.Proxy = new WebProxy("path.to.proxy", 8888);
             //hch.UseProxy = true;
+            hch.AllowAutoRedirect = false; // fixme explain this breaks POSTs - alas it does not work
 
             using (var client = new HttpClient(hch))
             {
