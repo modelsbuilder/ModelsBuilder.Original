@@ -1298,7 +1298,7 @@ using Umbraco.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedContentModels
 {
-	// Mixin content Type 1 with alias ""type1""
+	// Mixin content type with alias ""type1""
 	public partial interface IType1 : IPublishedContent
 	{
 		string Prop1a { get; }
@@ -1703,7 +1703,7 @@ using Umbraco.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedContentModels
 {
-	// Content Type 1 with alias ""type1""
+	// Content type with alias ""type1""
 	[PublishedContentModel(""type1"")]
 	public partial class Type2 : PublishedContentModel
 	{

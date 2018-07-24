@@ -43,7 +43,7 @@ namespace Umbraco.ModelsBuilder.Building
                 foreach (var mixinType in typeModel.DeclaringInterfaces)
                     i.BaseTypes.Add(mixinType.ClrName);
 
-                i.Comments.Add(new CodeCommentStatement($"Mixin content Type {typeModel.Id} with alias \"{typeModel.Alias}\""));
+                i.Comments.Add(new CodeCommentStatement($"Mixin content type with alias \"{typeModel.Alias}\""));
 
                 foreach (var propertyModel in typeModel.Properties)
                 {
@@ -81,7 +81,7 @@ namespace Umbraco.ModelsBuilder.Building
             foreach (var mixin in typeModel.MixinTypes)
                 c.BaseTypes.Add("I" + mixin.ClrName);
 
-            c.Comments.Add(new CodeCommentStatement($"Content Type {typeModel.Id} with alias \"{typeModel.Alias}\""));
+            c.Comments.Add(new CodeCommentStatement($"Content type with alias \"{typeModel.Alias}\""));
 
             foreach (var propertyModel in typeModel.Properties)
             {
