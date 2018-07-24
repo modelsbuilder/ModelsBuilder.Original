@@ -137,6 +137,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 var typeModel = new TypeModel
                 {
                     Id = contentType.Id,
+                    Key = contentType.Key,
                     Alias = contentType.Alias,
                     ClrName = GetClrName(contentType.Name, contentType.Alias),
                     ParentId = contentType.ParentId,

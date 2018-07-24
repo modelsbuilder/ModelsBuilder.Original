@@ -79,6 +79,7 @@ using Umbraco.ModelsBuilder;
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -128,6 +129,7 @@ using Umbraco.ModelsBuilder;
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -167,6 +169,7 @@ using Umbraco.ModelsBuilder;
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -223,6 +226,7 @@ public partial class Type1 : IHasXmlNode
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -233,6 +237,7 @@ public partial class Type1 : IHasXmlNode
             var type2 = new TypeModel
             {
                 Id = 2,
+                Key = new Guid("fd2ea218-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type2",
                 ClrName = "Type2",
                 ParentId = 0,
@@ -288,6 +293,7 @@ using Umbraco.ModelsBuilder;
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -298,6 +304,7 @@ using Umbraco.ModelsBuilder;
             var type2 = new TypeModel
             {
                 Id = 2,
+                Key = new Guid("fd2ea218-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type2",
                 ClrName = "Type2",
                 ParentId = 1,
@@ -343,6 +350,7 @@ using Umbraco.ModelsBuilder;
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -353,6 +361,7 @@ using Umbraco.ModelsBuilder;
             var type2 = new TypeModel
             {
                 Id = 2,
+                Key = new Guid("fd2ea218-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type2",
                 ClrName = "Type2",
                 ParentId = 0,
@@ -401,6 +410,7 @@ using Umbraco.ModelsBuilder;
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -411,6 +421,7 @@ using Umbraco.ModelsBuilder;
             var type2 = new TypeModel
             {
                 Id = 2,
+                Key = new Guid("fd2ea218-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type2",
                 ClrName = "Type2",
                 ParentId = 0,
@@ -460,6 +471,7 @@ using Umbraco.ModelsBuilder;
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -470,6 +482,7 @@ using Umbraco.ModelsBuilder;
             var type2 = new TypeModel
             {
                 Id = 2,
+                Key = new Guid("fd2ea218-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type2",
                 ClrName = "Type2",
                 ParentId = 0,
@@ -522,6 +535,7 @@ namespace Models
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -531,6 +545,7 @@ namespace Models
             var type2 = new TypeModel
             {
                 Id = 2,
+                Key = new Guid("fd2ea218-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type2",
                 ClrName = "Type2",
                 ParentId = 0,
@@ -614,6 +629,7 @@ namespace Dang
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -667,6 +683,7 @@ namespace Models
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -736,6 +753,7 @@ namespace Models
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -793,6 +811,7 @@ namespace Models
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -848,6 +867,7 @@ namespace Models
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -907,6 +927,7 @@ namespace Models
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -961,6 +982,7 @@ namespace Models
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -1017,6 +1039,7 @@ namespace Models
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -1075,6 +1098,7 @@ namespace Dang
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -1102,6 +1126,7 @@ namespace Dang
             var type2 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type2",
                 ClrName = "Type2",
                 ParentId = 0,
@@ -1209,6 +1234,7 @@ namespace Dang
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -1232,6 +1258,7 @@ namespace Dang
             var type2 = new TypeModel
             {
                 Id = 2,
+                Key = new Guid("fd2ea218-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type2",
                 ClrName = "Type2",
                 ParentId = 0,
@@ -1298,7 +1325,7 @@ using Umbraco.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedContentModels
 {
-	// Mixin content type with alias ""type1""
+	// Mixin content type fd2e9a34-8f8b-11e8-9eb6-529269fb1459 with alias ""type1""
 	public partial interface IType1 : IPublishedContent
 	{
 		string Prop1a { get; }
@@ -1424,6 +1451,7 @@ namespace Umbraco.Web.PublishedContentModels
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -1516,6 +1544,7 @@ namespace Umbraco.Web.PublishedContentModels
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -1539,11 +1568,11 @@ using Umbraco.Core.Models;
 
 public partial class Type1
 {
-    public Type1(IPublishedContent content)
-        : base(content)
-    {
-        // do our own stuff
-    }
+	public Type1(IPublishedContent content)
+		: base(content)
+	{
+		// do our own stuff
+	}
 }
 " }
             };
@@ -1617,34 +1646,35 @@ namespace Umbraco.Web.PublishedContentModels
 	}
 }
 ";
-            Console.WriteLine(gen);
-            Assert.AreEqual(expected.ClearLf(), gen);
-        }
+			Console.WriteLine(gen);
+			Assert.AreEqual(expected.ClearLf(), gen);
+		}
 
-        [Test]
-        public void PartialConstructorWithRename()
-        {
-            var type1 = new TypeModel
-            {
-                Id = 1,
-                Alias = "type1",
-                ClrName = "Type1",
-                ParentId = 0,
-                BaseType = null,
-                ItemType = TypeModel.ItemTypes.Content,
-            };
-            type1.Properties.Add(new PropertyModel
-            {
-                Alias = "prop1",
-                ClrName = "Prop1",
-                ClrType = typeof(string),
-            });
+		[Test]
+		public void PartialConstructorWithRename()
+		{
+			var type1 = new TypeModel
+			{
+				Id = 1,
+				Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
+				Alias = "type1",
+				ClrName = "Type1",
+				ParentId = 0,
+				BaseType = null,
+				ItemType = TypeModel.ItemTypes.Content,
+			};
+			type1.Properties.Add(new PropertyModel
+			{
+				Alias = "prop1",
+				ClrName = "Prop1",
+				ClrType = typeof(string),
+			});
 
-            var types = new[] { type1 };
+			var types = new[] { type1 };
 
-            var code = new Dictionary<string, string>
-            {
-                { "assembly", @"
+			var code = new Dictionary<string, string>
+			{
+				{ "assembly", @"
 using Umbraco.ModelsBuilder;
 using Umbraco.Core.Models;
 
@@ -1652,11 +1682,11 @@ using Umbraco.Core.Models;
 
 public partial class Type2
 {
-    public Type2(IPublishedContent content)
-        : base(content)
-    {
-        // do our own stuff
-    }
+	public Type2(IPublishedContent content)
+		: base(content)
+	{
+		// do our own stuff
+	}
 }
 " }
             };
@@ -1703,7 +1733,7 @@ using Umbraco.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedContentModels
 {
-	// Content type with alias ""type1""
+	// Content type fd2e9a34-8f8b-11e8-9eb6-529269fb1459 with alias ""type1""
 	[PublishedContentModel(""type1"")]
 	public partial class Type2 : PublishedContentModel
 	{
@@ -1746,6 +1776,7 @@ namespace Umbraco.Web.PublishedContentModels
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,
@@ -1763,6 +1794,7 @@ namespace Umbraco.Web.PublishedContentModels
             var type2 = new TypeModel
             {
                 Id = 2,
+                Key = new Guid("fd2ea218-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type2",
                 ClrName = "Type2",
                 ParentId = 0,
@@ -1816,6 +1848,7 @@ namespace Umbraco.Web.PublishedContentModels
             var type1 = new TypeModel
             {
                 Id = 1,
+                Key = new Guid("fd2e9a34-8f8b-11e8-9eb6-529269fb1459"),
                 Alias = "type1",
                 ClrName = "Type1",
                 ParentId = 0,

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core;
 
 namespace Umbraco.ModelsBuilder.Building
 {
@@ -13,6 +14,11 @@ namespace Umbraco.ModelsBuilder.Building
         /// Gets the unique identifier of the corresponding content type.
         /// </summary>
         public int Id;
+
+        /// <summary>
+        /// Gets the key of the content type.
+        /// </summary>
+        public Guid Key;
 
         /// <summary>
         /// Gets the alias of the model.
