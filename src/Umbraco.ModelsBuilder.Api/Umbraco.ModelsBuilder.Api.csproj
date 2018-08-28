@@ -31,7 +31,7 @@
     <PackageReference Include="" Version="" />
     -->
     <PackageReference Include="UmbracoCms.Core">
-      <Version>8.0.0-alpha.42</Version>
+      <Version>8.0.0-alpha.49</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
