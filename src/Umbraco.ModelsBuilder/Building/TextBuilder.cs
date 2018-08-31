@@ -483,7 +483,7 @@ namespace Umbraco.ModelsBuilder.Building
             s = Regex.Replace(s, @"\{(.*)\}\[\*\]", m => ModelsMap[m.Groups[1].Value + "[]"]);
 
             // takes care eg of "System.Int32" vs. "int"
-            if (TypesMap.TryGetValue(s.ToLowerInvariant(), out string typeName))
+            if (TypesMap.TryGetValue(s, out string typeName))
             {
                 sb.Append(typeName);
                 return;
@@ -553,24 +553,24 @@ namespace Umbraco.ModelsBuilder.Building
             return s.Replace('<', '{').Replace('>', '}').Replace('\r', ' ').Replace('\n', ' ');
         }
 
-        private static readonly IDictionary<string, string> TypesMap = new Dictionary<string, string>
+        private static readonly IDictionary<string, string> TypesMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            { "system.int16", "short" },
-            { "system.int32", "int" },
-            { "system.int64", "long" },
-            { "system.string", "string" },
-            { "system.object", "object" },
-            { "system.boolean", "bool" },
-            { "system.void", "void" },
-            { "system.char", "char" },
-            { "system.byte", "byte" },
-            { "system.uint16", "ushort" },
-            { "system.uint32", "uint" },
-            { "system.uint64", "ulong" },
-            { "system.sbyte", "sbyte" },
-            { "system.single", "float" },
-            { "system.double", "double" },
-            { "system.decimal", "decimal" }
+            { "System.Int16", "short" },
+            { "System.Int32", "int" },
+            { "System.Int64", "long" },
+            { "System.String", "string" },
+            { "System.Object", "object" },
+            { "System.Boolean", "bool" },
+            { "System.Void", "void" },
+            { "System.Char", "char" },
+            { "System.Byte", "byte" },
+            { "System.UInt16", "ushort" },
+            { "System.UInt32", "uint" },
+            { "System.UInt64", "ulong" },
+            { "System.SByte", "sbyte" },
+            { "System.Single", "float" },
+            { "System.Double", "double" },
+            { "System.Decimal", "decimal" }
         };
     }
 }
