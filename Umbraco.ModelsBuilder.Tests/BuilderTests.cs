@@ -43,7 +43,7 @@ public class Whatever
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            
+
             Assert.IsTrue(parseResult.HasModelsBaseClassName);
             Assert.AreEqual("Dang.Whatever", parseResult.ModelsBaseClassName);
         }
@@ -249,7 +249,7 @@ public partial class Type1 : IHasXmlNode
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
             };
-            
+
             var types = new[] { type1, type2, type3 };
 
             var code = new Dictionary<string, string>
@@ -451,7 +451,7 @@ using Umbraco.ModelsBuilder;
             Assert.AreEqual("Renamed1", btypes[0].ClrName);
             Assert.AreEqual("Type2", btypes[1].ClrName);
         }
-        
+
         [Test]
         public void ContentTypeRenameOnClass()
         {
@@ -563,7 +563,7 @@ namespace Dang
     }
 
     public abstract class MyType1 : Type1
-    { 
+    {
         public MyType1(IPublishedContent content)
             : base(content)
         { }
@@ -1301,8 +1301,10 @@ namespace Umbraco.Web.PublishedContentModels
 	// Mixin content Type 1 with alias ""type1""
 	public partial interface IType1 : IPublishedContent
 	{
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		string Prop1a { get; }
 
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		string Prop1b { get; }
 	}
 
@@ -1310,7 +1312,9 @@ namespace Umbraco.Web.PublishedContentModels
 	public partial class Type1 : PublishedContentModel, IType1
 	{
 #pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new const string ModelTypeAlias = ""type1"";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 #pragma warning restore 0109
 
@@ -1319,29 +1323,34 @@ namespace Umbraco.Web.PublishedContentModels
 		{ }
 
 #pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new static PublishedContentType GetModelContentType()
 		{
 			return PublishedContentType.Get(ModelItemType, ModelTypeAlias);
 		}
 #pragma warning restore 0109
 
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
 		{
 			return PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 		}
 
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1a"")]
 		public string Prop1a
 		{
 			get { return GetProp1a(this); }
 		}
 
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1b"")]
 		public string Prop1b
 		{
 			get { return GetProp1b(this); }
 		}
 
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public static string GetProp1b(IType1 that) { return that.GetPropertyValue<string>(""prop1b""); }
 	}
 }
@@ -1371,7 +1380,9 @@ namespace Umbraco.Web.PublishedContentModels
 	public partial class Type2 : PublishedContentModel, IType1
 	{
 #pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new const string ModelTypeAlias = ""type2"";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 #pragma warning restore 0109
 
@@ -1380,29 +1391,34 @@ namespace Umbraco.Web.PublishedContentModels
 		{ }
 
 #pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new static PublishedContentType GetModelContentType()
 		{
 			return PublishedContentType.Get(ModelItemType, ModelTypeAlias);
 		}
 #pragma warning restore 0109
 
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
 		{
 			return PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 		}
 
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop2"")]
 		public int Prop2
 		{
 			get { return this.GetPropertyValue<int>(""prop2""); }
 		}
 
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1a"")]
 		public string Prop1a
 		{
 			get { return Umbraco.Web.PublishedContentModels.Type1.GetProp1a(this); }
 		}
 
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1b"")]
 		public string Prop1b
 		{
@@ -1478,7 +1494,9 @@ namespace Umbraco.Web.PublishedContentModels
 	public partial class Type1 : PublishedContentModel
 	{
 #pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new const string ModelTypeAlias = ""type1"";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 #pragma warning restore 0109
 
@@ -1487,17 +1505,20 @@ namespace Umbraco.Web.PublishedContentModels
 		{ }
 
 #pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new static PublishedContentType GetModelContentType()
 		{
 			return PublishedContentType.Get(ModelItemType, ModelTypeAlias);
 		}
 #pragma warning restore 0109
 
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
 		{
 			return PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 		}
 
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1"")]
 		public string Prop1
 		{
@@ -1593,22 +1614,27 @@ namespace Umbraco.Web.PublishedContentModels
 	public partial class Type1 : PublishedContentModel
 	{
 #pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new const string ModelTypeAlias = ""type1"";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 #pragma warning restore 0109
 
 #pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new static PublishedContentType GetModelContentType()
 		{
 			return PublishedContentType.Get(ModelItemType, ModelTypeAlias);
 		}
 #pragma warning restore 0109
 
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
 		{
 			return PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 		}
 
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1"")]
 		public string Prop1
 		{
@@ -1708,22 +1734,27 @@ namespace Umbraco.Web.PublishedContentModels
 	public partial class Type2 : PublishedContentModel
 	{
 #pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new const string ModelTypeAlias = ""type1"";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 #pragma warning restore 0109
 
 #pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new static PublishedContentType GetModelContentType()
 		{
 			return PublishedContentType.Get(ModelItemType, ModelTypeAlias);
 		}
 #pragma warning restore 0109
 
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
 		{
 			return PublishedContentModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 		}
 
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1"")]
 		public string Prop1
 		{

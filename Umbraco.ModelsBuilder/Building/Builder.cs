@@ -271,8 +271,8 @@ namespace Umbraco.ModelsBuilder.Building
         // looking for a simple symbol eg 'Umbraco' or 'String'
         // expecting to match eg 'Umbraco' or 'System.String'
         // returns true if either
-        // - more than 1 symbol is found (explicitely ambiguous)
-        // - 1 symbol is found BUT not matching (implicitely ambiguous)
+        // - more than 1 symbol is found (explicitly ambiguous)
+        // - 1 symbol is found BUT not matching (implicitly ambiguous)
         protected bool IsAmbiguousSymbol(string symbol, string match)
         {
             if (_ambiguousSymbolsModel == null)
