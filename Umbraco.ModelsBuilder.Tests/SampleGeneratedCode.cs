@@ -17,7 +17,7 @@ using Umbraco.Web;
 
 namespace Umbraco.ModelsBuilder.Tests.Models
 {
-    // Content Type 1044 with alias "page"
+    // Content Type with alias "page"
     public partial class Page : PublishedContentModel
     {
         public Page(IPublishedContent content)
@@ -55,7 +55,7 @@ namespace Umbraco.ModelsBuilder.Tests.Models
         }
     }
 
-    // Content Type 1059 with alias "AnotherPage"
+    // Content Type with alias "AnotherPage"
     public partial class AnotherPage : PublishedContentModel
     {
         public AnotherPage(IPublishedContent content)
@@ -73,7 +73,7 @@ namespace Umbraco.ModelsBuilder.Tests.Models
         }
     }
 
-    // Content Type 1068 with alias "loskDalmosk"
+    // Content Type with alias "loskDalmosk"
     public partial class LoskDalmosk : PublishedContentModel
     {
         public LoskDalmosk(IPublishedContent content)
@@ -81,7 +81,7 @@ namespace Umbraco.ModelsBuilder.Tests.Models
         { }
     }
 
-    // Content Type 2078 with alias "parentDoc"
+    // Content Type with alias "parentDoc"
     public partial class ParentDoc : PublishedContentModel
     {
         public ParentDoc(IPublishedContent content)
@@ -94,7 +94,7 @@ namespace Umbraco.ModelsBuilder.Tests.Models
         }
     }
 
-    // Content Type 2079 with alias "childDoc"
+    // Content Type with alias "childDoc"
     public partial class ChildDoc : ParentDoc
     {
         public ChildDoc(IPublishedContent content)
@@ -107,7 +107,7 @@ namespace Umbraco.ModelsBuilder.Tests.Models
         }
     }
 
-    // Content Type 2087 with alias "aaa"
+    // Content Type with alias "aaa"
     public partial class Aaa : ParentDoc
     {
         public Aaa(IPublishedContent content)
@@ -115,7 +115,7 @@ namespace Umbraco.ModelsBuilder.Tests.Models
         { }
     }
 
-    // Content Type 2091 with alias "CrazyCTypeAlias"
+    // Content Type with alias "CrazyCTypeAlias"
     public partial class CrazyCTypeAlias : PublishedContentModel
     {
         public CrazyCTypeAlias(IPublishedContent content)
@@ -123,7 +123,7 @@ namespace Umbraco.ModelsBuilder.Tests.Models
         { }
     }
 
-    // Content Type 4092 with alias "RtePage"
+    // Content Type with alias "RtePage"
     public partial class RtePage : PublishedContentModel
     {
         public RtePage(IPublishedContent content)
@@ -141,7 +141,7 @@ namespace Umbraco.ModelsBuilder.Tests.Models
         }
     }
 
-    // Content Type 5101 with alias "SubRtePage"
+    // Content Type with alias "SubRtePage"
     public partial class SubRtePage : RtePage
     {
         public SubRtePage(IPublishedContent content)
@@ -149,7 +149,7 @@ namespace Umbraco.ModelsBuilder.Tests.Models
         { }
     }
 
-    // Content Type 6104 with alias "bbb"
+    // Content Type with alias "bbb"
     public partial class SpecialBbb : ParentDoc, IMixinTestRenamed
     {
         public SpecialBbb(IPublishedContent content)
@@ -162,13 +162,13 @@ namespace Umbraco.ModelsBuilder.Tests.Models
         }
     }
 
-    // Mixin content Type 6105 with alias "MixinTest"
+    // Mixin Content Type with alias "MixinTest"
     public partial interface IMixinTestRenamed : IPublishedContent
     {
         string MixinProp { get; }
     }
 
-    // Content Type 6105 with alias "MixinTest"
+    // Content Type with alias "MixinTest"
     public partial class MixinTestRenamed : PublishedContentModel, IMixinTestRenamed
     {
         public MixinTestRenamed(IPublishedContent content)

@@ -117,7 +117,7 @@ namespace Umbraco.ModelsBuilder.Building
             if (type.IsMixin)
             {
                 // write the interface declaration
-                sb.AppendFormat("\t// Mixin content Type {0} with alias \"{1}\"\n", type.Id, type.Alias);
+                sb.AppendFormat("\t// Mixin Content Type with alias \"{0}\"\n", type.Alias);
                 if (!string.IsNullOrWhiteSpace(type.Name))
                     sb.AppendFormat("\t/// <summary>{0}</summary>\n", XmlCommentString(type.Name));
                 sb.AppendFormat("\tpublic partial interface I{0}", type.ClrName);
@@ -151,7 +151,7 @@ namespace Umbraco.ModelsBuilder.Building
 
             // write the class declaration
             if (type.IsRenamed)
-                sb.AppendFormat("\t// Content Type {0} with alias \"{1}\"\n", type.Id, type.Alias);
+                sb.AppendFormat("\t// Content Type with alias \"{0}\"\n", type.Alias);
             if (!string.IsNullOrWhiteSpace(type.Name))
                 sb.AppendFormat("\t/// <summary>{0}</summary>\n", XmlCommentString(type.Name));
             // cannot do it now. see note in ImplementContentTypeAttribute
