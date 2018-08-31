@@ -39,7 +39,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         }
 
         internal const string DefaultStaticMixinGetterPattern = "Get{0}";
-        internal const LanguageVersion DefaultLanguageVersion = LanguageVersion.CSharp6;
+        internal const LanguageVersion DefaultLanguageVersion = LanguageVersion.CSharp7_3;
         internal const string DefaultModelsNamespace = "Umbraco.Web.PublishedModels";
         internal const ClrNameSource DefaultClrNameSource = ClrNameSource.Alias; // for legacy reasons
         internal const string DefaultModelsDirectory = "~/App_Data/Models";
