@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -14,6 +15,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.Web;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.UI.JavaScript;
 
@@ -39,6 +41,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
             // always setup the dashboard
             InstallServerVars(composition.Container.GetInstance<IRuntimeState>().Level);
             composition.Container.Register(typeof(ModelsBuilderBackOfficeController), new PerRequestLifeTime());
+
+            ContentModelBinder.ModelBindingException += ContentModelBinder_ModelBindingException;
         }
 
         public void Initialize(UmbracoServices umbracoServices)
@@ -168,6 +172,56 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     template.Content = markup;
                 }
             }
+        }
+
+        private void ContentModelBinder_ModelBindingException(object sender, ContentModelBinder.ModelBindingArgs args)
+        {
+            var sourceAttr = args.SourceType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
+            var modelAttr = args.ModelType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
+
+            // if source or model is not a ModelsBuider type...
+            if (sourceAttr == null || modelAttr == null)
+            {
+                // if neither are ModelsBuilder types, give up entirely
+                if (sourceAttr == null && modelAttr == null)
+                    return;
+
+                // else report, but better not restart (loops?)
+                args.Message.Append(" The ");
+                args.Message.Append(sourceAttr == null ? "view model" : "source");
+                args.Message.Append(" is a ModelsBuilder type, but the ");
+                args.Message.Append(sourceAttr != null ? "view model" : "source");
+                args.Message.Append(" is not. The application is in an unstable state and should be restarted.");
+                return;
+            }
+
+            // both are ModelsBuilder types
+	        var pureSource = sourceAttr.PureLive;
+	        var pureModel = modelAttr.PureLive;
+
+	        if (sourceAttr.PureLive || modelAttr.PureLive)
+	        {
+	            if (pureSource == false || pureModel == false)
+	            {
+                    // only one is pure - report, but better not restart (loops?)
+	                args.Message.Append(pureSource
+	                    ? " The content model is PureLive, but the view model is not."
+	                    : " The view model is PureLive, but the content model is not.");
+	                args.Message.Append(" The application is in an unstable state and should be restarted.");
+	            }
+	            else
+	            {
+                    // both are pure - report, and if different versions, restart
+                    // if same version... makes no sense... and better not restart (loops?)
+	                var sourceVersion = args.SourceType.Assembly.GetName().Version;
+                    var modelVersion = args.ModelType.Assembly.GetName().Version;
+	                args.Message.Append(" Both view and content models are PureLive, with ");
+	                args.Message.Append(sourceVersion == modelVersion
+	                    ? "same version. The application is in an unstable state and should be restarted."
+	                    : "different versions. The application is in an unstable state and is going to be restarted.");
+	                args.Restart = sourceVersion != modelVersion;
+	            }
+	        }
         }
     }
 }
