@@ -37,12 +37,12 @@ namespace Umbraco.ModelsBuilder.Tests
 
         public static PublishedPropertyType CreatePublishedPropertyType(string alias, int definition, string editor)
         {
-            return Ctor<PublishedPropertyType>(alias, definition, editor);
+            return Ctor<PublishedPropertyType>(alias, definition, editor, true);
         }
 
         public static PublishedContentType CreatePublishedContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes)
         {
-            return Ctor<PublishedContentType>(id, alias, propertyTypes);
+            return Ctor<PublishedContentType>(id, alias, Enumerable.Empty<string>(), propertyTypes);
         }
 
         #region Mock
