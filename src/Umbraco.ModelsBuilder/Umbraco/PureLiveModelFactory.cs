@@ -9,6 +9,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Web;
 using System.Web.Compilation;
 using System.Web.Hosting;
 using System.Web.WebPages.Razor;
@@ -190,6 +191,19 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
                 _hasModels = false;
                 _pendingRebuild = true;
+
+                var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
+                if (!Directory.Exists(modelsDirectory))
+                    Directory.CreateDirectory(modelsDirectory);
+
+                // clear stuff
+                var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
+                //var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
+                //var projFile = Path.Combine(modelsDirectory, "all.generated.cs");
+                var dllPathFile = Path.Combine(modelsDirectory, "all.dll.path");
+
+                if (File.Exists(dllPathFile)) File.Delete(dllPathFile);
+                if (File.Exists(modelsHashFile)) File.Delete(modelsHashFile);
             }
             finally
             {
@@ -332,6 +346,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
                         _logger.Logger.Debug<PureLiveModelFactory>("Found obsolete cached models.");
                         forceRebuild = true;
                     }
+
+                    // else cachedHash matches currentHash, we can try to load an existing dll
                 }
                 else
                 {
@@ -341,13 +357,28 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
 
             Assembly assembly;
-            if (forceRebuild == false)
+            if (!forceRebuild)
             {
                 // try to load the dll directly (avoid rebuilding)
+                //
+                // ensure that the .dll file does not have a corresponding .dll.delete file
+                // as that would mean the the .dll file is going to be deleted and should not
+                // be re-used - that should not happen in theory, but better be safe
+                //
+                // ensure that the .dll file is in the current codegen directory - when IIS
+                // or Express does a full restart, it can switch to an entirely new codegen
+                // directory, and then we end up referencing a dll which is *not* in that
+                // directory, and BuildManager fails to instantiate views ("the view found
+                // at ... was not created").
+                //
                 if (File.Exists(dllPathFile))
                 {
                     var dllPath = File.ReadAllText(dllPathFile);
-                    if (File.Exists(dllPath))
+                    var codegen = HttpRuntime.CodegenDir;
+
+                    _logger.Logger.Debug<PureLiveModelFactory>($"Cached models dll at {dllPath}.");
+
+                    if (File.Exists(dllPath) && !File.Exists(dllPath + ".delete") && dllPath.StartsWith(codegen))
                     {
                         assembly = Assembly.LoadFile(dllPath);
                         var attr = assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
@@ -362,10 +393,20 @@ namespace Umbraco.ModelsBuilder.Umbraco
                             _logger.Logger.Debug<PureLiveModelFactory>("Loading cached models (dll).");
                             return assembly;
                         }
+
+                        _logger.Logger.Debug<PureLiveModelFactory>("Cached models dll cannot be loaded (invalid assembly).");
                     }
+                    else if (!File.Exists(dllPath))
+                        _logger.Logger.Debug<PureLiveModelFactory>("Cached models dll does not exist.");
+                    else if (File.Exists(dllPath + ".delete"))
+                        _logger.Logger.Debug<PureLiveModelFactory>("Cached models dll is marked for deletion.");
+                    else if (!dllPath.StartsWith(codegen))
+                        _logger.Logger.Debug<PureLiveModelFactory>("Cached models dll is in a different codegen directory.");
+                    else
+                        _logger.Logger.Debug<PureLiveModelFactory>("Cached models dll cannot be loaded (why?).");
                 }
 
-                // mmust reset the version in the file else it would keep growing
+                // must reset the version in the file else it would keep growing
                 // loading cached modules only happens when the app restarts
                 var text = File.ReadAllText(projFile);
                 var match = AssemblyVersionRegex.Match(text);
@@ -381,8 +422,16 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 //File.WriteAllText(Path.Combine(modelsDirectory, "models.dep"), "VER:" + _ver);
 
                 _ver++;
-                assembly = BuildManager.GetCompiledAssembly(ProjVirt);
-                File.WriteAllText(dllPathFile, assembly.Location);
+                try
+                {
+                    assembly = BuildManager.GetCompiledAssembly(ProjVirt);
+                    File.WriteAllText(dllPathFile, assembly.Location);
+                }
+                catch
+                {
+                    ClearOnFailingToCompile(dllPathFile, modelsHashFile, projFile);
+                    throw;
+                }
 
                 _logger.Logger.Debug<PureLiveModelFactory>("Loading cached models (source).");
                 return assembly;
@@ -409,14 +458,37 @@ namespace Umbraco.ModelsBuilder.Umbraco
             File.WriteAllText(projFile, proj);
 
             // compile and register
-            assembly = BuildManager.GetCompiledAssembly(ProjVirt);
-            File.WriteAllText(dllPathFile, assembly.Location);
-
-            // assuming we can write and it's not going to cause exceptions...
-            File.WriteAllText(modelsHashFile, currentHash);
+            try
+            {
+                assembly = BuildManager.GetCompiledAssembly(ProjVirt);
+                File.WriteAllText(dllPathFile, assembly.Location);
+                File.WriteAllText(modelsHashFile, currentHash);
+            }
+            catch
+            {
+                ClearOnFailingToCompile(dllPathFile, modelsHashFile, projFile);
+                throw;
+            }
 
             _logger.Logger.Debug<PureLiveModelFactory>("Done rebuilding.");
             return assembly;
+        }
+
+        private void ClearOnFailingToCompile(string dllPathFile, string modelsHashFile, string projFile)
+        {
+            _logger.Logger.Debug<PureLiveModelFactory>("Failed to compile.");
+
+            // the dll file reference still points to the previous dll, which is obsolete
+            // now and will be deleted by ASP.NET eventually, so better clear that reference.
+            // also touch the proj file to force views to recompile - don't delete as it's
+            // useful to have the source around for debugging.
+            try
+            {
+                if (File.Exists(dllPathFile)) File.Delete(dllPathFile);
+                if (File.Exists(modelsHashFile)) File.Delete(modelsHashFile);
+                if (File.Exists(projFile)) File.SetLastWriteTime(projFile, DateTime.Now);
+            }
+            catch { /* enough */ }
         }
 
         private static Infos RegisterModels(IEnumerable<Type> types)
