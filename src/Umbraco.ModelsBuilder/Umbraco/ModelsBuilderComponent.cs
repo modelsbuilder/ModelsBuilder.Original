@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
@@ -63,8 +64,14 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private void ComposeForDefaultModelsFactory(IServiceContainer container)
         {
-            container.RegisterSingleton<IPublishedModelFactory>(factory
-                => new PublishedModelFactory(factory.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
+            container.RegisterSingleton<IPublishedModelFactory>(factory =>
+            {
+                var typeLoader = factory.GetInstance<TypeLoader>();
+                var types = typeLoader
+                    .GetTypes<PublishedElementModel>() // element models
+                    .Concat(typeLoader.GetTypes<PublishedContentModel>()); // content models
+                return new PublishedModelFactory(types);
+            });
         }
 
         private void ComposeForLiveModels(IServiceContainer container)
