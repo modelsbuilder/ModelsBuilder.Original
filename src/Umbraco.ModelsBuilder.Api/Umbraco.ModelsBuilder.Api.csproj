@@ -27,14 +27,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <!--
-    <PackageReference Include="" Version="" />
-    -->
-    <PackageReference Include="UmbracoCms.Core">
-      <Version>8.0.0-alpha.49</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
@@ -59,6 +51,11 @@
   <ItemGroup>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.ApplicationServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="UmbracoCms.Web">
+      <Version>8.0.0-alpha.51</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
