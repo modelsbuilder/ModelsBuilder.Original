@@ -209,9 +209,10 @@ namespace Umbraco.ModelsBuilder.Building
         /// <summary>
         /// Maps ModelType.
         /// </summary>
-        public static void MapModelTypes(IList<TypeModel> typeModels)
+        public static void MapModelTypes(IList<TypeModel> typeModels, string ns)
         {
-            var map = typeModels.ToDictionary(x => x.Alias, x => x.ClrName);
+            var hasNs = !string.IsNullOrWhiteSpace(ns);
+            var map = typeModels.ToDictionary(x => x.Alias, x => hasNs ? (ns + "." + x.ClrName) : x.ClrName);
             foreach (var typeModel in typeModels)
             {
                 foreach (var propertyModel in typeModel.Properties)

@@ -74,12 +74,8 @@ namespace Umbraco.ModelsBuilder.Building
         /// <param name="typeModels">The list of models to generate.</param>
         /// <param name="parseResult">The result of code parsing.</param>
         protected Builder(IList<TypeModel> typeModels, ParseResult parseResult)
-        {
-            _typeModels = typeModels ?? throw new ArgumentNullException(nameof(typeModels));
-            ParseResult = parseResult ?? throw new ArgumentNullException(nameof(parseResult));
-
-            Prepare();
-        }
+            : this(typeModels, parseResult, null)
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Builder"/> class with a list of models to generate,
@@ -89,10 +85,15 @@ namespace Umbraco.ModelsBuilder.Building
         /// <param name="parseResult">The result of code parsing.</param>
         /// <param name="modelsNamespace">The models namespace.</param>
         protected Builder(IList<TypeModel> typeModels, ParseResult parseResult, string modelsNamespace)
-            : this(typeModels, parseResult)
         {
+            _typeModels = typeModels ?? throw new ArgumentNullException(nameof(typeModels));
+            ParseResult = parseResult ?? throw new ArgumentNullException(nameof(parseResult));
+
             // can be null or empty, we'll manage
             ModelsNamespace = modelsNamespace;
+
+            // but we want it to prepare
+            Prepare();
         }
 
         // for unit tests only
@@ -108,7 +109,7 @@ namespace Umbraco.ModelsBuilder.Building
         /// </remarks>
         private void Prepare()
         {
-            TypeModel.MapModelTypes(_typeModels);
+            TypeModel.MapModelTypes(_typeModels, ModelsNamespace);
 
             var pureLive = UmbracoConfig.For.ModelsBuilder().ModelsMode == ModelsMode.PureLive;
 

@@ -503,6 +503,11 @@ namespace Umbraco.ModelsBuilder.Building
                     typeName = typeName.Substring(p + 1);
                     typeUsing = x;
                 }
+                else if (x == ModelsNamespace) // that one is used by default
+                {
+                    typeName = typeName.Substring(p + 1);
+                    typeUsing = ModelsNamespace;
+                }
             }
 
             // nested types *after* using
