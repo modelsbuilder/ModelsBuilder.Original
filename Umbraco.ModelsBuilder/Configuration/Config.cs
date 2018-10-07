@@ -94,7 +94,7 @@ namespace Umbraco.ModelsBuilder.Configuration
                         break;
                     default:
                         throw new ConfigurationErrorsException($"ModelsMode \"{modelsMode}\" is not a valid mode."
-                            + " Note that modes are case-sensitive.");
+                            + " Note that modes are case-sensitive. Possible values are: " + string.Join(", ", Enum.GetNames(typeof(ModelsMode))));
                 }
             }
 
@@ -147,7 +147,7 @@ namespace Umbraco.ModelsBuilder.Configuration
                         break;
                     default:
                         throw new ConfigurationErrorsException($"ClrNameSource \"{value}\" is not a valid source."
-                            + " Note that sources are case-sensitive.");
+                            + " Note that sources are case-sensitive. Possible values are: " + string.Join(", ", Enum.GetNames(typeof(ClrNameSource))));
                 }
             }
 
