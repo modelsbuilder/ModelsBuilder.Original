@@ -54,7 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="UmbracoCms.Web">
-      <Version>8.0.0-alpha.51</Version>
+      <Version>8.0.0-alpha.52</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
