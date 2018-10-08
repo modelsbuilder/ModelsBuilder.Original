@@ -66,7 +66,7 @@ namespace Umbraco.ModelsBuilder.Configuration
                 : DefaultModelsDirectory.TrimStart("~/");
             BinDirectory = HostingEnvironment.IsHosted
                 ? HostingEnvironment.MapPath(DefaultBinDirectory)
-                : DefaultModelsDirectory.TrimStart("~/");
+                : DefaultBinDirectory.TrimStart("~/");
 
             DebugLevel = 0;
 
