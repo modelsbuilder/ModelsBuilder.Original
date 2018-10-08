@@ -19,7 +19,7 @@ namespace Umbraco.ModelsBuilder.Api
 
     [PluginController(ControllerArea)]
     [IsBackOffice]
-    //[UmbracoApplicationAuthorize(Constants.Applications.Developer)] // see ApiBasicAuthFilter - that one would be for ASP.NET identity
+    //[UmbracoApplicationAuthorize(Constants.Applications.Settings)] // see ApiBasicAuthFilter - that one would be for ASP.NET identity
     public class ModelsBuilderApiController : UmbracoApiController // UmbracoAuthorizedApiController - for ASP.NET identity
     {
         public const string ControllerArea = "ModelsBuilder";
@@ -33,7 +33,7 @@ namespace Umbraco.ModelsBuilder.Api
 
         // invoked by the API
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
-        [ApiBasicAuthFilter("developer")] // have to use our own, non-cookie-based, auth
+        [ApiBasicAuthFilter("settings")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage ValidateClientVersion(ValidateClientVersionData data)
         {
             if (!UmbracoConfig.For.ModelsBuilder().ApiServer)
@@ -50,7 +50,7 @@ namespace Umbraco.ModelsBuilder.Api
 
         // invoked by the API
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
-        [ApiBasicAuthFilter("developer")] // have to use our own, non-cookie-based, auth
+        [ApiBasicAuthFilter("settings")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage GetModels(GetModelsData data)
         {
             if (!UmbracoConfig.For.ModelsBuilder().ApiServer)

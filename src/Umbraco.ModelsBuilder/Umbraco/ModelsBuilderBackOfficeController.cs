@@ -23,7 +23,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
     /// correct CSRF security is adhered to for angular and it also ensures that this controller is not subseptipal to
     /// global WebApi formatters being changed since this is always forced to only return Angular JSON Specific formats.
     /// </remarks>
-    [UmbracoApplicationAuthorize(Core.Constants.Applications.Developer)]
+    [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class ModelsBuilderBackOfficeController : UmbracoAuthorizedJsonController
     {
         private readonly UmbracoServices _umbracoServices;
@@ -34,7 +34,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         }
 
         // invoked by the dashboard
-        // requires that the user is logged into the backoffice and has access to the developer section
+        // requires that the user is logged into the backoffice and has access to the settings section
         // beware! the name of the method appears in modelsbuilder.controller.js
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
         public HttpResponseMessage BuildModels()
@@ -67,7 +67,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         }
 
         // invoked by the back-office
-        // requires that the user is logged into the backoffice and has access to the developer section
+        // requires that the user is logged into the backoffice and has access to the settings section
         [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
         public HttpResponseMessage GetModelsOutOfDateStatus()
         {
@@ -81,7 +81,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         }
 
         // invoked by the back-office
-        // requires that the user is logged into the backoffice and has access to the developer section
+        // requires that the user is logged into the backoffice and has access to the settings section
         // beware! the name of the method appears in modelsbuilder.controller.js
         [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
         public HttpResponseMessage GetDashboard()
