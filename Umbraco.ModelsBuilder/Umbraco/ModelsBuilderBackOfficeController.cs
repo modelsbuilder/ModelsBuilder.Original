@@ -39,13 +39,17 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 }
 
                 var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
+                var binPath = UmbracoConfig.For.ModelsBuilder().BinDirectory;
 
-                var bin = HostingEnvironment.MapPath("~/bin");
-                if (bin == null)
-                    throw new Exception("Panic: bin is null.");
+                if (string.IsNullOrWhiteSpace(binPath))
+                {
+                    binPath = HostingEnvironment.MapPath("~/bin");
+                    if (binPath == null)
+                        throw new Exception("Panic: bin is null.");
+                }
 
                 // EnableDllModels will recycle the app domain - but this request will end properly
-                GenerateModels(modelsDirectory, UmbracoConfig.For.ModelsBuilder().ModelsMode.IsAnyDll() ? bin : null);
+                GenerateModels(modelsDirectory, UmbracoConfig.For.ModelsBuilder().ModelsMode.IsAnyDll() ? binPath : null);
 
                 ModelsGenerationError.Clear();
             }
@@ -93,7 +97,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             };
         }
 
-        internal static void GenerateModels(string modelsDirectory, string bin)
+        internal static void GenerateModels(string modelsDirectory, string binPath)
         {
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
@@ -127,12 +131,16 @@ namespace Umbraco.ModelsBuilder.Umbraco
 ";
             */
 
-            if (bin != null)
+            if (binPath != null)
             {
+                //When bin directory is changed by config
+                if (!Directory.Exists(binPath))
+                    Directory.CreateDirectory(binPath);
+
                 foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                     ourFiles[file] = File.ReadAllText(file);
                 var compiler = new Compiler();
-                compiler.Compile(builder.GetModelsNamespace(), ourFiles, bin);
+                compiler.Compile(builder.GetModelsNamespace(), ourFiles, binPath);
             }
 
             OutOfDateModelsStatus.Clear();
