@@ -2,9 +2,11 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web;
+using Umbraco.ModelsBuilder;
 
-namespace Umbraco.ModelsBuilder
+// same namespace as original Umbraco.Web PublishedElementExtensions
+// ReSharper disable once CheckNamespace
+namespace Umbraco.Web
 {
     /// <summary>
     /// Provides extension methods to models.
@@ -14,13 +16,14 @@ namespace Umbraco.ModelsBuilder
         /// <summary>
         /// Gets the value of a property.
         /// </summary>
-        public static TValue Value<TModel, TValue>(this TModel model, Expression<Func<TModel, TValue>> property, string culture = ".", string segment = ".")
+        public static TValue Value<TModel, TValue>(this TModel model, Expression<Func<TModel, TValue>> property, string culture = null, string segment = null, Fallback fallback = default, TValue defaultValue = default)
             where TModel : IPublishedElement
         {
             var alias = GetAlias(model, property);
-            return model.Value<TValue>(alias, culture, segment);
+            return model.Value<TValue>(alias, culture, segment, fallback, defaultValue);
         }
 
+        // fixme that one should be public so ppl can use it
         private static string GetAlias<TModel, TValue>(TModel model, Expression<Func<TModel, TValue>> property)
         {
             if (property.NodeType != ExpressionType.Lambda)
