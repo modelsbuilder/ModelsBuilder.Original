@@ -43,6 +43,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         internal const string DefaultModelsNamespace = "Umbraco.Web.PublishedContentModels";
         internal const ClrNameSource DefaultClrNameSource = ClrNameSource.Alias; // for legacy reasons
         internal const string DefaultModelsDirectory = "~/App_Data/Models";
+        internal const string DefaultBinDirectory = "~/bin/";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Config"/> class.
@@ -63,6 +64,10 @@ namespace Umbraco.ModelsBuilder.Configuration
             ModelsDirectory = HostingEnvironment.IsHosted
                 ? HostingEnvironment.MapPath(DefaultModelsDirectory)
                 : DefaultModelsDirectory.TrimStart("~/");
+            BinDirectory = HostingEnvironment.IsHosted
+                ? HostingEnvironment.MapPath(DefaultBinDirectory)
+                : DefaultBinDirectory.TrimStart("~/");
+
             DebugLevel = 0;
 
             // stop here, everything is false
@@ -163,6 +168,27 @@ namespace Umbraco.ModelsBuilder.Configuration
 
                 // GetModelsDirectory will ensure that the path is safe
                 ModelsDirectory = GetModelsDirectory(root, value, AcceptUnsafeModelsDirectory);
+            }
+
+            // default: initialized above with DefaultBinDirectory const
+            value = ConfigurationManager.AppSettings[prefix + "BinDirectory"];
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                var root = HostingEnvironment.IsHosted
+                    ? HostingEnvironment.MapPath("~/")
+                    : Directory.GetCurrentDirectory();
+                if (root == null)
+                    throw new ConfigurationErrorsException("Could not determine root directory.");
+
+                var path = HostingEnvironment.IsHosted
+                    ? HostingEnvironment.MapPath(value)
+                    : Path.GetFullPath(value);
+
+                if (path != null && path.StartsWith(root))
+                {
+                    var dir = Path.Combine(root, value.TrimStart("~/"));
+                    BinDirectory = dir;
+                }
             }
 
             // default: 0
@@ -351,6 +377,14 @@ namespace Umbraco.ModelsBuilder.Configuration
         /// </summary>
         /// <remarks>Default is ~/App_Data/Models but that can be changed.</remarks>
         public string ModelsDirectory { get; }
+
+        /// <summary>
+        /// Gets the bin directory.
+        /// </summary>
+        /// <value>
+        /// Default is /bin/. Can be changed to subfolder for referencing.
+        /// </value>
+        public string BinDirectory { get; }
 
         /// <summary>
         /// Gets a value indicating whether to accept an unsafe value for ModelsDirectory.
