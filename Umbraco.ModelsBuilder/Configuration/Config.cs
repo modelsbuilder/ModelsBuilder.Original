@@ -160,13 +160,8 @@ namespace Umbraco.ModelsBuilder.Configuration
             value = ConfigurationManager.AppSettings[prefix + "ModelsDirectory"];
             if (!string.IsNullOrWhiteSpace(value))
             {
-                var root = HostingEnvironment.IsHosted
-                    ? HostingEnvironment.MapPath("~/")
-                    : Directory.GetCurrentDirectory();
-                if (root == null)
-                    throw new ConfigurationErrorsException("Could not determine root directory.");
-
                 // GetModelsDirectory will ensure that the path is safe
+                var root = GetRootDirectory();
                 ModelsDirectory = GetModelsDirectory(root, value, AcceptUnsafeModelsDirectory);
             }
 
@@ -174,21 +169,9 @@ namespace Umbraco.ModelsBuilder.Configuration
             value = ConfigurationManager.AppSettings[prefix + "BinDirectory"];
             if (!string.IsNullOrWhiteSpace(value))
             {
-                var root = HostingEnvironment.IsHosted
-                    ? HostingEnvironment.MapPath("~/")
-                    : Directory.GetCurrentDirectory();
-                if (root == null)
-                    throw new ConfigurationErrorsException("Could not determine root directory.");
-
-                var path = HostingEnvironment.IsHosted
-                    ? HostingEnvironment.MapPath(value)
-                    : Path.GetFullPath(value);
-
-                if (path != null && path.StartsWith(root))
-                {
-                    var dir = Path.Combine(root, value.TrimStart("~/"));
-                    BinDirectory = dir;
-                }
+                // GetBinDirectory will ensure that the path is safe - no AcceptUnsafe here
+                var root = GetRootDirectory();
+                BinDirectory = GetBinDirectory(root, value);
             }
 
             // default: 0
@@ -240,6 +223,16 @@ namespace Umbraco.ModelsBuilder.Configuration
             DebugLevel = debugLevel;
         }
 
+        private static string GetRootDirectory()
+        {
+            var root = HostingEnvironment.IsHosted
+                ? HostingEnvironment.MapPath("~/")
+                : Directory.GetCurrentDirectory();
+            if (root == null)
+                throw new ConfigurationErrorsException("Could not determine root directory.");
+            return root;
+        }
+
         // internal for tests
         internal static string GetModelsDirectory(string root, string config, bool acceptUnsafe)
         {
@@ -250,25 +243,39 @@ namespace Umbraco.ModelsBuilder.Configuration
                 throw new ConfigurationErrorsException($"Root is not rooted \"{root}\".");
 
             if (config.StartsWith("~/"))
-            {
-                var dir = Path.Combine(root, config.TrimStart("~/"));
-
-                // sanitize - GetFullPath will take care of any relative
-                // segments in path, eg '../../foo.tmp' - it may throw a SecurityException
-                // if the combined path reaches illegal parts of the filesystem
-                dir = Path.GetFullPath(dir);
-                root = Path.GetFullPath(root);
-
-                if (!dir.StartsWith(root) && !acceptUnsafe)
-                    throw new ConfigurationErrorsException($"Invalid models directory \"{config}\".");
-
-                return dir;
-            }
+                return GetMappedDirectory(root, config, acceptUnsafe, "models");
 
             if (acceptUnsafe)
                 return Path.GetFullPath(config);
 
             throw new ConfigurationErrorsException($"Invalid models directory \"{config}\".");
+        }
+
+        private static string GetBinDirectory(string root, string config)
+        {
+            if (!Path.IsPathRooted(root))
+                throw new ConfigurationErrorsException($"Root is not rooted \"{root}\".");
+
+            if (config.StartsWith("~/"))
+                return GetMappedDirectory(root, config, false, "bin");
+
+            throw new ConfigurationErrorsException($"Invalid bin directory \"{config}\".");
+        }
+
+        private static string GetMappedDirectory(string root, string config, bool acceptUnsafe, string name)
+        {
+            var dir = Path.Combine(root, config.TrimStart("~/"));
+
+            // sanitize - GetFullPath will take care of any relative
+            // segments in path, eg '../../foo.tmp' - it may throw a SecurityException
+            // if the combined path reaches illegal parts of the filesystem
+            dir = Path.GetFullPath(dir);
+            root = Path.GetFullPath(root);
+
+            if (!dir.StartsWith(root) && !acceptUnsafe)
+                throw new ConfigurationErrorsException($"Invalid {name} directory \"{config}\".");
+
+            return dir;
         }
 
         /// <summary>
