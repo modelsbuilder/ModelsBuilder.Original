@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 
@@ -26,6 +27,8 @@ namespace Umbraco.ModelsBuilder.Building
 
         protected Dictionary<string, string> ModelsMap { get; } = new Dictionary<string, string>();
         protected ParseResult ParseResult { get; }
+
+        private static Config Config => Current.Config.ModelsBuilder();
 
         // the list of assemblies that will be 'using' by default
         protected readonly IList<string> TypesUsing = new List<string>
@@ -111,7 +114,7 @@ namespace Umbraco.ModelsBuilder.Building
         {
             TypeModel.MapModelTypes(_typeModels, ModelsNamespace);
 
-            var pureLive = UmbracoConfig.For.ModelsBuilder().ModelsMode == ModelsMode.PureLive;
+            var pureLive = Config.ModelsMode == ModelsMode.PureLive;
 
             // mark IsContentIgnored models that we discovered should be ignored
             // then propagate / ignore children of ignored contents
@@ -309,7 +312,7 @@ namespace Umbraco.ModelsBuilder.Building
 
             // default
             // fixme - should NOT reference config here, should make ModelsNamespace mandatory
-            return UmbracoConfig.For.ModelsBuilder().ModelsNamespace;
+            return Config.ModelsNamespace;
         }
 
         protected string GetModelsBaseClassName(TypeModel type)

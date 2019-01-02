@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 
@@ -8,6 +9,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
 {
     internal static class ModelsGenerationError
     {
+        private static Config Config => Current.Config.ModelsBuilder();
+
         public static void Clear()
         {
             var errFile = GetErrFile();
@@ -50,7 +53,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private static string GetErrFile()
         {
-            var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
+            var modelsDirectory = Config.ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 return null;
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Api;
 using Umbraco.ModelsBuilder.Configuration;
@@ -39,11 +40,13 @@ namespace Umbraco.ModelsBuilder.Building
         internal TextBuilder()
         { }
 
+        private static Config Config => Current.Config.ModelsBuilder();
+
         /// <summary>
-        /// Outputs a generated model to a string builder.
-        /// </summary>
-        /// <param name="sb">The string builder.</param>
-        /// <param name="typeModel">The model to generate.</param>
+                                                                               /// Outputs a generated model to a string builder.
+                                                                               /// </summary>
+                                                                               /// <param name="sb">The string builder.</param>
+                                                                               /// <param name="typeModel">The model to generate.</param>
         public void Generate(StringBuilder sb, TypeModel typeModel)
         {
             WriteHeader(sb);
@@ -223,7 +226,7 @@ namespace Umbraco.ModelsBuilder.Building
 
         private void WriteContentTypeProperties(StringBuilder sb, TypeModel type)
         {
-            var staticMixinGetters = UmbracoConfig.For.ModelsBuilder().StaticMixinGetters;
+            var staticMixinGetters = Config.StaticMixinGetters;
 
             // write the properties
             foreach (var prop in type.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
@@ -275,7 +278,7 @@ namespace Umbraco.ModelsBuilder.Building
 
         private static string MixinStaticGetterName(string clrName)
         {
-            return string.Format(UmbracoConfig.For.ModelsBuilder().StaticMixinGetterPattern, clrName);
+            return string.Format(Config.StaticMixinGetterPattern, clrName);
         }
 
         private void WriteProperty(StringBuilder sb, TypeModel type, PropertyModel property, string mixinClrName = null)

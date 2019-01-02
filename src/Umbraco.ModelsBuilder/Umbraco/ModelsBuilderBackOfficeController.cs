@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Web.Hosting;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Composing;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.ModelsBuilder.Dashboard;
@@ -33,6 +33,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
             _umbracoServices = umbracoServices;
         }
 
+        private static Config Config => Current.Config.ModelsBuilder();
+
         // invoked by the dashboard
         // requires that the user is logged into the backoffice and has access to the settings section
         // beware! the name of the method appears in modelsbuilder.controller.js
@@ -41,20 +43,22 @@ namespace Umbraco.ModelsBuilder.Umbraco
         {
             try
             {
-                if (!UmbracoConfig.For.ModelsBuilder().ModelsMode.SupportsExplicitGeneration())
+                var config = Config;
+
+                if (!config.ModelsMode.SupportsExplicitGeneration())
                 {
                     var result2 = new BuildResult { Success = false, Message = "Models generation is not enabled." };
                     return Request.CreateResponse(HttpStatusCode.OK, result2, Configuration.Formatters.JsonFormatter);
                 }
 
-                var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
+                var modelsDirectory = config.ModelsDirectory;
 
                 var bin = HostingEnvironment.MapPath("~/bin");
                 if (bin == null)
                     throw new Exception("Panic: bin is null.");
 
                 // EnableDllModels will recycle the app domain - but this request will end properly
-                GenerateModels(modelsDirectory, UmbracoConfig.For.ModelsBuilder().ModelsMode.IsAnyDll() ? bin : null);
+                GenerateModels(modelsDirectory, config.ModelsMode.IsAnyDll() ? bin : null);
 
                 ModelsGenerationError.Clear();
             }
@@ -93,7 +97,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         {
             return new Dashboard
             {
-                Enable = UmbracoConfig.For.ModelsBuilder().Enable,
+                Enable = Config.Enable,
                 Text = BuilderDashboardHelper.Text(),
                 CanGenerate = BuilderDashboardHelper.CanGenerate(),
                 GenerateCausesRestart = BuilderDashboardHelper.GenerateCausesRestart(),
@@ -119,7 +123,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
-            var builder = new TextBuilder(typeModels, parseResult, UmbracoConfig.For.ModelsBuilder().ModelsNamespace);
+            var builder = new TextBuilder(typeModels, parseResult, Config.ModelsNamespace);
 
             foreach (var typeModel in builder.GetModelsToGenerate())
             {

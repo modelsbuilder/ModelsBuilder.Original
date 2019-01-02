@@ -33,7 +33,7 @@
     <Compile Include="ApiBasicAuthFilter.cs" />
     <Compile Include="ApiClient.cs" />
     <Compile Include="GetModelsData.cs" />
-    <Compile Include="ModelsBuilderApiComponent.cs" />
+    <Compile Include="ModelsBuilderApiComposer.cs" />
     <Compile Include="ModelsBuilderApiController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TokenData.cs" />
@@ -54,7 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="UmbracoCms.Web">
-      <Version>8.0.0-alpha.52</Version>
+      <Version>8.0.0-alpha.56</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

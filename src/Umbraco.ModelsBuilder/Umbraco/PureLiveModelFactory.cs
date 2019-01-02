@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
@@ -14,9 +13,8 @@ using System.Web.Compilation;
 using System.Web.Hosting;
 using System.Web.WebPages.Razor;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Cache;
 using Umbraco.ModelsBuilder.Building;
@@ -32,7 +30,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
         private volatile bool _hasModels; // volatile 'cos reading outside lock
         private bool _pendingRebuild;
-        private readonly ProfilingLogger _logger;
+        private readonly IProfilingLogger _logger;
         private readonly FileSystemWatcher _watcher;
         private int _ver, _skipver;
         private readonly int _debugLevel;
@@ -44,7 +42,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private const string ProjVirt = "~/App_Data/Models/all.generated.cs";
         private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err" };
 
-        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, ProfilingLogger logger)
+        private static Config Config => Current.Config.ModelsBuilder();
+
+        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IProfilingLogger logger)
         {
             _umbracoServices = umbracoServices;
             _logger = logger;
@@ -56,7 +56,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             if (!HostingEnvironment.IsHosted) return;
 
-            var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
+            var modelsDirectory = Config.ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
@@ -69,7 +69,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             _watcher.EnableRaisingEvents = true;
 
             // get it here, this need to be fast
-            _debugLevel = UmbracoConfig.For.ModelsBuilder().DebugLevel;
+            _debugLevel = Config.DebugLevel;
         }
 
         #region IPublishedModelFactory
@@ -116,7 +116,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             if (ctor != null) return ctor();
 
             var listType = typeof(List<>).MakeGenericType(modelInfo.ModelType);
-            ctor = modelInfo.ListCtor = ReflectionUtilities.EmitCtor<Func<IList>>(declaring: listType);
+            ctor = modelInfo.ListCtor = ReflectionUtilities.EmitConstructor<Func<IList>>(declaring: listType);
             return ctor();
         }
 
@@ -164,7 +164,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 if (_modelsAssembly == null) return;
 
                 if (_debugLevel > 0)
-                    _logger.Logger.Debug<PureLiveModelFactory>("RazorBuildProvider.CodeGenerationStarted");
+                    _logger.Debug<PureLiveModelFactory>("RazorBuildProvider.CodeGenerationStarted");
                 if (!(sender is RazorBuildProvider provider)) return;
 
                 // add the assembly, and add a dependency to a text file that will change on each
@@ -183,7 +183,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         // tells the factory that it should build a new generation of models
         private void ResetModels()
         {
-            _logger.Logger.Debug<PureLiveModelFactory>("Resetting models.");
+            _logger.Debug<PureLiveModelFactory>("Resetting models.");
 
             try
             {
@@ -192,7 +192,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 _hasModels = false;
                 _pendingRebuild = true;
 
-                var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
+                var modelsDirectory = Config.ModelsDirectory;
                 if (!Directory.Exists(modelsDirectory))
                     Directory.CreateDirectory(modelsDirectory);
 
@@ -230,7 +230,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         internal Infos EnsureModels()
         {
             if (_debugLevel > 0)
-                _logger.Logger.Debug<PureLiveModelFactory>("Ensuring models.");
+                _logger.Debug<PureLiveModelFactory>("Ensuring models.");
 
             // don't use an upgradeable lock here because only 1 thread at a time could enter it
             try
@@ -284,8 +284,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     {
                         try
                         {
-                            _logger.Logger.Error<PureLiveModelFactory>("Failed to build models.", e);
-                            _logger.Logger.Warn<PureLiveModelFactory>("Running without models."); // be explicit
+                            _logger.Error<PureLiveModelFactory>("Failed to build models.", e);
+                            _logger.Warn<PureLiveModelFactory>("Running without models."); // be explicit
                             ModelsGenerationError.Report("Failed to build PureLive models.", e);
                         }
                         finally
@@ -314,7 +314,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private Assembly GetModelsAssembly(bool forceRebuild)
         {
-            var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
+            var modelsDirectory = Config.ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
@@ -337,13 +337,13 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             if (!forceRebuild)
             {
-                _logger.Logger.Debug<PureLiveModelFactory>("Looking for cached models.");
+                _logger.Debug<PureLiveModelFactory>("Looking for cached models.");
                 if (File.Exists(modelsHashFile) && File.Exists(projFile))
                 {
                     var cachedHash = File.ReadAllText(modelsHashFile);
                     if (currentHash != cachedHash)
                     {
-                        _logger.Logger.Debug<PureLiveModelFactory>("Found obsolete cached models.");
+                        _logger.Debug<PureLiveModelFactory>("Found obsolete cached models.");
                         forceRebuild = true;
                     }
 
@@ -351,7 +351,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 }
                 else
                 {
-                    _logger.Logger.Debug<PureLiveModelFactory>("Could not find cached models.");
+                    _logger.Debug<PureLiveModelFactory>("Could not find cached models.");
                     forceRebuild = true;
                 }
             }
@@ -376,7 +376,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     var dllPath = File.ReadAllText(dllPathFile);
                     var codegen = HttpRuntime.CodegenDir;
 
-                    _logger.Logger.Debug<PureLiveModelFactory>($"Cached models dll at {dllPath}.");
+                    _logger.Debug<PureLiveModelFactory>($"Cached models dll at {dllPath}.");
 
                     if (File.Exists(dllPath) && !File.Exists(dllPath + ".delete") && dllPath.StartsWith(codegen))
                     {
@@ -390,20 +390,20 @@ namespace Umbraco.ModelsBuilder.Umbraco
                             // with the "same but different" version of the assembly in memory
                             _skipver = assembly.GetName().Version.Revision;
 
-                            _logger.Logger.Debug<PureLiveModelFactory>("Loading cached models (dll).");
+                            _logger.Debug<PureLiveModelFactory>("Loading cached models (dll).");
                             return assembly;
                         }
 
-                        _logger.Logger.Debug<PureLiveModelFactory>("Cached models dll cannot be loaded (invalid assembly).");
+                        _logger.Debug<PureLiveModelFactory>("Cached models dll cannot be loaded (invalid assembly).");
                     }
                     else if (!File.Exists(dllPath))
-                        _logger.Logger.Debug<PureLiveModelFactory>("Cached models dll does not exist.");
+                        _logger.Debug<PureLiveModelFactory>("Cached models dll does not exist.");
                     else if (File.Exists(dllPath + ".delete"))
-                        _logger.Logger.Debug<PureLiveModelFactory>("Cached models dll is marked for deletion.");
+                        _logger.Debug<PureLiveModelFactory>("Cached models dll is marked for deletion.");
                     else if (!dllPath.StartsWith(codegen))
-                        _logger.Logger.Debug<PureLiveModelFactory>("Cached models dll is in a different codegen directory.");
+                        _logger.Debug<PureLiveModelFactory>("Cached models dll is in a different codegen directory.");
                     else
-                        _logger.Logger.Debug<PureLiveModelFactory>("Cached models dll cannot be loaded (why?).");
+                        _logger.Debug<PureLiveModelFactory>("Cached models dll cannot be loaded (why?).");
                 }
 
                 // must reset the version in the file else it would keep growing
@@ -433,12 +433,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     throw;
                 }
 
-                _logger.Logger.Debug<PureLiveModelFactory>("Loading cached models (source).");
+                _logger.Debug<PureLiveModelFactory>("Loading cached models (source).");
                 return assembly;
             }
 
             // need to rebuild
-            _logger.Logger.Debug<PureLiveModelFactory>("Rebuilding models.");
+            _logger.Debug<PureLiveModelFactory>("Rebuilding models.");
 
             // generate code, save
             var code = GenerateModelsCode(ourFiles, typeModels);
@@ -470,13 +470,13 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 throw;
             }
 
-            _logger.Logger.Debug<PureLiveModelFactory>("Done rebuilding.");
+            _logger.Debug<PureLiveModelFactory>("Done rebuilding.");
             return assembly;
         }
 
         private void ClearOnFailingToCompile(string dllPathFile, string modelsHashFile, string projFile)
         {
-            _logger.Logger.Debug<PureLiveModelFactory>("Failed to compile.");
+            _logger.Debug<PureLiveModelFactory>("Failed to compile.");
 
             // the dll file reference still points to the previous dll, which is obsolete
             // now and will be deleted by ASP.NET eventually, so better clear that reference.
@@ -540,7 +540,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private static string GenerateModelsCode(IDictionary<string, string> ourFiles, IList<TypeModel> typeModels)
         {
-            var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
+            var modelsDirectory = Config.ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
@@ -548,7 +548,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 File.Delete(file);
 
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
-            var builder = new TextBuilder(typeModels, parseResult, UmbracoConfig.For.ModelsBuilder().ModelsNamespace);
+            var builder = new TextBuilder(typeModels, parseResult, Config.ModelsNamespace);
 
             var codeBuilder = new StringBuilder();
             builder.Generate(codeBuilder, builder.GetModelsToGenerate());
@@ -640,7 +640,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             //if (_building && OurFiles.Contains(changed))
             //{
-            //    //_logger.Logger.Info<PureLiveModelFactory>("Ignoring files self-changes.");
+            //    //_logger.Info<PureLiveModelFactory>("Ignoring files self-changes.");
             //    return;
             //}
 
@@ -648,7 +648,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             if (OurFiles.Contains(changed))
                 return;
 
-            _logger.Logger.Info<PureLiveModelFactory>("Detected files changes.");
+            _logger.Info<PureLiveModelFactory>("Detected files changes.");
 
             ResetModels();
         }

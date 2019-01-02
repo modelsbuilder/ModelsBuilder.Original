@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 
@@ -13,6 +14,8 @@ namespace Umbraco.ModelsBuilder.Tests
     [TestFixture]
     public class ConfigTests
     {
+        private static Config Config => Current.Config.ModelsBuilder();
+
         [SetUp]
         public void Setup()
         {
@@ -24,42 +27,42 @@ namespace Umbraco.ModelsBuilder.Tests
         public void Test1()
         {
             Config.Setup(new Config(modelsNamespace: "test1"));
-            Assert.AreEqual("test1", UmbracoConfig.For.ModelsBuilder().ModelsNamespace);
+            Assert.AreEqual("test1", Config.ModelsNamespace);
         }
 
         [Test]
         public void Test2()
         {
             Config.Setup(new Config(modelsNamespace: "test2"));
-            Assert.AreEqual("test2", UmbracoConfig.For.ModelsBuilder().ModelsNamespace);
+            Assert.AreEqual("test2", Config.ModelsNamespace);
         }
 
         [Test]
         public void DefaultModelsNamespace1()
         {
             Config.Setup(new Config(enable: true));
-            Assert.AreEqual(Config.DefaultModelsNamespace, UmbracoConfig.For.ModelsBuilder().ModelsNamespace);
+            Assert.AreEqual(Config.DefaultModelsNamespace, Config.ModelsNamespace);
         }
 
         [Test]
         public void DefaultModelsNamespace2()
         {
             Config.Setup(new Config());
-            Assert.AreEqual(Config.DefaultModelsNamespace, UmbracoConfig.For.ModelsBuilder().ModelsNamespace);
+            Assert.AreEqual(Config.DefaultModelsNamespace, Config.ModelsNamespace);
         }
 
         [Test]
         public void DefaultStaticMixinGetterPattern1()
         {
             Config.Setup(new Config(enable: true));
-            Assert.AreEqual(Config.DefaultStaticMixinGetterPattern, UmbracoConfig.For.ModelsBuilder().StaticMixinGetterPattern);
+            Assert.AreEqual(Config.DefaultStaticMixinGetterPattern, Config.StaticMixinGetterPattern);
         }
 
         [Test]
         public void DefaultStaticMixinGetterPattern2()
         {
             Config.Setup(new Config());
-            Assert.AreEqual(Config.DefaultStaticMixinGetterPattern, UmbracoConfig.For.ModelsBuilder().StaticMixinGetterPattern);
+            Assert.AreEqual(Config.DefaultStaticMixinGetterPattern, Config.StaticMixinGetterPattern);
         }
 
         [TestCase("c:/path/to/root", "~/dir/models", false, "c:\\path\\to\\root\\dir\\models")]

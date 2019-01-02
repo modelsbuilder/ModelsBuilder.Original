@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -26,6 +27,8 @@ namespace Umbraco.ModelsBuilder.Umbraco
             _memberTypeService = memberTypeService;
             _publishedContentTypeFactory = publishedContentTypeFactory;
         }
+
+        private static Config Config => Current.Config.ModelsBuilder();
 
         #region Services
 
@@ -74,7 +77,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             // however we CANNOT change Umbraco
             // so, adding a way to "do it right" deriving from name, here
 
-            switch (UmbracoConfig.For.ModelsBuilder().ClrNameSource)
+            switch (Config.ClrNameSource)
             {
                 case ClrNameSource.RawAlias:
                     // use Umbraco's alias

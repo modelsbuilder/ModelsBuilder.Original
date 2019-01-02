@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.ModelsBuilder.Umbraco;
@@ -8,14 +9,16 @@ namespace Umbraco.ModelsBuilder.Dashboard
 {
     internal static class BuilderDashboardHelper
     {
+        private static Config Config => Current.Config.ModelsBuilder();
+
         public static bool CanGenerate()
         {
-            return UmbracoConfig.For.ModelsBuilder().ModelsMode.SupportsExplicitGeneration();
+            return Config.ModelsMode.SupportsExplicitGeneration();
         }
 
         public static bool GenerateCausesRestart()
         {
-            return UmbracoConfig.For.ModelsBuilder().ModelsMode.IsAnyDll();
+            return Config.ModelsMode.IsAnyDll();
         }
 
         public static bool AreModelsOutOfDate()
@@ -30,7 +33,8 @@ namespace Umbraco.ModelsBuilder.Dashboard
 
         public static string Text()
         {
-            var config = UmbracoConfig.For.ModelsBuilder();
+            var config = Config;
+
             if (!config.Enable)
                 return "ModelsBuilder is disabled<br />(the .Enable key is missing, or its value is not 'true').";
 

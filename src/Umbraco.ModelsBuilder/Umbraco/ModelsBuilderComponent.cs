@@ -1,101 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
-using LightInject;
-using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.UI.JavaScript;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
-    [RequiredComponent(typeof(NuCacheComponent))]
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public class ModelsBuilderComponent : UmbracoComponentBase, IUmbracoCoreComponent
+    public class ModelsBuilderComponent : IComponent
     {
-        public override void Compose(Composition composition)
+        private static Config Config => Current.Config.ModelsBuilder();
+
+        public ModelsBuilderComponent(UmbracoServices umbracoServices)
         {
-            base.Compose(composition);
-
-            composition.Container.Register<UmbracoServices>(new PerContainerLifetime());
-
-            var config = UmbracoConfig.For.ModelsBuilder();
-
-            if (config.ModelsMode == ModelsMode.PureLive)
-                ComposeForLiveModels(composition.Container);
-            else if (config.EnableFactory)
-                ComposeForDefaultModelsFactory(composition.Container);
-
             // always setup the dashboard
-            InstallServerVars(composition.Container.GetInstance<IRuntimeState>().Level);
-            composition.Container.Register(typeof(ModelsBuilderBackOfficeController), new PerRequestLifeTime());
+            // note: UmbracoApiController instances are automatically registered
+            InstallServerVars();
 
             ContentModelBinder.ModelBindingException += ContentModelBinder_ModelBindingException;
-        }
 
-        public void Initialize(UmbracoServices umbracoServices)
-        {
-            var config = UmbracoConfig.For.ModelsBuilder();
-
-            if (config.Enable)
+            if (Config.Enable)
                 FileService.SavingTemplate += FileService_SavingTemplate;
 
             // fixme LiveModelsProvider should not be static
-            if (config.ModelsMode.IsLiveNotPure())
+            if (Config.ModelsMode.IsLiveNotPure())
                 LiveModelsProvider.Install(umbracoServices);
 
             // fixme OutOfDateModelsStatus should not be static
-            if (config.FlagOutOfDateModels)
+            if (Config.FlagOutOfDateModels)
                 OutOfDateModelsStatus.Install();
         }
 
-        private void ComposeForDefaultModelsFactory(IServiceContainer container)
-        {
-            container.RegisterSingleton<IPublishedModelFactory>(factory =>
-            {
-                var typeLoader = factory.GetInstance<TypeLoader>();
-                var types = typeLoader
-                    .GetTypes<PublishedElementModel>() // element models
-                    .Concat(typeLoader.GetTypes<PublishedContentModel>()); // content models
-                return new PublishedModelFactory(types);
-            });
-        }
-
-        private void ComposeForLiveModels(IServiceContainer container)
-        {
-            container.RegisterSingleton<IPublishedModelFactory, PureLiveModelFactory>();
-
-            // the following would add @using statement in every view so user's don't
-            // have to do it - however, then noone understands where the @using statement
-            // comes from, and it cannot be avoided / removed --- DISABLED
-            //
-            /*
-            // no need for @using in views
-            // note:
-            //  we are NOT using the in-code attribute here, config is required
-            //  because that would require parsing the code... and what if it changes?
-            //  we can AddGlobalImport not sure we can remove one anyways
-            var modelsNamespace = Configuration.Config.ModelsNamespace;
-            if (string.IsNullOrWhiteSpace(modelsNamespace))
-                modelsNamespace = Configuration.Config.DefaultModelsNamespace;
-            System.Web.WebPages.Razor.WebPageRazorHost.AddGlobalImport(modelsNamespace);
-            */
-        }
-
-        private void InstallServerVars(RuntimeLevel level)
+        private void InstallServerVars()
         {
             // register our url - for the backoffice api
             ServerVariablesParser.Parsing += (sender, serverVars) =>
@@ -117,18 +62,15 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
 
                 umbracoUrls["modelsBuilderBaseUrl"] = urlHelper.GetUmbracoApiServiceBaseUrl<ModelsBuilderBackOfficeController>(controller => controller.BuildModels());
-                umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings(level);
+                umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings();
             };
         }
 
-        private Dictionary<string, object> GetModelsBuilderSettings(RuntimeLevel level)
+        private Dictionary<string, object> GetModelsBuilderSettings()
         {
-            if (level != RuntimeLevel.Run)
-                return null;
-
             var settings = new Dictionary<string, object>
             {
-                {"enabled", UmbracoConfig.For.ModelsBuilder().Enable}
+                {"enabled", Config.Enable}
             };
 
             return settings;
@@ -144,7 +86,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         {
             // don't do anything if the factory is not enabled
             // because, no factory = no models (even if generation is enabled)
-            if (!UmbracoConfig.For.ModelsBuilder().EnableFactory) return;
+            if (!Config.EnableFactory) return;
 
             // don't do anything if this special key is not found
             if (!e.AdditionalData.ContainsKey("CreateTemplateForContentType")) return;
@@ -165,7 +107,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     var name = template.Name; // will be the name of the content type since we are creating
                     var className = UmbracoServices.GetClrName(name, alias);
 
-                    var modelNamespace = UmbracoConfig.For.ModelsBuilder().ModelsNamespace;
+                    var modelNamespace = Config.ModelsNamespace;
 
                     // we do not support configuring this at the moment, so just let Umbraco use its default value
                     //var modelNamespaceAlias = ...;

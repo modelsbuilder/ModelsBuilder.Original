@@ -79,7 +79,7 @@ namespace Umbraco.ModelsBuilder.Tests
 
             public Guid Key => throw new NotImplementedException();
 
-            public bool IsDraft => throw new NotImplementedException();
+            public bool IsDraft(string culture) => throw new NotImplementedException();
 
             public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; }
             public PublishedItemType ItemType => throw new NotImplementedException();

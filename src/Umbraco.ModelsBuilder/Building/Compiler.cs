@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Web;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 
@@ -17,7 +18,7 @@ namespace Umbraco.ModelsBuilder.Building
         private readonly LanguageVersion _languageVersion;
 
         public Compiler()
-            : this(UmbracoConfig.For.ModelsBuilder().LanguageVersion)
+            : this(Config.LanguageVersion)
         { }
 
         public Compiler(LanguageVersion languageVersion)
@@ -26,6 +27,8 @@ namespace Umbraco.ModelsBuilder.Building
             References = ReferencedAssemblies.References;
             Debug = HttpContext.Current != null && HttpContext.Current.IsDebuggingEnabled;
         }
+
+        private static Config Config => Current.Config.ModelsBuilder();
 
         // gets or sets the references
         public IEnumerable<PortableExecutableReference> References { get; set; }

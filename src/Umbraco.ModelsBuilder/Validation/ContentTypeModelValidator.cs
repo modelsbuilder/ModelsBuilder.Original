@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -12,9 +13,9 @@ using Umbraco.Web.Models.ContentEditing;
 namespace Umbraco.ModelsBuilder.Validation
 {
     /// <summary>
-    /// Used to validate the aliases for the content type when MB is enabled to ensure that
-    /// no illegal aliases are used
-    /// </summary>
+   /// Used to validate the aliases for the content type when MB is enabled to ensure that
+   /// no illegal aliases are used
+   /// </summary>
     internal class ContentTypeModelValidator : ContentTypeModelValidatorBase<DocumentTypeSave, PropertyTypeBasic>
     {
     }
@@ -39,10 +40,12 @@ namespace Umbraco.ModelsBuilder.Validation
         where TModel: ContentTypeSave<TProperty>
         where TProperty: PropertyTypeBasic
     {
+        private static Config Config => Current.Config.ModelsBuilder();
+
         protected override IEnumerable<ValidationResult> Validate(TModel model)
         {
             //don't do anything if we're not enabled
-            if (UmbracoConfig.For.ModelsBuilder().Enable)
+            if (Config.Enable)
             {
                 var properties = model.Groups.SelectMany(x => x.Properties)
                     .Where(x => x.Inherited == false)
@@ -51,7 +54,7 @@ namespace Umbraco.ModelsBuilder.Validation
                 foreach (var prop in properties)
                 {
                     var propertyGroup = model.Groups.Single(x => x.Properties.Contains(prop));
-                    
+
                     if (model.Alias.ToLowerInvariant() == prop.Alias.ToLowerInvariant())
                         yield return new ValidationResult(string.Format("With Models Builder enabled, you can't have a property with a the alias \"{0}\" when the content type alias is also \"{0}\".", prop.Alias), new[]
                     {

@@ -2,6 +2,7 @@
 using System.Net.Http;
 using Semver;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.ModelsBuilder.Umbraco;
@@ -19,6 +20,7 @@ namespace Umbraco.ModelsBuilder.Api
 
     [PluginController(ControllerArea)]
     [IsBackOffice]
+    [HideFromTypeFinder] // make sure it is *not* automatically registered
     //[UmbracoApplicationAuthorize(Constants.Applications.Settings)] // see ApiBasicAuthFilter - that one would be for ASP.NET identity
     public class ModelsBuilderApiController : UmbracoApiController // UmbracoAuthorizedApiController - for ASP.NET identity
     {
@@ -31,12 +33,14 @@ namespace Umbraco.ModelsBuilder.Api
             _umbracoServices = umbracoServices;
         }
 
+        private static Config Config => Current.Config.ModelsBuilder();
+
         // invoked by the API
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
         [ApiBasicAuthFilter("settings")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage ValidateClientVersion(ValidateClientVersionData data)
         {
-            if (!UmbracoConfig.For.ModelsBuilder().ApiServer)
+            if (!Config.ApiServer)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API server does not want to talk to you.");
 
             if (!ModelState.IsValid || data == null || !data.IsValid)
@@ -53,7 +57,7 @@ namespace Umbraco.ModelsBuilder.Api
         [ApiBasicAuthFilter("settings")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage GetModels(GetModelsData data)
         {
-            if (!UmbracoConfig.For.ModelsBuilder().ApiServer)
+            if (!Config.ApiServer)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API server does not want to talk to you.");
 
             if (!ModelState.IsValid || data == null || !data.IsValid)

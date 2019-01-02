@@ -2,6 +2,7 @@
 using System.IO;
 using System.Web.Hosting;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.Web.Cache;
@@ -10,10 +11,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
 {
     public sealed class OutOfDateModelsStatus
     {
+        private static Config Config => Current.Config.ModelsBuilder();
+        
         internal static void Install()
         {
             // just be sure
-            if (UmbracoConfig.For.ModelsBuilder().FlagOutOfDateModels == false)
+            if (Config.FlagOutOfDateModels == false)
                 return;
 
             ContentTypeCacheRefresher.CacheUpdated += (sender, args) => Write();
@@ -22,7 +25,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private static string GetFlagPath()
         {
-            var modelsDirectory = UmbracoConfig.For.ModelsBuilder().ModelsDirectory;
+            var modelsDirectory = Config.ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
             return Path.Combine(modelsDirectory, "ood.flag");
@@ -37,19 +40,19 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         public static void Clear()
         {
-            if (UmbracoConfig.For.ModelsBuilder().FlagOutOfDateModels == false) return;
+            if (Config.FlagOutOfDateModels == false) return;
             var path = GetFlagPath();
             if (path == null || !File.Exists(path)) return;
             File.Delete(path);
         }
 
-        public static bool IsEnabled => UmbracoConfig.For.ModelsBuilder().FlagOutOfDateModels;
+        public static bool IsEnabled => Config.FlagOutOfDateModels;
 
         public static bool IsOutOfDate
         {
             get
             {
-                if (UmbracoConfig.For.ModelsBuilder().FlagOutOfDateModels == false) return false;
+                if (Config.FlagOutOfDateModels == false) return false;
                 var path = GetFlagPath();
                 return path != null && File.Exists(path);
             }
