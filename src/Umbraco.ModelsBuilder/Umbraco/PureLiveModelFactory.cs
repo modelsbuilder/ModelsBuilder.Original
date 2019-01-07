@@ -42,12 +42,13 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private const string ProjVirt = "~/App_Data/Models/all.generated.cs";
         private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err" };
 
-        private static Config Config => Current.Config.ModelsBuilder();
+        private readonly Config _config;
 
-        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IProfilingLogger logger)
+        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IProfilingLogger logger, Config config)
         {
             _umbracoServices = umbracoServices;
             _logger = logger;
+            _config = config;
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
             ContentTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModels();
@@ -56,7 +57,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             if (!HostingEnvironment.IsHosted) return;
 
-            var modelsDirectory = Config.ModelsDirectory;
+            var modelsDirectory = _config.ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
@@ -69,7 +70,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             _watcher.EnableRaisingEvents = true;
 
             // get it here, this need to be fast
-            _debugLevel = Config.DebugLevel;
+            _debugLevel = _config.DebugLevel;
         }
 
         #region IPublishedModelFactory
@@ -192,7 +193,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 _hasModels = false;
                 _pendingRebuild = true;
 
-                var modelsDirectory = Config.ModelsDirectory;
+                var modelsDirectory = _config.ModelsDirectory;
                 if (!Directory.Exists(modelsDirectory))
                     Directory.CreateDirectory(modelsDirectory);
 
@@ -314,7 +315,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private Assembly GetModelsAssembly(bool forceRebuild)
         {
-            var modelsDirectory = Config.ModelsDirectory;
+            var modelsDirectory = _config.ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
@@ -538,9 +539,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
             return new Infos { ModelInfos = modelInfos.Count > 0 ? modelInfos : null, ModelTypeMap = map };
         }
 
-        private static string GenerateModelsCode(IDictionary<string, string> ourFiles, IList<TypeModel> typeModels)
+        private string GenerateModelsCode(IDictionary<string, string> ourFiles, IList<TypeModel> typeModels)
         {
-            var modelsDirectory = Config.ModelsDirectory;
+            var modelsDirectory = _config.ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
@@ -548,7 +549,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 File.Delete(file);
 
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
-            var builder = new TextBuilder(typeModels, parseResult, Config.ModelsNamespace);
+            var builder = new TextBuilder(typeModels, parseResult, _config.ModelsNamespace);
 
             var codeBuilder = new StringBuilder();
             builder.Generate(codeBuilder, builder.GetModelsToGenerate());

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using NUnit.Framework;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Api;
 using Umbraco.ModelsBuilder.Building;
@@ -17,8 +18,9 @@ namespace Umbraco.ModelsBuilder.Tests
         [SetUp]
         public void Setup()
         {
-            // this is needed to ensure that Config.Setup is OK in each test
-            UmbracoConfigExtensions.ResetConfig();
+            Current.Reset();
+            Current.UnlockConfigs();
+            Current.Configs.Add(() => new Config());
         }
 
         [Test]

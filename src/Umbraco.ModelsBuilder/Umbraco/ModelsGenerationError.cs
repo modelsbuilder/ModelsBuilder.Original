@@ -9,7 +9,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 {
     internal static class ModelsGenerationError
     {
-        private static Config Config => Current.Config.ModelsBuilder();
+        private static Config Config => Current.Configs.ModelsBuilder();
 
         public static void Clear()
         {

@@ -28,7 +28,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             _publishedContentTypeFactory = publishedContentTypeFactory;
         }
 
-        private static Config Config => Current.Config.ModelsBuilder();
+        private static Config Config => Current.Configs.ModelsBuilder();
 
         #region Services
 

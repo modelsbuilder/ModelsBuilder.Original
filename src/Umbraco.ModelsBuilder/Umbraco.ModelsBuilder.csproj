@@ -40,7 +40,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
     <PackageReference Include="UmbracoCms.Web">
-      <Version>8.0.0-alpha.57</Version>
+      <Version>8.0.0-alpha.57.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -64,7 +64,7 @@
     <Compile Include="Configuration\ModelsMode.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\ModelsModeExtensions.cs" />
-    <Compile Include="Configuration\UmbracoConfigExtensions.cs" />
+    <Compile Include="ConfigsExtensions.cs" />
     <Compile Include="ImplementPropertyTypeAttribute.cs" />
     <Compile Include="ImplementContentTypeAttribute.cs" />
     <Compile Include="ModelsUsingAttribute.cs" />

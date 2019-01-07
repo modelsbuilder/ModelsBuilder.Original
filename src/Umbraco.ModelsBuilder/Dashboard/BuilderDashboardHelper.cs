@@ -9,7 +9,7 @@ namespace Umbraco.ModelsBuilder.Dashboard
 {
     internal static class BuilderDashboardHelper
     {
-        private static Config Config => Current.Config.ModelsBuilder();
+        private static Config Config => Current.Configs.ModelsBuilder();
 
         public static bool CanGenerate()
         {

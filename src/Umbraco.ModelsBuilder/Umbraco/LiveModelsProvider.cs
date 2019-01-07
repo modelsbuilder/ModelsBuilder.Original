@@ -21,7 +21,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private static Mutex _mutex;
         private static int _req;
 
-        private static Config Config => Current.Config.ModelsBuilder();
+        private static Config Config => Current.Configs.ModelsBuilder();
 
         // we do not manage pure live here
         internal static bool IsEnabled => Config.ModelsMode.IsLiveNotPure();
@@ -100,13 +100,14 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private static void GenerateModels()
         {
             var modelsDirectory = Config.ModelsDirectory;
+            var modelsNamespace = Config.ModelsNamespace;
 
             var bin = HostingEnvironment.MapPath("~/bin");
             if (bin == null)
                 throw new Exception("Panic: bin is null.");
 
             // EnableDllModels will recycle the app domain - but this request will end properly
-            ModelsBuilderBackOfficeController.GenerateModels(_umbracoServices, modelsDirectory, Config.ModelsMode.IsAnyDll() ? bin : null);
+            ModelsBuilderBackOfficeController.GenerateModels(_umbracoServices, modelsDirectory, Config.ModelsMode.IsAnyDll() ? bin : null, modelsNamespace);
         }
     }
 

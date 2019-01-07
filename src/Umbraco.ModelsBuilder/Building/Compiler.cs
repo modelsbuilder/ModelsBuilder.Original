@@ -28,7 +28,7 @@ namespace Umbraco.ModelsBuilder.Building
             Debug = HttpContext.Current != null && HttpContext.Current.IsDebuggingEnabled;
         }
 
-        private static Config Config => Current.Config.ModelsBuilder();
+        private static Config Config => Current.Configs.ModelsBuilder();
 
         // gets or sets the references
         public IEnumerable<PortableExecutableReference> References { get; set; }

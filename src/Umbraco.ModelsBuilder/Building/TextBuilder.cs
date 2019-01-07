@@ -40,7 +40,7 @@ namespace Umbraco.ModelsBuilder.Building
         internal TextBuilder()
         { }
 
-        private static Config Config => Current.Config.ModelsBuilder();
+        private static Config Config => Current.Configs.ModelsBuilder();
 
         /// <summary>
                                                                                /// Outputs a generated model to a string builder.

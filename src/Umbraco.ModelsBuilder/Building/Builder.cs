@@ -28,7 +28,7 @@ namespace Umbraco.ModelsBuilder.Building
         protected Dictionary<string, string> ModelsMap { get; } = new Dictionary<string, string>();
         protected ParseResult ParseResult { get; }
 
-        private static Config Config => Current.Config.ModelsBuilder();
+        private static Config Config => Current.Configs.ModelsBuilder();
 
         // the list of assemblies that will be 'using' by default
         protected readonly IList<string> TypesUsing = new List<string>

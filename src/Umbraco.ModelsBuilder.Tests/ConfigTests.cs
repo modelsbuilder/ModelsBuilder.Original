@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Configuration;
 using NUnit.Framework;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Tests
@@ -14,55 +7,46 @@ namespace Umbraco.ModelsBuilder.Tests
     [TestFixture]
     public class ConfigTests
     {
-        private static Config Config => Current.Config.ModelsBuilder();
-
-        [SetUp]
-        public void Setup()
-        {
-            // this is needed to ensure that Config.Setup is OK in each test
-            UmbracoConfigExtensions.ResetConfig();
-        }
-
         [Test]
         public void Test1()
         {
-            Config.Setup(new Config(modelsNamespace: "test1"));
-            Assert.AreEqual("test1", Config.ModelsNamespace);
+            var config = new Config(modelsNamespace: "test1");
+            Assert.AreEqual("test1", config.ModelsNamespace);
         }
 
         [Test]
         public void Test2()
         {
-            Config.Setup(new Config(modelsNamespace: "test2"));
-            Assert.AreEqual("test2", Config.ModelsNamespace);
+            var config = new Config(modelsNamespace: "test2");
+            Assert.AreEqual("test2", config.ModelsNamespace);
         }
 
         [Test]
         public void DefaultModelsNamespace1()
         {
-            Config.Setup(new Config(enable: true));
-            Assert.AreEqual(Config.DefaultModelsNamespace, Config.ModelsNamespace);
+            var config = new Config(enable: true);
+            Assert.AreEqual(Config.DefaultModelsNamespace, config.ModelsNamespace);
         }
 
         [Test]
         public void DefaultModelsNamespace2()
         {
-            Config.Setup(new Config());
-            Assert.AreEqual(Config.DefaultModelsNamespace, Config.ModelsNamespace);
+            var config = new Config();
+            Assert.AreEqual(Config.DefaultModelsNamespace, config.ModelsNamespace);
         }
 
         [Test]
         public void DefaultStaticMixinGetterPattern1()
         {
-            Config.Setup(new Config(enable: true));
-            Assert.AreEqual(Config.DefaultStaticMixinGetterPattern, Config.StaticMixinGetterPattern);
+            var config = new Config(enable: true);
+            Assert.AreEqual(Config.DefaultStaticMixinGetterPattern, config.StaticMixinGetterPattern);
         }
 
         [Test]
         public void DefaultStaticMixinGetterPattern2()
         {
-            Config.Setup(new Config());
-            Assert.AreEqual(Config.DefaultStaticMixinGetterPattern, Config.StaticMixinGetterPattern);
+            var config = new Config();
+            Assert.AreEqual(Config.DefaultStaticMixinGetterPattern, config.StaticMixinGetterPattern);
         }
 
         [TestCase("c:/path/to/root", "~/dir/models", false, "c:\\path\\to\\root\\dir\\models")]

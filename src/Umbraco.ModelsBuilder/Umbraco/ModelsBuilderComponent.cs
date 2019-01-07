@@ -20,11 +20,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
     {
         private readonly UmbracoServices _umbracoServices;
 
-        private static Config Config => Current.Config.ModelsBuilder();
+        private readonly Config _config;
 
-        public ModelsBuilderComponent(UmbracoServices umbracoServices)
+        public ModelsBuilderComponent(UmbracoServices umbracoServices, Config config)
         {
             _umbracoServices = umbracoServices;
+            _config = config;
         }
 
         public void Initialize()
@@ -35,15 +36,15 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             ContentModelBinder.ModelBindingException += ContentModelBinder_ModelBindingException;
 
-            if (Config.Enable)
+            if (_config.Enable)
                 FileService.SavingTemplate += FileService_SavingTemplate;
 
             // fixme LiveModelsProvider should not be static
-            if (Config.ModelsMode.IsLiveNotPure())
+            if (_config.ModelsMode.IsLiveNotPure())
                 LiveModelsProvider.Install(_umbracoServices);
 
             // fixme OutOfDateModelsStatus should not be static
-            if (Config.FlagOutOfDateModels)
+            if (_config.FlagOutOfDateModels)
                 OutOfDateModelsStatus.Install();
         }
 
@@ -80,7 +81,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         {
             var settings = new Dictionary<string, object>
             {
-                {"enabled", Config.Enable}
+                {"enabled", _config.Enable}
             };
 
             return settings;
@@ -96,7 +97,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         {
             // don't do anything if the factory is not enabled
             // because, no factory = no models (even if generation is enabled)
-            if (!Config.EnableFactory) return;
+            if (!_config.EnableFactory) return;
 
             // don't do anything if this special key is not found
             if (!e.AdditionalData.ContainsKey("CreateTemplateForContentType")) return;
@@ -117,7 +118,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     var name = template.Name; // will be the name of the content type since we are creating
                     var className = UmbracoServices.GetClrName(name, alias);
 
-                    var modelNamespace = Config.ModelsNamespace;
+                    var modelNamespace = _config.ModelsNamespace;
 
                     // we do not support configuring this at the moment, so just let Umbraco use its default value
                     //var modelNamespaceAlias = ...;

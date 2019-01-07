@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Web.Hosting;
-using Umbraco.Core.Composing;
 using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.ModelsBuilder.Dashboard;
@@ -27,13 +26,13 @@ namespace Umbraco.ModelsBuilder.Umbraco
     public class ModelsBuilderBackOfficeController : UmbracoAuthorizedJsonController
     {
         private readonly UmbracoServices _umbracoServices;
+        private readonly Config _config;
 
-        public ModelsBuilderBackOfficeController(UmbracoServices umbracoServices)
+        public ModelsBuilderBackOfficeController(UmbracoServices umbracoServices, Config config)
         {
             _umbracoServices = umbracoServices;
+            _config = config;
         }
-
-        private static Config Config => Current.Config.ModelsBuilder();
 
         // invoked by the dashboard
         // requires that the user is logged into the backoffice and has access to the settings section
@@ -43,7 +42,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         {
             try
             {
-                var config = Config;
+                var config = _config;
 
                 if (!config.ModelsMode.SupportsExplicitGeneration())
                 {
@@ -97,7 +96,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         {
             return new Dashboard
             {
-                Enable = Config.Enable,
+                Enable = _config.Enable,
                 Text = BuilderDashboardHelper.Text(),
                 CanGenerate = BuilderDashboardHelper.CanGenerate(),
                 GenerateCausesRestart = BuilderDashboardHelper.GenerateCausesRestart(),
@@ -108,10 +107,10 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         private void GenerateModels(string modelsDirectory, string bin)
         {
-            GenerateModels(_umbracoServices, modelsDirectory, bin);
+            GenerateModels(_umbracoServices, modelsDirectory, bin, _config.ModelsNamespace);
         }
 
-        internal static void GenerateModels(UmbracoServices umbracoServices, string modelsDirectory, string bin)
+        internal static void GenerateModels(UmbracoServices umbracoServices, string modelsDirectory, string bin, string modelsNamespace)
         {
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
@@ -123,7 +122,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
-            var builder = new TextBuilder(typeModels, parseResult, Config.ModelsNamespace);
+            var builder = new TextBuilder(typeModels, parseResult, modelsNamespace);
 
             foreach (var typeModel in builder.GetModelsToGenerate())
             {

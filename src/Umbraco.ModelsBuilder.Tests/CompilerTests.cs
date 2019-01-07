@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
+using Umbraco.Core.Composing;
 using Umbraco.ModelsBuilder.Building;
+using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Tests
 {
@@ -17,6 +19,10 @@ namespace Umbraco.ModelsBuilder.Tests
         {
             _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             Directory.CreateDirectory(_tempDir);
+
+            Current.Reset();
+            Current.UnlockConfigs();
+            Current.Configs.Add(() => new Config());
         }
 
         [TearDown]

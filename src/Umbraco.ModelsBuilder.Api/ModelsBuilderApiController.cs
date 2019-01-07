@@ -33,7 +33,7 @@ namespace Umbraco.ModelsBuilder.Api
             _umbracoServices = umbracoServices;
         }
 
-        private static Config Config => Current.Config.ModelsBuilder();
+        private static Config Config => Current.Configs.ModelsBuilder();
 
         // invoked by the API
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!

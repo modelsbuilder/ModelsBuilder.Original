@@ -10,20 +10,16 @@ namespace Umbraco.ModelsBuilder.Umbraco
 {
     [ComposeBefore(typeof(NuCacheComposer))]
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public sealed class ModelsBuilderComposer : ICoreComposer
+    public sealed class ModelsBuilderComposer : ComponentComposer<ModelsBuilderComponent>, ICoreComposer
     {
-        // fixme don't use Current in Compsoer?!!
-        private static Config Config => Current.Config.ModelsBuilder();
-
         public void Compose(Composition composition)
         {
-            composition.Components().Append<ModelsBuilderComponent>();
-
             composition.Register<UmbracoServices>(Lifetime.Singleton);
+            composition.Configs.Add(() => new Config());
 
-            if (Config.ModelsMode == ModelsMode.PureLive)
+            if (composition.Configs.ModelsBuilder().ModelsMode == ModelsMode.PureLive)
                 ComposeForLiveModels(composition);
-            else if (Config.EnableFactory)
+            else if (composition.Configs.ModelsBuilder().EnableFactory)
                 ComposeForDefaultModelsFactory(composition);
         }
 
