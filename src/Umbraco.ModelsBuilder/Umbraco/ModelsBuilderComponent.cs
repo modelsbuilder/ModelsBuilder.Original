@@ -18,9 +18,16 @@ namespace Umbraco.ModelsBuilder.Umbraco
 {
     public class ModelsBuilderComponent : IComponent
     {
+        private readonly UmbracoServices _umbracoServices;
+
         private static Config Config => Current.Config.ModelsBuilder();
 
         public ModelsBuilderComponent(UmbracoServices umbracoServices)
+        {
+            _umbracoServices = umbracoServices;
+        }
+
+        public void Initialize()
         {
             // always setup the dashboard
             // note: UmbracoApiController instances are automatically registered
@@ -33,12 +40,15 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             // fixme LiveModelsProvider should not be static
             if (Config.ModelsMode.IsLiveNotPure())
-                LiveModelsProvider.Install(umbracoServices);
+                LiveModelsProvider.Install(_umbracoServices);
 
             // fixme OutOfDateModelsStatus should not be static
             if (Config.FlagOutOfDateModels)
                 OutOfDateModelsStatus.Install();
         }
+
+        public void Terminate()
+        { }
 
         private void InstallServerVars()
         {
