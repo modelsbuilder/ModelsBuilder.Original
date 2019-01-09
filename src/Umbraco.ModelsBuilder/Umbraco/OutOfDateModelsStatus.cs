@@ -1,9 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Web.Hosting;
-using Umbraco.Core;
+﻿using System.IO;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.Web.Cache;
 

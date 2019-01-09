@@ -3,7 +3,6 @@ using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.ModelsBuilder.Umbraco;
@@ -127,9 +126,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         public static void Install()
         {
-            if (!LiveModelsProvider.IsEnabled)
-                return;
-
+            // always - don't read config in PreApplicationStartMethod
             HttpApplication.RegisterModule(typeof(LiveModelsProviderModule));
         }
     }

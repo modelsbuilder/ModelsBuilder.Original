@@ -12,8 +12,10 @@ namespace Umbraco.ModelsBuilder.Umbraco
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public sealed class ModelsBuilderComposer : ComponentComposer<ModelsBuilderComponent>, ICoreComposer
     {
-        public void Compose(Composition composition)
+        public override void Compose(Composition composition)
         {
+            base.Compose(composition);
+
             composition.Register<UmbracoServices>(Lifetime.Singleton);
             composition.Configs.Add(() => new Config());
 

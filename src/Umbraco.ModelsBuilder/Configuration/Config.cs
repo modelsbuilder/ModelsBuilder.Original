@@ -14,30 +14,6 @@ namespace Umbraco.ModelsBuilder.Configuration
     /// </summary>
     public class Config
     {
-        private static Config _value;
-
-        /// <summary>
-        /// Gets the configuration - internal so that the UmbracoConfig extension
-        /// can get the value to initialize its own value. Either a value has
-        /// been provided via the Setup method, or a new instance is created, which
-        /// will load settings from the config file.
-        /// </summary>
-        internal static Config Value => _value ?? new Config();
-
-        /// <summary>
-        /// Sets the configuration programmatically.
-        /// </summary>
-        /// <param name="config">The configuration.</param>
-        /// <remarks>
-        /// <para>Once the configuration has been accessed via the UmbracoConfig extension,
-        /// it cannot be changed anymore, and using this method will achieve nothing.</para>
-        /// <para>For tests, see UmbracoConfigExtensions.ResetConfig().</para>
-        /// </remarks>
-        public static void Setup(Config config)
-        {
-            _value = config;
-        }
-
         internal const string DefaultStaticMixinGetterPattern = "Get{0}";
         internal const LanguageVersion DefaultLanguageVersion = LanguageVersion.CSharp7_3;
         internal const string DefaultModelsNamespace = "Umbraco.Web.PublishedModels";
@@ -47,7 +23,7 @@ namespace Umbraco.ModelsBuilder.Configuration
         /// <summary>
         /// Initializes a new instance of the <see cref="Config"/> class.
         /// </summary>
-        private Config()
+        public Config()
         {
             const string prefix = "Umbraco.ModelsBuilder.";
 
