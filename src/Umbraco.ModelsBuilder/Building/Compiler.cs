@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -7,7 +6,6 @@ using System.Web;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Building
@@ -38,8 +36,7 @@ namespace Umbraco.ModelsBuilder.Building
         // gets a compilation
         public CSharpCompilation GetCompilation(string assemblyName, IDictionary<string, string> files)
         {
-            SyntaxTree[] trees;
-            return GetCompilation(assemblyName, files, out trees);
+            return GetCompilation(assemblyName, files, out _);
         }
 
         // gets a compilation
@@ -120,7 +117,7 @@ namespace Umbraco.ModelsBuilder.Building
             using (var stream = new MemoryStream())
             {
                 Compile(assemblyName, new Dictionary<string, string> { { path, code } }, stream);
-               return Assembly.Load(stream.GetBuffer());
+                return Assembly.Load(stream.GetBuffer());
             }
         }
 
