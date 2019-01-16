@@ -40,7 +40,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
     <PackageReference Include="UmbracoCms.Web">
-      <Version>8.0.0-alpha.57.2</Version>
+      <Version>8.0.0-alpha.58.1612</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

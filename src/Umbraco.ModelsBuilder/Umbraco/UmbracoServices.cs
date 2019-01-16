@@ -122,33 +122,23 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     throw new Exception($"Panic: duplicate type ClrName \"{typeModel.ClrName}\".");
                 uniqueTypes.Add(typeModel.ClrName);
 
-                // fixme - we need a better way at figuring out what's an element type!
-                // and then we should not do the alias filtering below
-                bool IsElement(PublishedContentType x)
-                {
-                    return x.Alias.InvariantEndsWith("Element");
-                }
-
                 var publishedContentType = _publishedContentTypeFactory.CreateContentType(contentType);
                 switch (itemType)
                 {
                     case PublishedItemType.Content:
-                        if (IsElement(publishedContentType))
-                        {
-                            typeModel.ItemType = TypeModel.ItemTypes.Element;
-                            if (typeModel.ClrName.InvariantEndsWith("Element"))
-                                typeModel.ClrName = typeModel.ClrName.Substring(0, typeModel.ClrName.Length - "Element".Length);
-                        }
-                        else
-                        {
-                            typeModel.ItemType = TypeModel.ItemTypes.Content;
-                        }
+                        typeModel.ItemType = publishedContentType.ItemType == PublishedItemType.Element
+                            ? TypeModel.ItemTypes.Element
+                            : TypeModel.ItemTypes.Content;
                         break;
                     case PublishedItemType.Media:
-                        typeModel.ItemType = TypeModel.ItemTypes.Media;
+                        typeModel.ItemType = publishedContentType.ItemType == PublishedItemType.Element
+                            ? TypeModel.ItemTypes.Element
+                            : TypeModel.ItemTypes.Media;
                         break;
                     case PublishedItemType.Member:
-                        typeModel.ItemType = TypeModel.ItemTypes.Member;
+                        typeModel.ItemType = publishedContentType.ItemType == PublishedItemType.Element
+                            ? TypeModel.ItemTypes.Element
+                            : TypeModel.ItemTypes.Member;
                         break;
                     default:
                         throw new InvalidOperationException(string.Format("Unsupported PublishedItemType \"{0}\".", itemType));

@@ -97,7 +97,7 @@ namespace Umbraco.ModelsBuilder.Tests
 
             public int SortOrder => throw new NotImplementedException();
 
-            public int TemplateId => throw new NotImplementedException();
+            public int? TemplateId => throw new NotImplementedException();
 
             public DateTime UpdateDate => throw new NotImplementedException();
 
