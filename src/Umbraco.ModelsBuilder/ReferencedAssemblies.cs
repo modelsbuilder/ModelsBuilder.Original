@@ -36,6 +36,42 @@ namespace Umbraco.ModelsBuilder
         /// </summary>
         public static IEnumerable<PortableExecutableReference> References => LazyReferences.Value;
 
+        public static Assembly GetNetStandardAssembly(List<Assembly> assemblies)
+        {
+            if (assemblies == null)
+                assemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToList();
+
+            // for some reason, netstandard is also missing from BuildManager.ReferencedAssemblies and yet, is part of
+            // the references that CSharpCompiler (above) receives - where is it coming from? cannot figure it out
+            try
+            {
+                // so, resorting to an ugly trick
+                // we should have System.Reflection.Metadata around, and it should reference netstandard
+                var someAssembly = assemblies.First(x => x.FullName.StartsWith("System.Reflection.Metadata,"));
+                var netStandardAssemblyName = someAssembly.GetReferencedAssemblies().First(x => x.FullName.StartsWith("netstandard,"));
+                var netStandard = Assembly.Load(netStandardAssemblyName.FullName);
+                return netStandard;
+            }
+            catch { /* never mind */ }
+
+            return null;
+        }
+
+        public static Assembly GetNetStandardAssembly()
+        {
+            // in PreApplicationStartMethod we cannot get BuildManager.Referenced assemblies, do it differently
+            try
+            {
+                var someAssembly = Assembly.Load("System.Reflection.Metadata");
+                var netStandardAssemblyName = someAssembly.GetReferencedAssemblies().First(x => x.FullName.StartsWith("netstandard,"));
+                var netStandard = Assembly.Load(netStandardAssemblyName.FullName);
+                return netStandard;
+            }
+            catch { /* never mind */ }
+
+            return null;
+        }
+
         // hosted, get referenced assemblies from the BuildManager and filter
         private static IEnumerable<string> GetAllReferencedAssembliesLocationFromBuildManager()
         {
@@ -56,16 +92,8 @@ namespace Umbraco.ModelsBuilder
 
             // for some reason, netstandard is also missing from BuildManager.ReferencedAssemblies and yet, is part of
             // the references that CSharpCompiler (above) receives - where is it coming from? cannot figure it out
-            try
-            {
-                // so, resorting to an ugly trick
-                // we should have System.Reflection.Metadata around, and it should reference netstandard
-                var someAssembly = assemblies.First(x => x.FullName.StartsWith("System.Reflection.Metadata,"));
-                var netStandardAssemblyName = someAssembly.GetReferencedAssemblies().First(x => x.FullName.StartsWith("netstandard,"));
-                var netStandard = Assembly.Load(netStandardAssemblyName.FullName);
-                assemblies.Add(netStandard);
-            }
-            catch { /* never mind */ }
+            var netStandard = GetNetStandardAssembly(assemblies);
+            if (netStandard != null) assemblies.Add(netStandard);
 
             return assemblies
                 .Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace())
