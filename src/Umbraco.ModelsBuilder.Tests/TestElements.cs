@@ -75,6 +75,11 @@ namespace Umbraco.ModelsBuilder.Tests
                 throw new NotImplementedException();
             }
 
+            public bool IsPublished(string culture = null)
+            {
+                throw new NotImplementedException();
+            }
+
             public int Id => throw new NotImplementedException();
 
             public Guid Key => throw new NotImplementedException();
