@@ -20,7 +20,7 @@
 	</metadata>
 	<files>
         <!-- content for the dashboard -->
-        <file src="$solution$\src\Umbraco.ModelsBuilder\Dashboard\modelsbuilder.htm" target="content\App_Plugins\ModelsBuilder\modelsbuilder.htm" />
+        <file src="$solution$\src\Umbraco.ModelsBuilder\Dashboard\modelsbuilder.html" target="content\App_Plugins\ModelsBuilder\modelsbuilder.html" />
         <file src="$solution$\src\Umbraco.ModelsBuilder\Dashboard\modelsbuilder.controller.js" target="content\App_Plugins\ModelsBuilder\modelsbuilder.controller.js" />
         <file src="$solution$\src\Umbraco.ModelsBuilder\Dashboard\modelsbuilder.resource.js" target="content\App_Plugins\ModelsBuilder\modelsbuilder.resource.js" />
         <file src="$solution$\src\Umbraco.ModelsBuilder\Dashboard\package.manifest" target="content\App_Plugins\ModelsBuilder\package.manifest" />

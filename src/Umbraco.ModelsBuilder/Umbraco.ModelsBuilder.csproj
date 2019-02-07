@@ -101,7 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Dashboard\modelsbuilder.controller.js" />
-    <Content Include="Dashboard\modelsbuilder.htm" />
+    <Content Include="Dashboard\modelsbuilder.html" />
     <Content Include="Dashboard\modelsbuilder.resource.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
