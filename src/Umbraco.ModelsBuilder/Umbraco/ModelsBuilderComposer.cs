@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Components;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.ModelsBuilder.Configuration;
