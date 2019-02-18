@@ -6,9 +6,9 @@
     <title>Umbraco ModelsBuilder</title>
     <authors>Umbraco HQ</authors>
     <owners>Umbraco HQ</owners>
-    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+    <license type="expression">MIT</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
+    <iconUrl>https://umbraco.com/dist/nuget/logo-small.png</iconUrl>
     <description>Umbraco ModelsBuilder.</description>
     <projectUrl>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</projectUrl>
     <copyright>$copyright$</copyright>

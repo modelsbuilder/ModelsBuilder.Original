@@ -138,7 +138,7 @@
   {
     Write-Host "Package Umbraco.ModelsBuilder"
     $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
-    $copyright = "Copyright © Umbraco $((Get-Date).Year)"
+    $copyright = "Copyright (C) Umbraco $((Get-Date).Year)"
 	  &$this.BuildEnv.NuGet pack "$nuspecs\Umbraco.ModelsBuilder.nuspec" `
 	    -Properties copyright="$Copyright"`;solution="$($this.SolutionRoot)" `
 	    -Version "$($this.Version.Semver.ToString())" `
@@ -150,7 +150,7 @@
   {
     Write-Host "Package Umbraco.ModelsBuilder.Ui"
     $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
-    $copyright = "Copyright © Umbraco $((Get-Date).Year)"
+    $copyright = "Copyright (C) Umbraco $((Get-Date).Year)"
 	  &$this.BuildEnv.NuGet pack "$nuspecs\Umbraco.ModelsBuilder.Ui.nuspec" `
 	    -Properties copyright="$Copyright"`;solution="$($this.SolutionRoot)" `
 	    -Version "$($this.Version.Semver.ToString())" `
@@ -162,7 +162,7 @@
   {
     Write-Host "Package Umbraco.ModelsBuilder.Api"
     $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
-    $copyright = "Copyright © Umbraco $((Get-Date).Year)"
+    $copyright = "Copyright (C) Umbraco $((Get-Date).Year)"
 	  &$this.BuildEnv.NuGet pack "$nuspecs\Umbraco.ModelsBuilder.Api.nuspec" `
       -Properties copyright="$Copyright"`;solution="$($this.SolutionRoot)" `
 	    -Version "$($this.Version.Semver.ToString())" `
