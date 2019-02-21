@@ -23,7 +23,7 @@ using File = System.IO.File;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
-    internal class PureLiveModelFactory : IPublishedModelFactory, IRegisteredObject
+    internal class PureLiveModelFactory : ILivePublishedModelFactory, IRegisteredObject
     {
         private Assembly _modelsAssembly;
         private Infos _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
@@ -51,8 +51,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             _config = config;
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
-            ContentTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModels();
-            DataTypeCacheRefresher.CacheUpdated += (sender, args) => ResetModels();
+
             RazorBuildProvider.CodeGenerationStarted += RazorBuildProvider_CodeGenerationStarted;
 
             if (!HostingEnvironment.IsHosted) return;
@@ -72,6 +71,20 @@ namespace Umbraco.ModelsBuilder.Umbraco
             // get it here, this need to be fast
             _debugLevel = _config.DebugLevel;
         }
+
+        #region ILivePublishedModelFactory
+
+        /// <inheritdoc />
+        public object SyncRoot { get; } = new object();
+
+        /// <inheritdoc />
+        public void Refresh()
+        {
+            ResetModels();
+            EnsureModels();
+        }
+
+        #endregion
 
         #region IPublishedModelFactory
 
@@ -651,7 +664,10 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
             _logger.Info<PureLiveModelFactory>("Detected files changes.");
 
-            ResetModels();
+            lock (SyncRoot) // don't reset while being locked
+            {
+                ResetModels();
+            }
         }
 
         public void Stop(bool immediate)
