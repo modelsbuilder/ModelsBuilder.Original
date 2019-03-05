@@ -233,6 +233,17 @@ namespace Umbraco.ModelsBuilder.Building
                 typeModel.ImplementingInterfaces.AddRange(mixinImplems.Except(parentImplems));
             }
 
+            // ensure elements don't inherit from non-elements
+            foreach (var typeModel in _typeModels.Where(x => !x.IsContentIgnored && x.IsElement))
+            {
+                if (typeModel.BaseType != null && !typeModel.BaseType.IsElement)
+                    throw new Exception($"Cannot generate model for type '{typeModel.Alias}' because it is an element type, but its parent type '{typeModel.BaseType.Alias}' is not.");
+
+                var errs = typeModel.MixinTypes.Where(x => !x.IsElement).ToList();
+                if (errs.Count > 0)
+                    throw new Exception($"Cannot generate model for type '{typeModel.Alias}' because it is an element type, but it is composed of {string.Join(", ", errs.Select(x => "'" + x.Alias + "'"))} which {(errs.Count == 1 ? "is" : "are")} not.");
+            }
+
             // register using types
             foreach (var usingNamespace in ParseResult.UsingNamespaces)
             {
