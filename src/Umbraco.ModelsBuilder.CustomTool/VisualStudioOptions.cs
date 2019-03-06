@@ -1,46 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
-using Microsoft.VisualStudio.Shell;
 using Umbraco.ModelsBuilder.CustomTool.VisualStudio;
 
 namespace Umbraco.ModelsBuilder.CustomTool
 {
-    // see http://msdn.microsoft.com/en-us/library/bb166195.aspx
-
-    [ClassInterface(ClassInterfaceType.AutoDual)]
-    [CLSCompliant(false), ComVisible(true)] // that's for the grid
-    // [Guid("1D9ECCF3-5D2F-4112-9B25-264596873DC9")] // that's for the custom page
-    public class VisualStudioOptions : DialogPage
+    public class VisualStudioOptions
     {
         public const string OptionsCategory = "Umbraco";
         public const string OptionsPageName = "ModelsBuilder Options";
 
-        //[Category(OptionsCategory)]
-        //[DisplayName("Connection string")]
-        //[Description("The database connection string.")]
-        //public string ConnectionString { get; set; }
-
-        //[Category(OptionsCategory)]
-        //[DisplayName("Database provider")]
-        //[Description("The database provider.")]
-        //public string DatabaseProvider { get; set; }
-
-        //[Category(OptionsCategory)]
-        //[DisplayName("Bin directory")]
-        //[Description("The directory containing the project's binaries. By default it is the project's OutputPath. Can be relative to project's root.")]
-        //public string BinaryDirectory { get; set; }
+        public static readonly VisualStudioOptions Instance = new VisualStudioOptions();
 
         // note: could not find a way to order the properties, and Visual Studio sorts them alphabetically, so adjusting
-        //       display names here so that we have the order that we want (url, user, password). Still need to figure
+        //       display names here so that we have the order that we want (url, user, password). would be nice to figure
         //       out how to do it properly, though...
 
         [Category(OptionsCategory)]
@@ -61,8 +38,6 @@ namespace Umbraco.ModelsBuilder.CustomTool
         // by default "storage" is the registry
         // we want to write to our own settings file,
         // <solution>.sln.UmbracoModelsBuilder.user
-        // and yes - we should prob. use true config sections,
-        // not parse XML...
 
         private string OptionsFileName
         {
@@ -76,12 +51,30 @@ namespace Umbraco.ModelsBuilder.CustomTool
             }
         }
 
-        public override void LoadSettingsFromStorage()
+        public void Clear()
         {
-            //base.LoadSettingsFromStorage();
+            UmbracoUrl = UmbracoUser = UmbracoPassword = null;
+        }
 
+        public void Reload()
+        {
+            Clear();
+            Load();
+        }
+
+        public void Load()
+        {
+            // no solution = no options
+            if (!VisualStudioHelper.HasSolution)
+            {
+                UmbracoUrl = "(no solution)";
+                return;
+            }
+
+            // no solution = no options
             var filename = OptionsFileName;
-            if (!File.Exists(filename)) return;
+            if (!File.Exists(filename))
+                return;
 
             var text = File.ReadAllText(filename);
             var xml = new XmlDocument();
@@ -90,34 +83,29 @@ namespace Umbraco.ModelsBuilder.CustomTool
             var config = xml.SelectSingleNode("/configuration/umbraco/modelsBuilder");
             if (config == null || config.Attributes == null) return;
 
-            var attr = config.Attributes["version"];
-            if (attr == null) return;
-            var version = attr.Value;
-
             // we're not version-dependent at the moment
-            //attr = config.Attributes["connectionString"];
-            //if (attr != null)
-            //    ConnectionString = attr.Value;
-            //attr = config.Attributes["databaseProvider"];
-            //if (attr != null)
-            //    DatabaseProvider = attr.Value;
-            //attr = config.Attributes["binaryDirectory"];
-            //if (attr != null)
-            //    BinaryDirectory = attr.Value;
-            attr = config.Attributes["umbracoUrl"];
+            //var attr = config.Attributes["version"];
+            //if (attr == null) return;
+            //var version = attr.Value;
+
+            var attr = config.Attributes["umbracoUrl"];
             if (attr != null)
                 UmbracoUrl = attr.Value;
+
             attr = config.Attributes["umbracoUser"];
             if (attr != null)
                 UmbracoUser = attr.Value;
+
             attr = config.Attributes["umbracoPassword"];
             if (attr != null)
                 UmbracoPassword = attr.Value;
         }
 
-        public override void SaveSettingsToStorage()
+        public void Save()
         {
-            //base.SaveSettingsToStorage();
+            // no solution = no options
+            if (!VisualStudioHelper.HasSolution)
+                return;
 
             var filename = OptionsFileName;
 
@@ -141,13 +129,16 @@ namespace Umbraco.ModelsBuilder.CustomTool
             writer.WriteStartElement("configuration");
             writer.WriteStartElement("umbraco");
             writer.WriteStartElement("modelsBuilder");
+
+            // write version
             writer.WriteAttributeString("version", version);
-            //writer.WriteAttributeString("connectionString", ConnectionString);
-            //writer.WriteAttributeString("databaseProvider", DatabaseProvider);
-            //writer.WriteAttributeString("binaryDirectory", BinaryDirectory);
+
+            // write values
             writer.WriteAttributeString("umbracoUrl", UmbracoUrl);
             writer.WriteAttributeString("umbracoUser", UmbracoUser);
             writer.WriteAttributeString("umbracoPassword", UmbracoPassword);
+
+            // close
             writer.WriteEndElement(); // modelsBuilder
             writer.WriteEndElement(); // umbraco
             writer.WriteEndElement(); // configuration
@@ -157,7 +148,46 @@ namespace Umbraco.ModelsBuilder.CustomTool
             File.WriteAllText(filename, sb.ToString());
         }
 
-        // what about the FromXml / ToXml methods?!
-        // that would be for import/export?!
+        public void Validate()
+        {
+            StringBuilder message = null;
+
+            var empty = new List<string>();
+            if (string.IsNullOrWhiteSpace(UmbracoUrl))
+                empty.Add("Site Url");
+            if (string.IsNullOrWhiteSpace(UmbracoUser))
+                empty.Add("User Name");
+            if (string.IsNullOrWhiteSpace(UmbracoPassword))
+                empty.Add("User Password");
+
+            if (empty.Count > 0)
+            {
+                message = new StringBuilder("Invalid configuration. ");
+                for (var i = 0; i < empty.Count; i++)
+                {
+                    if (i > 0)
+                        message.Append(", ");
+                    message.Append(empty[i]);
+                }
+                message.Append(" cannot be empty.");
+            }
+
+            try
+            {
+                _ = new Uri(UmbracoUrl);
+            }
+            catch
+            {
+                if (message == null)
+                    message = new StringBuilder("Invalid configuration. Site Url \"");
+                else
+                    message.Append(" Site Url \"");
+                message.Append(UmbracoUrl);
+                message.Append("\" is not a valid Uri.");
+            }
+
+            if (message != null)
+                throw new Exception(message.ToString());
+        }
     }
 }

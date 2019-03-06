@@ -129,9 +129,10 @@
     <Compile Include="UmbracoModelsBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VisualStudio2013Package.cs" />
-    <Compile Include="VisualStudioOptions.cs">
+    <Compile Include="OptionsDialog.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="VisualStudioOptions.cs" />
     <Compile Include="VisualStudio\VisualStudioHelper.cs" />
   </ItemGroup>
   <ItemGroup>

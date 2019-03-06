@@ -12,14 +12,14 @@ namespace Umbraco.ModelsBuilder.Api
         #region Configure
 
         // indicate the minimum version of the client API that is supported by this server's API.
-        //   eg our Version = 4.8 but we support connections from VSIX down to version 3.2
+        //   eg our (server) Version = 4.8 but we support connections from (client) VSIX down to version 3.2
         //   => as a server, we accept connections from client down to version ...
-        private static readonly SemVersion MinClientVersionSupportedByServerConst = SemVersion.Parse("8.0.0-alpha.19");
+        private static readonly SemVersion MinClientVersionSupportedByServerConst = SemVersion.Parse("8.0.2");
 
         // indicate the minimum version of the server that can support the client API
-        //   eg our Version = 4.8 and we know we're compatible with website server down to version 3.2
+        //   eg our (client) Version = 4.8 and we know we're compatible with website server down to version 3.2
         //   => as a client, we tell the server down to version ... that it should accept us
-        private static readonly SemVersion MinServerVersionSupportingClientConst = SemVersion.Parse("8.0.0-alpha.19");
+        private static readonly SemVersion MinServerVersionSupportingClientConst = SemVersion.Parse("8.0.2");
 
         #endregion
 
@@ -37,7 +37,7 @@ namespace Umbraco.ModelsBuilder.Api
             MinServerVersionSupportingClient = minServerVersionSupportingClient;
         }
 
-        private static SemVersion CurrentAssemblyVersion 
+        private static SemVersion CurrentAssemblyVersion
             => SemVersion.Parse(Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
 
         /// <summary>
@@ -67,9 +67,11 @@ namespace Umbraco.ModelsBuilder.Api
         /// <param name="clientVersion">The client version.</param>
         /// <param name="minServerVersionSupportingClient">An opt min server version supporting the client.</param>
         /// <remarks>
-        /// <para>A client is compatible with a server if the client version is greater-or-equal _minClientVersionSupportedByServer
-        /// (ie client can be older than server, up to a point) AND the client version is lower-or-equal the server version
-        /// (ie client cannot be more recent than server) UNLESS the server .</para>
+        /// <para>A client is compatible with a server if
+        /// * the client version is greater-or-equal MinClientVersionSupportedByServer
+        /// * the client version is lower-or-equal the server version
+        ///   unless MinServerVersionSupportingClient indicates that the server should support a more recent client
+        /// </para>
         /// </remarks>
         public bool IsCompatibleWith(SemVersion clientVersion, SemVersion minServerVersionSupportingClient = null)
         {

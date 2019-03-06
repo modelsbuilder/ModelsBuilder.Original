@@ -15,6 +15,7 @@ namespace Umbraco.ModelsBuilder.Api
     // read http://our.umbraco.org/forum/developers/api-questions/43025-Web-API-authentication
     // UmbracoAuthorizedApiController :: /Umbraco/BackOffice/Zbu/ModelsBuilderApi/GetTypeModels
     // UmbracoApiController :: /Umbraco/Zbu/ModelsBuilderApi/GetTypeModels ??  UNLESS marked with isbackoffice
+    //   :: /umbraco/api/keepalive/ping
     //
     // BEWARE! the controller url is hard-coded in ModelsBuilderApi and needs to be in sync!
 
@@ -34,6 +35,20 @@ namespace Umbraco.ModelsBuilder.Api
         }
 
         private static Config Config => Current.Configs.ModelsBuilder();
+
+        // for tests
+        [System.Web.Http.HttpGet]
+        [ApiBasicAuthFilter("settings")] // have to use our own, non-cookie-based, auth
+        public HttpResponseMessage Ping()
+        {
+            if (!Config.ApiServer)
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "API server does not want to talk to you.");
+
+            if (!ModelState.IsValid)
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "Invalid data.");
+
+            return Request.CreateResponse(HttpStatusCode.OK, "OK", Configuration.Formatters.JsonFormatter);
+        }
 
         // invoked by the API
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!

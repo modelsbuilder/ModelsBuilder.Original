@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Design.Serialization;
+using Microsoft.VisualStudio.Shell.Interop;
 using Umbraco.ModelsBuilder.CustomTool.CustomTool;
 
 namespace Umbraco.ModelsBuilder.CustomTool
@@ -21,20 +23,22 @@ namespace Umbraco.ModelsBuilder.CustomTool
     // tells CreatePkgDef.exe utility that this class is a package
     [PackageRegistration(UseManagedResourcesOnly = true)]
 
+    // load when a solution exists - not
+    //[ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string)]
+
     // tells VS that we have an options dialog
-    [ProvideOptionPage(typeof(VisualStudioOptions), VisualStudioOptions.OptionsCategory, VisualStudioOptions.OptionsPageName, 0, 0, true)]
+    [ProvideOptionPage(typeof(OptionsDialog), VisualStudioOptions.OptionsCategory, VisualStudioOptions.OptionsPageName, 0, 0, true)]
     
     // register infos needed to show this package in the Help/About dialog of VS
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
-
     [Guid(GuidList.PkgString)]
     [DefaultRegistryRoot("Software\\Microsoft\\VisualStudio\\11.0")]
 
     // register the generator
     [ProvideObject(typeof(UmbracoCSharpModelsBuilder))]
-    [ProvideGeneratorAttribute(typeof(UmbracoCSharpModelsBuilder), "UmbracoModelsBuilder", "Umbraco ModelsBuilder Custom Tool for C#", "{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}", true)] // csharp
+    [ProvideGenerator(typeof(UmbracoCSharpModelsBuilder), "UmbracoModelsBuilder", "Umbraco ModelsBuilder Custom Tool for C#", "{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}", true)] // csharp
 
-    public sealed class UmbracoModelsBuilder : Package
+    public sealed class UmbracoModelsBuilder : Package, IVsSolutionEvents
     {
         /// <summary>
         /// Default constructor of the package.
@@ -48,17 +52,8 @@ namespace Umbraco.ModelsBuilder.CustomTool
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }
 
-        void Foo()
-        {
-            var options = GetDialogPage(typeof (VisualStudioOptions)) as VisualStudioOptions;
-            // fixme - and can the tool have access to it?!
-        }
-
-
-
-        /////////////////////////////////////////////////////////////////////////////
-        // Overridden Package Implementation
-        #region Package Members
+        //OptionsDialog Options
+        //    => GetDialogPage(typeof(OptionsDialog)) as OptionsDialog;
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -69,7 +64,62 @@ namespace Umbraco.ModelsBuilder.CustomTool
             Debug.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
         }
-        #endregion
 
+        #region IVsSolutionEvents
+
+        public int OnAfterOpenProject(IVsHierarchy pHierarchy, int fAdded)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnQueryCloseProject(IVsHierarchy pHierarchy, int fRemoving, ref int pfCancel)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnBeforeCloseProject(IVsHierarchy pHierarchy, int fRemoved)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnAfterLoadProject(IVsHierarchy pStubHierarchy, IVsHierarchy pRealHierarchy)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnQueryUnloadProject(IVsHierarchy pRealHierarchy, ref int pfCancel)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnBeforeUnloadProject(IVsHierarchy pRealHierarchy, IVsHierarchy pStubHierarchy)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
+        {
+            VisualStudioOptions.Instance.Reload();
+            return VSConstants.S_OK;
+        }
+
+        public int OnQueryCloseSolution(object pUnkReserved, ref int pfCancel)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int OnBeforeCloseSolution(object pUnkReserved)
+        {
+            // don't leave settings around
+            VisualStudioOptions.Instance.Clear();
+            return VSConstants.S_OK;
+        }
+
+        public int OnAfterCloseSolution(object pUnkReserved)
+        {
+            return VSConstants.S_OK;
+        }
+
+        #endregion
     }
 }

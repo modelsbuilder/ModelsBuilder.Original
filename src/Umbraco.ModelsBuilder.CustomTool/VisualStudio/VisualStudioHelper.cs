@@ -171,14 +171,12 @@ namespace Umbraco.ModelsBuilder.CustomTool.VisualStudio
 
         public static void ReportError(IVsGeneratorProgress progress, string message, uint line = 0xFFFFFFFF, uint column = 0xFFFFFFFF)
         {
-            if (progress != null)
-                progress.GeneratorError(0, 0, message, line, column);
+            progress?.GeneratorError(0, 0, message, line, column);
         }
 
         public static void ReportWarning(IVsGeneratorProgress progress, string message, uint line = 0xFFFFFFFF, uint column = 0xFFFFFFFF)
         {
-            if (progress != null)
-                progress.GeneratorError(1, 0, message, line, column);
+            progress?.GeneratorError(1, 0, message, line, column);
         }
 
         // see http://stackoverflow.com/questions/16443331/visual-studio-vspackage-single-file-generator-log-message-to-error-list
@@ -195,9 +193,8 @@ namespace Umbraco.ModelsBuilder.CustomTool.VisualStudio
 
             // note
             // in vs2010 the general pane is not there by default
-            Guid guidGeneral = VSConstants.OutputWindowPaneGuid.GeneralPane_guid;
-            IVsOutputWindowPane pane;
-            if (output.GetPane(guidGeneral, out pane) != VSConstants.S_OK || pane == null)
+            var guidGeneral = VSConstants.OutputWindowPaneGuid.GeneralPane_guid;
+            if (output.GetPane(guidGeneral, out var pane) != VSConstants.S_OK || pane == null)
             {
                 output.CreatePane(guidGeneral, "General", 1, 0); // should we create our own?
                 if (output.GetPane(guidGeneral, out pane) != VSConstants.S_OK || pane == null)
@@ -231,11 +228,13 @@ namespace Umbraco.ModelsBuilder.CustomTool.VisualStudio
             ReportMessage(string.Format(format, args));
         }
 
+        private static EnvDTE.DTE DTE => (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
+
         private static IVsStatusbar StatusBar
         {
             get
             {
-                var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
+                var dte = DTE;
                 IServiceProvider serviceProvider = new ServiceProvider(dte as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
                 return serviceProvider.GetService(typeof(SVsStatusbar)) as IVsStatusbar;
             }
@@ -245,8 +244,7 @@ namespace Umbraco.ModelsBuilder.CustomTool.VisualStudio
         {
             // http://geekswithblogs.net/onlyutkarsh/archive/2013/08/11/using-visual-studio-status-bar-in-your-extensions.aspx
             var bar = StatusBar;
-            int frozen;
-            bar.IsFrozen(out frozen);
+            bar.IsFrozen(out var frozen);
             if (frozen != 0) return;
             bar.SetText("Dim da da...");
             object icon = (short) Constants.SBAI_Synch;
@@ -264,15 +262,29 @@ namespace Umbraco.ModelsBuilder.CustomTool.VisualStudio
 
         public static string GetSolution()
         {
-            var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
+            var dte = DTE;
             return dte.Solution.FullName;
         }
 
-        public static Options GetOptions()
+        public static VisualStudioOptions GetOptions()
         {
-            var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
-            var properties = dte.Properties[VisualStudioOptions.OptionsCategory, VisualStudioOptions.OptionsPageName];
-            return new Options(properties);
+            // reload - in case file has been modified
+            var options = VisualStudioOptions.Instance;
+            options.Reload();
+            return options;
+
+            //var dte = DTE;
+            //var properties = dte.Properties[OptionsDialog.OptionsCategory, OptionsDialog.OptionsPageName];
+            //return new Options(properties);
+        }
+
+        public static bool HasSolution
+        {
+            get
+            {
+                var dte = DTE;
+                return dte.Solution.IsOpen;
+            }
         }
 
         public class Options
@@ -284,12 +296,9 @@ namespace Umbraco.ModelsBuilder.CustomTool.VisualStudio
                 _properties = properties;
             }
 
-            //public string ConnectionString { get { return (string)_properties.Item("ConnectionString").Value; } }
-            //public string DatabaseProvider { get { return (string)_properties.Item("DatabaseProvider").Value; } }
-            //public string BinaryDirectory { get { return (string)_properties.Item("BinaryDirectory").Value; } }
-            public string UmbracoUrl { get { return (string)_properties.Item("UmbracoUrl").Value; } }
-            public string UmbracoUser { get { return (string)_properties.Item("UmbracoUser").Value; } }
-            public string UmbracoPassword { get { return (string)_properties.Item("UmbracoPassword").Value; } }
+            public string UmbracoUrl => (string)_properties.Item("UmbracoUrl").Value;
+            public string UmbracoUser => (string)_properties.Item("UmbracoUser").Value;
+            public string UmbracoPassword => (string)_properties.Item("UmbracoPassword").Value;
 
             public void Validate()
             {
@@ -302,13 +311,14 @@ namespace Umbraco.ModelsBuilder.CustomTool.VisualStudio
                     empty.Add("User Name");
                 if (string.IsNullOrWhiteSpace(UmbracoPassword))
                     empty.Add("User Password");
+
                 if (empty.Count > 0)
                 {
                     message = new StringBuilder("Invalid configuration. ");
                     for (var i = 0; i < empty.Count; i++)
                     {
                         if (i > 0)
-                            message.Append(i < empty.Count - 1 ? ", " : "nor ");
+                            message.Append(", ");
                         message.Append(empty[i]);
                     }
                     message.Append(" cannot be empty.");
@@ -316,11 +326,14 @@ namespace Umbraco.ModelsBuilder.CustomTool.VisualStudio
 
                 try
                 {
-                    var uri = new Uri(UmbracoUrl);
+                    _ = new Uri(UmbracoUrl);
                 }
                 catch
                 {
-                    if (message == null) message = new StringBuilder("Invalid configuration. Site Url \"");
+                    if (message == null)
+                        message = new StringBuilder("Invalid configuration. Site Url \"");
+                    else
+                        message.Append(" Site Url \"");
                     message.Append(UmbracoUrl);
                     message.Append("\" is not a valid Uri.");
                 }
