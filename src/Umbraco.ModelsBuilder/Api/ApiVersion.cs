@@ -21,7 +21,7 @@ namespace Umbraco.ModelsBuilder.Api
         // indicate the minimum version of the server that can support the client API
         //   eg our (client) Version = 4.8 and we know we're compatible with website server down to version 3.2
         //   => as a client, we tell the server down to version ... that it should accept us
-        private static readonly SemVersion MinServerVersionSupportingClientConst = SemVersion.Parse("8.0.2");
+        private static readonly SemVersion MinServerVersionSupportingClientConst = SemVersion.Parse("3.0.0");
 
         #endregion
 
