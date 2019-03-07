@@ -3,11 +3,14 @@ using System.Net.Http;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.ModelsBuilder.Umbraco;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
+
+// use the http one, not mvc, with api controllers!
+using HttpGetAttribute = System.Web.Http.HttpGetAttribute;
+using HttpPostAttribute = System.Web.Http.HttpPostAttribute;
 
 namespace Umbraco.ModelsBuilder.Api
 {
@@ -36,10 +39,9 @@ namespace Umbraco.ModelsBuilder.Api
 
         private static Config Config => Current.Configs.ModelsBuilder();
 
-        // for tests
-        [System.Web.Http.HttpGet]
+        [HttpGet]
         [ApiBasicAuthFilter("settings")] // have to use our own, non-cookie-based, auth
-        public HttpResponseMessage Ping()
+        public HttpResponseMessage GetApiVersion()
         {
             if (!Config.ApiServer)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API server does not want to talk to you.");
@@ -47,11 +49,11 @@ namespace Umbraco.ModelsBuilder.Api
             if (!ModelState.IsValid)
                 return Request.CreateResponse(HttpStatusCode.BadRequest, "Invalid data.");
 
-            return Request.CreateResponse(HttpStatusCode.OK, "OK", Configuration.Formatters.JsonFormatter);
+            return Request.CreateResponse(HttpStatusCode.OK, ApiVersion.Current, Configuration.Formatters.JsonFormatter);
         }
 
         // invoked by the API
-        [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
+        [HttpPost]
         [ApiBasicAuthFilter("settings")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage ValidateClientVersion(ValidateClientVersionData data)
         {
@@ -68,7 +70,7 @@ namespace Umbraco.ModelsBuilder.Api
         }
 
         // invoked by the API
-        [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
+        [HttpPost]
         [ApiBasicAuthFilter("settings")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage GetModels(GetModelsData data)
         {

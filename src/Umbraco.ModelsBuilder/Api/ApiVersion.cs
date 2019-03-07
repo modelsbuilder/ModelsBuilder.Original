@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Newtonsoft.Json;
 using Semver;
 
 namespace Umbraco.ModelsBuilder.Api
@@ -7,6 +8,7 @@ namespace Umbraco.ModelsBuilder.Api
     /// <summary>
     /// Manages API version handshake between client and server.
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class ApiVersion
     {
         #region Configure
@@ -49,16 +51,19 @@ namespace Umbraco.ModelsBuilder.Api
         /// <summary>
         /// Gets the executing version of the API.
         /// </summary>
+        [JsonProperty("version")]
         public SemVersion Version { get; }
 
         /// <summary>
         /// Gets the min client version supported by the server.
         /// </summary>
+        [JsonProperty("minClientVersionSupportedByServer")]
         public SemVersion MinClientVersionSupportedByServer { get; }
 
         /// <summary>
         /// Gets the min server version supporting the client.
         /// </summary>
+        [JsonProperty("minServerVersionSupportingClient")]
         public SemVersion MinServerVersionSupportingClient { get; }
 
         /// <summary>
