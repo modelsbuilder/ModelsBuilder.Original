@@ -16,7 +16,7 @@ namespace Umbraco.ModelsBuilder.Api
         // indicate the minimum version of the client API that is supported by this server's API.
         //   eg our (server) Version = 4.8 but we support connections from (client) VSIX down to version 3.2
         //   => as a server, we accept connections from client down to version ...
-        private static readonly SemVersion MinClientVersionSupportedByServerConst = SemVersion.Parse("8.0.2");
+        private static readonly SemVersion MinClientVersionSupportedByServerConst = SemVersion.Parse("8.0.3");
 
         // indicate the minimum version of the server that can support the client API
         //   eg our (client) Version = 4.8 and we know we're compatible with website server down to version 3.2
