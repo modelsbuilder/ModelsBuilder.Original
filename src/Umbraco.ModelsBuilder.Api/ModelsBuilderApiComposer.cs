@@ -13,18 +13,22 @@ namespace Umbraco.ModelsBuilder.Api
         public void Compose(Composition composition)
         {
             // setup the API if enabled (and in debug mode)
-            // we *must* register the controller 'cos it is hidden from type finder
-            // (to prevent it from being always and automatically registered)
+
+            // the controller is hidden from type finder (to prevent it from being always and
+            // automatically registered), which means that Umbraco.Web.Composing.CompositionExtensions
+            // Controllers has *not* registered it into the container, and that it is not part of
+            // UmbracoApiControllerTypeCollection (and won't get routed etc)
+
+            // so...
+            // add it to the collection + register it in the container
+
             if (composition.Configs.ModelsBuilder().ApiServer)
             {
-                //composition.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>().Append<ModelsBuilderApiController>();
+                // add the controller to the list of known controllers
+                composition.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
+                    .Add<ModelsBuilderApiController>();
 
-                // fixme
-                // so far, the collection is not a real collection - which is sad
-                var umbracoApiControllerTypes = new UmbracoApiControllerTypeCollection(
-                    composition.TypeLoader.GetTypes<UmbracoApiController>().And(typeof(ModelsBuilderApiController)));
-                composition.RegisterUnique(umbracoApiControllerTypes);
-
+                // register the controller into the container
                 composition.Register(typeof(ModelsBuilderApiController), Lifetime.Request);
             }
         }
