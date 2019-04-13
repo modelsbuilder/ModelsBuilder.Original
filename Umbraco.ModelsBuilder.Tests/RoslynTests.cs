@@ -46,7 +46,7 @@ class Test
 
             Assert.Throws<CompilerException>(() =>
             {
-                compiler = new Compiler();
+                compiler = new Compiler(LanguageVersion.CSharp5);
                 compiler.GetCompilation("Umbraco.ModelsBuilder.Generated", files, out trees);
             });
 

@@ -15,7 +15,7 @@ namespace Umbraco.ModelsBuilder.Tests
     public class ParserTests
     {
         [Test]
-        public void ExpressionBodiedProperties()
+        public void ExpressionBodiedPropertiesRequireCSharp6()
         {
             var code = new Dictionary<string, string>
             {
@@ -39,6 +39,9 @@ namespace Foo
             // Umbraco.ModelsBuilder.Building.CompilerException : Feature 'expression-bodied property' is not available in C# 5.  Please use language version 6 or greater.
             try
             {
+                UmbracoConfigExtensions.ResetConfig();
+                Config.Setup(new Config(languageVersion: LanguageVersion.CSharp5));
+
                 var parseResult1 = new CodeParser().Parse(code, refs);
                 Assert.Fail("Expected CompilerException.");
             }
@@ -55,7 +58,7 @@ namespace Foo
         }
 
         [Test]
-        public void Test()
+        public void LambdaPropertiesRequireCSharp7()
         {
             var code = new Dictionary<string, string>
             {
@@ -80,6 +83,9 @@ namespace Foo
             // Umbraco.ModelsBuilder.Building.CompilerException : { or; expected(at assembly: line 7).
             try
             {
+                UmbracoConfigExtensions.ResetConfig();
+                Config.Setup(new Config(languageVersion: LanguageVersion.CSharp6));
+
                 var parseResult1 = new CodeParser().Parse(code, refs);
                 Assert.Fail("Expected CompilerException.");
             }
@@ -89,13 +95,10 @@ namespace Foo
                 Assert.IsTrue(e.Message.EndsWith("(at assembly:line 7)."));
             }
 
-            // we don't have c# 7 yet
-            /*
             UmbracoConfigExtensions.ResetConfig();
             Config.Setup(new Config(languageVersion: LanguageVersion.CSharp7));
 
             var parseResult2 = new CodeParser().Parse(code, refs);
-            */
         }
     }
 }
