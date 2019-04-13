@@ -5,7 +5,7 @@ namespace Umbraco.ModelsBuilder.Building
     public class CompilerException : Exception
     {
         public CompilerException(string message, string path, string sourceCode, int line)
-            : base(message)
+            : base($"{message} (at {path}:line {line}).")
         {
             Path = path;
             SourceCode = sourceCode;
