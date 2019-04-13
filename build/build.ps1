@@ -29,7 +29,7 @@ $SolutionRoot = $RepoRoot;
 
 # Locate visual studio 2017
 # using vswhere from https://github.com/Microsoft/vswhere
-$vsloc = ./vswhere -latest -requires Microsoft.Component.MSBuild
+$vsloc = ./vswhere -version "[15.0,16.0)" -requires Microsoft.Component.MSBuild
 $vspath = ""
 $vsloc | ForEach {
 	if ($_.StartsWith("installationPath: ")) {
