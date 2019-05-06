@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
-	<metadata minClientVersion="2.8.1">
+  <metadata minClientVersion="2.8.1">
     <id>Umbraco.ModelsBuilder</id>
     <version>$version$</version>
     <title>Umbraco ModelsBuilder</title>
@@ -15,10 +15,10 @@
     <language>en-US</language>
     <tags>umbraco</tags>
     <dependencies>
-			<dependency id="Microsoft.CodeAnalysis.CSharp" version="2.10.0" />
+      <dependency id="Microsoft.CodeAnalysis.CSharp" version="[2.10.0,3)" />
     </dependencies>
-	</metadata>
-	<files>
+  </metadata>
+  <files>
     <!-- our dlls -->
     <file src="Umbraco.ModelsBuilder.dll" target="lib\Umbraco.ModelsBuilder.dll" />
     <file src="Umbraco.ModelsBuilder.pdb" target="lib\Umbraco.ModelsBuilder.pdb" />
