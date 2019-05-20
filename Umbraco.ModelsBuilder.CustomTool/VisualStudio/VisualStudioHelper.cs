@@ -112,6 +112,19 @@ namespace Umbraco.ModelsBuilder.CustomTool.VisualStudio
         }
         */
 
+        public static void ClearExistingItem(EnvDTE.ProjectItem sourceItem, string filename)
+        {
+            foreach (EnvDTE.ProjectItem existingItem in sourceItem.ProjectItems)
+            {
+                var path = existingItem.Properties.Item("FullPath").Value;
+
+                if (path.Equals(filename))
+                {
+                    existingItem.Remove();
+                }
+            }
+        }
+
         public static void ClearExistingItems(EnvDTE.ProjectItem sourceItem)
         {
             foreach (EnvDTE.ProjectItem existingItem in sourceItem.ProjectItems)
