@@ -31,7 +31,7 @@
   $ubuild = &"$PSScriptRoot\build-bootstrap.ps1"
   if (-not $?) { return }
   $ubuild.Boot($PSScriptRoot,
-    @{ Local = $local; With7Zip = $false; WithNode = $false },
+    @{ Local = $local; With7Zip = $false; WithNode = $false; VsMajor = "15"; VsPreview = $false; },
     @{ Continue = $continue })
   if ($ubuild.OnError()) { return }
 
