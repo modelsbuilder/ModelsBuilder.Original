@@ -1,11 +1,14 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Design.Serialization;
 using Microsoft.VisualStudio.Shell.Interop;
 using Umbraco.ModelsBuilder.CustomTool.CustomTool;
+using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.ModelsBuilder.CustomTool
 {
@@ -21,7 +24,7 @@ namespace Umbraco.ModelsBuilder.CustomTool
     /// </summary>
 
     // tells CreatePkgDef.exe utility that this class is a package
-    [PackageRegistration(UseManagedResourcesOnly = true)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]    
 
     // load when a solution exists - not
     //[ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string)]
@@ -32,13 +35,13 @@ namespace Umbraco.ModelsBuilder.CustomTool
     // register infos needed to show this package in the Help/About dialog of VS
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [Guid(GuidList.PkgString)]
-    [DefaultRegistryRoot("Software\\Microsoft\\VisualStudio\\11.0")]
+    //[DefaultRegistryRoot("Software\\Microsoft\\VisualStudio\\11.0")]
 
     // register the generator
     [ProvideObject(typeof(UmbracoCSharpModelsBuilder))]
     [ProvideGenerator(typeof(UmbracoCSharpModelsBuilder), "UmbracoModelsBuilder", "Umbraco ModelsBuilder Custom Tool for C#", "{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}", true)] // csharp
 
-    public sealed class UmbracoModelsBuilder : Package, IVsSolutionEvents
+    public sealed class CustomToolPackage : AsyncPackage, IVsSolutionEvents
     {
         /// <summary>
         /// Default constructor of the package.
@@ -47,7 +50,7 @@ namespace Umbraco.ModelsBuilder.CustomTool
         /// not sited yet inside Visual Studio environment. The place to do all the other 
         /// initialization is the Initialize method.
         /// </summary>
-        public UmbracoModelsBuilder()
+        public CustomToolPackage()
         {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }
@@ -59,10 +62,19 @@ namespace Umbraco.ModelsBuilder.CustomTool
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
         /// </summary>
-        protected override void Initialize()
+        /// <param name="cancellationToken">A cancellation token to monitor for initialization cancellation, which can occur when VS is shutting down.</param>
+        /// <param name="progress">A provider for progress updates.</param>
+        /// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
+        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            Debug.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
-            base.Initialize();
+            // When initialized asynchronously, the current thread may be a background thread at this point.
+            // Do any initialization that requires the UI thread after switching to the UI thread.
+            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+            Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
+
+            //var dte = await GetServiceAsync(typeof(DTE)) as DTE;
+            //VisualStudioHelper.DTE = dte;
         }
 
         #region IVsSolutionEvents
