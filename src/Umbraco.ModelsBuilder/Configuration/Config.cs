@@ -7,7 +7,7 @@ using System.Web.Hosting;
 using Microsoft.CodeAnalysis.CSharp;
 using Umbraco.Core;
 
-namespace Umbraco.ModelsBuilder.Configuration
+namespace ZpqrtBnk.ModelzBuilder.Configuration
 {
     /// <summary>
     /// Represents the models builder configuration.

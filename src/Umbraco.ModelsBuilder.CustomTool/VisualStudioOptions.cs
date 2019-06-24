@@ -5,9 +5,9 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Xml;
-using Umbraco.ModelsBuilder.CustomTool.VisualStudio;
+using ZpqrtBnk.ModelzBuilder.CustomTool.VisualStudio;
 
-namespace Umbraco.ModelsBuilder.CustomTool
+namespace ZpqrtBnk.ModelzBuilder.CustomTool
 {
     public class VisualStudioOptions
     {

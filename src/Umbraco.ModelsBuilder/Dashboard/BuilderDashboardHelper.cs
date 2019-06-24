@@ -2,10 +2,10 @@
 using System.Text;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.ModelsBuilder.Configuration;
-using Umbraco.ModelsBuilder.Umbraco;
+using ZpqrtBnk.ModelzBuilder.Configuration;
+using ZpqrtBnk.ModelzBuilder.Umbraco;
 
-namespace Umbraco.ModelsBuilder.Dashboard
+namespace ZpqrtBnk.ModelzBuilder.Dashboard
 {
     internal static class BuilderDashboardHelper
     {

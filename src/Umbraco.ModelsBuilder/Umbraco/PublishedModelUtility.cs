@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Models.PublishedContent;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace ZpqrtBnk.ModelzBuilder.Umbraco
 {
     public static class PublishedModelUtility
     {

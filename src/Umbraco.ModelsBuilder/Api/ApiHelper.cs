@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using Umbraco.ModelsBuilder.Building;
-using Umbraco.ModelsBuilder.Umbraco;
+using ZpqrtBnk.ModelzBuilder.Building;
+using ZpqrtBnk.ModelzBuilder.Umbraco;
 
-namespace Umbraco.ModelsBuilder.Api
+namespace ZpqrtBnk.ModelzBuilder.Api
 {
     // internal to be used by Umbraco.ModelsBuilder.Api project
     internal static class ApiHelper

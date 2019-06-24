@@ -7,7 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 
-namespace Umbraco.ModelsBuilder.Tests
+namespace ZpqrtBnk.ModelzBuilder.Tests
 {
     class TestElements
     {

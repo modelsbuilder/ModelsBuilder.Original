@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.ModelsBuilder
+namespace ZpqrtBnk.ModelzBuilder
 {
     internal static class TypeExtensions
     {

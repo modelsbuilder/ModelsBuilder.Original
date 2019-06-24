@@ -5,7 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 
-namespace Umbraco.ModelsBuilder.Tests
+namespace ZpqrtBnk.ModelzBuilder.Tests
 {
     class UmbracoInternals
     {

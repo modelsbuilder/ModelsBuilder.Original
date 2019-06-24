@@ -6,13 +6,13 @@ using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Web.Hosting;
-using Umbraco.ModelsBuilder.Building;
-using Umbraco.ModelsBuilder.Configuration;
-using Umbraco.ModelsBuilder.Dashboard;
+using ZpqrtBnk.ModelzBuilder.Building;
+using ZpqrtBnk.ModelzBuilder.Configuration;
+using ZpqrtBnk.ModelzBuilder.Dashboard;
 using Umbraco.Web.Editors;
 using Umbraco.Web.WebApi.Filters;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace ZpqrtBnk.ModelzBuilder.Umbraco
 {
     /// <summary>
     /// API controller for use in the Umbraco back office with Angular resources
@@ -22,7 +22,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
     /// correct CSRF security is adhered to for angular and it also ensures that this controller is not subseptipal to
     /// global WebApi formatters being changed since this is always forced to only return Angular JSON Specific formats.
     /// </remarks>
-    [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
+    [UmbracoApplicationAuthorize(global::Umbraco.Core.Constants.Applications.Settings)]
     public class ModelsBuilderBackOfficeController : UmbracoAuthorizedJsonController
     {
         private readonly UmbracoServices _umbracoServices;

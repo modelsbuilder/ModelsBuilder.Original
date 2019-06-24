@@ -3,12 +3,12 @@
 
 using System;
 
-namespace Umbraco.ModelsBuilder.CustomTool
+namespace ZpqrtBnk.ModelzBuilder.CustomTool
 {
     static class GuidList
     {
-        public const string PkgString = "6a4c1726-440f-4b2d-a2e5-711277da6099";
-        public const string CmdSetString = "fb40dc0b-2f75-404c-ba4e-dc1b90c41941";
+        public const string PkgString = "d6667f9d-7c28-400f-85b3-cf2fa1d5b09c";
+        public const string CmdSetString = "0e7940a5-22e4-4286-961c-19fd4fa175c3";
 
         public static readonly Guid CmdSet = new Guid(CmdSetString);
     };

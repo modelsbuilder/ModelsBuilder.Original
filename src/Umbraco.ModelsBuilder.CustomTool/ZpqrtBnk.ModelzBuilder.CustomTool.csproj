@@ -6,8 +6,8 @@
     <ProjectGuid>{0419A43D-78C2-46C9-95A9-2470F224D60F}</ProjectGuid>
     <ProjectTypeGuids>{82b43b9b-a64c-4715-b499-d71e9ca2bd60};{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <AssemblyName>Umbraco.ModelsBuilder.CustomTool</AssemblyName>
-    <RootNamespace>Umbraco.ModelsBuilder.CustomTool</RootNamespace>
+    <AssemblyName>ZpqrtBnk.ModelzBuilder.CustomTool</AssemblyName>
+    <RootNamespace>ZpqrtBnk.ModelzBuilder.CustomTool</RootNamespace>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -99,13 +99,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.ModelsBuilder.Api\Umbraco.ModelsBuilder.Api.csproj">
+    <ProjectReference Include="..\Umbraco.ModelsBuilder.Api\ZpqrtBnk.ModelzBuilder.Api.csproj">
       <Project>{2317be7f-1723-4512-b863-5b6835e583a2}</Project>
-      <Name>Umbraco.ModelsBuilder.Api</Name>
+      <Name>ZpqrtBnk.ModelzBuilder.Api</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.ModelsBuilder\Umbraco.ModelsBuilder.csproj">
+    <ProjectReference Include="..\Umbraco.ModelsBuilder\ZpqrtBnk.ModelzBuilder.csproj">
       <Project>{998fb014-303a-4146-b3e4-b927bab0210f}</Project>
-      <Name>Umbraco.ModelsBuilder</Name>
+      <Name>ZpqrtBnk.ModelzBuilder</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

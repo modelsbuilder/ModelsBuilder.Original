@@ -4,10 +4,10 @@ using System.IO;
 using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
-using Umbraco.ModelsBuilder.Building;
-using Umbraco.ModelsBuilder.Configuration;
+using ZpqrtBnk.ModelzBuilder.Building;
+using ZpqrtBnk.ModelzBuilder.Configuration;
 
-namespace Umbraco.ModelsBuilder.Tests
+namespace ZpqrtBnk.ModelzBuilder.Tests
 {
     [TestFixture]
     public class CompilerTests

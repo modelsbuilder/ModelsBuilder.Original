@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
 
-namespace Umbraco.ModelsBuilder.CustomTool
+namespace ZpqrtBnk.ModelzBuilder.CustomTool
 {
     // see http://msdn.microsoft.com/en-us/library/bb166195.aspx
 

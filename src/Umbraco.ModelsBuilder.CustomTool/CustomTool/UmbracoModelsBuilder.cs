@@ -4,11 +4,11 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.VisualStudio.Shell.Interop;
-using Umbraco.ModelsBuilder.Api;
-using Umbraco.ModelsBuilder.Building;
-using Umbraco.ModelsBuilder.CustomTool.VisualStudio;
+using ZpqrtBnk.ModelzBuilder.Api;
+using ZpqrtBnk.ModelzBuilder.Building;
+using ZpqrtBnk.ModelzBuilder.CustomTool.VisualStudio;
 
-namespace Umbraco.ModelsBuilder.CustomTool.CustomTool
+namespace ZpqrtBnk.ModelzBuilder.CustomTool.CustomTool
 {
     [ComVisible(true)]
     public abstract class UmbracoModelsBuilder : BaseCodeGeneratorWithSite

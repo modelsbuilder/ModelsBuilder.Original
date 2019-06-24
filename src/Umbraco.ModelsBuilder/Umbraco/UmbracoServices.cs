@@ -8,10 +8,10 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.ModelsBuilder.Building;
-using Umbraco.ModelsBuilder.Configuration;
+using ZpqrtBnk.ModelzBuilder.Building;
+using ZpqrtBnk.ModelzBuilder.Configuration;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace ZpqrtBnk.ModelzBuilder.Umbraco
 {
     public class UmbracoServices
     {

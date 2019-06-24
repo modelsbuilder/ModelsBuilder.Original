@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Umbraco.ModelsBuilder
+namespace ZpqrtBnk.ModelzBuilder
 {
     public static class EnumerableExtensions
     {

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.ModelsBuilder.Configuration
+﻿namespace ZpqrtBnk.ModelzBuilder.Configuration
 {
     /// <summary>
     /// Defines the CLR name sources.

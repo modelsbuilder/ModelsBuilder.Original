@@ -7,10 +7,10 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Design.Serialization;
 using Microsoft.VisualStudio.Shell.Interop;
-using Umbraco.ModelsBuilder.CustomTool.CustomTool;
+using ZpqrtBnk.ModelzBuilder.CustomTool.CustomTool;
 using Task = System.Threading.Tasks.Task;
 
-namespace Umbraco.ModelsBuilder.CustomTool
+namespace ZpqrtBnk.ModelzBuilder.CustomTool
 {
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
@@ -39,7 +39,7 @@ namespace Umbraco.ModelsBuilder.CustomTool
 
     // register the generator
     [ProvideObject(typeof(UmbracoCSharpModelsBuilder))]
-    [ProvideGenerator(typeof(UmbracoCSharpModelsBuilder), "UmbracoModelsBuilder", "Umbraco ModelsBuilder Custom Tool for C#", "{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}", true)] // csharp
+    [ProvideGenerator(typeof(UmbracoCSharpModelsBuilder), "ZpqrtBnkModelzBuilder", "ZpqrtBnk ModelzBuilder Custom Tool for C#", "{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}", true)] // csharp
 
     public sealed class CustomToolPackage : AsyncPackage, IVsSolutionEvents
     {

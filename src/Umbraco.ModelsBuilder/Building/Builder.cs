@@ -7,9 +7,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.ModelsBuilder.Configuration;
+using ZpqrtBnk.ModelzBuilder.Configuration;
 
-namespace Umbraco.ModelsBuilder.Building
+namespace ZpqrtBnk.ModelzBuilder.Building
 {
     // NOTE
     // The idea was to have different types of builder, because I wanted to experiment with

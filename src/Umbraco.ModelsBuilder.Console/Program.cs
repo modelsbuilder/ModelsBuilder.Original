@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Umbraco.ModelsBuilder.Api;
-using Umbraco.ModelsBuilder.Building;
+using ZpqrtBnk.ModelzBuilder.Api;
+using ZpqrtBnk.ModelzBuilder.Building;
 using SysConsole = System.Console;
 
-namespace Umbraco.ModelsBuilder.Console
+namespace ZpqrtBnk.ModelzBuilder.Console
 {
     class Program
     {

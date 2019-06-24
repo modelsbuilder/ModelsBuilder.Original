@@ -6,11 +6,11 @@ using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.ModelsBuilder.Api;
-using Umbraco.ModelsBuilder.Building;
-using Umbraco.ModelsBuilder.Configuration;
+using ZpqrtBnk.ModelzBuilder.Api;
+using ZpqrtBnk.ModelzBuilder.Building;
+using ZpqrtBnk.ModelzBuilder.Configuration;
 
-namespace Umbraco.ModelsBuilder.Tests
+namespace ZpqrtBnk.ModelzBuilder.Tests
 {
     [TestFixture]
     public class BuilderTests

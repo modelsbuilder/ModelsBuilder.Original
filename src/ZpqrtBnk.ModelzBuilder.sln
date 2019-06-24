@@ -36,15 +36,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModelsBuilder.Api", "Models
 		build\Nuspecs\ModelsBuilder.Api\web.config.install.xdt = build\Nuspecs\ModelsBuilder.Api\web.config.install.xdt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder", "Umbraco.ModelsBuilder\Umbraco.ModelsBuilder.csproj", "{998FB014-303A-4146-B3E4-B927BAB0210F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZpqrtBnk.ModelzBuilder", "Umbraco.ModelsBuilder\ZpqrtBnk.ModelzBuilder.csproj", "{998FB014-303A-4146-B3E4-B927BAB0210F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.Tests", "Umbraco.ModelsBuilder.Tests\Umbraco.ModelsBuilder.Tests.csproj", "{CF597D44-04EA-4FD7-89C8-E4849D1355C8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZpqrtBnk.ModelzBuilder.Tests", "Umbraco.ModelsBuilder.Tests\ZpqrtBnk.ModelzBuilder.Tests.csproj", "{CF597D44-04EA-4FD7-89C8-E4849D1355C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.CustomTool", "Umbraco.ModelsBuilder.CustomTool\Umbraco.ModelsBuilder.CustomTool.csproj", "{0419A43D-78C2-46C9-95A9-2470F224D60F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZpqrtBnk.ModelzBuilder.CustomTool", "Umbraco.ModelsBuilder.CustomTool\ZpqrtBnk.ModelzBuilder.CustomTool.csproj", "{0419A43D-78C2-46C9-95A9-2470F224D60F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.Console", "Umbraco.ModelsBuilder.Console\Umbraco.ModelsBuilder.Console.csproj", "{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZpqrtBnk.ModelzBuilder.Console", "Umbraco.ModelsBuilder.Console\ZpqrtBnk.ModelzBuilder.Console.csproj", "{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.Api", "Umbraco.ModelsBuilder.Api\Umbraco.ModelsBuilder.Api.csproj", "{2317BE7F-1723-4512-B863-5B6835E583A2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZpqrtBnk.ModelzBuilder.Api", "Umbraco.ModelsBuilder.Api\ZpqrtBnk.ModelzBuilder.Api.csproj", "{2317BE7F-1723-4512-B863-5B6835E583A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

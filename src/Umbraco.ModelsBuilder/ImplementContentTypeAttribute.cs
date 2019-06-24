@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.ModelsBuilder
+namespace ZpqrtBnk.ModelzBuilder
 {
     // NOTE
     // that attribute should inherit from PublishedModelAttribute

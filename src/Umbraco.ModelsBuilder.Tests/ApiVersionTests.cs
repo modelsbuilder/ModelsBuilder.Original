@@ -1,9 +1,9 @@
 ﻿using System;
 using NUnit.Framework;
 using Semver;
-using Umbraco.ModelsBuilder.Api;
+using ZpqrtBnk.ModelzBuilder.Api;
 
-namespace Umbraco.ModelsBuilder.Tests
+namespace ZpqrtBnk.ModelzBuilder.Tests
 {
     [TestFixture]
     public class ApiVersionTests

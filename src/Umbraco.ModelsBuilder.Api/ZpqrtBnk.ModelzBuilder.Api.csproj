@@ -3,15 +3,13 @@
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <ProjectGuid>{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <AssemblyName>Umbraco.ModelsBuilder.Console</AssemblyName>
-    <RootNamespace>Umbraco.ModelsBuilder.Console</RootNamespace>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <ProjectGuid>{2317BE7F-1723-4512-B863-5B6835E583A2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AssemblyName>ZpqrtBnk.ModelzBuilder.Api</AssemblyName>
+    <RootNamespace>ZpqrtBnk.ModelzBuilder.Api</RootNamespace>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -21,7 +19,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -30,34 +27,34 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="ApiBasicAuthFilter.cs" />
+    <Compile Include="ApiClient.cs" />
+    <Compile Include="GetModelsData.cs" />
+    <Compile Include="ModelsBuilderApiComposer.cs" />
+    <Compile Include="ModelsBuilderApiController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TokenData.cs" />
+    <Compile Include="ValidateClientVersionData.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Umbraco.ModelsBuilder.Api\Umbraco.ModelsBuilder.Api.csproj">
-      <Project>{2317be7f-1723-4512-b863-5b6835e583a2}</Project>
-      <Name>Umbraco.ModelsBuilder.Api</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Umbraco.ModelsBuilder\Umbraco.ModelsBuilder.csproj">
+    <ProjectReference Include="..\Umbraco.ModelsBuilder\ZpqrtBnk.ModelzBuilder.csproj">
       <Project>{998fb014-303a-4146-b3e4-b927bab0210f}</Project>
-      <Name>Umbraco.ModelsBuilder</Name>
+      <Name>ZpqrtBnk.ModelzBuilder</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="semver">
-      <Version>2.0.4</Version>
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.ApplicationServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="UmbracoCms.Web">
+      <Version>8.1.0-zb.6</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

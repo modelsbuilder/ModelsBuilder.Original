@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Umbraco.Core.Models.PublishedContent;
 
-namespace Umbraco.ModelsBuilder.Building
+namespace ZpqrtBnk.ModelzBuilder.Building
 {
     /// <summary>
     /// Implements code parsing.

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Umbraco.ModelsBuilder.Api;
+using ZpqrtBnk.ModelzBuilder.Api;
 
-namespace Umbraco.ModelsBuilder.Tests
+namespace ZpqrtBnk.ModelzBuilder.Tests
 {
     [TestFixture]
     public class ApiTests

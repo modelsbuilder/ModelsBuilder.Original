@@ -3,10 +3,10 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.ModelsBuilder.Configuration;
+using ZpqrtBnk.ModelzBuilder.Configuration;
 using Umbraco.Web.PublishedCache.NuCache;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace ZpqrtBnk.ModelzBuilder.Umbraco
 {
     [ComposeBefore(typeof(NuCacheComposer))]
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Umbraco.ModelsBuilder
+namespace ZpqrtBnk.ModelzBuilder
 {
     /// <summary>
     /// Indicates a model name for a specified property alias.

@@ -1,7 +1,7 @@
 ﻿using System.Text;
-using Umbraco.ModelsBuilder.Api;
+using ZpqrtBnk.ModelzBuilder.Api;
 
-namespace Umbraco.ModelsBuilder.Building
+namespace ZpqrtBnk.ModelzBuilder.Building
 {
     public static class TextHeaderWriter
     {

@@ -2,7 +2,7 @@ using System;
 using System.Runtime.Serialization;
 using Semver;
 
-namespace Umbraco.ModelsBuilder.Api
+namespace ZpqrtBnk.ModelzBuilder.Api
 {
     [DataContract]
     public class ValidateClientVersionData

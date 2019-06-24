@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Umbraco.ModelsBuilder.Building
+namespace ZpqrtBnk.ModelzBuilder.Building
 {
     /// <summary>
     /// Contains the result of a code parsing.

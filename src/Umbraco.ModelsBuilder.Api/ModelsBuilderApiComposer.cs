@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.ModelsBuilder.Umbraco;
+using ZpqrtBnk.ModelzBuilder.Umbraco;
 using Umbraco.Web.WebApi;
 
-namespace Umbraco.ModelsBuilder.Api
+namespace ZpqrtBnk.ModelzBuilder.Api
 {
     [ComposeAfter(typeof(ModelsBuilderComposer))]
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]

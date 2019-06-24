@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.ModelsBuilder.Building
+namespace ZpqrtBnk.ModelzBuilder.Building
 {
     public class CompilerException : Exception
     {

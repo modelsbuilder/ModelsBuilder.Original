@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using Umbraco.Core.Composing;
-using Umbraco.ModelsBuilder.Configuration;
+using ZpqrtBnk.ModelzBuilder.Configuration;
 using Umbraco.Web.Cache;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace ZpqrtBnk.ModelzBuilder.Umbraco
 {
     public sealed class OutOfDateModelsStatus
     {

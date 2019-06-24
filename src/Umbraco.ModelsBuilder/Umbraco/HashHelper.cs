@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.ModelsBuilder.Building;
+using ZpqrtBnk.ModelzBuilder.Building;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace ZpqrtBnk.ModelzBuilder.Umbraco
 {
     class HashHelper
     {

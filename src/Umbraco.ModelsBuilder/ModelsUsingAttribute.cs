@@ -4,9 +4,9 @@ using System.Linq;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 
-namespace Umbraco.ModelsBuilder
+namespace ZpqrtBnk.ModelzBuilder
 {
     /// <summary>
     /// Indicates namespaces that should be used in generated models (in using clauses).

@@ -2,9 +2,9 @@
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("Umbraco ModelsBuilder")]
-[assembly: AssemblyCompany("Umbraco")]
-[assembly: AssemblyCopyright("Copyright © Umbraco HQ 2017")]
+[assembly: AssemblyProduct("ZpqrtBnk ModelzBuilder")]
+[assembly: AssemblyCompany("ZpqrtBnk")]
+[assembly: AssemblyCopyright("Copyright © ZpqrtBnk 2013-2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -29,14 +29,14 @@ using System.Runtime.InteropServices;
 
 // this is the ONLY ONE the CLR cares about for compatibility
 // should change ONLY when "hard" breaking compatibility (manual change)
-[assembly: AssemblyVersion("8.0.0")]
+[assembly: AssemblyVersion("4.0.0")]
 
 // ... good to have a build number ...
-[assembly: AssemblyFileVersion("8.1.0")]
+[assembly: AssemblyFileVersion("4.0.0")]
 
 // NuGet Package
 // Note: could not release "1.8.0" because it was depending on pre-release NuGet packages
 //  for Roslyn, so had to release 1.8.0-final... starting with 2.1.3 Roslyn has a released
 //  1.0 version, so now we can release "2.1.3" without the "-final" extension.
-[assembly: AssemblyInformationalVersion("8.1.0-zb.1")]
+[assembly: AssemblyInformationalVersion("4.0.0-alpha.1")]
 // Do not remove this line.

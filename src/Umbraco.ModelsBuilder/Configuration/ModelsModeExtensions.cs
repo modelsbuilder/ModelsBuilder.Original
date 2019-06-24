@@ -1,4 +1,4 @@
-﻿namespace Umbraco.ModelsBuilder.Configuration
+﻿namespace ZpqrtBnk.ModelzBuilder.Configuration
 {
     /// <summary>
     /// Provides extensions for the <see cref="ModelsMode"/> enumeration.

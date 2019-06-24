@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.ModelsBuilder
+namespace ZpqrtBnk.ModelzBuilder
 {
     /// <summary>
     /// Indicates the default base class for models.

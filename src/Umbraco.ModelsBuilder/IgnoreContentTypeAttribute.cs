@@ -4,9 +4,9 @@ using System.Linq;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 
-namespace Umbraco.ModelsBuilder
+namespace ZpqrtBnk.ModelzBuilder
 {
     // for the time being it's all-or-nothing
     // when the content type is ignored then

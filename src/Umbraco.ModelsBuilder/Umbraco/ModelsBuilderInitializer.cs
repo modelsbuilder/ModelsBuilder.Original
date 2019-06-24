@@ -1,10 +1,10 @@
 ﻿using System.Web;
 using System.Web.Compilation;
-using Umbraco.ModelsBuilder.Umbraco;
+using ZpqrtBnk.ModelzBuilder.Umbraco;
 
 [assembly: PreApplicationStartMethod(typeof(ModelsBuilderInitializer), "Initialize")]
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace ZpqrtBnk.ModelzBuilder.Umbraco
 {
     public static class ModelsBuilderInitializer
     {

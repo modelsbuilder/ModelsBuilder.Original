@@ -3,8 +3,8 @@ using System.Net.Http;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.ModelsBuilder.Configuration;
-using Umbraco.ModelsBuilder.Umbraco;
+using ZpqrtBnk.ModelzBuilder.Configuration;
+using ZpqrtBnk.ModelzBuilder.Umbraco;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 
@@ -12,7 +12,7 @@ using Umbraco.Web.WebApi;
 using HttpGetAttribute = System.Web.Http.HttpGetAttribute;
 using HttpPostAttribute = System.Web.Http.HttpPostAttribute;
 
-namespace Umbraco.ModelsBuilder.Api
+namespace ZpqrtBnk.ModelzBuilder.Api
 {
     // read http://umbraco.com/follow-us/blog-archive/2014/1/17/heads-up,-breaking-change-coming-in-702-and-62.aspx
     // read http://our.umbraco.org/forum/developers/api-questions/43025-Web-API-authentication

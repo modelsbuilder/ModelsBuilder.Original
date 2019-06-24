@@ -17,11 +17,11 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Cache;
-using Umbraco.ModelsBuilder.Building;
-using Umbraco.ModelsBuilder.Configuration;
+using ZpqrtBnk.ModelzBuilder.Building;
+using ZpqrtBnk.ModelzBuilder.Configuration;
 using File = System.IO.File;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace ZpqrtBnk.ModelzBuilder.Umbraco
 {
     internal class PureLiveModelFactory : ILivePublishedModelFactory, IRegisteredObject
     {

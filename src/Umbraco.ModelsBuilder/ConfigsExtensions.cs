@@ -1,7 +1,7 @@
 ﻿using Umbraco.Core.Configuration;
-using Umbraco.ModelsBuilder.Configuration;
+using ZpqrtBnk.ModelzBuilder.Configuration;
 
-namespace Umbraco.ModelsBuilder
+namespace ZpqrtBnk.ModelzBuilder
 {
     /// <summary>
     /// Provides extension methods for the <see cref="UmbracoConfig"/> class.

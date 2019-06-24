@@ -3,9 +3,9 @@ using System.IO;
 using System.Text;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.ModelsBuilder.Configuration;
+using ZpqrtBnk.ModelzBuilder.Configuration;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace ZpqrtBnk.ModelzBuilder.Umbraco
 {
     internal static class ModelsGenerationError
     {

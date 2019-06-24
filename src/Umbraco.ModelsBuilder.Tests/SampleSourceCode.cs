@@ -1,10 +1,10 @@
 ﻿using Umbraco.Web;
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 using Umbraco.Core.Models.PublishedContent;
 
 [assembly: IgnoreContentType("ccc")]
 
-namespace Umbraco.ModelsBuilder.Tests.Models
+namespace ZpqrtBnk.ModelzBuilder.Tests.Models
 {
     // don't create a model for ddd
     // invalid here though roslyn just ignores it

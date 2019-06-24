@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.ModelsBuilder
+namespace ZpqrtBnk.ModelzBuilder
 {
     /// <summary>
     /// Indicates that an Assembly is a Models Builder assembly.

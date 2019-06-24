@@ -5,7 +5,7 @@ using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Text;
 
-namespace Umbraco.ModelsBuilder.Api
+namespace ZpqrtBnk.ModelzBuilder.Api
 {
     public class ApiClient
     {

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Umbraco.ModelsBuilder.CustomTool.CustomTool
+namespace ZpqrtBnk.ModelzBuilder.CustomTool.CustomTool
 {
     // note: see https://github.com/RazorGenerator/RazorGenerator
 

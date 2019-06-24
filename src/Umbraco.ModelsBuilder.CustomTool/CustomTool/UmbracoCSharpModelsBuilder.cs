@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Umbraco.ModelsBuilder.CustomTool.CustomTool
+namespace ZpqrtBnk.ModelzBuilder.CustomTool.CustomTool
 {
     [Guid("98983F6D-BC77-46AC-BA5A-8D9E8763F0D2")]
     [ComVisible(true)]

@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 
 // same namespace as original Umbraco.Web PublishedElementExtensions
 // ReSharper disable once CheckNamespace

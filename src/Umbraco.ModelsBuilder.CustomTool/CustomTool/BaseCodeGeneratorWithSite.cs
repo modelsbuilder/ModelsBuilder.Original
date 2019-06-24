@@ -5,7 +5,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using VSOLE = Microsoft.VisualStudio.OLE.Interop;
 
-namespace Umbraco.ModelsBuilder.CustomTool.CustomTool
+namespace ZpqrtBnk.ModelzBuilder.CustomTool.CustomTool
 {
     // note: see https://github.com/RazorGenerator/RazorGenerator
 

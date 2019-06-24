@@ -14,10 +14,10 @@ using System.Linq.Expressions;
 using System.Web;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.ModelsBuilder.Umbraco;
+using ZpqrtBnk.ModelzBuilder.Umbraco;
 using Umbraco.Web;
 
-namespace Umbraco.ModelsBuilder.Tests.Models
+namespace ZpqrtBnk.ModelzBuilder.Tests.Models
 {
     // Content Type with alias "page"
     public partial class Page : PublishedContentModel

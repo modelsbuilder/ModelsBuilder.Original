@@ -6,8 +6,8 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <ProjectGuid>{998FB014-303A-4146-B3E4-B927BAB0210F}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AssemblyName>Umbraco.ModelsBuilder</AssemblyName>
-    <RootNamespace>Umbraco.ModelsBuilder</RootNamespace>
+    <AssemblyName>ZpqrtBnk.ModelzBuilder</AssemblyName>
+    <RootNamespace>ZpqrtBnk.ModelzBuilder</RootNamespace>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <TargetFrameworkProfile />
     <!-- see notes in AspNet csproj -->
@@ -30,7 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Umbraco.ModelsBuilder.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\ZpqrtBnk.ModelzBuilder.xml</DocumentationFile>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>

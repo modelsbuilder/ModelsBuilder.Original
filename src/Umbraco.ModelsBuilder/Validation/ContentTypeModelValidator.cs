@@ -6,11 +6,11 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.ModelsBuilder.Configuration;
+using ZpqrtBnk.ModelzBuilder.Configuration;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.ModelsBuilder.Validation
+namespace ZpqrtBnk.ModelzBuilder.Validation
 {
     /// <summary>
    /// Used to validate the aliases for the content type when MB is enabled to ensure that

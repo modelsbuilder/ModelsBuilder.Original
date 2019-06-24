@@ -7,7 +7,7 @@ using System.Web.Hosting;
 using Microsoft.CodeAnalysis;
 using Umbraco.Core;
 
-namespace Umbraco.ModelsBuilder
+namespace ZpqrtBnk.ModelzBuilder
 {
     internal static class ReferencedAssemblies
     {

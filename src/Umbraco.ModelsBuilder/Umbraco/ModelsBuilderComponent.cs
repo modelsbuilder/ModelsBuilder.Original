@@ -8,12 +8,12 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
-using Umbraco.ModelsBuilder.Configuration;
+using ZpqrtBnk.ModelzBuilder.Configuration;
 using Umbraco.Web;
 using Umbraco.Web.JavaScript;
 using Umbraco.Web.Mvc;
 
-namespace Umbraco.ModelsBuilder.Umbraco
+namespace ZpqrtBnk.ModelzBuilder.Umbraco
 {
     public class ModelsBuilderComponent : IComponent
     {
@@ -92,7 +92,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void FileService_SavingTemplate(IFileService sender, Core.Events.SaveEventArgs<Core.Models.ITemplate> e)
+        private void FileService_SavingTemplate(IFileService sender, global::Umbraco.Core.Events.SaveEventArgs<global::Umbraco.Core.Models.ITemplate> e)
         {
             // don't do anything if the factory is not enabled
             // because, no factory = no models (even if generation is enabled)
