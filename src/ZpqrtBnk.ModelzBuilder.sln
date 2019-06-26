@@ -1,4 +1,5 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29006.145
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -25,9 +26,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModelsBuilder", "ModelsBuil
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuspecs", "Nuspecs", "{30368E85-95E0-4A26-AC5A-D8570DB16FDA}"
 	ProjectSection(SolutionItems) = preProject
-		..\build\Nuspecs\Umbraco.ModelsBuilder.Api.nuspec = ..\build\Nuspecs\Umbraco.ModelsBuilder.Api.nuspec
-		..\build\Nuspecs\Umbraco.ModelsBuilder.nuspec = ..\build\Nuspecs\Umbraco.ModelsBuilder.nuspec
-		..\build\Nuspecs\Umbraco.ModelsBuilder.Ui.nuspec = ..\build\Nuspecs\Umbraco.ModelsBuilder.Ui.nuspec
+		..\build\Nuspecs\ZpqrtBnk.ModelzBuilder.nuspec = ..\build\Nuspecs\ZpqrtBnk.ModelzBuilder.nuspec
+		..\build\Nuspecs\ZpqrtBnk.ModelzBuilder.Web.nuspec = ..\build\Nuspecs\ZpqrtBnk.ModelzBuilder.Web.nuspec
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModelsBuilder.Api", "ModelsBuilder.Api", "{FC57764D-873F-4B6E-AC70-E29FAAFBBBF4}"
@@ -43,7 +43,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZpqrtBnk.ModelzBuilder.Cust
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZpqrtBnk.ModelzBuilder.Console", "ZpqrtBnk.ModelzBuilder.Console\ZpqrtBnk.ModelzBuilder.Console.csproj", "{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZpqrtBnk.ModelzBuilder.Web", "ZpqrtBnk.ModelzBuilder.Api\ZpqrtBnk.ModelzBuilder.Web.csproj", "{2317BE7F-1723-4512-B863-5B6835E583A2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZpqrtBnk.ModelzBuilder.Web", "ZpqrtBnk.ModelzBuilder.Web\ZpqrtBnk.ModelzBuilder.Web.csproj", "{2317BE7F-1723-4512-B863-5B6835E583A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -46,7 +46,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.ModelsBuilder.Api\ZpqrtBnk.ModelzBuilder.Web.csproj">
+    <ProjectReference Include="..\ZpqrtBnk.ModelzBuilder.Web\ZpqrtBnk.ModelzBuilder.Web.csproj">
       <Project>{2317be7f-1723-4512-b863-5b6835e583a2}</Project>
       <Name>ZpqrtBnk.ModelzBuilder.Web</Name>
     </ProjectReference>

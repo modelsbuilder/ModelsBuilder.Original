@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata minClientVersion="2.8.1">
-  <id>Umbraco.ModelsBuilder</id>
+  <id>ZpqrtBnk.ModelzBuilder</id>
   <version>$version$</version>
-  <title>Umbraco ModelsBuilder</title>
-  <authors>Umbraco HQ</authors>
-  <owners>Umbraco HQ</owners>
+  <title>ZpqrtBnk ModelzBuilder</title>
+  <authors>ZpqrtBnk</authors>
+  <owners>ZpqrtBnk</owners>
   <license type="expression">MIT</license>
   <requireLicenseAcceptance>false</requireLicenseAcceptance>
   <iconUrl>https://umbraco.com/dist/nuget/logo-small.png</iconUrl>
-  <description>Umbraco ModelsBuilder.</description>
+  <description>ZpqrtBnk ModelzBuilder for Umbraco.</description>
   <projectUrl>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</projectUrl>
   <copyright>$copyright$</copyright>
   <language>en-US</language>
@@ -22,7 +22,7 @@
   </metadata>
   <files>
     <!-- our dlls -->
-    <file src="$solution$\build.tmp\bin\Umbraco.ModelsBuilder.dll" target="lib\net472\Umbraco.ModelsBuilder.dll" />
-    <file src="$solution$\build.tmp\bin\Umbraco.ModelsBuilder.pdb" target="lib\net472\Umbraco.ModelsBuilder.pdb" />
+    <file src="$solution$\build.tmp\bin\ZpqrtBnk.ModelzBuilder.dll" target="lib\net472\ZpqrtBnk.ModelzBuilder.dll" />
+    <file src="$solution$\build.tmp\bin\ZpqrtBnk.ModelzBuilder.pdb" target="lib\net472\ZpqrtBnk.ModelzBuilder.pdb" />
   </files>
 </package>
