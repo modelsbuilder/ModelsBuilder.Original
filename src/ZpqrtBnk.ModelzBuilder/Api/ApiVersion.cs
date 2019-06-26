@@ -3,7 +3,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Semver;
 
-namespace ZpqrtBnk.ModelzBuilder.Web
+namespace ZpqrtBnk.ModelzBuilder.Api
 {
     /// <summary>
     /// Manages API version handshake between client and server.

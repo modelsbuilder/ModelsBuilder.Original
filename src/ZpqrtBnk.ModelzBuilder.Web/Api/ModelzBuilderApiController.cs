@@ -11,8 +11,10 @@ using Umbraco.Web.WebApi;
 // use the http one, not mvc, with api controllers!
 using HttpGetAttribute = System.Web.Http.HttpGetAttribute;
 using HttpPostAttribute = System.Web.Http.HttpPostAttribute;
+using ZpqrtBnk.ModelzBuilder.Api;
+using ZpqrtBnk.ModelzBuilder.Building;
 
-namespace ZpqrtBnk.ModelzBuilder.Web
+namespace ZpqrtBnk.ModelzBuilder.Web.Api
 {
     // read http://umbraco.com/follow-us/blog-archive/2014/1/17/heads-up,-breaking-change-coming-in-702-and-62.aspx
     // read http://our.umbraco.org/forum/developers/api-questions/43025-Web-API-authentication
@@ -20,19 +22,17 @@ namespace ZpqrtBnk.ModelzBuilder.Web
     // UmbracoApiController :: /Umbraco/Zbu/ModelsBuilderApi/GetTypeModels ??  UNLESS marked with isbackoffice
     //   :: /umbraco/api/keepalive/ping
     //
-    // BEWARE! the controller url is hard-coded in ModelsBuilderApi and needs to be in sync!
+    // routed by WebComponent as /umbraco/ModelzBuilderApi/{action}
 
-    [PluginController(ControllerArea)]
-    [IsBackOffice]
+
+    [DisableBrowserCache]
     [HideFromTypeFinder] // make sure it is *not* automatically registered
     //[UmbracoApplicationAuthorize(Constants.Applications.Settings)] // see ApiBasicAuthFilter - that one would be for ASP.NET identity
-    public class ModelsBuilderApiController : UmbracoApiController // UmbracoAuthorizedApiController - for ASP.NET identity
+    public class ModelzBuilderApiController : UmbracoApiController // UmbracoAuthorizedApiController - for ASP.NET identity
     {
-        public const string ControllerArea = "ModelsBuilder";
-
         private readonly UmbracoServices _umbracoServices;
 
-        public ModelsBuilderApiController(UmbracoServices umbracoServices)
+        public ModelzBuilderApiController(UmbracoServices umbracoServices)
         {
             _umbracoServices = umbracoServices;
         }
@@ -84,7 +84,7 @@ namespace ZpqrtBnk.ModelzBuilder.Web
             if (!checkResult.Success)
                 return checkResult.Result;
 
-            var models = ApiHelper.GetModels(_umbracoServices, data.Namespace, data.Files);
+            var models = Generator.GetModels(_umbracoServices, data.Namespace, data.Files);
 
             return Request.CreateResponse(HttpStatusCode.OK, models, Configuration.Formatters.JsonFormatter);
         }
@@ -101,6 +101,13 @@ namespace ZpqrtBnk.ModelzBuilder.Web
                 $"API version conflict: client version ({clientVersion}) is not compatible with server version({ApiVersion.Current.Version}).");
 
             return Attempt<HttpResponseMessage>.If(isOk, response);
+        }
+
+        public static string UrlBase { get; private set; } = string.Empty;
+
+        public static void Route(string umbracoPath)
+        {
+            UrlBase = ApiRoute.Route(umbracoPath, typeof(ModelzBuilderApiController));
         }
     }
 }

@@ -143,7 +143,7 @@
   {
     Write-Host "Package ZpqrtBnk.ModelzBuilder"
     $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
-    $copyright = "Copyright (C) Umbraco $((Get-Date).Year)"
+    $copyright = "Copyright (C) ZpqrtBnk $((Get-Date).Year)"
 	  &$this.BuildEnv.NuGet pack "$nuspecs\ZpqrtBnk.ModelzBuilder.nuspec" `
 	    -Properties copyright="$Copyright"`;solution="$($this.SolutionRoot)" `
 	    -Version "$($this.Version.Semver.ToString())" `
@@ -155,7 +155,7 @@
   {
     Write-Host "Package ZpqrtBnk.ModelzBuilder.Ui"
     $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
-    $copyright = "Copyright (C) Umbraco $((Get-Date).Year)"
+    $copyright = "Copyright (C) ZpqrtBnk $((Get-Date).Year)"
 	  &$this.BuildEnv.NuGet pack "$nuspecs\ZpqrtBnk.ModelzBuilder.Ui.nuspec" `
 	    -Properties copyright="$Copyright"`;solution="$($this.SolutionRoot)" `
 	    -Version "$($this.Version.Semver.ToString())" `
@@ -167,7 +167,7 @@
   {
     Write-Host "Package ZpqrtBnk.ModelzBuilder.Api"
     $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
-    $copyright = "Copyright (C) Umbraco $((Get-Date).Year)"
+    $copyright = "Copyright (C) ZpqrtBnk $((Get-Date).Year)"
 	  &$this.BuildEnv.NuGet pack "$nuspecs\ZpqrtBnk.ModelzBuilder.Api.nuspec" `
       -Properties copyright="$Copyright"`;solution="$($this.SolutionRoot)" `
 	    -Version "$($this.Version.Semver.ToString())" `

@@ -30,14 +30,19 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="ApiBasicAuthFilter.cs" />
-    <Compile Include="ApiClient.cs" />
-    <Compile Include="GetModelsData.cs" />
+    <Compile Include="Api\ApiBasicAuthFilter.cs" />
+    <Compile Include="Api\ApiClient.cs" />
+    <Compile Include="Api\GetModelsData.cs" />
+    <Compile Include="Dashboard\BuilderDashboardHelper.cs" />
+    <Compile Include="ApiRoute.cs" />
+    <Compile Include="Umbraco\ModelzBuilderController.cs" />
+    <Compile Include="WebComponent.cs" />
     <Compile Include="WebComposer.cs" />
-    <Compile Include="ModelsBuilderApiController.cs" />
+    <Compile Include="Api\ModelzBuilderApiController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TokenData.cs" />
-    <Compile Include="ValidateClientVersionData.cs" />
+    <Compile Include="Api\TokenData.cs" />
+    <Compile Include="Api\ValidateClientVersionData.cs" />
+    <Compile Include="WebManifestFilter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ZpqrtBnk.ModelzBuilder\ZpqrtBnk.ModelzBuilder.csproj">
@@ -54,8 +59,14 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="UmbracoCms.Web">
-      <Version>8.1.0-zb.6</Version>
+      <Version>8.1.0-zb.8</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Dashboard\modelzbuilder.controller.js" />
+    <Content Include="Dashboard\modelzbuilder.html" />
+    <Content Include="Dashboard\modelzbuilder.resource.js" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

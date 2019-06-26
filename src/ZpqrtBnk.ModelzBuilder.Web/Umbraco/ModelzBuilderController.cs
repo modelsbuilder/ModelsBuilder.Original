@@ -8,14 +8,21 @@ using System.Text;
 using System.Web.Hosting;
 using ZpqrtBnk.ModelzBuilder.Building;
 using ZpqrtBnk.ModelzBuilder.Configuration;
-using ZpqrtBnk.ModelzBuilder.Dashboard;
+using ZpqrtBnk.ModelzBuilder.Web.Dashboard;
+using ZpqrtBnk.ModelzBuilder.Umbraco;
 using Umbraco.Web.Editors;
 using Umbraco.Web.WebApi.Filters;
 
-namespace ZpqrtBnk.ModelzBuilder.Umbraco
+// use the http one, not mvc, with api controllers!
+using HttpGetAttribute = System.Web.Http.HttpGetAttribute;
+using HttpPostAttribute = System.Web.Http.HttpPostAttribute;
+
+namespace ZpqrtBnk.ModelzBuilder.Web.Umbraco
 {
+    // routed as /umbraco/BackOffice/Api/ModelsBuilder/{action}/{id}
+
     /// <summary>
-    /// API controller for use in the Umbraco back office with Angular resources
+    /// Represents the ModelzBuilder back office controller.
     /// </summary>
     /// <remarks>
     /// We've created a different controller for the backoffice/angular specifically this is to ensure that the
@@ -23,12 +30,12 @@ namespace ZpqrtBnk.ModelzBuilder.Umbraco
     /// global WebApi formatters being changed since this is always forced to only return Angular JSON Specific formats.
     /// </remarks>
     [UmbracoApplicationAuthorize(global::Umbraco.Core.Constants.Applications.Settings)]
-    public class ModelsBuilderBackOfficeController : UmbracoAuthorizedJsonController
+    public class ModelzBuilderController : UmbracoAuthorizedJsonController
     {
         private readonly UmbracoServices _umbracoServices;
         private readonly Config _config;
 
-        public ModelsBuilderBackOfficeController(UmbracoServices umbracoServices, Config config)
+        public ModelzBuilderController(UmbracoServices umbracoServices, Config config)
         {
             _umbracoServices = umbracoServices;
             _config = config;
@@ -37,7 +44,7 @@ namespace ZpqrtBnk.ModelzBuilder.Umbraco
         // invoked by the dashboard
         // requires that the user is logged into the backoffice and has access to the settings section
         // beware! the name of the method appears in modelsbuilder.controller.js
-        [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
+        [HttpPost]
         public HttpResponseMessage BuildModels()
         {
             try
@@ -71,7 +78,7 @@ namespace ZpqrtBnk.ModelzBuilder.Umbraco
 
         // invoked by the back-office
         // requires that the user is logged into the backoffice and has access to the settings section
-        [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
+        [HttpGet]
         public HttpResponseMessage GetModelsOutOfDateStatus()
         {
             var status = OutOfDateModelsStatus.IsEnabled
@@ -86,7 +93,7 @@ namespace ZpqrtBnk.ModelzBuilder.Umbraco
         // invoked by the back-office
         // requires that the user is logged into the backoffice and has access to the settings section
         // beware! the name of the method appears in modelsbuilder.controller.js
-        [System.Web.Http.HttpGet] // use the http one, not mvc, with api controllers!
+        [HttpGet]
         public HttpResponseMessage GetDashboard()
         {
             return Request.CreateResponse(HttpStatusCode.OK, GetDashboardResult(), Configuration.Formatters.JsonFormatter);
@@ -107,51 +114,7 @@ namespace ZpqrtBnk.ModelzBuilder.Umbraco
 
         private void GenerateModels(string modelsDirectory, string bin)
         {
-            GenerateModels(_umbracoServices, modelsDirectory, bin, _config.ModelsNamespace);
-        }
-
-        internal static void GenerateModels(UmbracoServices umbracoServices, string modelsDirectory, string bin, string modelsNamespace)
-        {
-            if (!Directory.Exists(modelsDirectory))
-                Directory.CreateDirectory(modelsDirectory);
-
-            foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
-                File.Delete(file);
-
-            var typeModels = umbracoServices.GetAllTypes();
-
-            var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
-            var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
-            var builder = new TextBuilder(typeModels, parseResult, modelsNamespace);
-
-            foreach (var typeModel in builder.GetModelsToGenerate())
-            {
-                var sb = new StringBuilder();
-                builder.Generate(sb, typeModel);
-                var filename = Path.Combine(modelsDirectory, typeModel.ClrName + ".generated.cs");
-                File.WriteAllText(filename, sb.ToString());
-            }
-
-            // the idea was to calculate the current hash and to add it as an extra file to the compilation,
-            // in order to be able to detect whether a DLL is consistent with an environment - however the
-            // environment *might not* contain the local partial files, and thus it could be impossible to
-            // calculate the hash. So... maybe that's not a good idea after all?
-            /*
-            var currentHash = HashHelper.Hash(ourFiles, typeModels);
-            ourFiles["models.hash.cs"] = $@"using Umbraco.ModelsBuilder;
-[assembly:ModelsBuilderAssembly(SourceHash = ""{currentHash}"")]
-";
-            */
-
-            if (bin != null)
-            {
-                foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
-                    ourFiles[file] = File.ReadAllText(file);
-                var compiler = new Compiler();
-                compiler.Compile(builder.GetModelsNamespace(), ourFiles, bin);
-            }
-
-            OutOfDateModelsStatus.Clear();
+            Generator.GenerateModels(_umbracoServices, modelsDirectory, bin, _config.ModelsNamespace);
         }
 
         [DataContract]

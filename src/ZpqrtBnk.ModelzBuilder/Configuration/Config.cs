@@ -82,6 +82,7 @@ namespace ZpqrtBnk.ModelzBuilder.Configuration
             EnableFactory = !ConfigurationManager.AppSettings[prefix + "EnableFactory"].InvariantEquals("false");
             StaticMixinGetters = !ConfigurationManager.AppSettings[prefix + "StaticMixinGetters"].InvariantEquals("false");
             FlagOutOfDateModels = !ConfigurationManager.AppSettings[prefix + "FlagOutOfDateModels"].InvariantEquals("false");
+            EnableBackOffice = !ConfigurationManager.AppSettings[prefix + "EnableBackOffice"].InvariantEquals("false");
 
             // default: initialized above with DefaultModelsNamespace const
             var value = ConfigurationManager.AppSettings[prefix + "ModelsNamespace"];
@@ -162,6 +163,7 @@ namespace ZpqrtBnk.ModelzBuilder.Configuration
         public Config(
             bool enable = false,
             ModelsMode modelsMode = ModelsMode.Nothing,
+            bool enableBackOffice = true,
             bool enableApi = true,
             string modelsNamespace = null,
             bool enableFactory = true,
@@ -177,6 +179,7 @@ namespace ZpqrtBnk.ModelzBuilder.Configuration
             Enable = enable;
             ModelsMode = modelsMode;
 
+            EnableBackOffice = enableBackOffice;
             EnableApi = enableApi;
             ModelsNamespace = string.IsNullOrWhiteSpace(modelsNamespace) ? DefaultModelsNamespace : modelsNamespace;
             EnableFactory = enableFactory;
@@ -234,6 +237,11 @@ namespace ZpqrtBnk.ModelzBuilder.Configuration
         /// Gets the models mode.
         /// </summary>
         public ModelsMode ModelsMode { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether backoffice integration is enabled.
+        /// </summary>
+        public bool EnableBackOffice { get; }
 
         /// <summary>
         /// Gets a value indicating whether to serve the API.

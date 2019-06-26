@@ -29,10 +29,6 @@ namespace ZpqrtBnk.ModelzBuilder.Umbraco
 
         public void Initialize()
         {
-            // always setup the dashboard
-            // note: UmbracoApiController instances are automatically registered
-            InstallServerVars();
-
             ContentModelBinder.ModelBindingException += ContentModelBinder_ModelBindingException;
 
             if (_config.Enable)
@@ -49,42 +45,6 @@ namespace ZpqrtBnk.ModelzBuilder.Umbraco
 
         public void Terminate()
         { }
-
-        private void InstallServerVars()
-        {
-            // register our url - for the backoffice api
-            ServerVariablesParser.Parsing += (sender, serverVars) =>
-            {
-                if (!serverVars.ContainsKey("umbracoUrls"))
-                    throw new Exception("Missing umbracoUrls.");
-                var umbracoUrlsObject = serverVars["umbracoUrls"];
-                if (umbracoUrlsObject == null)
-                    throw new Exception("Null umbracoUrls");
-                if (!(umbracoUrlsObject is Dictionary<string, object> umbracoUrls))
-                    throw new Exception("Invalid umbracoUrls");
-
-                if (!serverVars.ContainsKey("umbracoPlugins"))
-                    throw new Exception("Missing umbracoPlugins.");
-                if (!(serverVars["umbracoPlugins"] is Dictionary<string, object> umbracoPlugins))
-                    throw new Exception("Invalid umbracoPlugins");
-
-                if (HttpContext.Current == null) throw new InvalidOperationException("HttpContext is null");
-                var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
-
-                umbracoUrls["modelsBuilderBaseUrl"] = urlHelper.GetUmbracoApiServiceBaseUrl<ModelsBuilderBackOfficeController>(controller => controller.BuildModels());
-                umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings();
-            };
-        }
-
-        private Dictionary<string, object> GetModelsBuilderSettings()
-        {
-            var settings = new Dictionary<string, object>
-            {
-                {"enabled", _config.Enable}
-            };
-
-            return settings;
-        }
 
         /// <summary>
         /// Used to check if a template is being created based on a document type, in this case we need to

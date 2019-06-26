@@ -9,6 +9,7 @@ using Umbraco.Core.Models.PublishedContent;
 using ZpqrtBnk.ModelzBuilder.Web;
 using ZpqrtBnk.ModelzBuilder.Building;
 using ZpqrtBnk.ModelzBuilder.Configuration;
+using ZpqrtBnk.ModelzBuilder.Api;
 
 namespace ZpqrtBnk.ModelzBuilder.Tests
 {

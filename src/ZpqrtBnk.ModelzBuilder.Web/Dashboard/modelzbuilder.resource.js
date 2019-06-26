@@ -1,23 +1,23 @@
-﻿function modelsBuilderResource($q, $http, umbRequestHelper) {
+﻿function modelzBuilderResource($q, $http, umbRequestHelper) {
 
     return {
         getModelsOutOfDateStatus: function () {
             return umbRequestHelper.resourcePromise(
-                $http.get(umbRequestHelper.getApiUrl("modelsBuilderBaseUrl", "GetModelsOutOfDateStatus")),
+                $http.get(umbRequestHelper.getApiUrl("modelzBuilderBaseUrl", "GetModelsOutOfDateStatus")),
                 "Failed to get models out-of-date status");
         },
 
         buildModels: function () {
             return umbRequestHelper.resourcePromise(
-                $http.post(umbRequestHelper.getApiUrl("modelsBuilderBaseUrl", "BuildModels")),
+                $http.post(umbRequestHelper.getApiUrl("modelzBuilderBaseUrl", "BuildModels")),
                 "Failed to build models");
         },
 
         getDashboard: function () {
             return umbRequestHelper.resourcePromise(
-                $http.get(umbRequestHelper.getApiUrl("modelsBuilderBaseUrl", "GetDashboard")),
+                $http.get(umbRequestHelper.getApiUrl("modelzBuilderBaseUrl", "GetDashboard")),
                 "Failed to get dashboard");
         }
     };
 }
-angular.module("umbraco.resources").factory("modelsBuilderResource", modelsBuilderResource);
+angular.module("umbraco.resources").factory("modelzBuilderResource", modelzBuilderResource);

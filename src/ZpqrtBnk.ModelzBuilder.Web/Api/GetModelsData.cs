@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace ZpqrtBnk.ModelzBuilder.Web
+namespace ZpqrtBnk.ModelzBuilder.Web.Api
 {
     [DataContract]
     public class GetModelsData : ValidateClientVersionData

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace ZpqrtBnk.ModelzBuilder.Web
+namespace ZpqrtBnk.ModelzBuilder.Web.Api
 {
     [DataContract]
     class TokenData

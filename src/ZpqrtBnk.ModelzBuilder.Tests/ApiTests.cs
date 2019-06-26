@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using ZpqrtBnk.ModelzBuilder.Web;
+using ZpqrtBnk.ModelzBuilder.Web.Api;
 
 namespace ZpqrtBnk.ModelzBuilder.Tests
 {

@@ -7,6 +7,7 @@ using Umbraco.Core.Logging;
 using ZpqrtBnk.ModelzBuilder.Configuration;
 using ZpqrtBnk.ModelzBuilder.Umbraco;
 using Umbraco.Web.Cache;
+using ZpqrtBnk.ModelzBuilder.Building;
 
 // will install only if configuration says it needs to be installed
 [assembly: PreApplicationStartMethod(typeof(LiveModelsProviderModule), "Install")]
@@ -106,28 +107,7 @@ namespace ZpqrtBnk.ModelzBuilder.Umbraco
                 throw new Exception("Panic: bin is null.");
 
             // EnableDllModels will recycle the app domain - but this request will end properly
-            ModelsBuilderBackOfficeController.GenerateModels(_umbracoServices, modelsDirectory, Config.ModelsMode.IsAnyDll() ? bin : null, modelsNamespace);
-        }
-    }
-
-    // have to do this because it's the only way to subscribe to EndRequest,
-    // module is installed by assembly attribute at the top of this file
-    public class LiveModelsProviderModule : IHttpModule
-    {
-        public void Init(HttpApplication app)
-        {
-            app.EndRequest += LiveModelsProvider.GenerateModelsIfRequested;
-        }
-
-        public void Dispose()
-        {
-            // nothing
-        }
-
-        public static void Install()
-        {
-            // always - don't read config in PreApplicationStartMethod
-            HttpApplication.RegisterModule(typeof(LiveModelsProviderModule));
+            Generator.GenerateModels(_umbracoServices, modelsDirectory, Config.ModelsMode.IsAnyDll() ? bin : null, modelsNamespace);
         }
     }
 }

@@ -2,10 +2,11 @@
 using System.Text;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using ZpqrtBnk.ModelzBuilder.Api;
 using ZpqrtBnk.ModelzBuilder.Configuration;
 using ZpqrtBnk.ModelzBuilder.Umbraco;
 
-namespace ZpqrtBnk.ModelzBuilder.Dashboard
+namespace ZpqrtBnk.ModelzBuilder.Web.Dashboard
 {
     internal static class BuilderDashboardHelper
     {
@@ -36,12 +37,12 @@ namespace ZpqrtBnk.ModelzBuilder.Dashboard
             var config = Config;
 
             if (!config.Enable)
-                return "Version: " + Web.ApiVersion.Current.Version + "<br />&nbsp;<br />ModelsBuilder is disabled<br />(the .Enable key is missing, or its value is not 'true').";
+                return "Version: " + ApiVersion.Current.Version + "<br />&nbsp;<br />ModelsBuilder is disabled<br />(the .Enable key is missing, or its value is not 'true').";
 
             var sb = new StringBuilder();
 
             sb.Append("Version: ");
-            sb.Append(Web.ApiVersion.Current.Version);
+            sb.Append(ApiVersion.Current.Version);
             sb.Append("<br />&nbsp;<br />");
 
             sb.Append("ModelsBuilder is enabled, with the following configuration:");

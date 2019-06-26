@@ -2,12 +2,11 @@
 using System.IO;
 using System.Text;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using ZpqrtBnk.ModelzBuilder.Configuration;
 
 namespace ZpqrtBnk.ModelzBuilder.Umbraco
 {
-    internal static class ModelsGenerationError
+    public static class ModelsGenerationError
     {
         private static Config Config => Current.Configs.ModelsBuilder();
 

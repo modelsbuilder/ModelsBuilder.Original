@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using Semver;
+using ZpqrtBnk.ModelzBuilder.Api;
 using ZpqrtBnk.ModelzBuilder.Web;
 
 namespace ZpqrtBnk.ModelzBuilder.Tests

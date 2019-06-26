@@ -4,8 +4,9 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Text;
+using ZpqrtBnk.ModelzBuilder.Api;
 
-namespace ZpqrtBnk.ModelzBuilder.Web
+namespace ZpqrtBnk.ModelzBuilder.Web.Api
 {
     public class ApiClient
     {
@@ -16,10 +17,7 @@ namespace ZpqrtBnk.ModelzBuilder.Web
         private readonly JsonMediaTypeFormatter _formatter;
         private readonly MediaTypeFormatter[] _formatters;
 
-        // fixme hardcoded?
-        // could be options - but we cannot "discover" them as the API client runs outside of the web app
-        // in addition, anything that references the controller forces API clients to reference Umbraco.Core
-        private const string ApiControllerUrl = "/Umbraco/BackOffice/ModelsBuilder/ModelsBuilderApi/";
+        private static string ApiControllerUrl => ModelzBuilderApiController.UrlBase;
 
         public ApiClient(string url, string user, string password)
         {
@@ -60,7 +58,7 @@ namespace ZpqrtBnk.ModelzBuilder.Web
                     MinServerVersionSupportingClient = ApiVersion.Current.MinServerVersionSupportingClient,
                 };
 
-                var result = client.PostAsync(_url + ApiControllerUrl + nameof(ModelsBuilderApiController.ValidateClientVersion),
+                var result = client.PostAsync(_url + ApiControllerUrl + nameof(ModelzBuilderApiController.ValidateClientVersion),
                     data, _formatter).Result;
 
                 // this is not providing enough details in case of an error - do our own reporting
@@ -92,7 +90,7 @@ namespace ZpqrtBnk.ModelzBuilder.Web
                     Files = ourFiles
                 };
 
-                var result = client.PostAsync(_url + ApiControllerUrl + nameof(ModelsBuilderApiController.GetModels),
+                var result = client.PostAsync(_url + ApiControllerUrl + nameof(ModelzBuilderApiController.GetModels),
                     data, _formatter).Result;
 
                 // this is not providing enough details in case of an error - do our own reporting

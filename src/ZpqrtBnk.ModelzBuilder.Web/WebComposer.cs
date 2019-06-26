@@ -3,19 +3,22 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using ZpqrtBnk.ModelzBuilder.Umbraco;
 using Umbraco.Web.WebApi;
-using Umbraco.Core.Manifest;
-using System.Collections.Generic;
-using Umbraco.Core.IO;
+using ZpqrtBnk.ModelzBuilder.Web.Api;
+using System.Web.Routing;
+using System.Web.Mvc;
+using Umbraco.Core.Configuration;
+using System.Web.Http;
 
 namespace ZpqrtBnk.ModelzBuilder.Web
 {
     [Disable(typeof(ModelsBuilderComposer))]
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    public class WebComposer : IUserComposer
+    public class WebComposer : ComponentComposer<WebComponent>, IUserComposer
     {
-        public void Compose(Composition composition)
+        public override void Compose(Composition composition)
         {
-            // kill Umbraco.ModelsBuilder package manifest entirely, replace with ours
+            // kill Umbraco.ModelsBuilder package manifest entirely, replaced with ours
+            // always, as soon as we are installed, regardless of what is enabled or not
             composition.ManifestFilters().Append<WebManifestFilter>();
 
             // setup the API if enabled (and in debug mode)
@@ -26,50 +29,18 @@ namespace ZpqrtBnk.ModelzBuilder.Web
             // UmbracoApiControllerTypeCollection (and won't get routed etc)
 
             // so...
-            // add it to the collection + register it in the container
+            // register it in the container
+            // do NOT add it to the collection - we will route it in the component, our way
 
             if (composition.Configs.ModelsBuilder().ApiServer)
             {
                 // add the controller to the list of known controllers
-                composition.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
-                    .Add<ModelsBuilderApiController>();
+                //composition.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
+                //    .Add<ApiController>();
 
                 // register the controller into the container
-                composition.Register(typeof(ModelsBuilderApiController), Lifetime.Request);
+                composition.Register(typeof(ApiController), Lifetime.Request);
             }
-        }
-    }
-
-    // fixme move
-    public class WebManifestFilter : IManifestFilter
-    {
-        public void Filter(List<PackageManifest> manifests)
-        {
-            // remove ModelsBuilder built-in manifest
-            // this disables models builder UI entirely (dashboards, buttons)
-            var modelsBuilder = manifests.FirstOrDefault(x => x.Source.EndsWith("\\App_Plugins\\ModelsBuilder\\package.manifest"));
-
-            if (modelsBuilder != null)
-                manifests.Remove(modelsBuilder);
-
-            // fixme files locations?! or shall we just put our own manifest there?
-
-            manifests.Add(new PackageManifest
-            {
-                Source = "(builtin)",
-                Dashboards = new[] { new ManifestDashboard 
-                    { 
-                        Alias = "settingsModelzBuilder", 
-                        View = "~/App_Plugins/ModelsBuilder/modelsbuilder.html",
-                        Sections = new[] { "settings"}, 
-                        Weight = 40 
-                    }},
-                Scripts = new[] 
-                    {
-                        IOHelper.ResolveVirtualUrl("~/App_Plugins/ModelsBuilder/modelsbuilder.controller.js"),
-                        IOHelper.ResolveVirtualUrl("~/App_Plugins/ModelsBuilder/modelsbuilder.resource.js")
-                    }
-            });
         }
     }
 }

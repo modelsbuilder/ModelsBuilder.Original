@@ -1,4 +1,4 @@
-﻿function modelsBuilderController($scope, $http, umbRequestHelper, modelsBuilderResource) {
+﻿function modelzBuilderController($scope, $http, umbRequestHelper, modelzBuilderResource) {
 
     var vm = this;
 
@@ -9,7 +9,7 @@
     function generate() {
         vm.generating = true;
         umbRequestHelper.resourcePromise(
-                $http.post(umbRequestHelper.getApiUrl("modelsBuilderBaseUrl", "BuildModels")),
+                $http.post(umbRequestHelper.getApiUrl("modelzBuilderBaseUrl", "BuildModels")),
                 'Failed to generate.')
             .then(function (result) {
                 vm.generating = false;
@@ -19,7 +19,7 @@
 
     function reload() {
         vm.loading = true;
-        modelsBuilderResource.getDashboard().then(function (result) {
+        modelzBuilderResource.getDashboard().then(function (result) {
             vm.dashboard = result;
             vm.loading = false;
         });
@@ -27,7 +27,7 @@
 
     function init() {
         vm.loading = true;
-        modelsBuilderResource.getDashboard().then(function (result) {
+        modelzBuilderResource.getDashboard().then(function (result) {
             vm.dashboard = result;
             vm.loading = false;
         });
@@ -35,4 +35,4 @@
 
     init();
 }
-angular.module("umbraco").controller("Umbraco.Dashboard.ModelsBuilderController", modelsBuilderController);
+angular.module("umbraco").controller("ZpqrtBnk.ModelzBuilder.ModelzBuilderController", modelzBuilderController);
