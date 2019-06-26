@@ -35,7 +35,7 @@
     @{ Continue = $continue })
   if ($ubuild.OnError()) { return }
 
-  Write-Host "Zbu.ModelsBuilder Build"
+  Write-Host "ZpqrtBnk.ModelzBuilder Build"
   Write-Host "Umbraco.Build v$($ubuild.BuildVersion)"
 
   # ################################################################
@@ -48,7 +48,7 @@
 
     # Edit VSIX
     Write-Host "Update VSIX manifest."
-    $vsixFile = "$($this.SolutionRoot)\src\Umbraco.ModelsBuilder.CustomTool\source.extension.vsixmanifest"
+    $vsixFile = "$($this.SolutionRoot)\src\ZpqrtBnk.ModelzBuilder.CustomTool\source.extension.vsixmanifest"
     [xml] $vsixXml = Get-Content $vsixFile
     $xmlNameTable = New-Object System.Xml.NameTable
     $xmlNameSpace = New-Object System.Xml.XmlNamespaceManager($xmlNameTable)
@@ -96,9 +96,9 @@
   {
     Write-Host "Restore NuGet"
     Write-Host "Logging to $($this.BuildTemp)\nuget.restore.log"
-    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\Umbraco.ModelsBuilder.sln" > "$($this.BuildTemp)\nuget.restore.log"
+    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\ZpqrtBnk.ModelzBuilder.sln" > "$($this.BuildTemp)\nuget.restore.log"
     # temp - ignore errors, because of a circular dependency between U and MB
-    #   we'll eventually move Umbraco.ModelsBuilder (and only that one) into Core,
+    #   we'll eventually move ZpqrtBnk.ModelzBuilder (and only that one) into Core,
     #   once I have decided what to do with the work-in-progress stuff
     #if (-not $?) { throw "Failed to restore NuGet packages." }
     $error.Clear()
@@ -121,7 +121,7 @@
 
     # beware of the weird double \\ at the end of paths
     # see http://edgylogic.com/blog/powershell-and-external-commands-done-right/
-    &$this.BuildEnv.VisualStudio.MsBuild "$src\Umbraco.ModelsBuilder.sln" `
+    &$this.BuildEnv.VisualStudio.MsBuild "$src\ZpqrtBnk.ModelzBuilder.sln" `
       /p:WarningLevel=0 `
       /p:Configuration=$buildConfiguration `
       /p:Platform="Any CPU" `
@@ -141,52 +141,52 @@
 
   $ubuild.DefineMethod("PackageCore",
   {
-    Write-Host "Package Umbraco.ModelsBuilder"
+    Write-Host "Package ZpqrtBnk.ModelzBuilder"
     $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
     $copyright = "Copyright (C) Umbraco $((Get-Date).Year)"
-	  &$this.BuildEnv.NuGet pack "$nuspecs\Umbraco.ModelsBuilder.nuspec" `
+	  &$this.BuildEnv.NuGet pack "$nuspecs\ZpqrtBnk.ModelzBuilder.nuspec" `
 	    -Properties copyright="$Copyright"`;solution="$($this.SolutionRoot)" `
 	    -Version "$($this.Version.Semver.ToString())" `
 	    -Verbosity detailed -OutputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.core.log"
-  	if (-not $?) { throw "Failed to pack NuGet Umbraco.ModelsBuilder." }
+  	if (-not $?) { throw "Failed to pack NuGet ZpqrtBnk.ModelzBuilder." }
   })
 
   $ubuild.DefineMethod("PackageUi",
   {
-    Write-Host "Package Umbraco.ModelsBuilder.Ui"
+    Write-Host "Package ZpqrtBnk.ModelzBuilder.Ui"
     $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
     $copyright = "Copyright (C) Umbraco $((Get-Date).Year)"
-	  &$this.BuildEnv.NuGet pack "$nuspecs\Umbraco.ModelsBuilder.Ui.nuspec" `
+	  &$this.BuildEnv.NuGet pack "$nuspecs\ZpqrtBnk.ModelzBuilder.Ui.nuspec" `
 	    -Properties copyright="$Copyright"`;solution="$($this.SolutionRoot)" `
 	    -Version "$($this.Version.Semver.ToString())" `
 	    -Verbosity detailed -OutputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.ui.log"
-  	if (-not $?) { throw "Failed to pack NuGet Umbraco.ModelsBuilder.Ui." }
+  	if (-not $?) { throw "Failed to pack NuGet ZpqrtBnk.ModelzBuilder.Ui." }
   })
 
   $ubuild.DefineMethod("PackageApi",
   {
-    Write-Host "Package Umbraco.ModelsBuilder.Api"
+    Write-Host "Package ZpqrtBnk.ModelzBuilder.Api"
     $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
     $copyright = "Copyright (C) Umbraco $((Get-Date).Year)"
-	  &$this.BuildEnv.NuGet pack "$nuspecs\Umbraco.ModelsBuilder.Api.nuspec" `
+	  &$this.BuildEnv.NuGet pack "$nuspecs\ZpqrtBnk.ModelzBuilder.Api.nuspec" `
       -Properties copyright="$Copyright"`;solution="$($this.SolutionRoot)" `
 	    -Version "$($this.Version.Semver.ToString())" `
 	    -Verbosity detailed -OutputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.api.log"
-  	if (-not $?) { throw "Failed to pack NuGet Umbraco.ModelsBuilder.Api." }
+  	if (-not $?) { throw "Failed to pack NuGet ZpqrtBnk.ModelzBuilder.Api." }
   })
 
   $ubuild.DefineMethod("PackageVsix",
   {
-    Write-Host "Package Umbraco.ModelsBuilder.CustomTool"
-  	$this.CopyFile("$($this.SolutionRoot)\build.tmp\bin\Umbraco.ModelsBuilder.CustomTool.vsix",
-	    "$($this.BuildOutput)\Umbraco.ModelsBuilder.CustomTool-$($this.Version.Semver.ToString()).vsix")
+    Write-Host "Package ZpqrtBnk.ModelzBuilder.CustomTool"
+  	$this.CopyFile("$($this.SolutionRoot)\build.tmp\bin\ZpqrtBnk.ModelzBuilder.CustomTool.vsix",
+	    "$($this.BuildOutput)\ZpqrtBnk.ModelzBuilder.CustomTool-$($this.Version.Semver.ToString()).vsix")
   })
 
   $ubuild.DefineMethod("VerifyNuGet",
   {
     $this.VerifyNuGetConsistency(
-      ("Umbraco.ModelsBuilder", "Umbraco.ModelsBuilder.Api"),
-      ("Umbraco.ModelsBuilder", "Umbraco.ModelsBuilder.Api", "Umbraco.ModelsBuilder.CustomTool", "Umbraco.ModelsBuilder.Console"))
+      ("ZpqrtBnk.ModelzBuilder", "ZpqrtBnk.ModelzBuilder.Api"),
+      ("ZpqrtBnk.ModelzBuilder", "ZpqrtBnk.ModelzBuilder.Api", "ZpqrtBnk.ModelzBuilder.CustomTool", "ZpqrtBnk.ModelzBuilder.Console"))
   })
 
   $ubuild.DefineMethod("PostPackageHook",
