@@ -12,7 +12,7 @@ using Umbraco.Web.WebApi;
 using HttpGetAttribute = System.Web.Http.HttpGetAttribute;
 using HttpPostAttribute = System.Web.Http.HttpPostAttribute;
 
-namespace ZpqrtBnk.ModelzBuilder.Api
+namespace ZpqrtBnk.ModelzBuilder.Web
 {
     // read http://umbraco.com/follow-us/blog-archive/2014/1/17/heads-up,-breaking-change-coming-in-702-and-62.aspx
     // read http://our.umbraco.org/forum/developers/api-questions/43025-Web-API-authentication

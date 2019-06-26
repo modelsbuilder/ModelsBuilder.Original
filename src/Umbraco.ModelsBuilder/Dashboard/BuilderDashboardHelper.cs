@@ -36,12 +36,12 @@ namespace ZpqrtBnk.ModelzBuilder.Dashboard
             var config = Config;
 
             if (!config.Enable)
-                return "Version: " + Api.ApiVersion.Current.Version + "<br />&nbsp;<br />ModelsBuilder is disabled<br />(the .Enable key is missing, or its value is not 'true').";
+                return "Version: " + Web.ApiVersion.Current.Version + "<br />&nbsp;<br />ModelsBuilder is disabled<br />(the .Enable key is missing, or its value is not 'true').";
 
             var sb = new StringBuilder();
 
             sb.Append("Version: ");
-            sb.Append(Api.ApiVersion.Current.Version);
+            sb.Append(Web.ApiVersion.Current.Version);
             sb.Append("<br />&nbsp;<br />");
 
             sb.Append("ModelsBuilder is enabled, with the following configuration:");

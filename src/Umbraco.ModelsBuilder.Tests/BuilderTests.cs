@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
-using ZpqrtBnk.ModelzBuilder.Api;
+using ZpqrtBnk.ModelzBuilder.Web;
 using ZpqrtBnk.ModelzBuilder.Building;
 using ZpqrtBnk.ModelzBuilder.Configuration;
 

@@ -5,7 +5,7 @@ using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Text;
 
-namespace ZpqrtBnk.ModelzBuilder.Api
+namespace ZpqrtBnk.ModelzBuilder.Web
 {
     public class ApiClient
     {

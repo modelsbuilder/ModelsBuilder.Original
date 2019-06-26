@@ -2,7 +2,7 @@ using System;
 using System.Runtime.Serialization;
 using Semver;
 
-namespace ZpqrtBnk.ModelzBuilder.Api
+namespace ZpqrtBnk.ModelzBuilder.Web
 {
     [DataContract]
     public class ValidateClientVersionData

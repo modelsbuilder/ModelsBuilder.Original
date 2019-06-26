@@ -3,7 +3,7 @@ using System.Text;
 using ZpqrtBnk.ModelzBuilder.Building;
 using ZpqrtBnk.ModelzBuilder.Umbraco;
 
-namespace ZpqrtBnk.ModelzBuilder.Api
+namespace ZpqrtBnk.ModelzBuilder.Web
 {
     // internal to be used by Umbraco.ModelsBuilder.Api project
     internal static class ApiHelper

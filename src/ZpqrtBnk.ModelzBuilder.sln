@@ -44,7 +44,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZpqrtBnk.ModelzBuilder.Cust
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZpqrtBnk.ModelzBuilder.Console", "Umbraco.ModelsBuilder.Console\ZpqrtBnk.ModelzBuilder.Console.csproj", "{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZpqrtBnk.ModelzBuilder.Api", "Umbraco.ModelsBuilder.Api\ZpqrtBnk.ModelzBuilder.Api.csproj", "{2317BE7F-1723-4512-B863-5B6835E583A2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZpqrtBnk.ModelzBuilder.Web", "Umbraco.ModelsBuilder.Api\ZpqrtBnk.ModelzBuilder.Web.csproj", "{2317BE7F-1723-4512-B863-5B6835E583A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

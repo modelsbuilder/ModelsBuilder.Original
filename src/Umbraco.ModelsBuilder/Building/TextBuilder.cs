@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using ZpqrtBnk.ModelzBuilder.Api;
+using ZpqrtBnk.ModelzBuilder.Web;
 using ZpqrtBnk.ModelzBuilder.Configuration;
 
 namespace ZpqrtBnk.ModelzBuilder.Building
