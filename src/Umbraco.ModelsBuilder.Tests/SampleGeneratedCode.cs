@@ -191,9 +191,9 @@ namespace Umbraco.ModelsBuilder.Tests.Models
 #pragma warning disable 0109 // new is redundant
         public new const string ModelTypeAlias = "debugTextBuilder";
         public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-        public new static PublishedContentType GetModelContentType()
+        public new static IPublishedContentType GetModelContentType()
             => PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
-        public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<DebugTextBuilder, TValue>> selector)
+        public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<DebugTextBuilder, TValue>> selector)
             => PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 

@@ -21,7 +21,7 @@ namespace Umbraco.ModelsBuilder.Tests
 
             public object SourceValue { get; }
 
-            public PublishedPropertyType PropertyType => throw new NotImplementedException();
+            public IPublishedPropertyType PropertyType => throw new NotImplementedException();
 
             bool IPublishedProperty.HasValue(string culture, string segment) => SourceValue != null;
 
@@ -44,7 +44,7 @@ namespace Umbraco.ModelsBuilder.Tests
         {
             private readonly PublishedProperty[] _properties;
 
-            public PublishedContent(PublishedContentType contentType, PublishedProperty[] properties)
+            public PublishedContent(IPublishedContentType contentType, PublishedProperty[] properties)
             {
                 ContentType = contentType;
                 _properties = properties;
@@ -52,7 +52,9 @@ namespace Umbraco.ModelsBuilder.Tests
 
             public IEnumerable<IPublishedContent> Children => throw new NotImplementedException();
 
-            public PublishedContentType ContentType { get; }
+            public IEnumerable<IPublishedContent> ChildrenForAllCultures => throw new NotImplementedException();
+
+            public IPublishedContentType ContentType { get; }
 
             public DateTime CreateDate => throw new NotImplementedException();
 
