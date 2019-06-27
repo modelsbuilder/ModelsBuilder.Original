@@ -1,4 +1,4 @@
-﻿function modelzBuilderController($scope, $http, umbRequestHelper, modelzBuilderResource) {
+﻿function modelzBuilderController(modelzBuilderResource) {
 
     var vm = this;
 
@@ -8,13 +8,10 @@
 
     function generate() {
         vm.generating = true;
-        umbRequestHelper.resourcePromise(
-                $http.post(umbRequestHelper.getApiUrl("modelzBuilderBaseUrl", "BuildModels")),
-                'Failed to generate.')
-            .then(function (result) {
-                vm.generating = false;
-                vm.dashboard = result;
-            });
+        modelzBuilderResource.buildModels().then(function (result) {
+            vm.generating = false;
+            vm.dashboard = result;
+        });
     }
 
     function reload() {

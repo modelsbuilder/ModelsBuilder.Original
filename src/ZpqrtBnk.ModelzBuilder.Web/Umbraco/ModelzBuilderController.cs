@@ -1,14 +1,10 @@
 using System;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Web.Hosting;
 using ZpqrtBnk.ModelzBuilder.Building;
 using ZpqrtBnk.ModelzBuilder.Configuration;
-using ZpqrtBnk.ModelzBuilder.Web.Dashboard;
 using ZpqrtBnk.ModelzBuilder.Umbraco;
 using Umbraco.Web.Editors;
 using Umbraco.Web.WebApi.Filters;
@@ -16,6 +12,7 @@ using Umbraco.Web.WebApi.Filters;
 // use the http one, not mvc, with api controllers!
 using HttpGetAttribute = System.Web.Http.HttpGetAttribute;
 using HttpPostAttribute = System.Web.Http.HttpPostAttribute;
+using ZpqrtBnk.ModelzBuilder.Web.Plugin;
 
 namespace ZpqrtBnk.ModelzBuilder.Web.Umbraco
 {
@@ -104,11 +101,11 @@ namespace ZpqrtBnk.ModelzBuilder.Web.Umbraco
             return new Dashboard
             {
                 Enable = _config.Enable,
-                Text = BuilderDashboardHelper.Text(),
-                CanGenerate = BuilderDashboardHelper.CanGenerate(),
-                GenerateCausesRestart = BuilderDashboardHelper.GenerateCausesRestart(),
-                OutOfDateModels = BuilderDashboardHelper.AreModelsOutOfDate(),
-                LastError = BuilderDashboardHelper.LastError(),
+                Text = DashboardHelper.Text(),
+                CanGenerate = DashboardHelper.CanGenerate(),
+                GenerateCausesRestart = DashboardHelper.GenerateCausesRestart(),
+                OutOfDateModels = DashboardHelper.AreModelsOutOfDate(),
+                LastError = DashboardHelper.LastError(),
             };
         }
 

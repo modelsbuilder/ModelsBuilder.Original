@@ -59,7 +59,13 @@ namespace ZpqrtBnk.ModelzBuilder.Web
                 var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
 
                 umbracoUrls["modelzBuilderBaseUrl"] = urlHelper.GetUmbracoApiServiceBaseUrl<ModelzBuilderController>(controller => controller.BuildModels());
-                umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings();
+                umbracoPlugins["modelzBuilder"] = GetModelsBuilderSettings();
+
+                // see modelzbuilder.resource.js
+                // see Core's contenttypehelper.service.js service
+                // also register the plugin as 'modelsBuilder' so the Core UI can see it,
+                // and enhance 'Save' buttons with 'Save and Generate Models'
+                umbracoPlugins["modelsBuilder"] = umbracoPlugins["modelzBuilder"];
             };
         }
 

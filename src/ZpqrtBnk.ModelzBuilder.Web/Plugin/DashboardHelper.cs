@@ -8,9 +8,9 @@ using ZpqrtBnk.ModelzBuilder.Api;
 using ZpqrtBnk.ModelzBuilder.Configuration;
 using ZpqrtBnk.ModelzBuilder.Umbraco;
 
-namespace ZpqrtBnk.ModelzBuilder.Web.Dashboard
+namespace ZpqrtBnk.ModelzBuilder.Web.Plugin
 {
-    internal static class BuilderDashboardHelper
+    internal static class DashboardHelper
     {
         private static Config Config => Current.Configs.ModelsBuilder();
 

@@ -2,6 +2,8 @@
 using Umbraco.Core.Composing;
 using ZpqrtBnk.ModelzBuilder.Umbraco;
 using System.Web.Http;
+using Umbraco.Web.Editors;
+using ZpqrtBnk.ModelzBuilder.Validation;
 
 namespace ZpqrtBnk.ModelzBuilder.Web
 {
@@ -16,7 +18,24 @@ namespace ZpqrtBnk.ModelzBuilder.Web
 
             // kill Umbraco.ModelsBuilder package manifest entirely, replaced with ours
             // always, as soon as we are installed, regardless of what is enabled or not
+
             composition.ManifestFilters().Append<WebManifestFilter>();
+
+            // replaces the model validators
+            // Core (in WebInitialComposer) registers with:
+            //
+            // composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>()
+            //  .Add(() => composition.TypeLoader.GetTypes<IEditorValidator>());
+            //
+            // so ours are already in there, but better be safe: clear the collection,
+            // and then add exactly those that we want.
+
+            composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>()
+                .Clear()
+                .Add<ContentTypeModelValidator>()
+                .Add<MediaTypeModelValidator>()
+                .Add<MemberTypeModelValidator>();
+
 
             // setup the API if enabled (and in debug mode)
 

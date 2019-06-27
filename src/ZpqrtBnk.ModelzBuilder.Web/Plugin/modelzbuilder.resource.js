@@ -21,3 +21,8 @@
     };
 }
 angular.module("umbraco.resources").factory("modelzBuilderResource", modelzBuilderResource);
+
+// also register it as 'modelsBuilderResource' as that is required for the Core UI
+// to enhance the 'Save' buttons with 'Save and Generate Models' - see edit.html views,
+// edit.controller.js controllers, and the contenttypehelper.service.js service
+angular.module("umbraco.resources").factory("modelsBuilderResource", modelzBuilderResource);
