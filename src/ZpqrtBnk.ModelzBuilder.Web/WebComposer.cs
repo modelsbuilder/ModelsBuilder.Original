@@ -31,11 +31,15 @@ namespace ZpqrtBnk.ModelzBuilder.Web
             // and then add exactly those that we want.
 
             composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>()
-                .Clear()
-                .Add<ContentTypeModelValidator>()
-                .Add<MediaTypeModelValidator>()
-                .Add<MemberTypeModelValidator>();
+                .Clear();
 
+            if (composition.Configs.ModelsBuilder().EnableBackOffice)
+            {
+                composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>()
+                    .Add<ContentTypeModelValidator>()
+                    .Add<MediaTypeModelValidator>()
+                    .Add<MemberTypeModelValidator>();
+            }
 
             // setup the API if enabled (and in debug mode)
 
