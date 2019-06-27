@@ -45,7 +45,7 @@ namespace ZpqrtBnk.ModelzBuilder.CustomTool.CustomTool
             var rc = 0;
             string errMsg = null;
 
-            VisualStudioHelper.PumpAction("Generating models...", "Please wait while Umbraco.ModelsBuilder generates models.", () =>
+            VisualStudioHelper.PumpAction("Generating models...", "Please wait while ZpqrtBnk.ModelzBuilder generates models.", () =>
             {
                 rc = GenerateRaw(wszInputFilePath,
                 //bstrInputFileContents,

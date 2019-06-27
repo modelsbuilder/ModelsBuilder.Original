@@ -59,10 +59,11 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="UmbracoCms.Web">
-      <Version>8.1.0-zb.8</Version>
+      <Version>8.1.0-zb.10</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Dashboard\lang\en-US.xml" />
     <Content Include="Dashboard\modelzbuilder.controller.js" />
     <Content Include="Dashboard\modelzbuilder.html" />
     <Content Include="Dashboard\modelzbuilder.resource.js" />

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using ZpqrtBnk.ModelzBuilder.Web;
-using ZpqrtBnk.ModelzBuilder.Building;
 using SysConsole = System.Console;
+using ZpqrtBnk.ModelzBuilder.Web.Api;
+using ZpqrtBnk.ModelzBuilder.Api;
 
 namespace ZpqrtBnk.ModelzBuilder.Console
 {
@@ -11,16 +11,16 @@ namespace ZpqrtBnk.ModelzBuilder.Console
     {
         static void Usage()
         {
-            SysConsole.WriteLine("Usage: Umbraco.ModelsBuilder.Console [-d <directory>] [-ns <namespace>] <api>");
+            SysConsole.WriteLine("Usage: ZpqrtBnk.ModelzBuilder.Console [-d <directory>] [-ns <namespace>] <api>");
             SysConsole.WriteLine("\t<directory>: models directory");
             SysConsole.WriteLine("\t<namespace>: models namespace");
             SysConsole.WriteLine("\t<api>:       API uri, including user and password (%-encoded)");
-            SysConsole.WriteLine("Example: Umbraco.ModelsBuilder.Console -d c:/models -ns My.Models http://john%40doe.com:1234@example.com");
+            SysConsole.WriteLine("Example: ZpqrtBnk.ModelzBuilder.Console -d c:/models -ns My.Models http://john%40doe.com:1234@example.com");
         }
 
         static void Main(string[] args)
         {
-            SysConsole.WriteLine("Umbraco.ModelsBuilder v{0}", ApiVersion.Current.Version);
+            SysConsole.WriteLine("ZpqrtBnk.ModelzBuilder v{0}", ApiVersion.Current.Version);
 
             string apiUrl, apiUser, apiPassword;
             string modelsDirectory, modelsNamespace;

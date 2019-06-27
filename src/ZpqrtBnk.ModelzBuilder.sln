@@ -16,10 +16,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{42C3FC1A
 		..\build\build.ps1 = ..\build\build.ps1
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModelsBuilder", "ModelsBuilder", "{1FFB7043-4B35-4A92-80FC-A2306511C8D5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModelzBuilder", "ModelzBuilder", "{1FFB7043-4B35-4A92-80FC-A2306511C8D5}"
 	ProjectSection(SolutionItems) = preProject
-		build\Nuspecs\ModelsBuilder\web.config.install.xdt = build\Nuspecs\ModelsBuilder\web.config.install.xdt
-		build\Nuspecs\ModelsBuilder\web.config.uninstall.xdt = build\Nuspecs\ModelsBuilder\web.config.uninstall.xdt
+		..\build\Nuspecs\ModelzBuilder\web.config.install.xdt = ..\build\Nuspecs\ModelzBuilder\web.config.install.xdt
+		..\build\Nuspecs\ModelzBuilder\web.config.uninstall.xdt = ..\build\Nuspecs\ModelzBuilder\web.config.uninstall.xdt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuspecs", "Nuspecs", "{30368E85-95E0-4A26-AC5A-D8570DB16FDA}"

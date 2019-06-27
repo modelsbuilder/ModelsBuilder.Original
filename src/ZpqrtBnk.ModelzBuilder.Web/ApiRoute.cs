@@ -22,13 +22,15 @@ namespace ZpqrtBnk.ModelzBuilder.Web
             var route = RouteTable.Routes.MapHttpRoute(
                 "zpqrtbnk-modelzbuilder-" + name,
                 url,
-                new { controller = name, id = UrlParameter.Optional },
-                new[] { typeofController.Namespace });
+                new { controller = name, id = UrlParameter.Optional });
 
             if (route.DataTokens == null)
                 route.DataTokens = new RouteValueDictionary();
 
             route.DataTokens.Add(global::Umbraco.Core.Constants.Web.UmbracoDataToken, "api");
+
+            route.DataTokens.Add("Namespaces", new[] { typeofController.Namespace }); // look in this namespace to create the controller
+            route.DataTokens.Add("UseNamespaceFallback", false); // Don't look anywhere else except this namespace!
 
             return urlBase;
         }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Configuration;
 using System.IO;
-using System.Reflection;
 using System.Web.Configuration;
 using System.Web.Hosting;
 using Microsoft.CodeAnalysis.CSharp;
@@ -14,6 +13,23 @@ namespace ZpqrtBnk.ModelzBuilder.Configuration
     /// </summary>
     public class Config
     {
+        // the master prefix for all appSetting entries
+        private const string prefix = "ZpqrtBnk.ModelzBuilder.";
+
+        // default values for options
+        internal const bool DefaultEnable = false;
+        internal const bool DefaultEnableApi = false;
+        internal const bool DefaultEnableBackOffice = true;
+        internal const bool DefaultEnableFactory = true;
+
+        internal const ModelsMode DefaultModelsMode = ModelsMode.Nothing;
+
+        internal const bool DefaultAcceptUnsafeModelsDirectory = false;
+        internal const bool DefaultStaticMixinGetters = true;
+        internal const bool DefaultFlagOutOfDateModels = true;
+
+        internal const int DefaultDebugLevel = 0;
+
         internal const string DefaultStaticMixinGetterPattern = "Get{0}";
         internal const LanguageVersion DefaultLanguageVersion = LanguageVersion.CSharp7_3;
         internal const string DefaultModelsNamespace = "Umbraco.Web.PublishedModels";
@@ -25,112 +41,41 @@ namespace ZpqrtBnk.ModelzBuilder.Configuration
         /// </summary>
         public Config()
         {
-            const string prefix = "Umbraco.ModelsBuilder.";
-
             // giant kill switch, default: false
             // must be explicitely set to true for anything else to happen
-            Enable = ConfigurationManager.AppSettings[prefix + "Enable"] == "true";
+            Enable = GetSetting("Enable", DefaultEnable);
 
-            // ensure defaults are initialized for tests
-            StaticMixinGetterPattern = DefaultStaticMixinGetterPattern;
-            LanguageVersion = DefaultLanguageVersion;
-            ModelsNamespace = DefaultModelsNamespace;
-            ClrNameSource = DefaultClrNameSource;
-            ModelsDirectory = HostingEnvironment.IsHosted
-                ? HostingEnvironment.MapPath(DefaultModelsDirectory)
-                : DefaultModelsDirectory.TrimStart("~/");
-            DebugLevel = 0;
-
-            // stop here, everything is false
-            if (!Enable) return;
+            // switches
+            EnableApi = GetSetting("EnableApi", DefaultEnableApi);
+            EnableBackOffice = GetSetting("EnableBackOffice", DefaultEnableBackOffice);
+            EnableFactory = GetSetting("EnableFactory", DefaultEnableFactory);
 
             // mode
-            var modelsMode = ConfigurationManager.AppSettings[prefix + "ModelsMode"];
-            if (!string.IsNullOrWhiteSpace(modelsMode))
+            ModelsMode = GetSetting("ModelsMode", DefaultModelsMode);
+
+            // more switches
+            AcceptUnsafeModelsDirectory = GetSetting("AcceptUnsafeModelsDirectory", DefaultAcceptUnsafeModelsDirectory);
+            StaticMixinGetters = GetSetting("StaticMixinGetters", DefaultStaticMixinGetters);
+            FlagOutOfDateModels = GetSetting("FlagOutOfDateModels", DefaultFlagOutOfDateModels);
+
+            // strings
+            ModelsNamespace = GetSetting("ModelsNamespace", DefaultModelsNamespace);
+            StaticMixinGetterPattern = GetSetting("StaticMixinGetterPattern", DefaultStaticMixinGetterPattern);
+
+            // others
+            DebugLevel = GetSetting("DebugLevel", DefaultDebugLevel);
+            LanguageVersion = GetSetting("LanguageVersion", DefaultLanguageVersion);
+            ClrNameSource = GetSetting("ClrNameSource", DefaultClrNameSource);
+
+            // directory
+            var directory = GetSetting("ModelsDirectory", "");
+            if (string.IsNullOrWhiteSpace(directory))
             {
-                switch (modelsMode)
-                {
-                    case nameof(ModelsMode.Nothing):
-                        ModelsMode = ModelsMode.Nothing;
-                        break;
-                    case nameof(ModelsMode.PureLive):
-                        ModelsMode = ModelsMode.PureLive;
-                        break;
-                    case nameof(ModelsMode.Dll):
-                        ModelsMode = ModelsMode.Dll;
-                        break;
-                    case nameof(ModelsMode.LiveDll):
-                        ModelsMode = ModelsMode.LiveDll;
-                        break;
-                    case nameof(ModelsMode.AppData):
-                        ModelsMode = ModelsMode.AppData;
-                        break;
-                    case nameof(ModelsMode.LiveAppData):
-                        ModelsMode = ModelsMode.LiveAppData;
-                        break;
-                    default:
-                        throw new ConfigurationErrorsException($"ModelsMode \"{modelsMode}\" is not a valid mode."
-                            + " Note that modes are case-sensitive. Possible values are: " + string.Join(", ", Enum.GetNames(typeof(ModelsMode))));
-                }
+                ModelsDirectory = HostingEnvironment.IsHosted
+                    ? HostingEnvironment.MapPath(DefaultModelsDirectory)
+                    : DefaultModelsDirectory.TrimStart("~/");
             }
-
-            // default: false
-            EnableApi = ConfigurationManager.AppSettings[prefix + "EnableApi"].InvariantEquals("true");
-            AcceptUnsafeModelsDirectory = ConfigurationManager.AppSettings[prefix + "AcceptUnsafeModelsDirectory"].InvariantEquals("true");
-
-            // default: true
-            EnableFactory = !ConfigurationManager.AppSettings[prefix + "EnableFactory"].InvariantEquals("false");
-            StaticMixinGetters = !ConfigurationManager.AppSettings[prefix + "StaticMixinGetters"].InvariantEquals("false");
-            FlagOutOfDateModels = !ConfigurationManager.AppSettings[prefix + "FlagOutOfDateModels"].InvariantEquals("false");
-            EnableBackOffice = !ConfigurationManager.AppSettings[prefix + "EnableBackOffice"].InvariantEquals("false");
-
-            // default: initialized above with DefaultModelsNamespace const
-            var value = ConfigurationManager.AppSettings[prefix + "ModelsNamespace"];
-            if (!string.IsNullOrWhiteSpace(value))
-                ModelsNamespace = value;
-
-            // default: initialized above with DefaultStaticMixinGetterPattern const
-            value = ConfigurationManager.AppSettings[prefix + "StaticMixinGetterPattern"];
-            if (!string.IsNullOrWhiteSpace(value))
-                StaticMixinGetterPattern = value;
-
-            // default: initialized above with DefaultLanguageVersion const
-            value = ConfigurationManager.AppSettings[prefix + "LanguageVersion"];
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                LanguageVersion lv;
-                if (!Enum.TryParse(value, true, out lv))
-                    throw new ConfigurationErrorsException($"Invalid language version \"{value}\".");
-                LanguageVersion = lv;
-            }
-
-            // default: initialized above with DefaultClrNameSource const
-            value = ConfigurationManager.AppSettings[prefix + "ClrNameSource"];
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                switch (value)
-                {
-                    case nameof(ClrNameSource.Nothing):
-                        ClrNameSource = ClrNameSource.Nothing;
-                        break;
-                    case nameof(ClrNameSource.Alias):
-                        ClrNameSource = ClrNameSource.Alias;
-                        break;
-                    case nameof(ClrNameSource.RawAlias):
-                        ClrNameSource = ClrNameSource.RawAlias;
-                        break;
-                    case nameof(ClrNameSource.Name):
-                        ClrNameSource = ClrNameSource.Name;
-                        break;
-                    default:
-                        throw new ConfigurationErrorsException($"ClrNameSource \"{value}\" is not a valid source."
-                            + " Note that sources are case-sensitive. Possible values are: " + string.Join(", ", Enum.GetNames(typeof(ClrNameSource))));
-                }
-            }
-
-            // default: initialized above with DefaultModelsDirectory const
-            value = ConfigurationManager.AppSettings[prefix + "ModelsDirectory"];
-            if (!string.IsNullOrWhiteSpace(value))
+            else
             {
                 var root = HostingEnvironment.IsHosted
                     ? HostingEnvironment.MapPath("~/")
@@ -139,17 +84,7 @@ namespace ZpqrtBnk.ModelzBuilder.Configuration
                     throw new ConfigurationErrorsException("Could not determine root directory.");
 
                 // GetModelsDirectory will ensure that the path is safe
-                ModelsDirectory = GetModelsDirectory(root, value, AcceptUnsafeModelsDirectory);
-            }
-
-            // default: 0
-            value = ConfigurationManager.AppSettings[prefix + "DebugLevel"];
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                int debugLevel;
-                if (!int.TryParse(value, out debugLevel))
-                    throw new ConfigurationErrorsException($"Invalid debug level \"{value}\".");
-                DebugLevel = debugLevel;
+                ModelsDirectory = GetModelsDirectory(root, directory, AcceptUnsafeModelsDirectory);
             }
 
             // not flagging if not generating, or live (incl. pure)
@@ -161,36 +96,138 @@ namespace ZpqrtBnk.ModelzBuilder.Configuration
         /// Initializes a new instance of the <see cref="Config"/> class.
         /// </summary>
         public Config(
-            bool enable = false,
-            ModelsMode modelsMode = ModelsMode.Nothing,
-            bool enableBackOffice = true,
-            bool enableApi = true,
-            string modelsNamespace = null,
-            bool enableFactory = true,
+            bool enable = DefaultEnable,
+            ModelsMode modelsMode = DefaultModelsMode,
+            bool enableBackOffice = DefaultEnableBackOffice,
+            bool enableApi = DefaultEnableApi,
+            string modelsNamespace = DefaultModelsNamespace,
+            bool enableFactory = DefaultEnableFactory,
             LanguageVersion languageVersion = DefaultLanguageVersion,
-            bool staticMixinGetters = true,
-            string staticMixinGetterPattern = null,
-            bool flagOutOfDateModels = true,
+            bool staticMixinGetters = DefaultStaticMixinGetters,
+            string staticMixinGetterPattern = DefaultStaticMixinGetterPattern,
+            bool flagOutOfDateModels = DefaultFlagOutOfDateModels,
             ClrNameSource clrNameSource = DefaultClrNameSource,
-            string modelsDirectory = null,
-            bool acceptUnsafeModelsDirectory = false,
-            int debugLevel = 0)
+            string modelsDirectory = DefaultModelsDirectory,
+            bool acceptUnsafeModelsDirectory = DefaultAcceptUnsafeModelsDirectory,
+            int debugLevel = DefaultDebugLevel)
         {
             Enable = enable;
             ModelsMode = modelsMode;
 
             EnableBackOffice = enableBackOffice;
             EnableApi = enableApi;
-            ModelsNamespace = string.IsNullOrWhiteSpace(modelsNamespace) ? DefaultModelsNamespace : modelsNamespace;
+            ModelsNamespace = modelsNamespace;
             EnableFactory = enableFactory;
             LanguageVersion = languageVersion;
             StaticMixinGetters = staticMixinGetters;
-            StaticMixinGetterPattern = string.IsNullOrWhiteSpace(staticMixinGetterPattern) ? DefaultStaticMixinGetterPattern : staticMixinGetterPattern;
+            StaticMixinGetterPattern = staticMixinGetterPattern;
             FlagOutOfDateModels = flagOutOfDateModels;
             ClrNameSource = clrNameSource;
-            ModelsDirectory = string.IsNullOrWhiteSpace(modelsDirectory) ? DefaultModelsDirectory : modelsDirectory;
+            ModelsDirectory = modelsDirectory;
             AcceptUnsafeModelsDirectory = acceptUnsafeModelsDirectory;
             DebugLevel = debugLevel;
+        }
+
+        // reads a bool setting
+        private static bool GetSetting(string name, bool defaultValue)
+        {
+            name = prefix + name;
+            var setting = ConfigurationManager.AppSettings[name];
+            if (string.IsNullOrWhiteSpace(setting)) 
+                return defaultValue;
+
+            if (!bool.TryParse(setting, out var value))
+                throw new ConfigurationErrorsException($"Invalid value for setting '{name}': cannot parse '{setting}' as a boolean.");
+
+            return value;
+        }
+
+        // reads a string setting
+        private static string GetSetting(string name, string defaultValue)
+        {
+            name = prefix + name;
+            var setting = ConfigurationManager.AppSettings[name];
+            return string.IsNullOrWhiteSpace(setting) ? defaultValue : setting;
+        }
+
+        // reads an int setting
+        private static int GetSetting(string name, int defaultValue)
+        {
+            name = prefix + name;
+            var setting = ConfigurationManager.AppSettings[name];
+            if (string.IsNullOrWhiteSpace(setting))
+                return defaultValue;
+
+            if (!int.TryParse(setting, out var value))
+                throw new ConfigurationErrorsException($"Invalid value for setting '{name}': cannot parse '{setting}' as an integer.");
+
+            return value;
+        }
+
+        // reads a LanguageVersion setting
+        private static LanguageVersion GetSetting(string name, LanguageVersion defaultValue)
+        {
+            name = prefix + name;
+            var setting = ConfigurationManager.AppSettings[name];
+            if (string.IsNullOrWhiteSpace(setting))
+                return defaultValue;
+
+            if (!Enum.TryParse<LanguageVersion>(setting, true, out var value))
+                throw new ConfigurationErrorsException($"Invalid value for setting '{name}': cannot parse '{setting}' as a language version.");
+
+            return value;
+        }
+
+        // reads the mode setting
+        private static ModelsMode GetSetting(string name, ModelsMode defaultValue)
+        {
+            name = prefix + name;
+            var setting = ConfigurationManager.AppSettings[name];
+            if (string.IsNullOrWhiteSpace(setting))
+                return defaultValue;
+
+            switch (setting)
+            {
+                case nameof(ModelsMode.Nothing):
+                    return ModelsMode.Nothing;
+                case nameof(ModelsMode.PureLive):
+                    return ModelsMode.PureLive;
+                case nameof(ModelsMode.Dll):
+                    return ModelsMode.Dll;
+                case nameof(ModelsMode.LiveDll):
+                    return ModelsMode.LiveDll;
+                case nameof(ModelsMode.AppData):
+                    return ModelsMode.AppData;
+                case nameof(ModelsMode.LiveAppData):
+                    return ModelsMode.LiveAppData;
+                default:
+                    throw new ConfigurationErrorsException($"ModelsMode \"{setting}\" is not a valid mode."
+                        + " Note that modes are case-sensitive. Possible values are: " + string.Join(", ", Enum.GetNames(typeof(ModelsMode))));
+            }
+        }
+
+        // reads the name source setting
+        private static ClrNameSource GetSetting(string name, ClrNameSource defaultValue)
+        {
+            name = prefix + name;
+            var setting = ConfigurationManager.AppSettings[name];
+            if (string.IsNullOrWhiteSpace(setting))
+                return defaultValue;
+
+            switch (setting)
+            {
+                case nameof(ClrNameSource.Nothing):
+                    return ClrNameSource.Nothing;
+                case nameof(ClrNameSource.Alias):
+                    return ClrNameSource.Alias;
+                case nameof(ClrNameSource.RawAlias):
+                    return ClrNameSource.RawAlias;
+                case nameof(ClrNameSource.Name):
+                    return ClrNameSource.Name;
+                default:
+                    throw new ConfigurationErrorsException($"ClrNameSource \"{setting}\" is not a valid source."
+                        + " Note that sources are case-sensitive. Possible values are: " + string.Join(", ", Enum.GetNames(typeof(ClrNameSource))));
+            }
         }
 
         // internal for tests
@@ -224,6 +261,8 @@ namespace ZpqrtBnk.ModelzBuilder.Configuration
             throw new ConfigurationErrorsException($"Invalid models directory \"{config}\".");
         }
 
+        #region Config options
+
         /// <summary>
         /// Gets a value indicating whether the whole models experience is enabled.
         /// </summary>
@@ -232,21 +271,6 @@ namespace ZpqrtBnk.ModelzBuilder.Configuration
         ///     <para>Default value is <c>false</c> which means that unless we have this setting, nothing happens.</para>
         /// </remarks>
         public bool Enable { get; }
-
-        /// <summary>
-        /// Gets the models mode.
-        /// </summary>
-        public ModelsMode ModelsMode { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether backoffice integration is enabled.
-        /// </summary>
-        public bool EnableBackOffice { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether to serve the API.
-        /// </summary>
-        public bool ApiServer => EnableApi && ApiInstalled && IsDebug;
 
         /// <summary>
         /// Gets a value indicating whether to enable the API.
@@ -259,45 +283,27 @@ namespace ZpqrtBnk.ModelzBuilder.Configuration
         public bool EnableApi { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the API is installed.
+        /// Gets a value indicating whether backoffice integration is enabled.
         /// </summary>
-        public bool ApiInstalled => _apiInstalled.Value;
-
-        private readonly Lazy<bool> _apiInstalled = new Lazy<bool>(() =>
-        {
-            try
-            {
-                return Assembly.Load("Umbraco.ModelsBuilder.Api") != null;
-            }
-            catch (FileNotFoundException)
-            {
-                return false;
-            }
-        });
-
-        /// <summary>
-        /// Gets a value indicating whether system.web/compilation/@debug is true.
-        /// </summary>
-        public bool IsDebug
-        {
-            get
-            {
-                var section = (CompilationSection) ConfigurationManager.GetSection("system.web/compilation");
-                return section != null && section.Debug;
-            }
-        }
-
-        /// <summary>
-        /// Gets the models namespace.
-        /// </summary>
-        /// <remarks>That value could be overriden by other (attribute in user's code...). Return default if no value was supplied.</remarks>
-        public string ModelsNamespace { get; }
+        public bool EnableBackOffice { get; }
 
         /// <summary>
         /// Gets a value indicating whether we should enable the models factory.
         /// </summary>
         /// <remarks>Default value is <c>true</c> because no factory is enabled by default in Umbraco.</remarks>
         public bool EnableFactory { get; }
+
+
+        /// <summary>
+        /// Gets the models mode.
+        /// </summary>
+        public ModelsMode ModelsMode { get; }
+
+        /// <summary>
+        /// Gets the models namespace.
+        /// </summary>
+        /// <remarks>That value could be overriden by other (attribute in user's code...). Return default if no value was supplied.</remarks>
+        public string ModelsNamespace { get; }
 
         /// <summary>
         /// Gets the Roslyn parser language version.
@@ -348,5 +354,28 @@ namespace ZpqrtBnk.ModelzBuilder.Configuration
         /// </summary>
         /// <remarks>0 means minimal (safe on live site), anything else means more and more details (maybe not safe).</remarks>
         public int DebugLevel { get; }
+
+        #endregion
+
+        #region Utilities
+
+        /// <summary>
+        /// Gets a value indicating whether to serve the API.
+        /// </summary>
+        public bool IsApiServer => EnableApi && IsDebug;
+
+        /// <summary>
+        /// Gets a value indicating whether system.web/compilation/@debug is true.
+        /// </summary>
+        public bool IsDebug
+        {
+            get
+            {
+                var section = (CompilationSection)ConfigurationManager.GetSection("system.web/compilation");
+                return section != null && section.Debug;
+            }
+        }
+        
+        #endregion
     }
 }

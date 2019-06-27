@@ -21,7 +21,7 @@ namespace ZpqrtBnk.ModelzBuilder.Tests
 
             public object SourceValue { get; }
 
-            public PublishedPropertyType PropertyType => throw new NotImplementedException();
+            public IPublishedPropertyType PropertyType => throw new NotImplementedException();
 
             bool IPublishedProperty.HasValue(string culture, string segment) => SourceValue != null;
 
@@ -52,7 +52,9 @@ namespace ZpqrtBnk.ModelzBuilder.Tests
 
             public IEnumerable<IPublishedContent> Children => throw new NotImplementedException();
 
-            public PublishedContentType ContentType { get; }
+            public IEnumerable<IPublishedContent> ChildrenForAllCultures => throw new NotImplementedException();
+
+            public IPublishedContentType ContentType { get; }
 
             public DateTime CreateDate => throw new NotImplementedException();
 

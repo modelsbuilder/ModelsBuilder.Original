@@ -72,7 +72,7 @@ namespace ZpqrtBnk.ModelzBuilder.Umbraco
                 if (!template.HasIdentity && string.IsNullOrWhiteSpace(template.Content))
                 {
                     // ensure is safe and always pascal cased, per razor standard
-                    // + this is how we get the default model name in Umbraco.ModelsBuilder.Umbraco.Application
+                    // + this is how we get the default model name in ZpqrtBnk.ModelzBuilder.Umbraco.Application
                     var alias = e.AdditionalData["ContentTypeAlias"].ToString();
                     var name = template.Name; // will be the name of the content type since we are creating
                     var className = UmbracoServices.GetClrName(name, alias);

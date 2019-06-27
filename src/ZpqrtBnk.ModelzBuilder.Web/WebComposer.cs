@@ -1,22 +1,19 @@
-﻿using System.Linq;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Composing;
 using ZpqrtBnk.ModelzBuilder.Umbraco;
-using Umbraco.Web.WebApi;
-using ZpqrtBnk.ModelzBuilder.Web.Api;
-using System.Web.Routing;
-using System.Web.Mvc;
-using Umbraco.Core.Configuration;
 using System.Web.Http;
 
 namespace ZpqrtBnk.ModelzBuilder.Web
 {
-    [Disable(typeof(ModelsBuilderComposer))]
+    [Disable(typeof(global::Umbraco.ModelsBuilder.Umbraco.ModelsBuilderComposer))]
+    [ComposeAfter(typeof(ModelsBuilderComposer))]
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public class WebComposer : ComponentComposer<WebComponent>, IUserComposer
     {
         public override void Compose(Composition composition)
         {
+            base.Compose(composition);
+
             // kill Umbraco.ModelsBuilder package manifest entirely, replaced with ours
             // always, as soon as we are installed, regardless of what is enabled or not
             composition.ManifestFilters().Append<WebManifestFilter>();
@@ -32,7 +29,7 @@ namespace ZpqrtBnk.ModelzBuilder.Web
             // register it in the container
             // do NOT add it to the collection - we will route it in the component, our way
 
-            if (composition.Configs.ModelsBuilder().ApiServer)
+            if (composition.Configs.ModelsBuilder().IsApiServer)
             {
                 // add the controller to the list of known controllers
                 //composition.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()

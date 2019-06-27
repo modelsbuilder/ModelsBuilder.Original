@@ -28,7 +28,7 @@ namespace ZpqrtBnk.ModelzBuilder.Web
         {
             InstallServerVars();
 
-            if (_config.ApiServer)
+            if (_config.IsApiServer)
             {
                 ModelzBuilderApiController.Route(_globalSettings.GetUmbracoMvcArea());
             }
@@ -58,7 +58,7 @@ namespace ZpqrtBnk.ModelzBuilder.Web
                 if (HttpContext.Current == null) throw new InvalidOperationException("HttpContext is null");
                 var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
 
-                umbracoUrls["modelsBuilderBaseUrl"] = urlHelper.GetUmbracoApiServiceBaseUrl<ModelzBuilderController>(controller => controller.BuildModels());
+                umbracoUrls["modelzBuilderBaseUrl"] = urlHelper.GetUmbracoApiServiceBaseUrl<ModelzBuilderController>(controller => controller.BuildModels());
                 umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings();
             };
         }

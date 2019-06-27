@@ -30,7 +30,7 @@ namespace ZpqrtBnk.ModelzBuilder.Tests
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 using Dang;
 [assembly:ModelsBaseClass(typeof(Whatever))]
 namespace Dang
@@ -59,7 +59,7 @@ public class Whatever
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 [assembly:ModelsNamespace(""Foo.Bar.Nil"")]
 "}
             };
@@ -96,14 +96,14 @@ using Umbraco.ModelsBuilder;
             var code1 = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 "}
             };
 
             var code2 = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 [assembly:ModelsUsing(""Foo.Bar.Nil"")]
 "}
             };
@@ -145,7 +145,7 @@ using Umbraco.ModelsBuilder;
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 [assembly:IgnoreContentType(""type1"")]
 "}
             };
@@ -184,7 +184,7 @@ using Umbraco.ModelsBuilder;
             var code1 = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 public partial class Type1
 {}
 "}
@@ -195,7 +195,7 @@ public partial class Type1
             var code2 = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 public partial class Type1 : IHasXmlNode
 {}
 "}
@@ -207,7 +207,7 @@ public partial class Type1 : IHasXmlNode
             var code3 = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 using System.Xml;
 public partial class Type1 : IHasXmlNode
 {}
@@ -260,7 +260,7 @@ public partial class Type1 : IHasXmlNode
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 [assembly:IgnoreContentType(""type*"")]
 "}
             };
@@ -315,7 +315,7 @@ using Umbraco.ModelsBuilder;
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 [assembly:IgnoreContentType(""type1"")]
 "}
             };
@@ -371,7 +371,7 @@ using Umbraco.ModelsBuilder;
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 [assembly:IgnoreContentType(""type1"")]
 "}
             };
@@ -428,7 +428,7 @@ using Umbraco.ModelsBuilder;
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 [assembly:RenameContentType(""type1"", ""Renamed1"")]
 "}
             };
@@ -487,7 +487,7 @@ using Umbraco.ModelsBuilder;
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 namespace Models
 {
     [ImplementContentType(""type1"")]
@@ -556,7 +556,7 @@ namespace Models
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 using Dang;
 namespace Dang
 {
@@ -637,7 +637,7 @@ namespace Dang
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 namespace Models
 {
     [IgnorePropertyType(""prop1"")]
@@ -702,7 +702,7 @@ namespace Models
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 namespace Models
 {
     [IgnorePropertyType(""prop*"")]
@@ -759,7 +759,7 @@ namespace Models
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 namespace Models
 {
     [IgnorePropertyType(""prop1"")]
@@ -816,7 +816,7 @@ namespace Models
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 namespace Models
 {
     [RenamePropertyType(""prop1"", ""Renamed1"")]
@@ -871,7 +871,7 @@ namespace Models
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 namespace Models
 {
     [RenamePropertyType(""prop1"", ""Renamed1"")]
@@ -930,7 +930,7 @@ namespace Models
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 namespace Models
 {
     public partial class Type1
@@ -984,7 +984,7 @@ namespace Models
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 namespace Models
 {
     public class Type2
@@ -1039,7 +1039,7 @@ namespace Models
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 using Dang;
 namespace Dang
 {
@@ -1127,7 +1127,7 @@ namespace Dang
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 using Dang;
 namespace Dang
 {
@@ -1256,7 +1256,7 @@ namespace Dang
             var code = new Dictionary<string, string>
             {
                 {"assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 using Test;
 namespace Test
 {
@@ -1282,7 +1282,7 @@ namespace Test
 // <auto-generated>
 //   This code was generated by a tool.
 //
-//    Umbraco.ModelsBuilder v" + version + @"
+//    ZpqrtBnk.ModelzBuilder v" + version + @"
 //
 //   Changes to this file will be lost if the code is regenerated.
 // </auto-generated>
@@ -1295,18 +1295,18 @@ using System.Web;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
-using Umbraco.ModelsBuilder;
-using Umbraco.ModelsBuilder.Umbraco;
+using ZpqrtBnk.ModelzBuilder;
+using ZpqrtBnk.ModelzBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedModels
 {
 	// Mixin Content Type with alias ""type1""
 	public partial interface IType1 : IPublishedContent
 	{
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		string Prop1a { get; }
 
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		string Prop1b { get; }
 	}
 
@@ -1315,15 +1315,15 @@ namespace Umbraco.Web.PublishedModels
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		public new const string ModelTypeAlias = ""type1"";
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public new static PublishedContentType GetModelContentType()
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
+		public new static IPublishedContentType GetModelContentType()
 			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
@@ -1334,15 +1334,15 @@ namespace Umbraco.Web.PublishedModels
 
 		// properties
 
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1a"")]
 		public string Prop1a => GetProp1a(this);
 
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1b"")]
 		public string Prop1b => GetProp1b(this);
 
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		public static string GetProp1b(IType1 that) => that.Value<string>(""prop1b"");
 	}
 }
@@ -1350,7 +1350,7 @@ namespace Umbraco.Web.PublishedModels
 // <auto-generated>
 //   This code was generated by a tool.
 //
-//    Umbraco.ModelsBuilder v" + version + @"
+//    ZpqrtBnk.ModelzBuilder v" + version + @"
 //
 //   Changes to this file will be lost if the code is regenerated.
 // </auto-generated>
@@ -1363,8 +1363,8 @@ using System.Web;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
-using Umbraco.ModelsBuilder;
-using Umbraco.ModelsBuilder.Umbraco;
+using ZpqrtBnk.ModelzBuilder;
+using ZpqrtBnk.ModelzBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedModels
 {
@@ -1373,15 +1373,15 @@ namespace Umbraco.Web.PublishedModels
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		public new const string ModelTypeAlias = ""type2"";
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public new static PublishedContentType GetModelContentType()
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
+		public new static IPublishedContentType GetModelContentType()
 			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
@@ -1392,15 +1392,15 @@ namespace Umbraco.Web.PublishedModels
 
 		// properties
 
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop2"")]
 		public int Prop2 => this.Value<int>(""prop2"");
 
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1a"")]
 		public string Prop1a => Umbraco.Web.PublishedModels.Type1.GetProp1a(this);
 
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1b"")]
 		public string Prop1b => Umbraco.Web.PublishedModels.Type1.GetProp1b(this);
 	}
@@ -1451,7 +1451,7 @@ namespace Umbraco.Web.PublishedModels
 // <auto-generated>
 //   This code was generated by a tool.
 //
-//    Umbraco.ModelsBuilder v" + version + @"
+//    ZpqrtBnk.ModelzBuilder v" + version + @"
 //
 //   Changes to this file will be lost if the code is regenerated.
 // </auto-generated>
@@ -1464,8 +1464,8 @@ using System.Web;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
-using Umbraco.ModelsBuilder;
-using Umbraco.ModelsBuilder.Umbraco;
+using ZpqrtBnk.ModelzBuilder;
+using ZpqrtBnk.ModelzBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedModels
 {
@@ -1474,15 +1474,15 @@ namespace Umbraco.Web.PublishedModels
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		public new const string ModelTypeAlias = ""type1"";
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public new static PublishedContentType GetModelContentType()
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
+		public new static IPublishedContentType GetModelContentType()
 			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
@@ -1493,7 +1493,7 @@ namespace Umbraco.Web.PublishedModels
 
 		// properties
 
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1"")]
 		public string Prop1 => this.Value<string>(""prop1"");
 	}
@@ -1568,7 +1568,7 @@ namespace Umbraco.Web.PublishedModels
 // <auto-generated>
 //   This code was generated by a tool.
 //
-//    Umbraco.ModelsBuilder v" + version + @"
+//    ZpqrtBnk.ModelzBuilder v" + version + @"
 //
 //   Changes to this file will be lost if the code is regenerated.
 // </auto-generated>
@@ -1581,8 +1581,8 @@ using System.Web;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
-using Umbraco.ModelsBuilder;
-using Umbraco.ModelsBuilder.Umbraco;
+using ZpqrtBnk.ModelzBuilder;
+using ZpqrtBnk.ModelzBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedModels
 {
@@ -1591,15 +1591,15 @@ namespace Umbraco.Web.PublishedModels
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		public new const string ModelTypeAlias = ""type1"";
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public new static PublishedContentType GetModelContentType()
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
+		public new static IPublishedContentType GetModelContentType()
 			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
@@ -1610,7 +1610,7 @@ namespace Umbraco.Web.PublishedModels
 
 		// properties
 
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""foo"")]
 		public IEnumerable<Foo> Foo => this.Value<IEnumerable<Foo>>(""foo"");
 	}
@@ -1644,7 +1644,7 @@ namespace Umbraco.Web.PublishedModels
             var code = new Dictionary<string, string>
             {
                 { "assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -1682,7 +1682,7 @@ public partial class Type1
 // <auto-generated>
 //   This code was generated by a tool.
 //
-//    Umbraco.ModelsBuilder v" + version + @"
+//    ZpqrtBnk.ModelzBuilder v" + version + @"
 //
 //   Changes to this file will be lost if the code is regenerated.
 // </auto-generated>
@@ -1695,8 +1695,8 @@ using System.Web;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
-using Umbraco.ModelsBuilder;
-using Umbraco.ModelsBuilder.Umbraco;
+using ZpqrtBnk.ModelzBuilder;
+using ZpqrtBnk.ModelzBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedModels
 {
@@ -1705,21 +1705,21 @@ namespace Umbraco.Web.PublishedModels
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		public new const string ModelTypeAlias = ""type1"";
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public new static PublishedContentType GetModelContentType()
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
+		public new static IPublishedContentType GetModelContentType()
 			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
 		// properties
 
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1"")]
 		public string Prop1 => this.Value<string>(""prop1"");
 	}
@@ -1753,7 +1753,7 @@ namespace Umbraco.Web.PublishedModels
             var code = new Dictionary<string, string>
             {
                 { "assembly", @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -1794,7 +1794,7 @@ public partial class Type2
 // <auto-generated>
 //   This code was generated by a tool.
 //
-//    Umbraco.ModelsBuilder v" + version + @"
+//    ZpqrtBnk.ModelzBuilder v" + version + @"
 //
 //   Changes to this file will be lost if the code is regenerated.
 // </auto-generated>
@@ -1807,8 +1807,8 @@ using System.Web;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
-using Umbraco.ModelsBuilder;
-using Umbraco.ModelsBuilder.Umbraco;
+using ZpqrtBnk.ModelzBuilder;
+using ZpqrtBnk.ModelzBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedModels
 {
@@ -1818,21 +1818,21 @@ namespace Umbraco.Web.PublishedModels
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		public new const string ModelTypeAlias = ""type1"";
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public new static PublishedContentType GetModelContentType()
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
+		public new static IPublishedContentType GetModelContentType()
 			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
 		// properties
 
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelzBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1"")]
 		public string Prop1 => this.Value<string>(""prop1"");
 	}
@@ -1904,7 +1904,7 @@ namespace Umbraco.Web.PublishedModels
 // <auto-generated>
 //   This code was generated by a tool.
 //
-//    Umbraco.ModelsBuilder v" + version + @"
+//    ZpqrtBnk.ModelzBuilder v" + version + @"
 //
 //   Changes to this file will be lost if the code is regenerated.
 // </auto-generated>
@@ -1955,7 +1955,7 @@ namespace Umbraco.Web.PublishedModels
 
             var parseResult = new CodeParser().Parse(code);
             var builder = new TextBuilder(types, parseResult);
-            builder.ModelsNamespace = "Umbraco.ModelsBuilder.Models"; // forces conflict with Umbraco.ModelsBuilder.Umbraco
+            builder.ModelsNamespace = "ZpqrtBnk.ModelzBuilder.Models"; // forces conflict with ZpqrtBnk.ModelzBuilder.Umbraco
             var btypes = builder.TypeModels;
 
             var sb = new StringBuilder();
@@ -1972,8 +1972,8 @@ namespace Umbraco.Web.PublishedModels
 
         [TestCase("int", typeof(int))]
         [TestCase("IEnumerable<int>", typeof(IEnumerable<int>))]
-        [TestCase("Umbraco.ModelsBuilder.Tests.BuilderTestsClass1", typeof(BuilderTestsClass1))]
-        [TestCase("Umbraco.ModelsBuilder.Tests.BuilderTests.Class1", typeof(Class1))]
+        [TestCase("ZpqrtBnk.ModelzBuilder.Tests.BuilderTestsClass1", typeof(BuilderTestsClass1))]
+        [TestCase("ZpqrtBnk.ModelzBuilder.Tests.BuilderTests.Class1", typeof(Class1))]
         public void WriteClrType(string expected, Type input)
         {
             var builder = new TextBuilder();
@@ -1990,7 +1990,7 @@ namespace Umbraco.Web.PublishedModels
         public void WriteClrTypeUsing(string expected, Type input)
         {
             var builder = new TextBuilder();
-            builder.Using.Add("Umbraco.ModelsBuilder.Tests");
+            builder.Using.Add("ZpqrtBnk.ModelzBuilder.Tests");
             builder.ModelsNamespaceForTests = "ModelsNamespace";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, input);
@@ -2002,7 +2002,7 @@ namespace Umbraco.Web.PublishedModels
         {
             var builder = new TextBuilder();
             builder.Using.Add("System.Text");
-            builder.ModelsNamespaceForTests = "Umbraco.ModelsBuilder.Tests.Models";
+            builder.ModelsNamespaceForTests = "ZpqrtBnk.ModelzBuilder.Tests.Models";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, typeof(StringBuilder));
             Assert.AreEqual("StringBuilder", sb.ToString());
@@ -2012,7 +2012,7 @@ namespace Umbraco.Web.PublishedModels
         public void WriteClrTypeAnother_WithoutUsing()
         {
             var builder = new TextBuilder();
-            builder.ModelsNamespaceForTests = "Umbraco.ModelsBuilder.Tests.Models";
+            builder.ModelsNamespaceForTests = "ZpqrtBnk.ModelzBuilder.Tests.Models";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, typeof(StringBuilder));
             Assert.AreEqual("System.Text.StringBuilder", sb.ToString());
@@ -2023,7 +2023,7 @@ namespace Umbraco.Web.PublishedModels
         {
             var builder = new TextBuilder();
             builder.Using.Add("System.Text");
-            builder.Using.Add("Umbraco.ModelsBuilder.Tests");
+            builder.Using.Add("ZpqrtBnk.ModelzBuilder.Tests");
             builder.ModelsNamespaceForTests = "SomeRandomNamespace";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, typeof(System.Text.ASCIIEncoding));
@@ -2037,7 +2037,7 @@ namespace Umbraco.Web.PublishedModels
         {
             var builder = new TextBuilder();
             builder.Using.Add("System.Text");
-            builder.Using.Add("Umbraco.ModelsBuilder.Tests");
+            builder.Using.Add("ZpqrtBnk.ModelzBuilder.Tests");
             builder.ModelsNamespaceForTests = "SomeBorkedNamespace";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, typeof(System.Text.ASCIIEncoding));
@@ -2051,13 +2051,13 @@ namespace Umbraco.Web.PublishedModels
         {
             var builder = new TextBuilder();
             builder.Using.Add("System.Text");
-            builder.Using.Add("Umbraco.ModelsBuilder.Tests");
+            builder.Using.Add("ZpqrtBnk.ModelzBuilder.Tests");
             builder.ModelsNamespaceForTests = "SomeRandomNamespace";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, typeof(ASCIIEncoding));
 
             // full type name is needed but not global::
-            Assert.AreEqual("Umbraco.ModelsBuilder.Tests.ASCIIEncoding", sb.ToString());
+            Assert.AreEqual("ZpqrtBnk.ModelzBuilder.Tests.ASCIIEncoding", sb.ToString());
         }
 
         [Test]
@@ -2065,8 +2065,8 @@ namespace Umbraco.Web.PublishedModels
         {
             var builder = new TextBuilder();
             builder.Using.Add("System.Text");
-            builder.Using.Add("Umbraco.ModelsBuilder.Tests");
-            builder.ModelsNamespaceForTests = "Umbraco.ModelsBuilder.Tests.Models";
+            builder.Using.Add("ZpqrtBnk.ModelzBuilder.Tests");
+            builder.ModelsNamespaceForTests = "ZpqrtBnk.ModelzBuilder.Tests.Models";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, typeof(ASCIIEncoding));
 
@@ -2079,13 +2079,13 @@ namespace Umbraco.Web.PublishedModels
         {
             var builder = new TextBuilder();
             builder.Using.Add("System.Text");
-            builder.Using.Add("Umbraco.ModelsBuilder.Tests");
+            builder.Using.Add("ZpqrtBnk.ModelzBuilder.Tests");
             builder.ModelsNamespaceForTests = "SomeRandomNamespace";
             var sb = new StringBuilder();
             builder.WriteClrType(sb, typeof(ASCIIEncoding.Nested));
 
             // full type name is needed but not global::
-            Assert.AreEqual("Umbraco.ModelsBuilder.Tests.ASCIIEncoding.Nested", sb.ToString());
+            Assert.AreEqual("ZpqrtBnk.ModelzBuilder.Tests.ASCIIEncoding.Nested", sb.ToString());
         }
 
         public class Class1 { }

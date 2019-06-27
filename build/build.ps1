@@ -151,28 +151,16 @@
   	if (-not $?) { throw "Failed to pack NuGet ZpqrtBnk.ModelzBuilder." }
   })
 
-  $ubuild.DefineMethod("PackageUi",
+  $ubuild.DefineMethod("PackageWeb",
   {
-    Write-Host "Package ZpqrtBnk.ModelzBuilder.Ui"
+    Write-Host "Package ZpqrtBnk.ModelzBuilder.Web"
     $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
     $copyright = "Copyright (C) ZpqrtBnk $((Get-Date).Year)"
-	  &$this.BuildEnv.NuGet pack "$nuspecs\ZpqrtBnk.ModelzBuilder.Ui.nuspec" `
+	  &$this.BuildEnv.NuGet pack "$nuspecs\ZpqrtBnk.ModelzBuilder.Web.nuspec" `
 	    -Properties copyright="$Copyright"`;solution="$($this.SolutionRoot)" `
 	    -Version "$($this.Version.Semver.ToString())" `
-	    -Verbosity detailed -OutputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.ui.log"
-  	if (-not $?) { throw "Failed to pack NuGet ZpqrtBnk.ModelzBuilder.Ui." }
-  })
-
-  $ubuild.DefineMethod("PackageApi",
-  {
-    Write-Host "Package ZpqrtBnk.ModelzBuilder.Api"
-    $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
-    $copyright = "Copyright (C) ZpqrtBnk $((Get-Date).Year)"
-	  &$this.BuildEnv.NuGet pack "$nuspecs\ZpqrtBnk.ModelzBuilder.Api.nuspec" `
-      -Properties copyright="$Copyright"`;solution="$($this.SolutionRoot)" `
-	    -Version "$($this.Version.Semver.ToString())" `
-	    -Verbosity detailed -OutputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.api.log"
-  	if (-not $?) { throw "Failed to pack NuGet ZpqrtBnk.ModelzBuilder.Api." }
+	    -Verbosity detailed -OutputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.web.log"
+  	if (-not $?) { throw "Failed to pack NuGet ZpqrtBnk.ModelzBuilder.Web." }
   })
 
   $ubuild.DefineMethod("PackageVsix",
@@ -185,8 +173,8 @@
   $ubuild.DefineMethod("VerifyNuGet",
   {
     $this.VerifyNuGetConsistency(
-      ("ZpqrtBnk.ModelzBuilder", "ZpqrtBnk.ModelzBuilder.Api"),
-      ("ZpqrtBnk.ModelzBuilder", "ZpqrtBnk.ModelzBuilder.Api", "ZpqrtBnk.ModelzBuilder.CustomTool", "ZpqrtBnk.ModelzBuilder.Console"))
+      ("ZpqrtBnk.ModelzBuilder", "ZpqrtBnk.ModelzBuilder.Web"),
+      ("ZpqrtBnk.ModelzBuilder", "ZpqrtBnk.ModelzBuilder.Web", "ZpqrtBnk.ModelzBuilder.CustomTool", "ZpqrtBnk.ModelzBuilder.Console"))
   })
 
   $ubuild.DefineMethod("PostPackageHook",
@@ -212,9 +200,7 @@
     if ($this.OnError()) { return }
     $this.PackageCore()
     if ($this.OnError()) { return }
-    $this.PackageApi()
-    if ($this.OnError()) { return }
-    $this.PackageUi()
+    $this.PackageWeb()
     if ($this.OnError()) { return }
     $this.PackageVsix()
     if ($this.OnError()) { return }

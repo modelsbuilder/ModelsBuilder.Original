@@ -14,14 +14,9 @@
   <system.web>
 		<compilation>
 		  <assemblies>
-        <add assembly="Umbraco.ModelsBuilder"
+        <add assembly="ZpqrtBnk.ModelzBuilder"
           xdt:Transform="Remove" xdt:Locator="Match(assembly)" />
       </assemblies>
-      <buildProviders>
-        <!-- not supported anymore, so remove from installs, using the *old* naming -->
-        <add extension=".models" type="Umbraco.ModelsBuilder.AspNet.ModelsBuildProvider, Umbraco.ModelsBuilder.AspNet"
-          xdt:Transform="Remove" xdt:Locator="Match(extension,type)"/>
-      </buildProviders>
 		</compilation>
 	</system.web>
 </configuration>

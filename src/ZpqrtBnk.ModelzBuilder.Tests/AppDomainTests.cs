@@ -32,12 +32,12 @@ namespace ZpqrtBnk.ModelzBuilder.Tests
             if (Directory.Exists(bzzt))
                 Directory.Delete(bzzt, true);
             Directory.CreateDirectory(bzzt);
-            var load = Path.Combine(bzzt, "Umbraco.ModelsBuilder.Tests.dll"); // we want to load the copy!
-            File.Copy("Umbraco.ModelsBuilder.Tests.dll", load);
+            var load = Path.Combine(bzzt, "ZpqrtBnk.ModelzBuilder.Tests.dll"); // we want to load the copy!
+            File.Copy("ZpqrtBnk.ModelzBuilder.Tests.dll", load);
 
             // fixme - why do we want copies? why cant we load stuff from where we are?
             // because - we want Umbraco plugin whatever to discover those things properly!
-            File.Copy("Umbraco.ModelsBuilder.dll", Path.Combine(bzzt, "Umbraco.ModelsBuilder.dll")); // REQUIRED if we load copies
+            File.Copy("ZpqrtBnk.ModelzBuilder.dll", Path.Combine(bzzt, "ZpqrtBnk.ModelzBuilder.dll")); // REQUIRED if we load copies
 
             // fixme - notes
             // because we set a root dir to the app which is in appdata
@@ -57,7 +57,7 @@ namespace ZpqrtBnk.ModelzBuilder.Tests
             // fixme - then we MUST copy a bunch of binaries out there!
             var domain = AppDomain.CreateDomain("Test Domain", null, domainSetup);
             // the dll here is relative to the local domain path, not the remote one?!
-            var remote = domain.CreateInstanceFromAndUnwrap(load, "Umbraco.ModelsBuilder.Tests.RemoteObject") as RemoteObject;
+            var remote = domain.CreateInstanceFromAndUnwrap(load, "ZpqrtBnk.ModelzBuilder.Tests.RemoteObject") as RemoteObject;
             var sho = remote.GetSharedObjects();
             Console.WriteLine(remote.GetAppDomainDetails());
             //Console.WriteLine(domain.);
@@ -86,7 +86,7 @@ namespace ZpqrtBnk.ModelzBuilder.Tests
         public IEnumerable<SharedObject> GetSharedObjects()
         {
             // in order for this to work... where should we look into?
-            Assembly.Load("Umbraco.ModelsBuilder");
+            Assembly.Load("ZpqrtBnk.ModelzBuilder");
 
             return new[] { new SharedObject { Value = "hello" } };
         }

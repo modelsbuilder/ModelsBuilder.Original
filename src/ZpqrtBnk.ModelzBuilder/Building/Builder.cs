@@ -40,8 +40,8 @@ namespace ZpqrtBnk.ModelzBuilder.Building
             "Umbraco.Core.Models",
             "Umbraco.Core.Models.PublishedContent",
             "Umbraco.Web",
-            "Umbraco.ModelsBuilder",
-            "Umbraco.ModelsBuilder.Umbraco",
+            "ZpqrtBnk.ModelzBuilder",
+            "ZpqrtBnk.ModelzBuilder.Umbraco",
         };
 
         /// <summary>

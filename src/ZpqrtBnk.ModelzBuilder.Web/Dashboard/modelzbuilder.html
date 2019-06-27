@@ -12,7 +12,7 @@
             <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
 
             <div ng-show="!vm.loading && vm.dashboard">
-                <div ng-bind-html="vm.dashboard.text"></div>
+                <div ng-bind-html="vm.dashboard.text|safe_html"></div>
 
                 <div ng-if="vm.dashboard.outOfDateModels">
                     <p>Models are <strong>out-of-date</strong>.</p>

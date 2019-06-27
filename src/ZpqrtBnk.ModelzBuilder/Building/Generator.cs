@@ -38,7 +38,7 @@ namespace ZpqrtBnk.ModelzBuilder.Building
             // calculate the hash. So... maybe that's not a good idea after all?
             /*
             var currentHash = HashHelper.Hash(ourFiles, typeModels);
-            ourFiles["models.hash.cs"] = $@"using Umbraco.ModelsBuilder;
+            ourFiles["models.hash.cs"] = $@"using ZpqrtBnk.ModelzBuilder;
 [assembly:ModelsBuilderAssembly(SourceHash = ""{currentHash}"")]
 ";
             */

@@ -45,8 +45,8 @@ namespace ZpqrtBnk.ModelzBuilder.Web
                 },
                 Scripts = new[]
                 {
-                    IOHelper.MapPath("~/App_Plugins/ModelzBuilder/modelzbuilder.controller.js"),
-                    IOHelper.MapPath("~/App_Plugins/ModelzBuilder/modelzbuilder.resource.js")
+                    "/App_Plugins/ModelzBuilder/modelzbuilder.controller.js",
+                    "/App_Plugins/ModelzBuilder/modelzbuilder.resource.js"
                 }
             });
         }

@@ -29,11 +29,11 @@
     <file src="$solution$\src\ZpqrtBnk.ModelzBuilder.Web\Dashboard\modelzbuilder.html" target="content\App_Plugins\ModelzBuilder\modelzbuilder.html" />
     <file src="$solution$\src\ZpqrtBnk.ModelzBuilder.Web\Dashboard\modelzbuilder.controller.js" target="content\App_Plugins\ModelzBuilder\modelzbuilder.controller.js" />
     <file src="$solution$\src\ZpqrtBnk.ModelzBuilder.Web\Dashboard\modelzbuilder.resource.js" target="content\App_Plugins\ModelzBuilder\modelzbuilder.resource.js" />
-    <file src="$solution$\src\ZpqrtBnk.ModelzBuilder.Web\Dashboard\package.manifest" target="content\App_Plugins\ModelsBuilder\package.manifest" />
+    <file src="$solution$\src\ZpqrtBnk.ModelzBuilder.Web\Dashboard\lang\en-US.xml" target="content\App_Plugins\ModelzBuilder\lang\en-US.xml" />
 
     <!-- transforms -->
-    <file src="$solution$\build\nuspecs\ModelsBuilder\web.config.install.xdt" target="content" />
-    <file src="$solution$\build\nuspecs\ModelsBuilder\web.config.uninstall.xdt" target="content" />
+    <file src="$solution$\build\Nuspecs\ModelzBuilder\web.config.install.xdt" target="content" />
+    <file src="$solution$\build\Nuspecs\ModelzBuilder\web.config.uninstall.xdt" target="content" />
 
   </files>
 </package>

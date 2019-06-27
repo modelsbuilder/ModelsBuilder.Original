@@ -43,7 +43,7 @@ namespace ZpqrtBnk.ModelzBuilder.Web.Api
         [ApiBasicAuthFilter("settings")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage GetApiVersion()
         {
-            if (!Config.ApiServer)
+            if (!Config.IsApiServer)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API server does not want to talk to you.");
 
             if (!ModelState.IsValid)
@@ -57,7 +57,7 @@ namespace ZpqrtBnk.ModelzBuilder.Web.Api
         [ApiBasicAuthFilter("settings")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage ValidateClientVersion(ValidateClientVersionData data)
         {
-            if (!Config.ApiServer)
+            if (!Config.IsApiServer)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API server does not want to talk to you.");
 
             if (!ModelState.IsValid || data == null || !data.IsValid)
@@ -74,7 +74,7 @@ namespace ZpqrtBnk.ModelzBuilder.Web.Api
         [ApiBasicAuthFilter("settings")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage GetModels(GetModelsData data)
         {
-            if (!Config.ApiServer)
+            if (!Config.IsApiServer)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API server does not want to talk to you.");
 
             if (!ModelState.IsValid || data == null || !data.IsValid)

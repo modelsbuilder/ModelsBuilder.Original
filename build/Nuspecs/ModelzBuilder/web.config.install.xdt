@@ -15,7 +15,7 @@
 		<compilation>
 		  <assemblies xdt:Transform="InsertIfMissing" />
 		  <assemblies>
-        <add assembly="Umbraco.ModelsBuilder"
+        <add assembly="ZpqrtBnk.ModelzBuilder"
           xdt:Transform="InsertIfMissing" xdt:Locator="Match(assembly)" />
 		  </assemblies>
      </compilation>

@@ -27,7 +27,7 @@ namespace ZpqrtBnk.ModelzBuilder.Tests
         public void GetModels()
         {
             const string text1 = @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 
 namespace Umbraco.Demo3.Core.Models
 {
@@ -38,7 +38,7 @@ namespace Umbraco.Demo3.Core.Models
 }
 ";
             const string text2 = @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 
 [assembly:IgnoreContentType(""product"")]
 ";
@@ -49,7 +49,7 @@ using Umbraco.ModelsBuilder;
                 {"file1", text1},
                 {"file2", text2},
             };
-            var res = api.GetModels(ourFiles, "Umbraco.ModelsBuilder.Tests.Models");
+            var res = api.GetModels(ourFiles, "ZpqrtBnk.ModelzBuilder.Tests.Models");
 
             foreach (var kvp in res)
             {

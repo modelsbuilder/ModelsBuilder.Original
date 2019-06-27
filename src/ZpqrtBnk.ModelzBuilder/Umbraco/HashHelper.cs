@@ -13,7 +13,7 @@ namespace ZpqrtBnk.ModelzBuilder.Umbraco
             foreach (var kvp in ourFiles)
                 hash.Add(kvp.Key + "::" + kvp.Value);
 
-            // see Umbraco.ModelsBuilder.Umbraco.Application for what's important to hash
+            // see ZpqrtBnk.ModelzBuilder.Umbraco.Application for what's important to hash
             // ie what comes from Umbraco (not computed by ModelsBuilder) and makes a difference
 
             foreach (var typeModel in typeModels.OrderBy(x => x.Alias))

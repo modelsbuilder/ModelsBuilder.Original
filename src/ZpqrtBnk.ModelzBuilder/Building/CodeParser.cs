@@ -36,7 +36,7 @@ namespace ZpqrtBnk.ModelzBuilder.Building
         {
             SyntaxTree[] trees;
             var compiler = new Compiler { References = references };
-            var compilation = compiler.GetCompilation("Umbraco.ModelsBuilder.Generated", files, out trees);
+            var compilation = compiler.GetCompilation("ZpqrtBnk.ModelzBuilder.Generated", files, out trees);
 
             var disco = new ParseResult();
             foreach (var tree in trees)
@@ -117,11 +117,11 @@ namespace ZpqrtBnk.ModelzBuilder.Building
                 var attrClassName = SymbolDisplay.ToDisplayString(attrClassSymbol);
                 switch (attrClassName)
                 {
-                    case "Umbraco.ModelsBuilder.IgnorePropertyTypeAttribute":
+                    case "ZpqrtBnk.ModelzBuilder.IgnorePropertyTypeAttribute":
                         var propertyAliasToIgnore = (string)attrData.ConstructorArguments[0].Value;
                         disco.SetIgnoredProperty(symbol.Name /*SymbolDisplay.ToDisplayString(symbol)*/, propertyAliasToIgnore);
                         break;
-                    case "Umbraco.ModelsBuilder.RenamePropertyTypeAttribute":
+                    case "ZpqrtBnk.ModelzBuilder.RenamePropertyTypeAttribute":
                         var propertyAliasToRename = (string)attrData.ConstructorArguments[0].Value;
                         var propertyRenamed = (string)attrData.ConstructorArguments[1].Value;
                         disco.SetRenamedProperty(symbol.Name /*SymbolDisplay.ToDisplayString(symbol)*/, propertyAliasToRename, propertyRenamed);
@@ -131,7 +131,7 @@ namespace ZpqrtBnk.ModelzBuilder.Building
                     //    var contentAliasToRename = (string)attrData.ConstructorArguments[0].Value;
                     //    disco.SetRenamedContent(contentAliasToRename, symbol.Name /*SymbolDisplay.ToDisplayString(symbol)*/);
                     //    break;
-                    case "Umbraco.ModelsBuilder.ImplementContentTypeAttribute":
+                    case "ZpqrtBnk.ModelzBuilder.ImplementContentTypeAttribute":
                         var contentAliasToRename = (string)attrData.ConstructorArguments[0].Value;
                         disco.SetRenamedContent(contentAliasToRename, symbol.Name, true /*SymbolDisplay.ToDisplayString(symbol)*/);
                         break;
@@ -153,7 +153,7 @@ namespace ZpqrtBnk.ModelzBuilder.Building
                 // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (attrClassName)
                 {
-                    case "Umbraco.ModelsBuilder.ImplementPropertyTypeAttribute":
+                    case "ZpqrtBnk.ModelzBuilder.ImplementPropertyTypeAttribute":
                         var propertyAliasToIgnore = (string)attrData.ConstructorArguments[0].Value;
                         disco.SetIgnoredProperty(classSymbol.Name /*SymbolDisplay.ToDisplayString(classSymbol)*/, propertyAliasToIgnore);
                         break;
@@ -174,7 +174,7 @@ namespace ZpqrtBnk.ModelzBuilder.Building
                 var attrClassName = SymbolDisplay.ToDisplayString(attrClassSymbol);
                 switch (attrClassName)
                 {
-                    case "Umbraco.ModelsBuilder.IgnoreContentTypeAttribute":
+                    case "ZpqrtBnk.ModelzBuilder.IgnoreContentTypeAttribute":
                         var contentAliasToIgnore = (string)attrData.ConstructorArguments[0].Value;
                         // see notes in IgnoreContentTypeAttribute
                         //var ignoreContent = (bool)attrData.ConstructorArguments[1].Value;
@@ -183,25 +183,25 @@ namespace ZpqrtBnk.ModelzBuilder.Building
                         disco.SetIgnoredContent(contentAliasToIgnore /*, ignoreContent, ignoreMixin, ignoreMixinProperties*/);
                         break;
 
-                    case "Umbraco.ModelsBuilder.RenameContentTypeAttribute":
+                    case "ZpqrtBnk.ModelzBuilder.RenameContentTypeAttribute":
                         var contentAliasToRename = (string) attrData.ConstructorArguments[0].Value;
                         var contentRenamed = (string)attrData.ConstructorArguments[1].Value;
                         disco.SetRenamedContent(contentAliasToRename, contentRenamed, false);
                         break;
 
-                    case "Umbraco.ModelsBuilder.ModelsBaseClassAttribute":
+                    case "ZpqrtBnk.ModelzBuilder.ModelsBaseClassAttribute":
                         var modelsBaseClass = (INamedTypeSymbol) attrData.ConstructorArguments[0].Value;
                         if (modelsBaseClass is IErrorTypeSymbol)
                             throw new Exception($"Invalid base class type \"{modelsBaseClass.Name}\".");
                         disco.SetModelsBaseClassName(SymbolDisplay.ToDisplayString(modelsBaseClass));
                         break;
 
-                    case "Umbraco.ModelsBuilder.ModelsNamespaceAttribute":
+                    case "ZpqrtBnk.ModelzBuilder.ModelsNamespaceAttribute":
                         var modelsNamespace= (string) attrData.ConstructorArguments[0].Value;
                         disco.SetModelsNamespace(modelsNamespace);
                         break;
 
-                    case "Umbraco.ModelsBuilder.ModelsUsingAttribute":
+                    case "ZpqrtBnk.ModelzBuilder.ModelsUsingAttribute":
                         var usingNamespace = (string)attrData.ConstructorArguments[0].Value;
                         disco.SetUsingNamespace(usingNamespace);
                         break;

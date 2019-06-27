@@ -47,12 +47,12 @@ class Test
             Assert.Throws<CompilerException>(() =>
             {
                 compiler = new Compiler(LanguageVersion.CSharp5);
-                compiler.GetCompilation("Umbraco.ModelsBuilder.Generated", files, out trees);
+                compiler.GetCompilation("ZpqrtBnk.ModelzBuilder.Generated", files, out trees);
             });
 
             // works
             compiler = new Compiler();
-            compiler.GetCompilation("Umbraco.ModelsBuilder.Generated", files, out trees);
+            compiler.GetCompilation("ZpqrtBnk.ModelzBuilder.Generated", files, out trees);
         }
 
         [Test]
@@ -62,7 +62,7 @@ class Test
             const string code = @"
 using System; // required to properly define the attribute
 using Foo;
-using Umbraco.ModelsBuilder.Tests;
+using ZpqrtBnk.ModelzBuilder.Tests;
 
 [assembly:AsmAttribute]
 
@@ -180,8 +180,8 @@ namespace Foo
         {
             const string code = @"
 using System.Collections.Generic;
-using Umbraco.ModelsBuilder.Building;
-class MyBuilder : Umbraco.ModelsBuilder.Tests.TestBuilder
+using ZpqrtBnk.ModelzBuilder.Building;
+class MyBuilder : ZpqrtBnk.ModelzBuilder.Tests.TestBuilder
 {
     public MyBuilder(IList<TypeModel> typeModels, ParseResult parseResult)
         : base(typeModels, parseResult)
@@ -202,7 +202,7 @@ class MyBuilder : Umbraco.ModelsBuilder.Tests.TestBuilder
                 .WithStrongNameProvider(new DesktopStrongNameProvider());
 
             var compilation = CSharpCompilation.Create(
-                "Umbraco.ModelsBuilder.RunTests",
+                "ZpqrtBnk.ModelzBuilder.RunTests",
                 syntaxTrees: new[] { tree },
                 references: refs,
                 options: options);
@@ -232,8 +232,8 @@ class MyBuilder : Umbraco.ModelsBuilder.Tests.TestBuilder
         {
             const string code = @"
 using System.Collections.Generic;
-using Umbraco.ModelsBuilder.Building;
-class MyBuilder : Umbraco.ModelsBuilder.Tests.TestBuilder
+using ZpqrtBnk.ModelzBuilder.Building;
+class MyBuilder : ZpqrtBnk.ModelzBuilder.Tests.TestBuilder
 {
     public MyBuilder(IList<TypeModel> typeModels, ParseResult parseResult)
         : base(typeModels, parseResult)
@@ -254,7 +254,7 @@ class MyBuilder : Umbraco.ModelsBuilder.Tests.TestBuilder
                 .WithStrongNameProvider(new DesktopStrongNameProvider());
 
             var compilation = CSharpCompilation.Create(
-                "Umbraco.ModelsBuilder.RunTests",
+                "ZpqrtBnk.ModelzBuilder.RunTests",
                 syntaxTrees: new[] { tree },
                 references: refs,
                 options: options);
@@ -344,7 +344,7 @@ class SimpleClass
         public void ParseTest2()
         {
             const string code = @"
-using Umbraco.ModelsBuilder;
+using ZpqrtBnk.ModelzBuilder;
 
 [assembly: Generator.IgnoreContentType(""ccc"")]
 
@@ -471,7 +471,7 @@ class MyClass
         {
             const string code = @"
 using System.Text; // imports ASCIIEncoding
-using Umbraco.ModelsBuilder.Tests; // imports ASCIIEncoding
+using ZpqrtBnk.ModelzBuilder.Tests; // imports ASCIIEncoding
 namespace SomeCryptoNameThatDoesReallyNotExistEgAGuid
 { }
 ";
@@ -492,8 +492,8 @@ namespace SomeCryptoNameThatDoesReallyNotExistEgAGuid
         {
             const string code = @"
 using System.Text; // imports ASCIIEncoding
-using Umbraco.ModelsBuilder.Tests; // imports ASCIIEncoding
-namespace Umbraco.ModelsBuilder.Tests.Models // forces Umbraco.ModelsBuilder.Tests.ASCIIEncoding
+using ZpqrtBnk.ModelzBuilder.Tests; // imports ASCIIEncoding
+namespace ZpqrtBnk.ModelzBuilder.Tests.Models // forces ZpqrtBnk.ModelzBuilder.Tests.ASCIIEncoding
 { }
 ";
 
@@ -559,7 +559,7 @@ namespace System.Models
         public void SymbolLookup_AmbiguousNamespace4()
         {
             const string code = @"
-namespace Umbraco.ModelsBuilder
+namespace ZpqrtBnk.ModelzBuilder
 {
     public class Test
     {
@@ -574,12 +574,12 @@ namespace Umbraco.ModelsBuilder
             GetSemantic(code, out model, out pos);
 
             // implicit
-            // finds Umbraco.ModelsBuilder.Umbraco
+            // finds ZpqrtBnk.ModelzBuilder.Umbraco
             // but we thought we'd find global Umbraco.Core.Models.IPublishedContent
-            // so it is NOT ambiguous but will not compile because Umbraco.ModelsBuilder.Umbraco.Core... does not exist
+            // so it is NOT ambiguous but will not compile because ZpqrtBnk.ModelzBuilder.Umbraco.Core... does not exist
             var lookup = model.LookupNamespacesAndTypes(pos, null, "Umbraco");
             Assert.AreEqual(1, lookup.Length);
-            Assert.AreEqual("Umbraco.ModelsBuilder.Umbraco", lookup[0].ToDisplayString());
+            Assert.AreEqual("ZpqrtBnk.ModelzBuilder.Umbraco", lookup[0].ToDisplayString());
 
             // fullName => "Umbraco" has to be the top-level namespace
             //  so what the lookup returns must be exactly "Umbraco" else ambiguous
@@ -591,7 +591,7 @@ namespace Umbraco.ModelsBuilder
             SyntaxTree[] trees;
 
             var compiler = new Compiler();
-            var compilation = compiler.GetCompilation("Umbraco.ModelsBuilder.Generated", files, out trees);
+            var compilation = compiler.GetCompilation("ZpqrtBnk.ModelzBuilder.Generated", files, out trees);
             foreach (var diag in compilation.GetDiagnostics())
                 Console.WriteLine(diag);
         }
