@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -13,6 +14,8 @@ namespace Umbraco.ModelsBuilder.CustomTool.CustomTool
     [ComVisible(true)]
     public abstract class UmbracoModelsBuilder : BaseCodeGeneratorWithSite
     {
+        private IVsGeneratorProgress _progress;
+
         #region IVsSingleFileGenerator Members
 
         protected override int Generate(string wszInputFilePath,
@@ -22,54 +25,31 @@ namespace Umbraco.ModelsBuilder.CustomTool.CustomTool
                                     out uint pcbOutput,
                                     IVsGeneratorProgress pGenerateProgress)
         {
-            return GenerateWithPump(wszInputFilePath,
+            var rc = GenerateInternal(wszInputFilePath,
                 //bstrInputFileContents,
                 wszDefaultNamespace,
                 rgbOutputFileContents,
                 out pcbOutput,
-                pGenerateProgress);
-        }
+                pGenerateProgress,
+                out var errMsg);
 
-        // wraps GenerateRaw in a message pump so that Visual Studio
-        // will display the nice "waiting" modal window...
-        private int GenerateWithPump(string wszInputFilePath,
-                                     //string bstrInputFileContents,
-                                     string wszDefaultNamespace,
-                                     IntPtr[] rgbOutputFileContents,
-                                     out uint pcbOutput,
-                                     IVsGeneratorProgress pGenerateProgress)
-        {
-            uint pcbOutput2 = 0;
-            var rc = 0;
-            string errMsg = null;
-
-            VisualStudioHelper.PumpAction("Generating models...", "Please wait while Umbraco.ModelsBuilder generates models.", () =>
-            {
-                rc = GenerateRaw(wszInputFilePath,
-                //bstrInputFileContents,
-                wszDefaultNamespace,
-                rgbOutputFileContents,
-                out pcbOutput2,
-                //pGenerateProgress,
-                out errMsg);
-            });
-
-            // get value back
-            pcbOutput = pcbOutput2;
-
-            // handle error here - cannot do it in PumpAction - ComObject exception
             if (errMsg != null)
                 VisualStudioHelper.ReportError(pGenerateProgress, errMsg);
 
             return rc;
         }
 
-        private int GenerateRaw(string wszInputFilePath,
+        private void Progress(IVsGeneratorProgress progress, uint percent)
+        {
+            progress.Progress(percent, 100);
+        }
+
+        private int GenerateInternal(string wszInputFilePath,
                                 //string bstrInputFileContents,
                                 string wszDefaultNamespace,
                                 IntPtr[] rgbOutputFileContents,
                                 out uint pcbOutput,
-                                //IVsGeneratorProgress pGenerateProgress,
+                                IVsGeneratorProgress pGenerateProgress,
                                 out string errMsg)
         {
             errMsg = null;
@@ -82,54 +62,71 @@ namespace Umbraco.ModelsBuilder.CustomTool.CustomTool
                 if (string.IsNullOrWhiteSpace(wszDefaultNamespace))
                     throw new Exception("No namespace.");
 
+                Progress(pGenerateProgress, 0);
                 VisualStudioHelper.ReportMessage("Starting v{0} {1}.", ApiVersion.Current.Version, DateTime.Now);
 
-                var path = Path.GetDirectoryName(wszInputFilePath) ?? "";
+                // GetSourceItem was an endless source of confusion - this should be better
+                //var vsitem = VisualStudioHelper.GetSourceItem(wszInputFilePath);
+                var sourceItem = GetProjectItem();
 
+                // save project before modifying it
+                var project = sourceItem.ContainingProject;
+                if (!project.Saved)
+                    project.Save();
+                Progress(pGenerateProgress, 5);
+
+                var sourceItemDirectory = Path.GetDirectoryName(wszInputFilePath) ?? "";
+
+                Progress(pGenerateProgress, 10);
                 var options = VisualStudioHelper.GetOptions();
                 options.Validate();
 
+                Progress(pGenerateProgress, 15);
                 var api = new ApiClient(options.UmbracoUrl, options.UmbracoUser, options.UmbracoPassword);
                 api.ValidateClientVersion(); // so we get a meaningful error message first
 
                 // exclude .generated.cs files but don't delete them now, should anything go wrong
-                var ourFiles = Directory.GetFiles(path, "*.cs")
+                Progress(pGenerateProgress, 20);
+                var ourFiles = Directory.GetFiles(sourceItemDirectory, "*.cs")
                     .Where(x => !x.EndsWith(".generated.cs"))
                     .ToDictionary(x => x, File.ReadAllText);
-                var genFiles = api.GetModels(ourFiles, wszDefaultNamespace);
+
+                Progress(pGenerateProgress, 25);
+                var generatedFiles = api.GetModels(ourFiles, wszDefaultNamespace);
 
                 /*
                 VisualStudioHelper.ReportMessage("Found {0} content types in Umbraco.", modelTypes.Count);
                 */
 
-                // GetSourceItem was an endless source of confusion - this should be better
-                //var vsitem = VisualStudioHelper.GetSourceItem(wszInputFilePath);
-                var vsitem = GetProjectItem();
-                VisualStudioHelper.ClearExistingItems(vsitem);
+                Progress(pGenerateProgress, 50);
 
-                foreach (var file in Directory.GetFiles(path, "*.generated.cs"))
+                VisualStudioHelper.ClearExistingItems(sourceItem);
+                Progress(pGenerateProgress, 70);
+
+                var projectDirectory = ((string)sourceItem.ContainingProject.Properties.Item("LocalPath").Value).TrimEnd(Path.DirectorySeparatorChar);
+                var relativePath = sourceItemDirectory.Substring(projectDirectory.Length).TrimStart(Path.DirectorySeparatorChar);
+
+                foreach (var file in Directory.GetFiles(sourceItemDirectory, "*.generated.cs"))
                     File.Delete(file);
-
-                foreach (var file in genFiles)
+                var filenames = new List<string>();
+                foreach (var file in generatedFiles)
                 {
-                    var filename = Path.Combine(path, file.Key + ".generated.cs");
-                    File.WriteAllText(filename, file.Value);
-                    VisualStudioHelper.AddGeneratedItem(vsitem, filename);
+                    var filename = Path.Combine(relativePath, file.Key + ".generated.cs");
+                    filenames.Add(filename);
+                    File.WriteAllText(Path.Combine(projectDirectory, filename), file.Value);
                 }
+                Progress(pGenerateProgress, 80);
 
-                // we need to generate something
-                var code = new StringBuilder();
-                TextHeaderWriter.WriteHeader(code);
-                code.Append("// Umbraco ModelsBuilder\n");
-                code.AppendFormat("// {0:yyyy-MM-ddTHH:mm:ssZ}", DateTime.UtcNow);
+                VisualStudioHelper.AddGeneratedItems(sourceItem, projectDirectory, filenames);
+                Progress(pGenerateProgress, 90);
 
-                var data = Encoding.Default.GetBytes(code.ToString());
-                var ptr = Marshal.AllocCoTaskMem(data.Length);
-                Marshal.Copy(data, 0, ptr, data.Length);
-                pcbOutput = (uint)data.Length;
-                rgbOutputFileContents[0] = ptr;
+                // no need to generate anything
+                pcbOutput = 0;
+                rgbOutputFileContents[0] = IntPtr.Zero;
+                Progress(pGenerateProgress, 95);
 
                 VisualStudioHelper.ReportMessage("Done.");
+                Progress(pGenerateProgress, 100);
             }
             catch (Exception e)
             {

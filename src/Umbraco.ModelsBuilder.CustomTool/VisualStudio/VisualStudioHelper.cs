@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
+using System.Xml;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -112,59 +117,117 @@ namespace Umbraco.ModelsBuilder.CustomTool.VisualStudio
         }
         */
 
+        // https://github.com/dotnet/project-system/issues/1870
+        // "in .NET Standard project I cannot create dependent upon file scenarios with AddFromFile"
+        //
+        // example: https://github.com/meision/Lever/commit/d59b5870ede8142a6073dde6bd0d5b47ea299c6f
+        //
+        // but https://developercommunity.visualstudio.com/content/problem/312523/envdteprojectkind-no-longer-differentiates-between.html
+        // project.Kind does not indicate NetSdk anymore
+        //
+        // so https://github.com/Microsoft/VSProjectSystem/blob/master/doc/automation/detect_whether_a_project_is_a_CPS_project.md
+
+        public static bool IsNetSdkProject(EnvDTE.ProjectItem sourceItem)
+        {
+            // see above, that does not work anymore
+            //return sourceItem.ContainingProject.Kind == vsContextGuids.vsContextGuidNetSdkProject;
+
+            var project = sourceItem.ContainingProject;
+            var hierarchy = ToHierarchy(project);
+            return hierarchy.IsCapabilityMatch("CPS");
+        }
+
+        public static XDocument GetProjectFile(EnvDTE.Project project)
+        {
+            string projectPath = System.IO.Path.Combine((string)project.Properties.Item("LocalPath").Value, (string)project.Properties.Item("FileName").Value);
+            return XDocument.Load(projectPath);
+        }
+
+        public static void SaveProjectFile(EnvDTE.Project project, XDocument projectFile)
+        {
+            string projectPath = System.IO.Path.Combine((string)project.Properties.Item("LocalPath").Value, (string)project.Properties.Item("FileName").Value);
+            projectFile.Save(projectPath);
+        }
+
         public static void ClearExistingItems(EnvDTE.ProjectItem sourceItem)
         {
-            foreach (EnvDTE.ProjectItem existingItem in sourceItem.ProjectItems)
-                existingItem.Remove(); // or, there's .Delete() ?
+            if (IsNetSdkProject(sourceItem))
+            {
+                var sourceIdentity = (string)sourceItem.Properties.Item("Identity").Value;
+                var sourceDirectory = Path.GetDirectoryName(sourceIdentity) + Path.DirectorySeparatorChar;
+                var dependentUpon = Path.GetFileName(sourceIdentity); // cannot be relative
+                var projectFile = GetProjectFile(sourceItem.ContainingProject);
+
+                var items = projectFile.XPathSelectElements($"//ItemGroup/Compile [@Update [starts-with(.,\"{sourceDirectory}\")] and DependentUpon=\"{dependentUpon}\"]");
+                foreach (var item in items.ToList()) // ToList is important! else only the first one is actually removed!
+                    item.Remove();
+
+                SaveProjectFile(sourceItem.ContainingProject, projectFile);
+            }
+            else
+            {
+                foreach (EnvDTE.ProjectItem existingItem in sourceItem.ProjectItems)
+                    existingItem.Remove(); // or, there's .Delete() ?
+            }
         }
 
-        public static void AddGeneratedItem(EnvDTE.ProjectItem sourceItem, string filename)
+        public static void AddGeneratedItems(EnvDTE.ProjectItem sourceItem, string projectPath, IEnumerable<string> filenames)
         {
-            var newItem = sourceItem.ProjectItems.AddFromFile(filename);
-            // build actions
-            // 0 - none
-            // 1 - compile
-            // 2 - content
-            // 3 - embedded resources
-            // ?
-            newItem.Properties.Item("BuildAction").Value = 1;
+            if (IsNetSdkProject(sourceItem))
+            {
+                var sourceIdentity = (string)sourceItem.Properties.Item("Identity").Value;
+                var dependentUpon = Path.GetFileName(sourceIdentity); // cannot be relative
+                var projectFile = GetProjectFile(sourceItem.ContainingProject);
+
+                var itemGroup = projectFile.XPathSelectElements($"//ItemGroup [@Label=\"DependentUpon:ModelsBuilder\"]").FirstOrDefault();
+                if (itemGroup == null)
+                {
+                    itemGroup = XElement.Parse($"<ItemGroup Label=\"DependentUpon:ModelsBuilder\"></ItemGroup>");
+                    projectFile.Root.Add(itemGroup);
+                }
+
+                foreach (var filename in filenames)
+                {
+                    var item = XElement.Parse($"<Compile Update=\"{filename}\"><DesignTime>True</DesignTime><AutoGen>True</AutoGen><DependentUpon>{dependentUpon}</DependentUpon></Compile>");
+                    itemGroup.Add(item);
+                }
+
+                SaveProjectFile(sourceItem.ContainingProject, projectFile);
+            }
+            else
+            {
+                foreach (var filename in filenames)
+                {
+                    var newItem = sourceItem.ProjectItems.AddFromFile(Path.Combine(projectPath, filename));
+                    // build actions
+                    // 0 - none
+                    // 1 - compile
+                    // 2 - content
+                    // 3 - embedded resources
+                    // ?
+                    newItem.Properties.Item("BuildAction").Value = 1;
+                }
+            }
         }
 
-        /*
+        public static IVsSolution GetSolution(EnvDTE.Project project)
+        {
+            var provider = project.DTE as Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
+            var solution = provider.QueryService<SVsSolution>() as IVsSolution;
+            return solution;
+        }
+
         private static IVsHierarchy ToHierarchy(EnvDTE.Project project)
         {
             if (project == null || string.IsNullOrWhiteSpace(project.FileName))
                 throw new ArgumentNullException("project");
 
-            string projectGuid = null;
+            var solution = GetSolution(project);
+            if (solution.GetProjectOfUniqueName(project.UniqueName, out var hierarchy) == 0)
+                return hierarchy;
 
-            // DTE does not expose the project GUID that exists at in the msbuild project file.
-            // Cannot use MSBuild object model because it uses a static instance of the Engine,
-            // and using the Project will cause it to be unloaded from the engine when the
-            // GC collects the variable that we declare.
-            using (var projectReader = XmlReader.Create(project.FileName))
-            {
-                projectReader.MoveToContent();
-
-                if (projectReader.NameTable == null)
-                    throw new Exception("Panic: projectReader.NameTable is null.");
-
-                object nodeName = projectReader.NameTable.Add("ProjectGuid");
-                while (projectReader.Read())
-                {
-                    if (!Equals(projectReader.LocalName, nodeName)) continue;
-
-                    projectGuid = projectReader.ReadElementContentAsString();
-                    break;
-                }
-            }
-            if (projectGuid == null)
-                throw new Exception("Panic: projectGuid is null.");
-
-            IServiceProvider serviceProvider = new ServiceProvider(project.DTE as Microsoft.VisualStudio.OLE.Interop.IServiceProvider);
-            return VsShellUtilities.GetHierarchy(serviceProvider, new Guid(projectGuid));
+            throw new Exception("Panic: failed to get hierarchy.");
         }
-        */
 
         // see http://msdn.microsoft.com/fr-fr/library/microsoft.visualstudio.shell.interop.ivsgeneratorprogress.generatorerror%28v=vs.90%29.aspx
         // level is ignored, line should be -1 if not specified

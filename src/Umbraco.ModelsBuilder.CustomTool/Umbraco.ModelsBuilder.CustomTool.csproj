@@ -62,6 +62,7 @@
     <Compile Include="CustomTool\BaseCodeGeneratorWithSite.cs" />
     <Compile Include="CustomTool\UmbracoModelsBuilder.cs" />
     <Compile Include="CustomTool\UmbracoCSharpModelsBuilder.cs" />
+    <Compile Include="VisualStudio\vsContextGuids.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="UmbracoModelsBuilder.cs" />
