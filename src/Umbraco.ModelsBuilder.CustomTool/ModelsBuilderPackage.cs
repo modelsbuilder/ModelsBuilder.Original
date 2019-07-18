@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Threading;
+using EnvDTE;
+using EnvDTE80;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Design.Serialization;
@@ -40,8 +42,9 @@ namespace Umbraco.ModelsBuilder.CustomTool
     // register the generator
     [ProvideObject(typeof(UmbracoCSharpModelsBuilder))]
     [ProvideGenerator(typeof(UmbracoCSharpModelsBuilder), "UmbracoModelsBuilder", "Umbraco ModelsBuilder Custom Tool for C#", "{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}", true)] // csharp
+    [ProvideMenuResource("Menus.ctmenu", 1)]
 
-    public sealed class CustomToolPackage : AsyncPackage, IVsSolutionEvents
+    public sealed class ModelsBuilderPackage : AsyncPackage, IVsSolutionEvents
     {
         /// <summary>
         /// Default constructor of the package.
@@ -50,13 +53,15 @@ namespace Umbraco.ModelsBuilder.CustomTool
         /// not sited yet inside Visual Studio environment. The place to do all the other 
         /// initialization is the Initialize method.
         /// </summary>
-        public CustomToolPackage()
+        public ModelsBuilderPackage()
         {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }
 
         //OptionsDialog Options
         //    => GetDialogPage(typeof(OptionsDialog)) as OptionsDialog;
+
+        public DTE2 Dte { get; private set; }
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -72,9 +77,11 @@ namespace Umbraco.ModelsBuilder.CustomTool
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
+            await BuildModelsCommand.InitializeAsync(this);
 
             //var dte = await GetServiceAsync(typeof(DTE)) as DTE;
             //VisualStudioHelper.DTE = dte;
+            Dte = await GetServiceAsync(typeof(DTE)) as DTE2;
         }
 
         #region IVsSolutionEvents

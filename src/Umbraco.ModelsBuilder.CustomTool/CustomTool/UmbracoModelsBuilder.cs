@@ -120,17 +120,29 @@ namespace Umbraco.ModelsBuilder.CustomTool.CustomTool
                 VisualStudioHelper.AddGeneratedItems(sourceItem, projectDirectory, filenames);
                 Progress(pGenerateProgress, 90);
 
-                // no *do* need to generate something
+                // we *do* need to generate something
                 // else Visual Studio reports an error
                 var code = new StringBuilder();
                 TextHeaderWriter.WriteHeader(code);
                 code.Append("// Umbraco ModelsBuilder\n");
-                code.AppendFormat("// {0:yyyy-MM-ddTHH:mm:ssZ}", DateTime.UtcNow);
+                code.AppendFormat("// {0:yyyy-MM-ddTHH:mm:ssZ}\n\n", DateTime.UtcNow);
                 var data = Encoding.Default.GetBytes(code.ToString());
                 var ptr = Marshal.AllocCoTaskMem(data.Length);
                 Marshal.Copy(data, 0, ptr, data.Length);
                 pcbOutput = (uint)data.Length;
                 rgbOutputFileContents[0] = ptr;
+
+                // fixme
+                // on NetSdk project, we have modified the csproj - but not reloaded it
+                // and returning something here, will modify the project in Visual Studio
+                // which will then try to reload the modified csproj = conflict
+                // how can we force-reload the project before we return?
+                project.DTE.ExecuteCommand("Project.ReloadProject"); // but, must unload first = slow?!
+                //
+                // if we don't return something we have an error
+                // if we *do* return something, it conflicts with the changes we have made to the csproj
+                // if we make it a command (vs a generator) we are totally in charge
+                // but, how can we make sure that the command only shows on 1 file? foo.models
 
                 Progress(pGenerateProgress, 95);
 

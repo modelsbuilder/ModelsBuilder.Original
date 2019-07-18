@@ -1,0 +1,6 @@
+﻿; icons
+; see also: https://github.com/madskristensen/FileIcons
+; and use KnownMonitors Explorer
+
+[$RootKey$\ShellFileAssociations\.mb]
+"DefaultIconMoniker"="KnownMonikers.GenerateFile"

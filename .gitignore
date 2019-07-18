@@ -9,6 +9,7 @@ refs
 /build/Debug
 /build/Release
 /Umbraco.ModelsBuilder.Console/build
+/src/Umbraco.ModelsBuilder.CustomTool/ItemTemplate.Etc/Umbraco Models.zip
 /lib/umbraco*
 /debug/
 /Umbraco.ModelsBuilder.Tests/App_Data/
