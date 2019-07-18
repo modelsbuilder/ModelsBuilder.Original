@@ -160,12 +160,12 @@
     <ProjectReference Include="..\Umbraco.ModelsBuilder.Api\Umbraco.ModelsBuilder.Api.csproj">
       <Project>{2317be7f-1723-4512-b863-5b6835e583a2}</Project>
       <Name>Umbraco.ModelsBuilder.Api</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.ModelsBuilder\Umbraco.ModelsBuilder.csproj">
       <Project>{998fb014-303a-4146-b3e4-b927bab0210f}</Project>
       <Name>Umbraco.ModelsBuilder</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
