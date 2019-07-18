@@ -120,9 +120,18 @@ namespace Umbraco.ModelsBuilder.CustomTool.CustomTool
                 VisualStudioHelper.AddGeneratedItems(sourceItem, projectDirectory, filenames);
                 Progress(pGenerateProgress, 90);
 
-                // no need to generate anything
-                pcbOutput = 0;
-                rgbOutputFileContents[0] = IntPtr.Zero;
+                // no *do* need to generate something
+                // else Visual Studio reports an error
+                var code = new StringBuilder();
+                TextHeaderWriter.WriteHeader(code);
+                code.Append("// Umbraco ModelsBuilder\n");
+                code.AppendFormat("// {0:yyyy-MM-ddTHH:mm:ssZ}", DateTime.UtcNow);
+                var data = Encoding.Default.GetBytes(code.ToString());
+                var ptr = Marshal.AllocCoTaskMem(data.Length);
+                Marshal.Copy(data, 0, ptr, data.Length);
+                pcbOutput = (uint)data.Length;
+                rgbOutputFileContents[0] = ptr;
+
                 Progress(pGenerateProgress, 95);
 
                 VisualStudioHelper.ReportMessage("Done.");
