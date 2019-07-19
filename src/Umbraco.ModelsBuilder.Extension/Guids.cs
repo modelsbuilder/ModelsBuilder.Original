@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Umbraco.ModelsBuilder.CustomTool
+namespace Umbraco.ModelsBuilder.Extension
 {
     static class GuidList
     {

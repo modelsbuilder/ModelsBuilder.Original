@@ -6,8 +6,8 @@
 //     MySql.Data.MySqlClient
 //
 // Then on this file,
-//   set CustomToolNameSpace (in properties) to whatever
-//   set CustomTool (in properties) to UmbracoModelsBuilder
+//   set ExtensionNameSpace (in properties) to whatever
+//   set Extension (in properties) to UmbracoModelsBuilder
 // And save => will generate items underneath.
 
 // no need to have actual code in here, although it is possible

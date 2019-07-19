@@ -25,7 +25,7 @@
 
   <!--The Commands section is where commands, menus, and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
-  <Commands package="guidCustomToolPackage">
+  <Commands package="guidExtensionPackage">
     <!-- Inside this section we have different sub-sections: one for the menus, another
     for the menu groups, one for the buttons (the actual commands), one for the combos
     and the last one for the bitmaps used. Each element is identified by a command id that
@@ -44,7 +44,7 @@
          must be a menu. -->
 
     <Groups>
-      <Group guid="guidCustomToolPackageCmdSet" id="MyMenuGroup" priority="0x0600">
+      <Group guid="guidExtensionPackageCmdSet" id="MyMenuGroup" priority="0x0600">
         <!-- <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS"/> -->
         <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ITEMNODE"/>
       </Group>
@@ -64,8 +64,8 @@
           https://docs.microsoft.com/en-us/visualstudio/extensibility/command-flag-element
       -->
       
-      <Button guid="guidCustomToolPackageCmdSet" id="BuildModelsCommand" priority="0x0100" type="Button">
-        <Parent guid="guidCustomToolPackageCmdSet" id="MyMenuGroup" />
+      <Button guid="guidExtensionPackageCmdSet" id="BuildModelsCommand" priority="0x0100" type="Button">
+        <Parent guid="guidExtensionPackageCmdSet" id="MyMenuGroup" />
         <Icon guid="ImageCatalogGuid" id="Event" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -83,10 +83,10 @@
 
   <Symbols>
     <!-- This is the package guid. -->
-    <GuidSymbol name="guidCustomToolPackage" value="{6a4c1726-440f-4b2d-a2e5-711277da6099}" />
+    <GuidSymbol name="guidExtensionPackage" value="{6a4c1726-440f-4b2d-a2e5-711277da6099}" />
 
     <!-- This is the guid used to group the menu commands together -->
-    <GuidSymbol name="guidCustomToolPackageCmdSet" value="{84e96047-2ab3-4a6b-bbbb-ccc65b541fbe}">
+    <GuidSymbol name="guidExtensionPackageCmdSet" value="{84e96047-2ab3-4a6b-bbbb-ccc65b541fbe}">
       <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="BuildModelsCommand" value="0x0100" />
     </GuidSymbol>

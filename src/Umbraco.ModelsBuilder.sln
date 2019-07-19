@@ -5,8 +5,8 @@ VisualStudioVersion = 16.0.29006.145
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{C7535949-9EEE-4711-8351-0CA8EB32DBE6}"
 	ProjectSection(SolutionItems) = preProject
-		license.txt = license.txt
-		readme.md = readme.md
+		..\license.txt = ..\license.txt
+		..\readme.md = ..\readme.md
 		SolutionInfo.cs = SolutionInfo.cs
 	EndProjectSection
 EndProject
@@ -40,7 +40,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder", "Um
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.Tests", "Umbraco.ModelsBuilder.Tests\Umbraco.ModelsBuilder.Tests.csproj", "{CF597D44-04EA-4FD7-89C8-E4849D1355C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.CustomTool", "Umbraco.ModelsBuilder.CustomTool\Umbraco.ModelsBuilder.CustomTool.csproj", "{0419A43D-78C2-46C9-95A9-2470F224D60F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.Extension", "Umbraco.ModelsBuilder.Extension\Umbraco.ModelsBuilder.Extension.csproj", "{0419A43D-78C2-46C9-95A9-2470F224D60F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.Console", "Umbraco.ModelsBuilder.Console\Umbraco.ModelsBuilder.Console.csproj", "{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}"
 EndProject

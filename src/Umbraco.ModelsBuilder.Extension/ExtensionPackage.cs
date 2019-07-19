@@ -7,11 +7,10 @@ using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Design.Serialization;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
 
-namespace Umbraco.ModelsBuilder.CustomTool
+namespace Umbraco.ModelsBuilder.Extension
 {
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
@@ -43,7 +42,7 @@ namespace Umbraco.ModelsBuilder.CustomTool
 
     [ProvideAutoLoad(UIContextGuids80.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
 
-    public sealed class ModelsBuilderPackage : AsyncPackage, IVsSolutionEvents
+    public sealed class ExtensionPackage : AsyncPackage, IVsSolutionEvents
     {
         /// <summary>
         /// Default constructor of the package.
@@ -52,7 +51,7 @@ namespace Umbraco.ModelsBuilder.CustomTool
         /// not sited yet inside Visual Studio environment. The place to do all the other 
         /// initialization is the Initialize method.
         /// </summary>
-        public ModelsBuilderPackage()
+        public ExtensionPackage()
         {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }

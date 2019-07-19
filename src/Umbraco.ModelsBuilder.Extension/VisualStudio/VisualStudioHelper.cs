@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using EnvDTE;
@@ -12,113 +11,10 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Umbraco.ModelsBuilder.CustomTool.VisualStudio
+namespace Umbraco.ModelsBuilder.Extension.VisualStudio
 {
     class VisualStudioHelper
     {
-        // GetSourceItem was an endless source of confusion
-
-        /*
-
-        private static readonly string[] ExcludedProjectKinds =
-        {
-            EnvDTE.Constants.vsProjectKindSolutionItems.ToLowerInvariant(), // see [#49]
-            "{E24C65DC-7377-472B-9ABA-BC803B73C61A}".ToLowerInvariant(), // see [#31]
-        };
-
-        private static string GetProjectName(EnvDTE.Project project)
-        {
-            try
-            {
-                return project.Name;
-            }
-            catch
-            {
-                return "(throws)";
-            }
-        }
-
-        public static EnvDTE.ProjectItem GetSourceItem(string inputFilePath)
-        {
-            var dte = (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
-
-            var pdwPriority = new VSDOCUMENTPRIORITY[1];
-            uint itemId = 0;
-            var vsProject = dte.Solution.Projects
-                // process the project
-                .Cast<EnvDTE.Project>()
-                // exclude project types that are know to cause ToHierarchy to throw
-                .Where(p =>
-                {
-                    var exclude = ExcludedProjectKinds.Contains(p.Kind.ToLowerInvariant());
-                    if (!exclude) return true;
-
-                    var msg = string.Format("Skipping project at \"{0}\" named \"{1}\" of kind \"{2}\" (excluded kind).",
-                        p.FileName, GetProjectName(p), p.Kind);
-                    ReportMessage(msg);
-                    return false;
-                })
-                // exclude projet types that don't have a filename (ToHierarchy cannot work)
-                .Where(p =>
-                {
-                    var exclude = string.IsNullOrWhiteSpace(p.FileName);
-                    if (!exclude) return true;
-
-                    var msg = string.Format("Skipping project at \"{0}\" named \"{1}\" of kind \"{2}\" (empty filename).",
-                        p.FileName, GetProjectName(p), p.Kind);
-                    ReportMessage(msg);
-                    return false;
-                })
-                // try...catch ToHierarchy, in case it's a project type we should have excluded
-                .Select(x =>
-                {
-                    try
-                    {
-                        return ToHierarchy(x);
-                    }
-                    catch (Exception e)
-                    {
-                        var errmsg = string.Format("Failed to process project at \"{0}\" named \"{1}\" of kind \"{2}\" (see inner exception).",
-                            x.FileName, GetProjectName(x), x.Kind);
-
-                        // what shall we do? throwing is not nice neither required, but it's the
-                        // only way we can add project kinds to our exclude list... for the time
-                        // being, be a pain to everybody and throw
-                        throw new Exception(errmsg, e);
-                        //ReportMessage(errmsg);
-                        //return null;
-                    }
-                })
-                // when ToHierachy has thrown, all we have is null
-                .Where(x => x != null)
-                // process the IVsProject
-                .Cast<IVsProject>()
-                .FirstOrDefault(x =>
-                {
-                    int iFound;
-                    x.IsDocumentInProject(inputFilePath, out iFound, pdwPriority, out itemId);
-                    return iFound != 0 && itemId != 0;
-                });
-
-            if (vsProject == null)
-                throw new Exception("Panic: source file not found in any project.");
-
-            Microsoft.VisualStudio.OLE.Interop.IServiceProvider oleSp;
-            vsProject.GetItemContext(itemId, out oleSp);
-            if (oleSp == null)
-                throw new Exception("Panic: could not retrieve project item.");
-
-            // convert handle to a ProjectItem
-            var sp = new ServiceProvider(oleSp);
-            var sourceItem = sp.GetService(typeof(EnvDTE.ProjectItem)) as EnvDTE.ProjectItem;
-            if (sourceItem == null)
-                throw new Exception("Panic: could not create source item.");
-
-
-            return sourceItem;
-        }
-        */
-
         // https://github.com/dotnet/project-system/issues/1870
         // "in .NET Standard project I cannot create dependent upon file scenarios with AddFromFile"
         //

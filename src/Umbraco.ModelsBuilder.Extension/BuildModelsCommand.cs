@@ -1,16 +1,12 @@
 ﻿using System;
 using System.ComponentModel.Design;
-using System.Globalization;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using Umbraco.ModelsBuilder.CustomTool.VisualStudio;
+using Umbraco.ModelsBuilder.Extension.VisualStudio;
 using Task = System.Threading.Tasks.Task;
 
-namespace Umbraco.ModelsBuilder.CustomTool
+namespace Umbraco.ModelsBuilder.Extension
 {
     /// <summary>
     /// Command handler
@@ -30,7 +26,7 @@ namespace Umbraco.ModelsBuilder.CustomTool
         /// <summary>
         /// VS Package that provides this command, not null.
         /// </summary>
-        private readonly ModelsBuilderPackage _package;
+        private readonly ExtensionPackage _package;
 
         /// <summary>
         /// Project item that supports the command.
@@ -43,7 +39,7 @@ namespace Umbraco.ModelsBuilder.CustomTool
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
         /// <param name="commandService">Command service to add command to, not null.</param>
-        private BuildModelsCommand(ModelsBuilderPackage package, OleMenuCommandService commandService)
+        private BuildModelsCommand(ExtensionPackage package, OleMenuCommandService commandService)
         {
             _package = package ?? throw new ArgumentNullException(nameof(package));
             commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
@@ -68,7 +64,7 @@ namespace Umbraco.ModelsBuilder.CustomTool
         /// Initializes the singleton instance of the command.
         /// </summary>
         /// <param name="package">Owner package, not null.</param>
-        public static async Task InitializeAsync(ModelsBuilderPackage package)
+        public static async Task InitializeAsync(ExtensionPackage package)
         {
             // Switch to the main thread - the call to AddCommand in Command1's constructor requires
             // the UI thread.

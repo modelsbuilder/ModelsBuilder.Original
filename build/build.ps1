@@ -48,7 +48,7 @@
 
     # Edit VSIX
     Write-Host "Update VSIX manifest."
-    $vsixFile = "$($this.SolutionRoot)\src\Umbraco.ModelsBuilder.CustomTool\source.extension.vsixmanifest"
+    $vsixFile = "$($this.SolutionRoot)\src\Umbraco.ModelsBuilder.Extension\source.extension.vsixmanifest"
     [xml] $vsixXml = Get-Content $vsixFile
     $xmlNameTable = New-Object System.Xml.NameTable
     $xmlNameSpace = New-Object System.Xml.XmlNamespaceManager($xmlNameTable)
@@ -177,16 +177,16 @@
 
   $ubuild.DefineMethod("PackageVsix",
   {
-    Write-Host "Package Umbraco.ModelsBuilder.CustomTool"
-  	$this.CopyFile("$($this.SolutionRoot)\build.tmp\bin\Umbraco.ModelsBuilder.CustomTool.vsix",
-	    "$($this.BuildOutput)\Umbraco.ModelsBuilder.CustomTool-$($this.Version.Semver.ToString()).vsix")
+    Write-Host "Package Umbraco.ModelsBuilder.Extension"
+  	$this.CopyFile("$($this.SolutionRoot)\build.tmp\bin\Umbraco.ModelsBuilder.Extension.vsix",
+	    "$($this.BuildOutput)\Umbraco.ModelsBuilder.Extension-$($this.Version.Semver.ToString()).vsix")
   })
 
   $ubuild.DefineMethod("VerifyNuGet",
   {
     $this.VerifyNuGetConsistency(
       ("Umbraco.ModelsBuilder", "Umbraco.ModelsBuilder.Api"),
-      ("Umbraco.ModelsBuilder", "Umbraco.ModelsBuilder.Api", "Umbraco.ModelsBuilder.CustomTool", "Umbraco.ModelsBuilder.Console"))
+      ("Umbraco.ModelsBuilder", "Umbraco.ModelsBuilder.Api", "Umbraco.ModelsBuilder.Extension", "Umbraco.ModelsBuilder.Console"))
   })
 
   $ubuild.DefineMethod("PostPackageHook",

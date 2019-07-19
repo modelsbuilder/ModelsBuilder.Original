@@ -5,12 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.ModelsBuilder.Api;
-using Umbraco.ModelsBuilder.CustomTool.VisualStudio;
+using Umbraco.ModelsBuilder.Extension.VisualStudio;
 
-namespace Umbraco.ModelsBuilder.CustomTool
+namespace Umbraco.ModelsBuilder.Extension
 {
     public class Generator
     {
