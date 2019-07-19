@@ -11,7 +11,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Umbraco.ModelsBuilder.Extension.VisualStudio
+namespace ZpqrtBnk.ModelsBuilder.Extension.VisualStudio
 {
     class VisualStudioHelper
     {

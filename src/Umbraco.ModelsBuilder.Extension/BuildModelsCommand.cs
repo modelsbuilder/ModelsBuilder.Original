@@ -3,10 +3,10 @@ using System.ComponentModel.Design;
 using System.IO;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
-using Umbraco.ModelsBuilder.Extension.VisualStudio;
+using ZpqrtBnk.ModelsBuilder.Extension.VisualStudio;
 using Task = System.Threading.Tasks.Task;
 
-namespace Umbraco.ModelsBuilder.Extension
+namespace ZpqrtBnk.ModelsBuilder.Extension
 {
     /// <summary>
     /// Command handler

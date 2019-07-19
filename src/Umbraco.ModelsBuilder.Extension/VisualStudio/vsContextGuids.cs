@@ -1,4 +1,4 @@
-﻿namespace Umbraco.ModelsBuilder.Extension.VisualStudio
+﻿namespace ZpqrtBnk.ModelsBuilder.Extension.VisualStudio
 {
     public class vsContextGuids
     {

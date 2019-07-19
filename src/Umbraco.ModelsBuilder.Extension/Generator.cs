@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Umbraco.ModelsBuilder.Api;
-using Umbraco.ModelsBuilder.Extension.VisualStudio;
+using ZpqrtBnk.ModelsBuilder.Extension.VisualStudio;
 
-namespace Umbraco.ModelsBuilder.Extension
+namespace ZpqrtBnk.ModelsBuilder.Extension
 {
     public class Generator
     {

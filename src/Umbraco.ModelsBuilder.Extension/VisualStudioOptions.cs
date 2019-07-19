@@ -5,9 +5,9 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Xml;
-using Umbraco.ModelsBuilder.Extension.VisualStudio;
+using ZpqrtBnk.ModelsBuilder.Extension.VisualStudio;
 
-namespace Umbraco.ModelsBuilder.Extension
+namespace ZpqrtBnk.ModelsBuilder.Extension
 {
     public class VisualStudioOptions
     {
