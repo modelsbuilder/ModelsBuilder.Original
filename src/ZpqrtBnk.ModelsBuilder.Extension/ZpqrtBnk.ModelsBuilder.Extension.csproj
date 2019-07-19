@@ -6,8 +6,8 @@
     <ProjectGuid>{0419A43D-78C2-46C9-95A9-2470F224D60F}</ProjectGuid>
     <ProjectTypeGuids>{82b43b9b-a64c-4715-b499-d71e9ca2bd60};{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <AssemblyName>Umbraco.ModelsBuilder.Extension</AssemblyName>
-    <RootNamespace>Umbraco.ModelsBuilder.Extension</RootNamespace>
+    <AssemblyName>ZpqrtBnk.ModelsBuilder.Extension</AssemblyName>
+    <RootNamespace>ZpqrtBnk.ModelsBuilder.Extension</RootNamespace>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -224,6 +224,6 @@
       <In>@(CommonInfosLines)</In>
       <PackageVersion>$([System.Text.RegularExpressions.Regex]::Match($(In), $(Pattern)))</PackageVersion>
     </PropertyGroup>
-    <Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\Umbraco.ModelsBuilder.Extension.vsix" DestinationFiles="$(SolutionDir)build\$(Configuration)\Umbraco.ModelsBuilder.Extension-$(PackageVersion).vsix" />
+    <Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\ZpqrtBnk.ModelsBuilder.Extension.vsix" DestinationFiles="$(SolutionDir)build\$(Configuration)\ZpqrtBnk.ModelsBuilder.Extension-$(PackageVersion).vsix" />
   </Target>
 </Project>

@@ -40,7 +40,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder", "Um
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.Tests", "Umbraco.ModelsBuilder.Tests\Umbraco.ModelsBuilder.Tests.csproj", "{CF597D44-04EA-4FD7-89C8-E4849D1355C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZpqrtBnk.ModelsBuilder.Extension", "Umbraco.ModelsBuilder.Extension\ZpqrtBnk.ModelsBuilder.Extension.csproj", "{0419A43D-78C2-46C9-95A9-2470F224D60F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZpqrtBnk.ModelsBuilder.Extension", "ZpqrtBnk.ModelsBuilder.Extension\ZpqrtBnk.ModelsBuilder.Extension.csproj", "{0419A43D-78C2-46C9-95A9-2470F224D60F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.ModelsBuilder.Console", "Umbraco.ModelsBuilder.Console\Umbraco.ModelsBuilder.Console.csproj", "{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}"
 EndProject

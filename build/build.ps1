@@ -35,7 +35,7 @@
     @{ Continue = $continue })
   if ($ubuild.OnError()) { return }
 
-  Write-Host "Zbu.ModelsBuilder Build"
+  Write-Host "ZpqrtBnk.ModelsBuilder Build"
   Write-Host "Umbraco.Build v$($ubuild.BuildVersion)"
 
   # ################################################################
@@ -48,7 +48,7 @@
 
     # Edit VSIX
     Write-Host "Update VSIX manifest."
-    $vsixFile = "$($this.SolutionRoot)\src\Umbraco.ModelsBuilder.Extension\source.extension.vsixmanifest"
+    $vsixFile = "$($this.SolutionRoot)\src\ZpqrtBnk.ModelsBuilder.Extension\source.extension.vsixmanifest"
     [xml] $vsixXml = Get-Content $vsixFile
     $xmlNameTable = New-Object System.Xml.NameTable
     $xmlNameSpace = New-Object System.Xml.XmlNamespaceManager($xmlNameTable)
@@ -177,16 +177,16 @@
 
   $ubuild.DefineMethod("PackageVsix",
   {
-    Write-Host "Package Umbraco.ModelsBuilder.Extension"
-  	$this.CopyFile("$($this.SolutionRoot)\build.tmp\bin\Umbraco.ModelsBuilder.Extension.vsix",
-	    "$($this.BuildOutput)\Umbraco.ModelsBuilder.Extension-$($this.Version.Semver.ToString()).vsix")
+    Write-Host "Package ZpqrtBnk.ModelsBuilder.Extension"
+  	$this.CopyFile("$($this.SolutionRoot)\build.tmp\bin\ZpqrtBnk.ModelsBuilder.Extension.vsix",
+	    "$($this.BuildOutput)\ZpqrtBnk.ModelsBuilder.Extension-$($this.Version.Semver.ToString()).vsix")
   })
 
   $ubuild.DefineMethod("VerifyNuGet",
   {
     $this.VerifyNuGetConsistency(
       ("Umbraco.ModelsBuilder", "Umbraco.ModelsBuilder.Api"),
-      ("Umbraco.ModelsBuilder", "Umbraco.ModelsBuilder.Api", "Umbraco.ModelsBuilder.Extension", "Umbraco.ModelsBuilder.Console"))
+      ("Umbraco.ModelsBuilder", "Umbraco.ModelsBuilder.Api", "ZpqrtBnk.ModelsBuilder.Extension", "Umbraco.ModelsBuilder.Console"))
   })
 
   $ubuild.DefineMethod("PostPackageHook",

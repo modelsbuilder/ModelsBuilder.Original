@@ -72,7 +72,7 @@ namespace ZpqrtBnk.ModelsBuilder.Extension
             var parts = path.Split(new[] { Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
             for (var i = 0; i < parts.Length; i++)
             {
-                parts[i] = Building.Compiler.CreateValidIdentifier(parts[i]);
+                parts[i] = Umbraco.ModelsBuilder.Building.Compiler.CreateValidIdentifier(parts[i]);
             }
             return string.Join(".", parts);
         }

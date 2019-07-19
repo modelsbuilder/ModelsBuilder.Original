@@ -15,7 +15,7 @@ _ReSharper.Caches/*
 App_Data/
 
 # build artifact that *has* to be there
-/src/Umbraco.ModelsBuilder.CustomTool/ItemTemplate.Etc/Umbraco Models.zip
+/src/ZpqrtBnk.ModelsBuilder.Extension/ItemTemplate.Etc/Umbraco Models.zip
 
 # build
 build/temp/
