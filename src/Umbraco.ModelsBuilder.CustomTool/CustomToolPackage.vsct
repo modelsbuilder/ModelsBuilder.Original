@@ -60,16 +60,18 @@
       
       <!--To define a menu group you have to specify its ID, the parent menu and its display priority.
           The command is visible and enabled by default. If you need to change the visibility, status, etc, you can use
-          the CommandFlag node. -->
+          the CommandFlag node.
+          https://docs.microsoft.com/en-us/visualstudio/extensibility/command-flag-element
+      -->
       
       <Button guid="guidCustomToolPackageCmdSet" id="BuildModelsCommand" priority="0x0100" type="Button">
         <Parent guid="guidCustomToolPackageCmdSet" id="MyMenuGroup" />
         <Icon guid="ImageCatalogGuid" id="Event" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
         <!--
         <CommandFlag>TextChanges</CommandFlag>
-        <CommandFlag>DefaultInvisible</CommandFlag>
         -->
         <Strings>
           <ButtonText>Build Models</ButtonText>

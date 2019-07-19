@@ -9,7 +9,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Design.Serialization;
 using Microsoft.VisualStudio.Shell.Interop;
-using Umbraco.ModelsBuilder.CustomTool.CustomTool;
 using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.ModelsBuilder.CustomTool
@@ -39,10 +38,10 @@ namespace Umbraco.ModelsBuilder.CustomTool
     [Guid(GuidList.PkgString)]
     //[DefaultRegistryRoot("Software\\Microsoft\\VisualStudio\\11.0")]
 
-    // register the generator
-    [ProvideObject(typeof(UmbracoCSharpModelsBuilder))]
-    [ProvideGenerator(typeof(UmbracoCSharpModelsBuilder), "UmbracoModelsBuilder", "Umbraco ModelsBuilder Custom Tool for C#", "{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}", true)] // csharp
+    // register the command menu
     [ProvideMenuResource("Menus.ctmenu", 1)]
+
+    [ProvideAutoLoad(UIContextGuids80.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
 
     public sealed class ModelsBuilderPackage : AsyncPackage, IVsSolutionEvents
     {

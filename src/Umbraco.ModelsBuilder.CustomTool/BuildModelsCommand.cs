@@ -104,6 +104,8 @@ namespace Umbraco.ModelsBuilder.CustomTool
         private void Execute(object sender, EventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
+
+            /*
             string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
             string title = "BuildModelsCommand";
 
@@ -115,6 +117,14 @@ namespace Umbraco.ModelsBuilder.CustomTool
                 OLEMSGICON.OLEMSGICON_INFO,
                 OLEMSGBUTTON.OLEMSGBUTTON_OK,
                 OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            */
+
+            // on the very first run, _item can be null?!
+            var item = _item ?? VisualStudioHelper.GetProjectItem(_package.Dte);
+
+            // does *not* throw, handles its own errors
+            // including if item is null
+            Generator.Generate(_package, item);
         }
     }
 }

@@ -121,10 +121,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="BuildModelsCommand.cs" />
-    <Compile Include="CustomTool\BaseCodeGenerator.cs" />
-    <Compile Include="CustomTool\BaseCodeGeneratorWithSite.cs" />
-    <Compile Include="CustomTool\UmbracoModelsBuilder.cs" />
-    <Compile Include="CustomTool\UmbracoCSharpModelsBuilder.cs" />
+    <Compile Include="Generator.cs" />
     <Compile Include="VisualStudio\vsContextGuids.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="GlobalSuppressions.cs" />
