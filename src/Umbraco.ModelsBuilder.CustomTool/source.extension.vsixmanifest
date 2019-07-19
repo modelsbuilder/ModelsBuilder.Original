@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="F5C32FC3-6672-4665-803D-6C5D2CAC556A" Version="8.1.0.190626003" Language="en-US" Publisher="ZpqrtBnk" />
-    <DisplayName>Umbraco ModelsBuilder Custom Tool</DisplayName>
-    <Description xml:space="preserve">Umbraco Visual Studio Custom Tool for generating strongly typed IPublishedContent models.</Description>
+    <Identity Id="F5C32FC3-6672-4665-803D-6C5D2CAC556A" Version="8.1.5.190719002" Language="en-US" Publisher="ZpqrtBnk" />
+    <DisplayName>Umbraco ModelsBuilder Extension</DisplayName>
+    <Description xml:space="preserve">Umbraco Visual Studio extension for generating strongly typed models.</Description>
     <MoreInfo>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</MoreInfo>
     <License>license.txt</License>
     <Icon>u32.png</Icon>
@@ -18,29 +18,18 @@
       15.0 is Visual Studio 2017
       16.0 is Visual Studio 2019
     -->
-    <InstallationTarget Version="[15.0,17.0)" Id="Microsoft.VisualStudio.IntegratedShell" />
+    <InstallationTarget Version="[15.0,17.0)" Id="Microsoft.VisualStudio.Community" />
   </Installation>
   <Prerequisites>
-    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,17.0)" />
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,)" />
   </Prerequisites>
   <Dependencies>
     <!-- [4.5-5.0) means "4.5 <= version < 5.0" -->
     <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.7.2,5.0)" />
-    <!--
-      how should we target the proper version, depending on the Visual Studio
-      version we are installing on? or should there be a VSIX per version?
-      temp fixing by removing the dependency...
-    -->
-    <!--
-    <Dependency Id="Microsoft.VisualStudio.MPF.11.0"
-                DisplayName="Visual Studio MPF 11.0"
-                d:Source="Installed"
-                Version="11.0" />
-    -->
   </Dependencies>
   <Assets>
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="File" Path="icons.pkgdef" />
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
-    <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="File" Path="ItemTemplates" TargetVersion="[16.0,17.0)" d:TargetPath="ItemTemplate.Etc\Umbraco Models.zip" />
+    <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="File" Path="ItemTemplates" TargetVersion="[15.0,17.0)" d:TargetPath="ItemTemplate.Etc\Umbraco Models.zip" />
   </Assets>
 </PackageManifest>
