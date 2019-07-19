@@ -1,9 +1,9 @@
 #### Umbraco Models Builder
 
-Copyright (C) Umbraco ZpqrtBnk 2013-2019 
+Copyright (C) Umbraco ZpqrtBnk 2013-2019  
 Distributed under the MIT license  
 
-A tool that can generate a complete set of strongly-typed models for Umbraco. 
+A tool that can generate a complete set of strongly-typed models for Umbraco.  
 Runs either from the Umbraco UI, from the command line, or from Visual Studio.
 
 #### Documentation
