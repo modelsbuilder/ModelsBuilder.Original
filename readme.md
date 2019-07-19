@@ -19,7 +19,7 @@ Models Builder is available:
 * A console application also exists, but is only distributed as source
 
 >Note: a Visual Studio *Custom Tool* is also available on the [Visual Studio MarketPlace](https://marketplace.visualstudio.com/items?itemName=ZpqrtBnk.UmbracoModelsBuilderCustomTool)
-but that tool is now deprecated in favor of the extension. Please refer to the documentation and to this blog post for details.
+but that tool is now deprecated in favor of the extension. Please refer to [this blog post](https://www.zpqrtbnk.net/posts/models-builder-extension/) for details.
 
 #### Versions
 
