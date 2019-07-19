@@ -1,8 +1,0 @@
-if [ -z $1 ]; then
-  cmd //c dir | grep umbraco
-else
-  if [ -d umbraco ]; then
-    cmd //c rmdir umbraco
-  fi
-  cmd //c mklink //j umbraco $1
-fi

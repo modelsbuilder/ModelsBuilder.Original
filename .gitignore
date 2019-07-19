@@ -1,3 +1,4 @@
+# common
 bin
 obj
 pkg
@@ -6,21 +7,17 @@ pkg
 packages
 refs
 *.snk
-/build/Debug
-/build/Release
-/Umbraco.ModelsBuilder.Console/build
-/src/Umbraco.ModelsBuilder.CustomTool/ItemTemplate.Etc/Umbraco Models.zip
-/lib/umbraco*
-/debug/
-/Umbraco.ModelsBuilder.Tests/App_Data/
 .vs/
-build/nuget.exe
-Umbraco.ModelsBuilder/App_Data/NuGetBackup/*
-.Umbraco.ModelsBuilder.boltdata/*
+
+# temp
 *.pdb/
 _ReSharper.Caches/*
 App_Data/
 
+# build artifact that *has* to be there
+/src/Umbraco.ModelsBuilder.CustomTool/ItemTemplate.Etc/Umbraco Models.zip
+
+# build
 build/temp/
 build/hooks/
 build.tmp/
