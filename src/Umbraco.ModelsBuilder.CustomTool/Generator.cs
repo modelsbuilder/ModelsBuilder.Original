@@ -126,30 +126,64 @@ namespace Umbraco.ModelsBuilder.CustomTool
             Progress(sourceItem.DTE, "Get models from server...", 25);
             var generatedFiles = api.GetModels(ourFiles, defaultNameSpace);
 
-            /*
-            VisualStudioHelper.ReportMessage("Found {0} content types in Umbraco.", modelTypes.Count);
-            */
+            // determine project type
+            var isNetSdk = VisualStudioHelper.IsNetSdkProject(sourceItem.ContainingProject);
 
-            // remove existing *.generated.cs files from project
-            Progress(sourceItem.DTE, "Remove old generated files...", 50);
-            VisualStudioHelper.ClearExistingItems(sourceItem);
-
-            // delete existing *.generated.cs files from disk
-            foreach (var file in Directory.GetFiles(sourceItemDirectory, "*.generated.cs"))
-                File.Delete(file);
-
-            // save new *.generated.cs files to disk
-            Progress(sourceItem.DTE, "Add new generated files...", 70);
-            var filenames = new List<string>();
-            foreach (var file in generatedFiles)
+            // have to do things in different order
+            // else for NetSdk weird things (can) happen in VS
+            if (isNetSdk)
             {
-                var filename = Path.Combine(relativePath, file.Key + ".generated.cs");
-                filenames.Add(filename);
-                File.WriteAllText(Path.Combine(projectDirectory, filename), file.Value);
-            }
+                // delete existing *.generated.cs files from disk
+                Progress(sourceItem.DTE, "Remove old generated files...", 50);
+                foreach (var file in Directory.GetFiles(sourceItemDirectory, "*.generated.cs"))
+                    File.Delete(file);
 
-            // add new *.generated.cs files to project
-            VisualStudioHelper.AddGeneratedItems(sourceItem, projectDirectory, filenames);
+                // remove existing *.generated.cs files from project
+                VisualStudioHelper.ClearExistingItems(sourceItem);
+
+                // add new *.generated.cs files to project
+                Progress(sourceItem.DTE, "Add new generated files...", 70);
+                var files = new Dictionary<string, string>();
+                foreach (var file in generatedFiles)
+                {
+                    var filename = Path.Combine(relativePath, file.Key + ".generated.cs");
+                    files[filename] = file.Value;
+                }
+                VisualStudioHelper.AddGeneratedItems(sourceItem, projectDirectory, files.Keys);
+
+                // with that pause here, it works
+                // FIXME could we not pause, and wait for VS to detect the csproj changes?
+                System.Threading.Thread.Sleep(1000);
+
+                // save new *.generated.cs files to disk
+                foreach (var file in files)
+                {
+                    File.WriteAllText(Path.Combine(projectDirectory, file.Key), file.Value);
+                }
+            }
+            else
+            {
+                // remove existing *.generated.cs files from project
+                Progress(sourceItem.DTE, "Remove old generated files...", 50);
+                VisualStudioHelper.ClearExistingItems(sourceItem);
+
+                // delete existing *.generated.cs files from disk
+                foreach (var file in Directory.GetFiles(sourceItemDirectory, "*.generated.cs"))
+                    File.Delete(file);
+
+                // save new *.generated.cs files to disk
+                Progress(sourceItem.DTE, "Add new generated files...", 70);
+                var filenames = new List<string>();
+                foreach (var file in generatedFiles)
+                {
+                    var filename = Path.Combine(relativePath, file.Key + ".generated.cs");
+                    filenames.Add(filename);
+                    File.WriteAllText(Path.Combine(projectDirectory, filename), file.Value);
+                }
+
+                // add new *.generated.cs files to project
+                VisualStudioHelper.AddGeneratedItems(sourceItem, projectDirectory, filenames);
+            }
 
             VisualStudioHelper.ReportMessage("Done.");
             Progress(sourceItem.DTE, "Done.", 100);

@@ -81,6 +81,9 @@ namespace Umbraco.ModelsBuilder.CustomTool
             //var dte = await GetServiceAsync(typeof(DTE)) as DTE;
             //VisualStudioHelper.DTE = dte;
             Dte = await GetServiceAsync(typeof(DTE)) as DTE2;
+
+            // access DTE events...
+            //Dte.Events.
         }
 
         #region IVsSolutionEvents

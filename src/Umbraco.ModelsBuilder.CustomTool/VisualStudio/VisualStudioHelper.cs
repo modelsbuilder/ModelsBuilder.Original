@@ -129,12 +129,11 @@ namespace Umbraco.ModelsBuilder.CustomTool.VisualStudio
         //
         // so https://github.com/Microsoft/VSProjectSystem/blob/master/doc/automation/detect_whether_a_project_is_a_CPS_project.md
 
-        public static bool IsNetSdkProject(EnvDTE.ProjectItem sourceItem)
+        public static bool IsNetSdkProject(EnvDTE.Project project)
         {
             // see above, that does not work anymore
             //return sourceItem.ContainingProject.Kind == vsContextGuids.vsContextGuidNetSdkProject;
 
-            var project = sourceItem.ContainingProject;
             var hierarchy = ToHierarchy(project);
             return hierarchy.IsCapabilityMatch("CPS");
         }
@@ -153,7 +152,7 @@ namespace Umbraco.ModelsBuilder.CustomTool.VisualStudio
 
         public static void ClearExistingItems(EnvDTE.ProjectItem sourceItem)
         {
-            if (IsNetSdkProject(sourceItem))
+            if (IsNetSdkProject(sourceItem.ContainingProject))
             {
                 var sourceIdentity = (string)sourceItem.Properties.Item("Identity").Value;
                 var sourceDirectory = Path.GetDirectoryName(sourceIdentity) + Path.DirectorySeparatorChar;
@@ -175,7 +174,7 @@ namespace Umbraco.ModelsBuilder.CustomTool.VisualStudio
 
         public static void AddGeneratedItems(EnvDTE.ProjectItem sourceItem, string projectPath, IEnumerable<string> filenames)
         {
-            if (IsNetSdkProject(sourceItem))
+            if (IsNetSdkProject(sourceItem.ContainingProject))
             {
                 var sourceIdentity = (string)sourceItem.Properties.Item("Identity").Value;
                 var dependentUpon = Path.GetFileName(sourceIdentity); // cannot be relative
