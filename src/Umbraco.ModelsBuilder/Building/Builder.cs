@@ -329,7 +329,7 @@ namespace Umbraco.ModelsBuilder.Building
         protected string GetModelsBaseClassName(TypeModel type)
         {
             // code attribute overrides everything
-            if (ParseResult.HasModelsBaseClassName)
+            if (ParseResult.HasModelsBaseClassName && !type.IsElement)
                 return ParseResult.ModelsBaseClassName;
 
             // default
