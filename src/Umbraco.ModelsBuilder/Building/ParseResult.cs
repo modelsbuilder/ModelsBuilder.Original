@@ -129,6 +129,11 @@ namespace Umbraco.ModelsBuilder.Building
             ModelsBaseClassName = modelsBaseClassName;
         }
 
+        public void SetElementModelsBaseClassName(string elementModelsBaseClassName)
+        {
+            ElementModelsBaseClassName = elementModelsBaseClassName;
+        }
+
         public void SetModelsNamespace(string modelsNamespace)
         {
             ModelsNamespace = modelsNamespace;
@@ -244,7 +249,13 @@ namespace Umbraco.ModelsBuilder.Building
             get { return !string.IsNullOrWhiteSpace(ModelsBaseClassName); }
         }
 
+        public bool HasElementModelsBaseClassName
+        {
+            get { return !string.IsNullOrWhiteSpace(ElementModelsBaseClassName); }
+        }
+
         public string ModelsBaseClassName { get; private set; }
+        public string ElementModelsBaseClassName { get; private set; }
 
         public bool HasModelsNamespace
         {

@@ -332,6 +332,9 @@ namespace Umbraco.ModelsBuilder.Building
             if (ParseResult.HasModelsBaseClassName && !type.IsElement)
                 return ParseResult.ModelsBaseClassName;
 
+            if (ParseResult.HasElementModelsBaseClassName && type.IsElement)
+                return ParseResult.ElementModelsBaseClassName;
+
             // default
             return type.IsElement ? "PublishedElementModel" : "PublishedContentModel";
         }
