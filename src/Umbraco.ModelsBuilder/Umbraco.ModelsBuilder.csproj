@@ -54,6 +54,7 @@
     <Compile Include="Configuration\ClrNameSource.cs" />
     <Compile Include="Dashboard\BuilderDashboardHelper.cs" />
     <Compile Include="ElementModelsBaseClassAttribute.cs" />
+    <Compile Include="SelectiveModelsBaseClassAttribute.cs" />
     <Compile Include="ModelsBuilderAssemblyAttribute.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
     <Compile Include="PureLiveAssemblyAttribute.cs" />

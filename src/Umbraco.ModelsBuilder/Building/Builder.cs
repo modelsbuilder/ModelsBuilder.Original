@@ -329,11 +329,17 @@ namespace Umbraco.ModelsBuilder.Building
         protected string GetModelsBaseClassName(TypeModel type)
         {
             // code attribute overrides everything
-            if (ParseResult.HasModelsBaseClassName && !type.IsElement)
+            if (ParseResult.HasModelsBaseClassName && !type.IsElement && !ParseResult.HasSelectiveModelsBaseClassName(type.Alias))
                 return ParseResult.ModelsBaseClassName;
 
-            if (ParseResult.HasElementModelsBaseClassName && type.IsElement)
+            if (ParseResult.HasElementModelsBaseClassName && type.IsElement && !ParseResult.HasSelectiveModelsBaseClassName(type.Alias))
                 return ParseResult.ElementModelsBaseClassName;
+
+            if (ParseResult.HasSelectiveModelsBaseClassName(type.Alias) && !type.IsElement) {
+                var selectiveBaseClass = ParseResult.GetSelectiveModelsBaseClassName(type.Alias);
+                if (!string.IsNullOrEmpty(selectiveBaseClass))
+                    return selectiveBaseClass;
+            }
 
             // default
             return type.IsElement ? "PublishedElementModel" : "PublishedContentModel";

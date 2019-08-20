@@ -212,6 +212,14 @@ namespace Umbraco.ModelsBuilder.Building
                         var usingNamespace = (string)attrData.ConstructorArguments[0].Value;
                         disco.SetUsingNamespace(usingNamespace);
                         break;
+                    case "Umbraco.ModelsBuilder.SelectiveModelsBaseClassAttribute":
+                        var selectiveModelsBaseClass = (INamedTypeSymbol)attrData.ConstructorArguments[0].Value;
+                        if (selectiveModelsBaseClass is IErrorTypeSymbol)
+                            throw new Exception($"Invalid base class type \"{selectiveModelsBaseClass.Name}\".");
+                        var contentAliasToInclude = (string)attrData.ConstructorArguments[1].Value;
+                        disco.SetSelectiveContent(contentAliasToInclude, SymbolDisplay.ToDisplayString(selectiveModelsBaseClass));
+                        break;
+
                 }
             }
         }
