@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("ZpqrtBnk ModelzBuilder")]
+[assembly: AssemblyProduct("ZpqrtBnk ModelsBuilder")]
 [assembly: AssemblyCompany("ZpqrtBnk")]
 [assembly: AssemblyCopyright("Copyright © ZpqrtBnk 2013-2019")]
 [assembly: AssemblyTrademark("")]
