@@ -1,0 +1,228 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <ProjectGuid>{0419A43D-78C2-46C9-95A9-2470F224D60F}</ProjectGuid>
+    <ProjectTypeGuids>{82b43b9b-a64c-4715-b499-d71e9ca2bd60};{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AssemblyName>ZpqrtBnk.ModelsBuilder.Extension</AssemblyName>
+    <RootNamespace>ZpqrtBnk.ModelsBuilder.Extension</RootNamespace>
+    <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DeployExtension>False</DeployExtension>
+    <CreateVsixContainer>False</CreateVsixContainer>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <DeployExtension>True</DeployExtension>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- One day the Umbraco solution will not be a giant mess of dependencies anymore -->
+    <SuppressFromVsix Include="ClientDependency.Core.dll" />
+    <SuppressFromVsix Include="ClientDependency.Core.pdb" />
+    <SuppressFromVsix Include="ClientDependency.Core.Mvc.dll" />
+    <SuppressFromVsix Include="ClientDependency.Core.Mvc.pdb" />
+    <SuppressFromVsix Include="CSharpTest.Net.Collections.dll" />
+    <SuppressFromVsix Include="Examine.dll" />
+    <SuppressFromVsix Include="Examine.pdb" />
+    <SuppressFromVsix Include="HtmlAgilityPack.dll" />
+    <SuppressFromVsix Include="HtmlAgilityPack.pdb" />
+    <SuppressFromVsix Include="ICSharpCode.SharpZipLib.dll" />
+    <SuppressFromVsix Include="ImageProcessor.dll" />
+    <SuppressFromVsix Include="LightInject.Annotation.dll" />
+    <SuppressFromVsix Include="LightInject.Annotation.pdb" />
+    <SuppressFromVsix Include="LightInject.dll" />
+    <SuppressFromVsix Include="LightInject.pdb" />
+    <SuppressFromVsix Include="LightInject.Mvc.dll" />
+    <SuppressFromVsix Include="LightInject.Mvc.pdb" />
+    <SuppressFromVsix Include="LightInject.Web.dll" />
+    <SuppressFromVsix Include="LightInject.Web.pdb" />
+    <SuppressFromVsix Include="LightInject.WebApi.dll" />
+    <SuppressFromVsix Include="LightInject.WebApi.pdb" />
+    <SuppressFromVsix Include="Lucene.Net.dll" />
+    <SuppressFromVsix Include="Lucene.Net.pdb" />
+    <SuppressFromVsix Include="Markdown.dll" />
+    <SuppressFromVsix Include="MiniProfiler.dll" />
+    <SuppressFromVsix Include="MiniProfiler.Shared.dll" />
+    <SuppressFromVsix Include="NPoco.dll" />
+    <SuppressFromVsix Include="Serilog.dll" />
+    <SuppressFromVsix Include="Serilog.pdb" />
+    <SuppressFromVsix Include="Serilog.Enrichers.Process.dll" />
+    <SuppressFromVsix Include="Serilog.Enrichers.Thread.dll" />
+    <SuppressFromVsix Include="Serilog.Filters.Expressions.dll" />
+    <SuppressFromVsix Include="Serilog.Formatting.Compact.dll" />
+    <SuppressFromVsix Include="Serilog.Formatting.Compact.Reader.dll" />
+    <SuppressFromVsix Include="Serilog.Settings.AppSettings.dll" />
+    <SuppressFromVsix Include="Serilog.Sinks.Async.dll" />
+    <SuppressFromVsix Include="Serilog.Sinks.File.dll" />
+    <SuppressFromVsix Include="Serilog.Sinks.Map.dll" />
+    <SuppressFromVsix Include="Superpower.dll" />
+    <SuppressFromVsix Include="System.Data.SqlServerCe.dll" />
+    <SuppressFromVsix Include="System.Data.SqlServerCe.Entity.dll" />
+    <SuppressFromVsix Include="Umbraco.Core.dll" />
+    <SuppressFromVsix Include="Umbraco.Examine.dll" />
+    <SuppressFromVsix Include="Umbraco.Web.dll" />
+    <SuppressFromVsix Include="Umbraco.Web.UI.dll" />
+    <SuppressFromVsix Include="Microsoft.VC90.CRT.manifest" />
+    <SuppressFromVsix Include="msvcr90.dll" />
+    <SuppressFromVsix Include="sqlceca40.dll" />
+    <SuppressFromVsix Include="sqlcecompact40.dll" />
+    <SuppressFromVsix Include="sqlceer40EN.dll" />
+    <SuppressFromVsix Include="sqlceme40.dll" />
+    <SuppressFromVsix Include="sqlceqp40.dll" />
+    <SuppressFromVsix Include="sqlcese40.dll" />
+    <!-- and probably many more... -->
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
+    <Compile Include="BuildModelsCommand.cs" />
+    <Compile Include="Generator.cs" />
+    <Compile Include="VisualStudio\vsContextGuids.cs" />
+    <Compile Include="Guids.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="ExtensionPackage.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="OptionsDialog.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="VisualStudioOptions.cs" />
+    <Compile Include="VisualStudio\VisualStudioHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="VSPackage.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <ManifestResourceName>VSPackage</ManifestResourceName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <VSCTCompile Include="ExtensionPackage.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <Content Include="ItemTemplate.Etc\Umbraco Models.zip">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubPath>ItemTemplates\Umbraco</VSIXSubPath>
+    </Content>
+    <None Include="ItemTemplate\Models.mb" />
+    <None Include="source.extension.vsixmanifest">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="ItemTemplate\Models.ico" />
+    <Resource Include="ItemTemplate.Etc\Models.png" />
+    <Resource Include="ItemTemplate.Etc\Models.txt" />
+    <Content Include="icons.pkgdef">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplate\Models.vstemplate" />
+    <Content Include="u32.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Resource Include="debug.txt" />
+    <Content Include="license.txt">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Resources\Package.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ZpqrtBnk.ModelsBuilder.Web\ZpqrtBnk.ModelsBuilder.Web.csproj">
+      <Project>{2317be7f-1723-4512-b863-5b6835e583a2}</Project>
+      <Name>ZpqrtBnk.ModelsBuilder.Web</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ZpqrtBnk.ModelsBuilder\ZpqrtBnk.ModelsBuilder.csproj">
+      <Project>{998fb014-303a-4146-b3e4-b927bab0210f}</Project>
+      <Name>Umbraco.ModelsBuilder</Name>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.SDK">
+      <Version>15.9.3</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VSSDK.BuildTools">
+      <Version>15.9.3039</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="semver">
+      <Version>2.0.4</Version>
+    </PackageReference>
+  </ItemGroup>
+  <PropertyGroup>
+    <UseCodebase>true</UseCodebase>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Target Name="BeforeBuild">
+    <!-- bundle the item template -->
+    <ZipDirectory DestinationFile="ItemTemplate.Etc/Umbraco Models.zip" Overwrite="true" SourceDirectory="ItemTemplate" />
+  </Target>
+  <!-- fixme what is running this task? -->
+  <Target Name="CopyVsix" Condition=" '$(Configuration)' == 'Release' ">
+    <!-- get the assembly version -->
+    <GetAssemblyIdentity AssemblyFiles="$(OutputPath)Umbraco.ModelsBuilder.dll">
+      <Output TaskParameter="Assemblies" ItemName="AssemblyInfos" />
+    </GetAssemblyIdentity>
+    <!-- dunno how to get the assembly informational version -->
+    <ReadLinesFromFile File="$(SolutionDir)Umbraco.ModelsBuilder\Properties\CommonInfo.cs">
+      <Output TaskParameter="Lines" ItemName="CommonInfosLines" />
+    </ReadLinesFromFile>
+    <PropertyGroup>
+      <Pattern>(?&lt;=\[assembly: AssemblyInformationalVersion\(").*(?="\)\])</Pattern>
+      <In>@(CommonInfosLines)</In>
+      <PackageVersion>$([System.Text.RegularExpressions.Regex]::Match($(In), $(Pattern)))</PackageVersion>
+    </PropertyGroup>
+    <Copy SourceFiles="$(ProjectDir)bin\$(Configuration)\ZpqrtBnk.ModelsBuilder.Extension.vsix" DestinationFiles="$(SolutionDir)build\$(Configuration)\ZpqrtBnk.ModelsBuilder.Extension-$(PackageVersion).vsix" />
+  </Target>
+</Project>

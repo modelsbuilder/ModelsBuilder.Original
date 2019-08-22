@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -11,7 +13,7 @@ using ZpqrtBnk.ModelsBuilder.Configuration;
 namespace ZpqrtBnk.ModelsBuilder.Building
 {
     // main Roslyn compiler
-    internal class Compiler
+    public class Compiler
     {
         private readonly LanguageVersion _languageVersion;
 
@@ -166,6 +168,57 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
             var position = diagnostic.Location.GetLineSpan().StartLinePosition.Line + 1;
             throw new CompilerException(message, path, code, position);
+        }
+
+        public static string CreateValidIdentifier(string value)
+        {
+            // not sure how VisualStudio does it
+
+            // these don't do what we expect them to do
+            //return Microsoft.CSharp.CSharpCodeProvider.CreateProvider("C#").CreateValidIdentifier(value);
+            //return System.CodeDom.Compiler.CodeDomProvider.CreateProvider("C#").CreateValidIdentifier(value);
+
+            // but IsValidIdentifier *does* fully validate
+            // so... re-use their code
+            // https://referencesource.microsoft.com/#System/compmod/system/codedom/compiler/CodeGenerator.cs,b8ef446f3714a2d6
+
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Null or empty value cannot be a valid identifier.", nameof(value));
+
+            var chars = value.ToCharArray();
+            var leadingDecimal = false;
+
+            for (var i = 0; i < chars.Length; i++)
+            {
+                var ch = chars[i];
+                var uc = char.GetUnicodeCategory(ch);
+
+                switch (uc)
+                {
+                    case UnicodeCategory.UppercaseLetter:        // Lu
+                    case UnicodeCategory.LowercaseLetter:        // Ll
+                    case UnicodeCategory.TitlecaseLetter:        // Lt
+                    case UnicodeCategory.ModifierLetter:         // Lm
+                    case UnicodeCategory.LetterNumber:           // Lm
+                    case UnicodeCategory.OtherLetter:            // Lo
+                        break;
+
+                    case UnicodeCategory.DecimalDigitNumber:     // Nd
+                        if (i == 0) leadingDecimal = true;
+                        break;
+
+                    default:
+                        chars[i] = '_';
+                        break;
+                }
+            }
+
+            value = new string(chars);
+
+            if (leadingDecimal)
+                value = '_' + value;
+
+            return value;
         }
     }
 }

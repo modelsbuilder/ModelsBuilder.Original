@@ -1,0 +1,11 @@
+
+
+https://docs.microsoft.com/en-us/visualstudio/ide/how-to-create-item-templates?view=vs-2019
+
+icon exported from KnownMoniker explorer
+
+https://marketplace.visualstudio.com/items?itemName=MadsKristensen.FileIcons
+
+icon
+
+https://github.com/madskristensen/FileIcons

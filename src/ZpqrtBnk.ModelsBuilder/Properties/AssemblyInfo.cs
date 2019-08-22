@@ -7,7 +7,6 @@ using System.Runtime.InteropServices;
 [assembly: Guid("b59ebab2-bc7c-4a89-876f-7613684510e2")]
 
 [assembly: InternalsVisibleTo("ZpqrtBnk.ModelsBuilder.Tests")]
-[assembly: InternalsVisibleTo("ZpqrtBnk.ModelsBuilder.Api")]
 
 // dynamic assembly that is built during tests - do not remove!
 [assembly: InternalsVisibleTo("ZpqrtBnk.ModelsBuilder.RunTests")]

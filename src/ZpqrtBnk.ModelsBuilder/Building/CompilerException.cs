@@ -9,7 +9,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         { }
 
         public CompilerException(string message, string path, string sourceCode, int line)
-            : base(message)
+            : base($"{message} (at {path}:line {line}).")
         {
             Path = path;
             SourceCode = sourceCode;

@@ -1,0 +1,13 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Item">
+  <TemplateData>
+    <DefaultName>Models.mb</DefaultName>
+    <Name>Umbraco Models</Name>
+    <Description>An Umbraco Models placeholder</Description>
+    <ProjectType>CSharp</ProjectType>
+    <SortOrder>10</SortOrder>
+    <Icon>Models.ico</Icon>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem SubType="" TargetFileName="$fileinputname$.mb" ReplaceParameters="false">Models.mb</ProjectItem>
+  </TemplateContent>
+</VSTemplate>

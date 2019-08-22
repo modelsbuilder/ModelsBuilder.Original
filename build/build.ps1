@@ -48,7 +48,7 @@
 
     # Edit VSIX
     Write-Host "Update VSIX manifest."
-    $vsixFile = "$($this.SolutionRoot)\src\ZpqrtBnk.ModelsBuilder.CustomTool\source.extension.vsixmanifest"
+    $vsixFile = "$($this.SolutionRoot)\src\ZpqrtBnk.ModelsBuilder.Extension\source.extension.vsixmanifest"
     [xml] $vsixXml = Get-Content $vsixFile
     $xmlNameTable = New-Object System.Xml.NameTable
     $xmlNameSpace = New-Object System.Xml.XmlNamespaceManager($xmlNameTable)
@@ -165,16 +165,16 @@
 
   $ubuild.DefineMethod("PackageVsix",
   {
-    Write-Host "Package ZpqrtBnk.ModelsBuilder.CustomTool"
-  	$this.CopyFile("$($this.SolutionRoot)\build.tmp\bin\ZpqrtBnk.ModelsBuilder.CustomTool.vsix",
-	    "$($this.BuildOutput)\ZpqrtBnk.ModelsBuilder.CustomTool-$($this.Version.Semver.ToString()).vsix")
+    Write-Host "Package ZpqrtBnk.ModelsBuilder.Extension"
+  	$this.CopyFile("$($this.SolutionRoot)\build.tmp\bin\ZpqrtBnk.ModelsBuilder.Extension.vsix",
+	    "$($this.BuildOutput)\ZpqrtBnk.ModelsBuilder.Extension-$($this.Version.Semver.ToString()).vsix")
   })
 
   $ubuild.DefineMethod("VerifyNuGet",
   {
     $this.VerifyNuGetConsistency(
       ("ZpqrtBnk.ModelsBuilder", "ZpqrtBnk.ModelsBuilder.Web"),
-      ("ZpqrtBnk.ModelsBuilder", "ZpqrtBnk.ModelsBuilder.Web", "ZpqrtBnk.ModelsBuilder.CustomTool", "ZpqrtBnk.ModelsBuilder.Console"))
+      ("ZpqrtBnk.ModelsBuilder", "ZpqrtBnk.ModelsBuilder.Web", "ZpqrtBnk.ModelsBuilder.Extension", "ZpqrtBnk.ModelsBuilder.Console"))
   })
 
   $ubuild.DefineMethod("PostPackageHook",
