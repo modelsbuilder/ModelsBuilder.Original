@@ -256,6 +256,16 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             // handle ctor
             foreach (var typeModel in _typeModels.Where(x => ParseResult.HasCtor(x.ClrName)))
                 typeModel.HasCtor = true;
+
+            // handle extensions
+            foreach (var typeModel in _typeModels)
+            {
+                var typeFullName = typeModel.ClrName;
+                foreach (var propertyModel in typeModel.Properties)
+                {
+                    propertyModel.IsExtensionImplemented = ParseResult.IsExtensionImplemented(typeFullName, propertyModel.ClrName);
+                }
+            }
         }
 
         private SemanticModel _ambiguousSymbolsModel;

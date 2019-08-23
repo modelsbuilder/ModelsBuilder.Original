@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Models;
 using ZpqrtBnk.ModelsBuilder.Api;
 using ZpqrtBnk.ModelsBuilder.Configuration;
 
@@ -42,10 +43,10 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         private static Config Config => Current.Configs.ModelsBuilder();
 
         /// <summary>
-                                                                               /// Outputs a generated model to a string builder.
-                                                                               /// </summary>
-                                                                               /// <param name="sb">The string builder.</param>
-                                                                               /// <param name="typeModel">The model to generate.</param>
+       /// Outputs a generated model to a string builder.
+       /// </summary>
+       /// <param name="sb">The string builder.</param>
+       /// <param name="typeModel">The model to generate.</param>
         public void Generate(StringBuilder sb, TypeModel typeModel)
         {
             WriteHeader(sb);
@@ -117,6 +118,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         {
             string sep;
 
+            // generate interface for mixins
             if (type.IsMixin)
             {
                 // write the interface declaration
@@ -149,6 +151,24 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                     WriteInterfaceProperty(sb, prop);
                 }
 
+                sb.Append("\t}\n\n");
+            }
+
+            // extension methods for varying properties
+            var extensionProperties = type.Properties.Where(x => !x.IsIgnored && x.Variations != ContentVariation.Nothing && !x.IsExtensionImplemented).ToList();
+            if (extensionProperties.Count > 0)
+            {
+                sb.AppendFormat("\t/// <summary>Provides extension methods for the {0}{1} {2}.</summary>\n",
+                    type.IsMixin ? "I" : "", type.ClrName, type.IsMixin ? "interface" : "class");
+                sb.AppendFormat("\tpublic static partial class {0}Extensions\n", type.ClrName);
+                sb.Append("\t{\n");
+                var first = true;
+                foreach (var prop in extensionProperties)
+                {
+                    if (first) first = false;
+                    else sb.Append("\n");
+                    WriteVaryingProperty(sb, type, prop);
+                }
                 sb.Append("\t}\n\n");
             }
 
@@ -280,6 +300,43 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             return string.Format(Config.StaticMixinGetterPattern, clrName);
         }
 
+        private void WriteVaryingProperty(StringBuilder sb, TypeModel type, PropertyModel property)
+        {
+            if (property.Errors != null) return;
+
+            // Adds xml summary to each property containing
+            // property name and property description
+            if (!string.IsNullOrWhiteSpace(property.Name) || !string.IsNullOrWhiteSpace(property.Description))
+            {
+                sb.Append("\t\t///<summary>\n");
+
+                if (!string.IsNullOrWhiteSpace(property.Description))
+                    sb.AppendFormat("\t\t/// {0}: {1}\n", XmlCommentString(property.Name), XmlCommentString(property.Description));
+                else
+                    sb.AppendFormat("\t\t/// {0}\n", XmlCommentString(property.Name));
+
+                sb.Append("\t\t///</summary>\n");
+            }
+
+            WriteGeneratedCodeAttribute(sb, "\t\t");
+
+            sb.Append("\t\tpublic static ");
+            WriteClrType(sb, property.ClrTypeName);
+            sb.Append(" ");
+            sb.Append(property.ClrName);
+            sb.AppendFormat("(this {0}{1} that, string culture = null, string segment = null)",
+                type.IsMixin ? "I" : "", type.ClrName);
+            sb.Append(" => that.Value");
+            if (property.ModelClrType != typeof(object))
+            {
+                sb.Append("<");
+                WriteClrType(sb, property.ClrTypeName);
+                sb.Append(">");
+            }
+            sb.AppendFormat("(\"{0}\", culture, segment);\n",
+                property.Alias);
+        }
+
         private void WriteProperty(StringBuilder sb, TypeModel type, PropertyModel property, string mixinClrName = null)
         {
             var mixinStatic = mixinClrName != null;
@@ -333,18 +390,28 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             }
             else
             {
-                sb.Append("\t\tpublic ");
-                WriteClrType(sb, property.ClrTypeName);
-                sb.AppendFormat(" {0} => this.Value",
-                    property.ClrName);
-                if (property.ModelClrType != typeof(object))
+                if (property.Variations == ContentVariation.Nothing)
                 {
-                    sb.Append("<");
+                    sb.Append("\t\tpublic ");
                     WriteClrType(sb, property.ClrTypeName);
-                    sb.Append(">");
+                    sb.AppendFormat(" {0} => this.Value",
+                        property.ClrName);
+                    if (property.ModelClrType != typeof(object))
+                    {
+                        sb.Append("<");
+                        WriteClrType(sb, property.ClrTypeName);
+                        sb.Append(">");
+                    }
+                    sb.AppendFormat("(\"{0}\");\n",
+                        property.Alias);
                 }
-                sb.AppendFormat("(\"{0}\");\n",
-                    property.Alias);
+                else
+                {
+                    sb.Append("\t\tpublic ");
+                    WriteClrType(sb, property.ClrTypeName);
+                    sb.AppendFormat(" {0} => this.{0}();\n",
+                        property.ClrName);
+                }
             }
 
             if (property.Errors != null)

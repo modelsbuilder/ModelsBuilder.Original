@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Models;
 
 namespace ZpqrtBnk.ModelsBuilder.Building
 {
@@ -24,6 +25,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         public string Description;
 
         /// <summary>
+        /// Gets the content variation of the property.
+        /// </summary>
+        public ContentVariation Variations = ContentVariation.Nothing;
+
+        /// <summary>
         /// Gets the clr name of the property.
         /// </summary>
         /// <remarks>This is just the local name eg "Price".</remarks>
@@ -45,6 +51,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// Gets a value indicating whether this property should be excluded from generation.
         /// </summary>
         public bool IsIgnored;
+
+        /// <summary>
+        /// Gets a value indicating whether an extension method for the property was found.
+        /// </summary>
+        public bool IsExtensionImplemented;
 
         /// <summary>
         /// Gets the generation errors for the property.

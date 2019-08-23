@@ -112,7 +112,8 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                     ParentId = contentType.ParentId,
 
                     Name = contentType.Name,
-                    Description = contentType.Description
+                    Description = contentType.Description,
+                    Variations = contentType.Variations
                 };
 
                 // of course this should never happen, but when it happens, better detect it
@@ -153,7 +154,8 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                         ClrName = GetClrName(propertyType.Name, propertyType.Alias),
 
                         Name = propertyType.Name,
-                        Description = propertyType.Description
+                        Description = propertyType.Description,
+                        Variations = propertyType.Variations
                     };
 
                     var publishedPropertyType = publishedContentType.GetPropertyType(propertyType.Alias);

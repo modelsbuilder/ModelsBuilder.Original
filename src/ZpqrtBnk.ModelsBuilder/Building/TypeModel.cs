@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace ZpqrtBnk.ModelsBuilder.Building
@@ -29,6 +30,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// Gets the description of the content type.
         /// </summary>
         public string Description;
+
+        /// <summary>
+        /// Gets the content variation of the content type.
+        /// </summary>
+        public ContentVariation Variations = ContentVariation.Nothing;
 
         /// <summary>
         /// Gets the clr name of the model.

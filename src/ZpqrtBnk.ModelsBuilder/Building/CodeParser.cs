@@ -58,7 +58,39 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             //var diags = model.GetDiagnostics();
 
             var classDecls = tree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>();
-            foreach (var classSymbol in classDecls.Select(x => model.GetDeclaredSymbol(x)))
+            var classSymbols = classDecls.Select(x => model.GetDeclaredSymbol(x)).ToList();
+            var interfaceDecls = tree.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>();
+
+            // extensions
+            foreach (var classSymbol in classSymbols.Where(x => x.IsStatic))
+            {
+                var methods = classSymbol.GetMembers().OfType<IMethodSymbol>().Where(x => x.IsExtensionMethod && !x.IsGenericMethod);
+
+                foreach (var method in methods)
+                {
+                    var parameters = method.Parameters;
+                    if (parameters.Length != 3) continue;
+
+                    bool IsStringType(ITypeSymbol type)
+                        => type.ToDisplayString() == "string";
+
+                    if (!IsStringType(parameters[1].Type) || !IsStringType(parameters[2].Type))
+                        continue;
+
+                    // the type here is *not* the type full name - only a symbol
+                    // at that point we may even be referencing a type that has not been generated
+                    // and then it will come out as 'Foo' *but* it may come out as 'Namespace.Foo'.
+                    // ParserResult will deal with it
+                    // TODO this could have consequences with duplicate names in namespaces?
+                    // but the only way would be to have an attribute to specify the alias = later
+                    var typeName = parameters[0].Type.ToDisplayString();
+                    var propertyName = method.Name;
+                    disco.SetImplementedExtension(typeName, propertyName);
+                }
+            }
+
+            // classes
+            foreach (var classSymbol in classSymbols)
             {
                 ParseClassSymbols(disco, classSymbol);
 
@@ -91,7 +123,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                     ParseMethodSymbol(disco, classSymbol, staticMethodSymbol);
             }
 
-            var interfaceDecls = tree.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>();
+            // interfaces
             foreach (var interfaceSymbol in interfaceDecls.Select(x => model.GetDeclaredSymbol(x)))
             {
                 ParseClassSymbols(disco, interfaceSymbol);

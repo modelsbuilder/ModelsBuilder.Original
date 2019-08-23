@@ -39,6 +39,8 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             = new Dictionary<string, List<StaticMixinMethodInfo>>();
         private readonly HashSet<string> _withCtor
             = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+        private readonly Dictionary<string, List<string>> _implementedExtensions
+            = new Dictionary<string, List<string>>();
 
         public static readonly ParseResult Empty = new ParseResult();
 
@@ -150,6 +152,19 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         public void SetHasCtor(string contentName)
         {
             _withCtor.Add(contentName);
+        }
+
+        public void SetImplementedExtension(string typeName, string propertyName)
+        {
+            // see CodeParser
+            // typeName here... can be 'Foo' or 'Namespace.Foo' and we want to keep the last part
+            var pos = typeName.LastIndexOf('.');
+            if (pos > 0) typeName = typeName.Substring(pos + 1);
+
+            if (!_implementedExtensions.ContainsKey(typeName))
+                _implementedExtensions[typeName] = new List<string>();
+
+            _implementedExtensions[typeName].Add(propertyName);
         }
 
         #endregion
@@ -268,6 +283,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         public bool HasCtor(string contentName)
         {
             return _withCtor.Contains(contentName);
+        }
+
+        public bool IsExtensionImplemented(string typeFullName, string propertyClrName)
+        {
+            return _implementedExtensions.TryGetValue(typeFullName, out var props) && props.Contains(propertyClrName);
         }
 
         #endregion
