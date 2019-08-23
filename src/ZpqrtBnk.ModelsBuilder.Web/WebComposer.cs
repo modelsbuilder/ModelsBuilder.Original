@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -54,16 +55,35 @@ namespace ZpqrtBnk.ModelsBuilder.Web
             // so ours are already in there, but better be safe: clear the collection,
             // and then add exactly those that we want.
 
-            composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>()
-                .Clear();
+            // EditorValidatorCollectionBuilder is not public yet, have to use reflection ;(
 
-            if (composition.Configs.ModelsBuilder().EnableBackOffice)
-            {
-                composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>()
-                    .Add<ContentTypeModelValidator>()
-                    .Add<MediaTypeModelValidator>()
-                    .Add<MemberTypeModelValidator>();
-            }
+            var builderType = Type.GetType("Umbraco.Web.Editors.EditorValidatorCollectionBuilder,Umbraco.Web", false);
+            if (builderType == null) throw new Exception("panic: cannot get EditorValidatorCollectionBuilder type.");
+            var withMethod = composition.GetType().GetMethod("WithCollectionBuilder", BindingFlags.Public | BindingFlags.Instance);
+            if (withMethod == null) throw new Exception("panic: cannot get Composition.WithCollectionBuilder<> method.");
+            var withBuilderMethod = withMethod.MakeGenericMethod(builderType);
+            var builder = withBuilderMethod.Invoke(composition, Array.Empty<object>());
+            var clearMethod = builderType.GetMethod("Clear", BindingFlags.Public | BindingFlags.Instance);
+            if (clearMethod == null) throw new Exception("panic: cannot get EditorValidatorCollectionBuilder.Clear method.");
+            clearMethod.Invoke(builder, Array.Empty<object>());
+            var addMethod = builderType.GetMethod("Add", BindingFlags.Public | BindingFlags.Instance, null, new[] { typeof(Type) }, null);
+            if (addMethod == null) throw new Exception("panic: cannot get EditorValidatorCollectionBuilder.Add method.");
+            addMethod.Invoke(builder, new object[] { typeof(ContentTypeModelValidator) });
+            addMethod.Invoke(builder, new object[] { typeof(MediaTypeModelValidator) });
+            addMethod.Invoke(builder, new object[] { typeof(MemberTypeModelValidator) });
+
+            // below is what we would do if EditorValidatorCollectionBuilder was public
+
+            //composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>()
+            //    .Clear();
+
+            //if (composition.Configs.ModelsBuilder().EnableBackOffice)
+            //{
+            //    composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>()
+            //        .Add<ContentTypeModelValidator>()
+            //        .Add<MediaTypeModelValidator>()
+            //        .Add<MemberTypeModelValidator>();
+            //}
 
             // setup the API if enabled (and in debug mode)
 
