@@ -2124,6 +2124,13 @@ namespace Umbraco.Web.PublishedModels
                 ClrName = "Prop3",
                 ModelClrType = typeof(string)
             });
+            type1.Properties.Add(new PropertyModel
+            {
+                Alias = "prop4",
+                ClrName = "Prop4",
+                ModelClrType = typeof(string),
+                Variations = ContentVariation.Culture
+            });
 
             var types = new[] { type1 };
 
@@ -2134,15 +2141,25 @@ using System;
 using ZpqrtBnk.ModelsBuilder;
 namespace Models
 {
-    public static class Type1Extensions
+    public static partial class Type1Extensions
     {
         public static string Prop1(this Type1 that, string culture = null, string segment = null) { return """"; }
     }
+
+    [IgnorePropertyType(""prop4"")]
+    public partial class Type1
+    { }
 }
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
