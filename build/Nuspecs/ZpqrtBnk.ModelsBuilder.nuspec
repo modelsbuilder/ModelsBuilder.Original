@@ -16,7 +16,7 @@
   <tags>umbraco</tags>
   <dependencies>
     <group targetFramework="net472">
-      <dependency id="Microsoft.CodeAnalysis.CSharp" version="2.10.0" />
+      <dependency id="Microsoft.CodeAnalysis.CSharp" version="[2.10.0,3.0.0)" />
     </group>
   </dependencies>
   </metadata>
