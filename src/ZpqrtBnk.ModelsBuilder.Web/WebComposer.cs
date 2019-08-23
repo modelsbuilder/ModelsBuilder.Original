@@ -4,6 +4,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Web.Editors;
 using ZpqrtBnk.ModelsBuilder.Umbraco;
 using ZpqrtBnk.ModelsBuilder.Validation;
+using ZpqrtBnk.ModelsBuilder.Web.Api;
 
 namespace ZpqrtBnk.ModelsBuilder.Web
 {
@@ -51,6 +52,7 @@ namespace ZpqrtBnk.ModelsBuilder.Web
             // so...
             // register it in the container
             // do NOT add it to the collection - we will route it in the component, our way
+            // fixme - explain why?
 
             if (composition.Configs.ModelsBuilder().IsApiServer)
             {
@@ -59,7 +61,7 @@ namespace ZpqrtBnk.ModelsBuilder.Web
                 //    .Add<ApiController>();
 
                 // register the controller into the container
-                composition.Register(typeof(ApiController), Lifetime.Request);
+                composition.Register(typeof(ModelsBuilderApiController), Lifetime.Request);
             }
         }
     }

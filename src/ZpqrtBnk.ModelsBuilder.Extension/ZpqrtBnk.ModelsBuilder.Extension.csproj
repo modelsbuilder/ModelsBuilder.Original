@@ -60,63 +60,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <!-- One day the Umbraco solution will not be a giant mess of dependencies anymore -->
-    <SuppressFromVsix Include="ClientDependency.Core.dll" />
-    <SuppressFromVsix Include="ClientDependency.Core.pdb" />
-    <SuppressFromVsix Include="ClientDependency.Core.Mvc.dll" />
-    <SuppressFromVsix Include="ClientDependency.Core.Mvc.pdb" />
-    <SuppressFromVsix Include="CSharpTest.Net.Collections.dll" />
-    <SuppressFromVsix Include="Examine.dll" />
-    <SuppressFromVsix Include="Examine.pdb" />
-    <SuppressFromVsix Include="HtmlAgilityPack.dll" />
-    <SuppressFromVsix Include="HtmlAgilityPack.pdb" />
-    <SuppressFromVsix Include="ICSharpCode.SharpZipLib.dll" />
-    <SuppressFromVsix Include="ImageProcessor.dll" />
-    <SuppressFromVsix Include="LightInject.Annotation.dll" />
-    <SuppressFromVsix Include="LightInject.Annotation.pdb" />
-    <SuppressFromVsix Include="LightInject.dll" />
-    <SuppressFromVsix Include="LightInject.pdb" />
-    <SuppressFromVsix Include="LightInject.Mvc.dll" />
-    <SuppressFromVsix Include="LightInject.Mvc.pdb" />
-    <SuppressFromVsix Include="LightInject.Web.dll" />
-    <SuppressFromVsix Include="LightInject.Web.pdb" />
-    <SuppressFromVsix Include="LightInject.WebApi.dll" />
-    <SuppressFromVsix Include="LightInject.WebApi.pdb" />
-    <SuppressFromVsix Include="Lucene.Net.dll" />
-    <SuppressFromVsix Include="Lucene.Net.pdb" />
-    <SuppressFromVsix Include="Markdown.dll" />
-    <SuppressFromVsix Include="MiniProfiler.dll" />
-    <SuppressFromVsix Include="MiniProfiler.Shared.dll" />
-    <SuppressFromVsix Include="NPoco.dll" />
-    <SuppressFromVsix Include="Serilog.dll" />
-    <SuppressFromVsix Include="Serilog.pdb" />
-    <SuppressFromVsix Include="Serilog.Enrichers.Process.dll" />
-    <SuppressFromVsix Include="Serilog.Enrichers.Thread.dll" />
-    <SuppressFromVsix Include="Serilog.Filters.Expressions.dll" />
-    <SuppressFromVsix Include="Serilog.Formatting.Compact.dll" />
-    <SuppressFromVsix Include="Serilog.Formatting.Compact.Reader.dll" />
-    <SuppressFromVsix Include="Serilog.Settings.AppSettings.dll" />
-    <SuppressFromVsix Include="Serilog.Sinks.Async.dll" />
-    <SuppressFromVsix Include="Serilog.Sinks.File.dll" />
-    <SuppressFromVsix Include="Serilog.Sinks.Map.dll" />
-    <SuppressFromVsix Include="Superpower.dll" />
-    <SuppressFromVsix Include="System.Data.SqlServerCe.dll" />
-    <SuppressFromVsix Include="System.Data.SqlServerCe.Entity.dll" />
-    <SuppressFromVsix Include="Umbraco.Core.dll" />
-    <SuppressFromVsix Include="Umbraco.Examine.dll" />
-    <SuppressFromVsix Include="Umbraco.Web.dll" />
-    <SuppressFromVsix Include="Umbraco.Web.UI.dll" />
-    <SuppressFromVsix Include="Microsoft.VC90.CRT.manifest" />
-    <SuppressFromVsix Include="msvcr90.dll" />
-    <SuppressFromVsix Include="sqlceca40.dll" />
-    <SuppressFromVsix Include="sqlcecompact40.dll" />
-    <SuppressFromVsix Include="sqlceer40EN.dll" />
-    <SuppressFromVsix Include="sqlceme40.dll" />
-    <SuppressFromVsix Include="sqlceqp40.dll" />
-    <SuppressFromVsix Include="sqlcese40.dll" />
-    <!-- and probably many more... -->
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>

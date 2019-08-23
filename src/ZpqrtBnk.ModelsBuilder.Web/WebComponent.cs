@@ -15,8 +15,8 @@ namespace ZpqrtBnk.ModelsBuilder.Web
 {
     public class WebComponent : IComponent
     {
-        private IGlobalSettings _globalSettings;
-        private Config _config;
+        private readonly IGlobalSettings _globalSettings;
+        private readonly Config _config;
 
         public WebComponent(IGlobalSettings globalSettings, Config config)
         {

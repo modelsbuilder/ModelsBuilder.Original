@@ -7,7 +7,7 @@ namespace ZpqrtBnk.ModelsBuilder.Web
 {
     public class WebManifestFilter : IManifestFilter
     {
-        private Config _config;
+        private readonly Config _config;
 
         public WebManifestFilter(Config config)
         {
@@ -37,15 +37,15 @@ namespace ZpqrtBnk.ModelsBuilder.Web
                     new ManifestDashboard 
                     { 
                         Alias = "settingsModelsBuilder",
-                        View = "~/App_Plugins/ModelsBuilder/modelsbuilder.html",
+                        View = "~/App_Plugins/ZpqrtBnk.ModelsBuilder/modelsbuilder.html",
                         Sections = new[] { "settings" },
                         Weight = 40
                     }
                 },
                 Scripts = new[]
                 {
-                    "/App_Plugins/ModelsBuilder/modelsbuilder.controller.js",
-                    "/App_Plugins/ModelsBuilder/modelsbuilder.resource.js"
+                    "/App_Plugins/ZpqrtBnk.ModelsBuilder/modelsbuilder.controller.js",
+                    "/App_Plugins/ZpqrtBnk.ModelsBuilder/modelsbuilder.resource.js"
                 }
             });
         }

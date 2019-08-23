@@ -14,15 +14,14 @@ namespace ZpqrtBnk.ModelsBuilder.Web
         {
             // see Umbraco.Web.Runtime.WebFinalComponent
 
-            var name = typeofController.Name;
-            name = name.Substring(0, name.Length - "Controller".Length);
+            var controllerName = typeofController.Name;
+            controllerName = controllerName.Substring(0, controllerName.Length - "Controller".Length);
 
-            var urlBase = umbracoPath + "/" + name + "/";
-            var url = urlBase + "{action}/{id}";
+            var url = umbracoPath + "/BackOffice/Api/" + controllerName;
             var route = RouteTable.Routes.MapHttpRoute(
-                "zpqrtbnk-modelsbuilder-" + name,
-                url,
-                new { controller = name, id = UrlParameter.Optional });
+                "zpqrtbnk-modelsbuilder-" + controllerName.ToLowerInvariant(),
+                url + "/{action}/{id}",
+                new { controller = controllerName, id = UrlParameter.Optional });
 
             if (route.DataTokens == null)
                 route.DataTokens = new RouteValueDictionary();
@@ -32,7 +31,7 @@ namespace ZpqrtBnk.ModelsBuilder.Web
             route.DataTokens.Add("Namespaces", new[] { typeofController.Namespace }); // look in this namespace to create the controller
             route.DataTokens.Add("UseNamespaceFallback", false); // Don't look anywhere else except this namespace!
 
-            return urlBase;
+            return url;
         }
     }
 }

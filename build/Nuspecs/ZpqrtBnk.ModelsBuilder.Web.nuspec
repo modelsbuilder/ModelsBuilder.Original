@@ -26,10 +26,10 @@
     <file src="$solution$\build.tmp\bin\ZpqrtBnk.ModelsBuilder.Web.pdb" target="lib\net472\ZpqrtBnk.ModelsBuilder.Web.pdb" />
 
     <!-- content for the dashboard -->
-    <file src="$solution$\src\ZpqrtBnk.ModelsBuilder.Web\Plugin\modelsbuilder.html" target="content\App_Plugins\ModelsBuilder\modelsbuilder.html" />
-    <file src="$solution$\src\ZpqrtBnk.ModelsBuilder.Web\Plugin\modelsbuilder.controller.js" target="content\App_Plugins\ModelsBuilder\modelsbuilder.controller.js" />
-    <file src="$solution$\src\ZpqrtBnk.ModelsBuilder.Web\Plugin\modelsbuilder.resource.js" target="content\App_Plugins\ModelsBuilder\modelsbuilder.resource.js" />
-    <file src="$solution$\src\ZpqrtBnk.ModelsBuilder.Web\Plugin\lang\en-US.xml" target="content\App_Plugins\ModelsBuilder\lang\en-US.xml" />
+    <file src="$solution$\src\ZpqrtBnk.ModelsBuilder.Web\Plugin\modelsbuilder.html" target="content\App_Plugins\ZpqrtBnk.ModelsBuilder\modelsbuilder.html" />
+    <file src="$solution$\src\ZpqrtBnk.ModelsBuilder.Web\Plugin\modelsbuilder.controller.js" target="content\App_Plugins\ZpqrtBnk.ModelsBuilder\modelsbuilder.controller.js" />
+    <file src="$solution$\src\ZpqrtBnk.ModelsBuilder.Web\Plugin\modelsbuilder.resource.js" target="content\App_Plugins\ZpqrtBnk.ModelsBuilder\modelsbuilder.resource.js" />
+    <file src="$solution$\src\ZpqrtBnk.ModelsBuilder.Web\Plugin\lang\en-US.xml" target="content\App_Plugins\ZpqrtBnk.ModelsBuilder\lang\en-US.xml" />
 
     <!-- transforms -->
     <file src="$solution$\build\Nuspecs\ModelsBuilder\web.config.install.xdt" target="content" />

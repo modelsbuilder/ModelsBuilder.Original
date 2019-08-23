@@ -17,7 +17,10 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Api
         private readonly JsonMediaTypeFormatter _formatter;
         private readonly MediaTypeFormatter[] _formatters;
 
-        private static string ApiControllerUrl => ModelsBuilderApiController.UrlBase;
+        // cannot get UrlBase if the controller hasn't been routed = cannot work here!
+        // the client runs outside of the web app ;-( so we have to hard code for now
+        public static string ApiControllerUrl //=> ModelsBuilderApiController.UrlBase;
+            => "/Umbraco/BackOffice/Api/ModelsBuilderApi/";
 
         public ApiClient(string url, string user, string password)
         {

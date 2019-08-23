@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="1E869FFD-E0BF-43EB-A1E2-7AFDE3E0A3AD" Version="8.1.5.190719002" Language="en-US" Publisher="ZpqrtBnk" />
-    <DisplayName>Umbraco ModelsBuilder Extension</DisplayName>
-    <Description xml:space="preserve">Umbraco Visual Studio extension for generating strongly typed models.</Description>
+    <Identity Id="88C3D56C-4657-4C90-9868-4585568CD165" Version="4.0.0.190823001" Language="en-US" Publisher="ZpqrtBnk" />
+    <DisplayName>ZpqrtBnk ModelsBuilder Extension for Umbraco</DisplayName>
+    <Description xml:space="preserve">Umbraco Visual Studio extension for generating strongly typed models. Works with ZpqrtBnk ModelsBuilder.</Description>
     <MoreInfo>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</MoreInfo>
     <License>license.txt</License>
     <Icon>u32.png</Icon>
