@@ -38,9 +38,15 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             var compiler = new Compiler { References = references };
             var compilation = compiler.GetCompilation("ZpqrtBnk.ModelsBuilder.Generated", files, out trees);
 
+            // debug
+            foreach (var d in compilation.GetDiagnostics())
+                Console.WriteLine(d);
+
             var disco = new ParseResult();
             foreach (var tree in trees)
+            {
                 Parse(disco, compilation, tree);
+            }
 
             return disco;
         }
@@ -225,7 +231,25 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                         var modelsBaseClass = (INamedTypeSymbol) attrData.ConstructorArguments[0].Value;
                         if (modelsBaseClass is IErrorTypeSymbol)
                             throw new Exception($"Invalid base class type \"{modelsBaseClass.Name}\".");
-                        disco.SetModelsBaseClassName(SymbolDisplay.ToDisplayString(modelsBaseClass));
+                        disco.SetModelsBaseClassName(true, "*", SymbolDisplay.ToDisplayString(modelsBaseClass));
+                        break;
+
+                    case "ZpqrtBnk.ModelsBuilder.ContentModelsBaseClassAttribute":
+                        var contentArgsCount = attrData.ConstructorArguments.Length;
+                        var contentAliasPattern = contentArgsCount == 1 ? "*" : (string) attrData.ConstructorArguments[0].Value;
+                        var contentModelsBaseClass = (INamedTypeSymbol) attrData.ConstructorArguments[contentArgsCount - 1].Value;
+                        if (contentModelsBaseClass is IErrorTypeSymbol)
+                            throw new Exception($"Invalid content base class type \"{contentModelsBaseClass.Name}\".");
+                        disco.SetModelsBaseClassName(true, contentAliasPattern, SymbolDisplay.ToDisplayString(contentModelsBaseClass));
+                        break;
+
+                    case "ZpqrtBnk.ModelsBuilder.ElementModelsBaseClassAttribute":
+                        var elementArgsCount = attrData.ConstructorArguments.Length;
+                        var elementAliasPattern = elementArgsCount == 1 ? "*" : (string) attrData.ConstructorArguments[0].Value;
+                        var elementModelsBaseClass = (INamedTypeSymbol) attrData.ConstructorArguments[elementArgsCount - 1].Value;
+                        if (elementModelsBaseClass is IErrorTypeSymbol)
+                            throw new Exception($"Invalid element base class type \"{elementModelsBaseClass.Name}\".");
+                        disco.SetModelsBaseClassName(false, elementAliasPattern, SymbolDisplay.ToDisplayString(elementModelsBaseClass));
                         break;
 
                     case "ZpqrtBnk.ModelsBuilder.ModelsNamespaceAttribute":

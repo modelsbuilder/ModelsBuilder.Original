@@ -185,7 +185,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             var inherits = type.HasBase
                 ? null // has its own base already
                 : (type.BaseType == null || type.BaseType.IsContentIgnored
-                    ? GetModelsBaseClassName(type)
+                    ? GetBaseClassName(type)
                     : type.BaseType.ClrName);
             if (inherits != null)
                 sb.AppendFormat(" : {0}", inherits);

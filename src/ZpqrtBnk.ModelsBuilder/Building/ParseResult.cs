@@ -41,6 +41,8 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         private readonly Dictionary<string, List<string>> _implementedExtensions
             = new Dictionary<string, List<string>>();
+        private readonly List<ModelsBaseClassInfo> _modelsBaseClassNames
+             = new List<ModelsBaseClassInfo>();
 
         public static readonly ParseResult Empty = new ParseResult();
 
@@ -66,6 +68,24 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
             //public string ReturnType { get; private set; }
             //public string ParamType { get; private set; }
+        }
+
+        private class ModelsBaseClassInfo
+        {
+            public ModelsBaseClassInfo(bool isContent, string aliasPattern, string baseClassName)
+            {
+                IsContent = isContent;
+                AliasPattern = aliasPattern;
+                BaseClassName = baseClassName;
+            }
+
+            public bool IsElement => !IsContent;
+
+            public bool IsContent { get; }
+
+            public string AliasPattern { get; }
+
+            public string BaseClassName { get; }
         }
 
         #region Declare
@@ -126,9 +146,14 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             _contentInterfaces[contentName] = interfaceNames.ToArray();
         }
 
-        public void SetModelsBaseClassName(string modelsBaseClassName)
+        public void SetModelsBaseClassName(string modelsBaseClassName) // fixme kill
         {
             ModelsBaseClassName = modelsBaseClassName;
+        }
+
+        public void SetModelsBaseClassName(bool isContent, string aliasPattern, string baseClassName)
+        {
+            _modelsBaseClassNames.Add(new ModelsBaseClassInfo(isContent, aliasPattern, baseClassName));
         }
 
         public void SetModelsNamespace(string modelsNamespace)
@@ -260,6 +285,22 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         }
 
         public string ModelsBaseClassName { get; private set; }
+
+        public string GetModelBaseClassName(bool isContent, string alias)
+        {
+            bool Match(string pattern, string s)
+            {
+                if (pattern == "*") return true;
+                if (pattern.StartsWith("*")) return s.EndsWith(pattern.Substring(1));
+                if (pattern.EndsWith("*")) return s.StartsWith(pattern.Substring(0, pattern.Length - 1));
+                return pattern == s;
+            }
+
+            var infos = _modelsBaseClassNames.Where(x => x.IsContent == isContent);
+            infos = infos.OrderByDescending(x => x.AliasPattern); // longest first... so at least '*' triggers last
+            var info = infos.FirstOrDefault(x => Match(x.AliasPattern, alias));
+            return info?.BaseClassName;
+        }
 
         public bool HasModelsNamespace
         {

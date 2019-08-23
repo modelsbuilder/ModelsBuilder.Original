@@ -2223,6 +2223,131 @@ namespace Umbraco.Web.PublishedModels
 
         }
 
+        [Test]
+        public void SelectiveBaseClass()
+        {
+            // Umbraco returns nice, pascal-cased names
+
+            var types = new List<TypeModel>();
+
+            for (var i = 1; i < 5; i++)
+            {
+                types.Add(new TypeModel
+                {
+                    Id = i,
+                    Alias = "type" + i,
+                    ClrName = "Type" + i,
+                    ParentId = 0,
+                    BaseType = null,
+                    ItemType = TypeModel.ItemTypes.Content
+                });
+            }
+
+            for (var i = 1; i < 5; i++)
+            {
+                types.Add(new TypeModel
+                {
+                    Id = i + 4,
+                    Alias = "type" + (i + 4),
+                    ClrName = "Type" + (i + 4),
+                    ParentId = 0,
+                    BaseType = null,
+                    ItemType = TypeModel.ItemTypes.Element
+                });
+            }
+
+            var code = new Dictionary<string, string>
+            {
+                {"assembly", @"
+using ZpqrtBnk.ModelsBuilder;
+
+[assembly:ContentModelsBaseClass(typeof(ContentModelBase1))]
+[assembly:ElementModelsBaseClass(typeof(ElementModelBase1))]
+
+[assembly:ContentModelsBaseClass(""*3"", typeof(ContentModelBase2))]
+[assembly:ElementModelsBaseClass(""*7"", typeof(ElementModelBase2))]
+
+[assembly:ContentModelsBaseClass(""type4"", typeof(ContentModelBase3))]
+[assembly:ElementModelsBaseClass(""type8"", typeof(ElementModelBase3))]
+
+public class ContentModelBase1 {}
+public class ElementModelBase1 {}
+public class ContentModelBase2 {}
+public class ElementModelBase2 {}
+public class ContentModelBase3 {}
+public class ElementModelBase3 {}
+"}
+            };
+
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
+            var builder = new TextBuilder(types, parseResult);
+            var btypes = builder.TypeModels;
+
+            var modelsToGenerate = builder.GetModelsToGenerate().ToList();
+
+            var sb = new StringBuilder();
+            builder.Generate(sb, modelsToGenerate[0]);
+            var gen = sb.ToString();
+
+            Console.WriteLine(gen);
+            Assert.IsTrue(gen.Contains("public partial class Type1 : ContentModelBase1"));
+
+            sb = new StringBuilder();
+            builder.Generate(sb, modelsToGenerate[1]);
+            gen = sb.ToString();
+
+            Console.WriteLine(gen);
+            Assert.IsTrue(gen.Contains("public partial class Type2 : ContentModelBase1"));
+
+            sb = new StringBuilder();
+            builder.Generate(sb, modelsToGenerate[2]);
+            gen = sb.ToString();
+
+            Console.WriteLine(gen);
+            Assert.IsTrue(gen.Contains("public partial class Type3 : ContentModelBase2"));
+
+            sb = new StringBuilder();
+            builder.Generate(sb, modelsToGenerate[3]);
+            gen = sb.ToString();
+
+            Console.WriteLine(gen);
+            Assert.IsTrue(gen.Contains("public partial class Type4 : ContentModelBase3"));
+            
+            sb = new StringBuilder();
+            builder.Generate(sb, modelsToGenerate[4]);
+            gen = sb.ToString();
+
+            Console.WriteLine(gen);
+            Assert.IsTrue(gen.Contains("public partial class Type5 : ElementModelBase1"));
+            
+            sb = new StringBuilder();
+            builder.Generate(sb, modelsToGenerate[5]);
+            gen = sb.ToString();
+
+            Console.WriteLine(gen);
+            Assert.IsTrue(gen.Contains("public partial class Type6 : ElementModelBase1"));
+
+            sb = new StringBuilder();
+            builder.Generate(sb, modelsToGenerate[6]);
+            gen = sb.ToString();
+
+            Console.WriteLine(gen);
+            Assert.IsTrue(gen.Contains("public partial class Type7 : ElementModelBase2"));
+
+            sb = new StringBuilder();
+            builder.Generate(sb, modelsToGenerate[7]);
+            gen = sb.ToString();
+
+            Console.WriteLine(gen);
+            Assert.IsTrue(gen.Contains("public partial class Type8 : ElementModelBase3"));
+        }
+
         public class Class1 { }
     }
 

@@ -334,11 +334,10 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             return Config.ModelsNamespace;
         }
 
-        protected string GetModelsBaseClassName(TypeModel type)
+        protected string GetBaseClassName(TypeModel type)
         {
-            // code attribute overrides everything
-            if (ParseResult.HasModelsBaseClassName)
-                return ParseResult.ModelsBaseClassName;
+            var baseClassName = ParseResult.GetModelBaseClassName(!type.IsElement, type.Alias);
+            if (baseClassName != null) return baseClassName;
 
             // default
             return type.IsElement ? "PublishedElementModel" : "PublishedContentModel";
