@@ -1,4 +1,5 @@
-﻿using System.Web.Http;
+﻿using System;
+using System.Reflection;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Editors;
@@ -8,7 +9,29 @@ using ZpqrtBnk.ModelsBuilder.Web.Api;
 
 namespace ZpqrtBnk.ModelsBuilder.Web
 {
-    [Disable(typeof(global::Umbraco.ModelsBuilder.Umbraco.ModelsBuilderComposer))]
+    [Disable]
+    public class NoopComposer : IComposer {
+        public void Compose(Composition composition)
+        { }
+    }
+
+    public class DisableUmbracoModelsBuilderAttribute : DisableAttribute
+    {
+        public DisableUmbracoModelsBuilderAttribute()
+        {
+            var field = typeof(DisableAttribute).GetField("<DisabledType>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (field == null) throw new Exception("panic: cannot get DisableAttribute.DisableType backing field.");
+
+            var type = Type.GetType("Umbraco.ModelsBuilder.Umbraco.ModelsBuilderComposer,Umbraco.ModelsBuilder", false);
+            field.SetValue(this, type ?? typeof(NoopComposer));
+        }
+    }
+
+    // do not reference Umbraco.ModelsBuilder - the type will be replaced at runtime
+    // (see DisableUmbracoModelsBuilderAttribute class above)
+    //[Disable(typeof(global::Umbraco.ModelsBuilder.Umbraco.ModelsBuilderComposer))]
+    [DisableUmbracoModelsBuilder]
+
     [ComposeAfter(typeof(ModelsBuilderComposer))]
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public class WebComposer : ComponentComposer<WebComponent>, IUserComposer

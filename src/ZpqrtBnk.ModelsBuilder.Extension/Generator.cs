@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Umbraco.ModelsBuilder.Api;
+using ZpqrtBnk.ModelsBuilder.Api;
 using ZpqrtBnk.ModelsBuilder.Extension.VisualStudio;
 using ZpqrtBnk.ModelsBuilder.Web.Api;
 
