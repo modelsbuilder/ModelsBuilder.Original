@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.IO;
+using System.Windows.Interop;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using ZpqrtBnk.ModelsBuilder.Extension.VisualStudio;
@@ -44,8 +45,9 @@ namespace ZpqrtBnk.ModelsBuilder.Extension
             _package = package ?? throw new ArgumentNullException(nameof(package));
             commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
-            var menuCommandID = new CommandID(CommandSet, CommandId);
-            var menuItem = new OleMenuCommand(Execute, menuCommandID);
+            var menuCommandId = new CommandID(CommandSet, CommandId);
+            var menuItem = new OleMenuCommand(Execute, menuCommandId);
+            //var menuItem = new OleMenuCommand(async (s, e) => await ExecuteAsync(s, e), menuCommandId);
             menuItem.BeforeQueryStatus += BeforeQueryStatus;
             commandService.AddCommand(menuItem);
         }
@@ -101,26 +103,27 @@ namespace ZpqrtBnk.ModelsBuilder.Extension
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            /*
-            string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
-            string title = "BuildModelsCommand";
-
-            // Show a message box to prove we were here
-            VsShellUtilities.ShowMessageBox(
-                this._package,
-                message,
-                title,
-                OLEMSGICON.OLEMSGICON_INFO,
-                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-            */
-
             // on the very first run, _item can be null?!
             var item = _item ?? VisualStudioHelper.GetProjectItem(_package.Dte);
 
-            // does *not* throw, handles its own errors
+            // NOTE:
+            // generator.Generate() does *not* throw,
+            // handles its own errors,
             // including if item is null
-            Generator.Generate(_package, item);
+
+            // getting tons of VS warnings saying the generator is going things... that should be done on the "main thread"
+            // which leads to VerifyOnUIThread() which seems to imply... generator should run on UI thread
+            // (at least for everything VS-related, maybe fetching files could be done async)
+            //
+            // https://stackoverflow.com/questions/57597098/vsthrd010-accessing-item-should-only-be-done-on-the-main-thread
+
+            var dialog = new GeneratorWindow(_package, item);
+            var hwnd = new IntPtr(_package.Dte.MainWindow.HWnd);
+            var window = (System.Windows.Window) HwndSource.FromHwnd(hwnd).RootVisual;
+            dialog.Owner = window;
+            dialog.ShowDialog();
+
+            // we'll get there only after the dialog has been closed
         }
     }
 }
