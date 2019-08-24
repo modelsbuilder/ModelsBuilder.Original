@@ -13,7 +13,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 namespace ZpqrtBnk.ModelsBuilder.Extension.VisualStudio
 {
-    class VisualStudioHelper
+    internal class VisualStudioHelper
     {
         // https://github.com/dotnet/project-system/issues/1870
         // "in .NET Standard project I cannot create dependent upon file scenarios with AddFromFile"
@@ -36,16 +36,16 @@ namespace ZpqrtBnk.ModelsBuilder.Extension.VisualStudio
 
         public static XDocument GetProjectFile(EnvDTE.Project project)
         {
-            string projectPath = System.IO.Path.Combine((string)project.Properties.Item("LocalPath").Value, (string)project.Properties.Item("FileName").Value);
-            return XDocument.Load(projectPath);
+            return XDocument.Load(GetProjectFilePath(project));
         }
 
         public static void SaveProjectFile(EnvDTE.Project project, XDocument projectFile)
         {
-            string projectPath = System.IO.Path.Combine((string)project.Properties.Item("LocalPath").Value, (string)project.Properties.Item("FileName").Value);
-            projectFile.Save(projectPath);
+            var projectPath = Path.Combine(GetProjectDirectory(project), GetProjectFileName(project));
+            projectFile.Save(GetProjectFilePath(project));
         }
 
+        /*
         public static void ClearExistingItems(EnvDTE.ProjectItem sourceItem)
         {
             if (IsNetSdkProject(sourceItem.ContainingProject))
@@ -67,13 +67,74 @@ namespace ZpqrtBnk.ModelsBuilder.Extension.VisualStudio
                     existingItem.Remove(); // or, there's .Delete() ?
             }
         }
+        */
+
+        /// <summary>
+        /// Gets the full path of the directory containing the project file (the csproj).
+        /// </summary>
+        private static string GetProjectDirectory(Project project)
+            => (string)project.Properties.Item("LocalPath").Value;
+
+        /// <summary>
+        /// Gets the project file name (just the csproj name).
+        /// </summary>
+        private static string GetProjectFileName(Project project)
+            => (string)project.Properties.Item("FileName").Value;
+
+        /// <summary>
+        /// Gets the full path of the project file (the csproj).
+        /// </summary>
+        /// <returns></returns>
+        private static string GetProjectFilePath(Project project)
+            => Path.Combine(GetProjectDirectory(project), GetProjectFileName(project));
+
+        /// <summary>
+        /// Gets the full path of the project item (including file name).
+        /// </summary>
+        private static string GetItemFullPath(ProjectItem item)
+            => (string)item.Properties.Item("FullPath").Value;
+        
+        public static void ClearGeneratedItems(EnvDTE.ProjectItem sourceItem, List<string> preserve)
+        {
+            var projectDirectory = GetProjectDirectory(sourceItem.ContainingProject);
+
+            if (IsNetSdkProject(sourceItem.ContainingProject))
+            {
+                var sourcePath = GetItemFullPath(sourceItem);
+                var sourceDirectory = Path.GetDirectoryName(sourcePath).Substring(projectDirectory.Length) + Path.DirectorySeparatorChar;
+                var dependentUpon = Path.GetFileName(sourcePath); // cannot be relative
+                var projectFile = GetProjectFile(sourceItem.ContainingProject);
+
+                var edited = false;
+                var items = projectFile.XPathSelectElements($"//ItemGroup/Compile [@Update [starts-with(.,\"{sourceDirectory}\")] and DependentUpon=\"{dependentUpon}\"]");
+                foreach (var item in items.ToList()) // ToList is important! else only the first one is actually removed!
+                {
+                    var relativeFilename = item.Attribute("Update").Value;
+                    if (preserve.Contains(relativeFilename)) continue;
+                    item.Remove();
+                    edited = true;
+                }
+
+                if (edited)
+                    SaveProjectFile(sourceItem.ContainingProject, projectFile);
+            }
+            else
+            {
+                foreach (ProjectItem existingItem in sourceItem.ProjectItems)
+                {
+                    var relativePath = GetItemFullPath(existingItem).Substring(projectDirectory.Length);
+                    if (preserve.Contains(relativePath)) continue;
+                    existingItem.Remove(); // or, there's .Delete() ?
+                }
+            }
+        }
 
         public static void AddGeneratedItems(EnvDTE.ProjectItem sourceItem, string projectPath, IEnumerable<string> filenames)
         {
             if (IsNetSdkProject(sourceItem.ContainingProject))
             {
-                var sourceIdentity = (string)sourceItem.Properties.Item("Identity").Value;
-                var dependentUpon = Path.GetFileName(sourceIdentity); // cannot be relative
+                var sourcePath = GetItemFullPath(sourceItem);
+                var dependentUpon = Path.GetFileName(sourcePath); // cannot be relative
                 var projectFile = GetProjectFile(sourceItem.ContainingProject);
 
                 var itemGroup = projectFile.XPathSelectElements($"//ItemGroup [@Label=\"DependentUpon:ModelsBuilder\"]").FirstOrDefault();
@@ -83,13 +144,16 @@ namespace ZpqrtBnk.ModelsBuilder.Extension.VisualStudio
                     projectFile.Root.Add(itemGroup);
                 }
 
+                var edited = false;
                 foreach (var filename in filenames)
                 {
                     var item = XElement.Parse($"<Compile Update=\"{filename}\"><DesignTime>True</DesignTime><AutoGen>True</AutoGen><DependentUpon>{dependentUpon}</DependentUpon></Compile>");
                     itemGroup.Add(item);
+                    edited = true;
                 }
 
-                SaveProjectFile(sourceItem.ContainingProject, projectFile);
+                if (edited)
+                    SaveProjectFile(sourceItem.ContainingProject, projectFile);
             }
             else
             {

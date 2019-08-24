@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Umbraco.Core;
 using ZpqrtBnk.ModelsBuilder.Api;
 using ZpqrtBnk.ModelsBuilder.Extension.VisualStudio;
 using ZpqrtBnk.ModelsBuilder.Web.Api;
@@ -117,7 +118,8 @@ namespace ZpqrtBnk.ModelsBuilder.Extension
 
             // load existing non-generated files
             Progress(sourceItem.DTE, "Load non-generated files...", 20);
-            var ourFiles = Directory.GetFiles(sourceItemDirectory, "*.cs")
+            var allFiles = Directory.GetFiles(sourceItemDirectory, "*.cs");
+            var ourFiles = allFiles
                 .Where(x => !x.EndsWith(".generated.cs"))
                 .ToDictionary(x => x, File.ReadAllText);
 
@@ -128,60 +130,93 @@ namespace ZpqrtBnk.ModelsBuilder.Extension
             // determine project type
             var isNetSdk = VisualStudioHelper.IsNetSdkProject(sourceItem.ContainingProject);
 
+            // prepare file lists
+            var oldGeneratedFiles = allFiles.Where(x => x.EndsWith(".generated.cs")).ToList();
+            var newGeneratedFiles = new List<string>(); // full path of new files
+            var keepGeneratedFiles = new List<string>(); // relative path of files to keep
+
+            foreach (var filename in generatedFiles.Keys)
+            {
+                var relative = Path.Combine(relativePath, filename + ".generated.cs");
+                var full = Path.Combine(projectDirectory, relative);
+
+                if (oldGeneratedFiles.Contains(full))
+                    keepGeneratedFiles.Add(relative);
+
+                newGeneratedFiles.Add(full);
+            }
+
+            // full path of files to delete
+            var removeGeneratedFiles = oldGeneratedFiles.Except(newGeneratedFiles).ToList();
+
             // have to do things in different order
             // else for NetSdk weird things (can) happen in VS
             if (isNetSdk)
             {
                 // delete existing *.generated.cs files from disk
-                Progress(sourceItem.DTE, "Remove old generated files...", 50);
-                foreach (var file in Directory.GetFiles(sourceItemDirectory, "*.generated.cs"))
+                Progress(sourceItem.DTE, "Delete old generated files...", 50);
+                foreach (var file in removeGeneratedFiles)
                     File.Delete(file);
 
                 // remove existing *.generated.cs files from project
-                VisualStudioHelper.ClearExistingItems(sourceItem);
+                Progress(sourceItem.DTE, "Remove old generated files from project...", 55);
+                VisualStudioHelper.ClearGeneratedItems(sourceItem, keepGeneratedFiles);
 
                 // add new *.generated.cs files to project
-                Progress(sourceItem.DTE, "Add new generated files...", 70);
-                var files = new Dictionary<string, string>();
-                foreach (var file in generatedFiles)
+                Progress(sourceItem.DTE, "Add new generated files to project...", 70);
+                var relFilenames = new List<string>(); // relative file names to add
+                var filesToWrite = new Dictionary<string, string>(); // files to write to disk
+                foreach (var (filename, text) in generatedFiles)
                 {
-                    var filename = Path.Combine(relativePath, file.Key + ".generated.cs");
-                    files[filename] = file.Value;
+                    var relFilename = Path.Combine(relativePath, filename + ".generated.cs");
+                    var fulFilename = Path.Combine(projectDirectory, relFilename);
+                    if (!oldGeneratedFiles.Contains(fulFilename))
+                        relFilenames.Add(relFilename);
+                    filesToWrite[fulFilename] = text;
                 }
-                VisualStudioHelper.AddGeneratedItems(sourceItem, projectDirectory, files.Keys);
+                VisualStudioHelper.AddGeneratedItems(sourceItem, projectDirectory, relFilenames);
 
+                // VS must reload the project *before* we create the files, else there's a conflict
                 // with that pause here, it works
                 // FIXME could we not pause, and wait for VS to detect the csproj changes?
                 System.Threading.Thread.Sleep(1000);
 
                 // save new *.generated.cs files to disk
-                foreach (var file in files)
+                Progress(sourceItem.DTE, "Write new generated files...", 80);
+                foreach (var (path, text) in filesToWrite)
                 {
-                    File.WriteAllText(Path.Combine(projectDirectory, file.Key), file.Value);
+                    File.WriteAllText(path, text);
                 }
             }
             else
             {
                 // remove existing *.generated.cs files from project
-                Progress(sourceItem.DTE, "Remove old generated files...", 50);
-                VisualStudioHelper.ClearExistingItems(sourceItem);
+                // (but not those that are simply overwritten)
+                Progress(sourceItem.DTE, "Remove old generated files from project...", 50);
+                VisualStudioHelper.ClearGeneratedItems(sourceItem, keepGeneratedFiles);
 
                 // delete existing *.generated.cs files from disk
-                foreach (var file in Directory.GetFiles(sourceItemDirectory, "*.generated.cs"))
+                // (but not those that are simply overwritten)
+                Progress(sourceItem.DTE, "Delete old generated files...", 55);
+                foreach (var file in removeGeneratedFiles)
                     File.Delete(file);
 
                 // save new *.generated.cs files to disk
-                Progress(sourceItem.DTE, "Add new generated files...", 70);
-                var filenames = new List<string>();
-                foreach (var file in generatedFiles)
+                Progress(sourceItem.DTE, "Write new generated files...", 70);
+                var relFilenames = new List<string>(); // relative file names to add
+                foreach (var (filename, text) in generatedFiles)
                 {
-                    var filename = Path.Combine(relativePath, file.Key + ".generated.cs");
-                    filenames.Add(filename);
-                    File.WriteAllText(Path.Combine(projectDirectory, filename), file.Value);
+                    var relFilename = Path.Combine(relativePath, filename + ".generated.cs");
+                    var fulFilename = Path.Combine(projectDirectory, relFilename);
+                    if (!oldGeneratedFiles.Contains(fulFilename))
+                        relFilenames.Add(relFilename);
+                    File.WriteAllText(fulFilename, text);
                 }
 
                 // add new *.generated.cs files to project
-                VisualStudioHelper.AddGeneratedItems(sourceItem, projectDirectory, filenames);
+                // (those that are really new, not overwritten)
+                Progress(sourceItem.DTE, "Add new generated files to project...", 75);
+                VisualStudioHelper.AddGeneratedItems(sourceItem, projectDirectory, relFilenames);
             }
 
             VisualStudioHelper.ReportMessage("Done.");
