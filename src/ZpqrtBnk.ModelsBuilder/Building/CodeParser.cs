@@ -15,6 +15,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
     internal class CodeParser
     {
         /// <summary>
+        /// Gets or sets a value indicating whether to write diagnostics to console, for debugging purposes.
+        /// </summary>
+        public bool WriteDiagnostics { get; set; }
+
+        /// <summary>
         /// Parses a set of file.
         /// </summary>
         /// <param name="files">A set of (filename,content) representing content to parse.</param>
@@ -39,8 +44,9 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             var compilation = compiler.GetCompilation("ZpqrtBnk.ModelsBuilder.Generated", files, out trees);
 
             // debug
-            foreach (var d in compilation.GetDiagnostics())
-                Console.WriteLine(d);
+            if (WriteDiagnostics)
+                foreach (var d in compilation.GetDiagnostics())
+                    Console.WriteLine(d);
 
             var disco = new ParseResult();
             foreach (var tree in trees)
