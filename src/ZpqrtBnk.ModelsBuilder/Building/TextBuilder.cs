@@ -258,10 +258,15 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             // write the mixins properties
             foreach (var mixinType in type.ImplementingInterfaces.OrderBy(x => x.ClrName))
                 foreach (var prop in mixinType.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
+                {
+                    // exclude directly implemented properties
+                    if (type.IgnoredMixinProperties.Contains(prop)) continue;
+
                     if (staticMixinGetters)
                         WriteMixinProperty(sb, prop, mixinType.ClrName);
                     else
                         WriteProperty(sb, mixinType, prop);
+                }
         }
 
         private void WriteMixinProperty(StringBuilder sb, PropertyModel property, string mixinClrName)

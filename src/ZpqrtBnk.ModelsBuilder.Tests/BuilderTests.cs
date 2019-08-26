@@ -2088,7 +2088,6 @@ namespace Umbraco.Web.PublishedModels
             Assert.AreEqual("ZpqrtBnk.ModelsBuilder.Tests.ASCIIEncoding.Nested", sb.ToString());
         }
 
-
         [Test]
         public void VaryingProperty()
         {

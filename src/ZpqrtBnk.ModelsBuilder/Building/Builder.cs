@@ -231,6 +231,16 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 typeModel.ImplementingInterfaces.AddRange(mixinImplems.Except(parentImplems));
             }
 
+            // detect mixin properties that have local implementations
+            foreach (var typeModel in _typeModels)
+            {
+                foreach (var mixinProperty in typeModel.ImplementingInterfaces.SelectMany(x => x.Properties))
+                {
+                    if (ParseResult.IsPropertyIgnored(ParseResult.ContentClrName(typeModel.Alias) ?? typeModel.ClrName, mixinProperty.Alias))
+                        typeModel.IgnoredMixinProperties.Add(mixinProperty);
+                }
+            }
+
             // ensure elements don't inherit from non-elements
             foreach (var typeModel in _typeModels.Where(x => !x.IsContentIgnored && x.IsElement))
             {

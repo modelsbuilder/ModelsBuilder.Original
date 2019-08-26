@@ -84,6 +84,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         public readonly List<TypeModel> ImplementingInterfaces = new List<TypeModel>();
 
         /// <summary>
+        /// Gets the list of mixin properties that should be ignored because this model implements them directly.
+        /// </summary>
+        public readonly List<PropertyModel> IgnoredMixinProperties = new List<PropertyModel>();
+
+        /// <summary>
         /// Gets the list of existing static mixin method candidates.
         /// </summary>
         public readonly List<string> StaticMixinMethods = new List<string>();
