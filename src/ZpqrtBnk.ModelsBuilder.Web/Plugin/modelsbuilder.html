@@ -9,8 +9,6 @@
 
             <h3 class="bold">Models Builder</h3>
 
-            <umb-load-indicator ng-show="vm.loading"></umb-load-indicator>
-
             <div ng-show="!vm.loading && vm.dashboard">
                 <div ng-bind-html="vm.dashboard.text|safe_html"></div>
 
@@ -18,7 +16,7 @@
                     <p>Models are <strong>out-of-date</strong>.</p>
                 </div>
 
-                <div ng-if="vm.dashboard.canGenerate">
+                <div style="position: relative;" ng-if="vm.dashboard.canGenerate">
                     <div ng-if="vm.dashboard.generateCausesRestart">
                         <p style="color: red; font-weight: bold;">Generating models will restart the application.</p>
                     </div>
@@ -27,9 +25,10 @@
                             <span>Generate models</span>
                         </button>
                     </div>
-                    <div class="umb-loader-wrapper" ng-show="vm.generating">
-                        <div class="umb-loader"></div>
-                    </div>
+                </div>
+                
+                <div style="position: relative;">
+                    <umb-loader ng-show="vm.generating || vm.loading"></umb-loader>
                 </div>
 
                 <div ng-if="vm.dashboard.lastError" style="margin-top: 32px;" ng-show="!vm.generating">
