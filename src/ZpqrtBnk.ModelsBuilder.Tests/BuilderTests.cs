@@ -1209,7 +1209,7 @@ namespace Dang
         [Test]
         public void MixinPropertyStatic()
         {
-            Current.Configs.Add(() => new Config(staticMixinGetters: true));
+            Current.Configs.Add(() => new Config());
 
             var type1 = new TypeModel
             {
@@ -1310,6 +1310,18 @@ namespace Umbraco.Web.PublishedModels
 		string Prop1b { get; }
 	}
 
+	/// <summary>Provides extension methods for the IType1 interface.</summary>
+	public static partial class Type1Extensions
+	{
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", ""4.0.0-alpha.6"")]
+		public static string Prop1a(this IType1 that, Fallback fallback = default, string defaultValue = default)
+			=> that.Value<string>(""prop1a"", fallback: fallback, defaultValue: defaultValue);
+
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", ""4.0.0-alpha.6"")]
+		public static string Prop1b(this IType1 that, Fallback fallback = default, string defaultValue = default)
+			=> that.Value<string>(""prop1b"", fallback: fallback, defaultValue: defaultValue);
+	}
+
 	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel, IType1
 	{
@@ -1336,14 +1348,11 @@ namespace Umbraco.Web.PublishedModels
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1a"")]
-		public string Prop1a => GetProp1a(this);
+		public string Prop1a => this.Prop1a();
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1b"")]
-		public string Prop1b => GetProp1b(this);
-
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public static string GetProp1b(IType1 that) => that.Value<string>(""prop1b"");
+		public string Prop1b => this.Prop1b();
 	}
 }
 //------------------------------------------------------------------------------
@@ -1368,6 +1377,14 @@ using ZpqrtBnk.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedModels
 {
+	/// <summary>Provides extension methods for the Type2 class.</summary>
+	public static partial class Type2Extensions
+	{
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", ""4.0.0-alpha.6"")]
+		public static int Prop2(this Type2 that, Fallback fallback = default, string defaultValue = default)
+			=> that.Value<int>(""prop2"", fallback: fallback, defaultValue: defaultValue);
+	}
+
 	[PublishedModel(""type2"")]
 	public partial class Type2 : PublishedContentModel, IType1
 	{
@@ -1394,15 +1411,15 @@ namespace Umbraco.Web.PublishedModels
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop2"")]
-		public int Prop2 => this.Value<int>(""prop2"");
+		public int Prop2 => this.Prop2();
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1a"")]
-		public string Prop1a => Umbraco.Web.PublishedModels.Type1.GetProp1a(this);
+		public string Prop1a => this.Prop1a();
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1b"")]
-		public string Prop1b => Umbraco.Web.PublishedModels.Type1.GetProp1b(this);
+		public string Prop1b => this.Prop1b();
 	}
 }
 ";
@@ -1469,6 +1486,14 @@ using ZpqrtBnk.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedModels
 {
+	/// <summary>Provides extension methods for the Type1 class.</summary>
+	public static partial class Type1Extensions
+	{
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", ""4.0.0-alpha.6"")]
+		public static string Prop1(this Type1 that, Fallback fallback = default, string defaultValue = default)
+			=> that.Value<string>(""prop1"", fallback: fallback, defaultValue: defaultValue);
+	}
+
 	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
@@ -1495,7 +1520,7 @@ namespace Umbraco.Web.PublishedModels
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1"")]
-		public string Prop1 => this.Value<string>(""prop1"");
+		public string Prop1 => this.Prop1();
 	}
 }
 ";
@@ -1586,6 +1611,14 @@ using ZpqrtBnk.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedModels
 {
+	/// <summary>Provides extension methods for the Type1 class.</summary>
+	public static partial class Type1Extensions
+	{
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", ""4.0.0-alpha.6"")]
+		public static IEnumerable<Foo> Foo(this Type1 that, Fallback fallback = default, string defaultValue = default)
+			=> that.Value<IEnumerable<Foo>>(""foo"", fallback: fallback, defaultValue: defaultValue);
+	}
+
 	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
@@ -1612,7 +1645,7 @@ namespace Umbraco.Web.PublishedModels
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""foo"")]
-		public IEnumerable<Foo> Foo => this.Value<IEnumerable<Foo>>(""foo"");
+		public IEnumerable<Foo> Foo => this.Foo();
 	}
 }
 ";
@@ -1700,6 +1733,14 @@ using ZpqrtBnk.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedModels
 {
+	/// <summary>Provides extension methods for the Type1 class.</summary>
+	public static partial class Type1Extensions
+	{
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", ""4.0.0-alpha.6"")]
+		public static string Prop1(this Type1 that, Fallback fallback = default, string defaultValue = default)
+			=> that.Value<string>(""prop1"", fallback: fallback, defaultValue: defaultValue);
+	}
+
 	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
@@ -1721,7 +1762,7 @@ namespace Umbraco.Web.PublishedModels
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1"")]
-		public string Prop1 => this.Value<string>(""prop1"");
+		public string Prop1 => this.Prop1();
 	}
 }
 ";
@@ -1812,6 +1853,14 @@ using ZpqrtBnk.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedModels
 {
+	/// <summary>Provides extension methods for the Type2 class.</summary>
+	public static partial class Type2Extensions
+	{
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", ""4.0.0-alpha.6"")]
+		public static string Prop1(this Type2 that, Fallback fallback = default, string defaultValue = default)
+			=> that.Value<string>(""prop1"", fallback: fallback, defaultValue: defaultValue);
+	}
+
 	// Content Type with alias ""type1""
 	[PublishedModel(""type1"")]
 	public partial class Type2 : PublishedContentModel
@@ -1834,7 +1883,7 @@ namespace Umbraco.Web.PublishedModels
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1"")]
-		public string Prop1 => this.Value<string>(""prop1"");
+		public string Prop1 => this.Prop1();
 	}
 }
 ";
@@ -1847,7 +1896,7 @@ namespace Umbraco.Web.PublishedModels
         {
             // Umbraco returns nice, pascal-cased names
 
-            Current.Configs.Add(() => new Config(staticMixinGetters: true));
+            Current.Configs.Add(() => new Config());
 
             var type1 = new TypeModel
             {
@@ -2089,7 +2138,7 @@ namespace Umbraco.Web.PublishedModels
         }
 
         [Test]
-        public void VaryingProperty()
+        public void VaryingProperties()
         {
             // Umbraco returns nice, pascal-cased names
 
@@ -2121,12 +2170,26 @@ namespace Umbraco.Web.PublishedModels
             {
                 Alias = "prop3",
                 ClrName = "Prop3",
-                ModelClrType = typeof(string)
+                ModelClrType = typeof(string),
+                Variations = ContentVariation.Segment
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop4",
                 ClrName = "Prop4",
+                ModelClrType = typeof(string),
+                Variations = ContentVariation.CultureAndSegment
+            });
+            type1.Properties.Add(new PropertyModel
+            {
+                Alias = "prop5",
+                ClrName = "Prop5",
+                ModelClrType = typeof(string)
+            });
+            type1.Properties.Add(new PropertyModel
+            {
+                Alias = "prop6",
+                ClrName = "Prop6",
                 ModelClrType = typeof(string),
                 Variations = ContentVariation.Culture
             });
@@ -2145,7 +2208,7 @@ namespace Models
         public static string Prop1(this Type1 that, string culture = null, string segment = null) { return """"; }
     }
 
-    [IgnorePropertyType(""prop4"")]
+    [IgnorePropertyType(""prop6"")]
     public partial class Type1
     { }
 }
@@ -2171,7 +2234,7 @@ namespace Models
 // <auto-generated>
 //   This code was generated by a tool.
 //
-//    ZpqrtBnk.ModelsBuilder v4.0.0-alpha.7
+//    ZpqrtBnk.ModelsBuilder v" + version + @"
 //
 //   Changes to this file will be lost if the code is regenerated.
 // </auto-generated>
@@ -2192,8 +2255,21 @@ namespace Umbraco.Web.PublishedModels
 	/// <summary>Provides extension methods for the Type1 class.</summary>
 	public static partial class Type1Extensions
 	{
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", ""4.0.0-alpha.7"")]
-		public static string Prop2(this Type1 that, string culture = null, string segment = null) => that.Value<string>(""prop2"", culture, segment);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
+		public static string Prop2(this Type1 that, string culture = null, Fallback fallback = default, string defaultValue = default)
+			=> that.Value<string>(""prop2"", culture: culture, fallback: fallback, defaultValue: defaultValue);
+
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
+		public static string Prop3(this Type1 that, string segment = null, Fallback fallback = default, string defaultValue = default)
+			=> that.Value<string>(""prop3"", segment: segment, fallback: fallback, defaultValue: defaultValue);
+
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
+		public static string Prop4(this Type1 that, string culture = null, string segment = null, Fallback fallback = default, string defaultValue = default)
+			=> that.Value<string>(""prop4"", culture: culture, segment: segment, fallback: fallback, defaultValue: defaultValue);
+
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
+		public static string Prop5(this Type1 that, Fallback fallback = default, string defaultValue = default)
+			=> that.Value<string>(""prop5"", fallback: fallback, defaultValue: defaultValue);
 	}
 
 	[PublishedModel(""type1"")]
@@ -2201,14 +2277,14 @@ namespace Umbraco.Web.PublishedModels
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", ""4.0.0-alpha.7"")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
 		public new const string ModelTypeAlias = ""type1"";
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", ""4.0.0-alpha.7"")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", ""4.0.0-alpha.7"")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
 		public new static IPublishedContentType GetModelContentType()
 			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", ""4.0.0-alpha.7"")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
 		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
@@ -2220,17 +2296,25 @@ namespace Umbraco.Web.PublishedModels
 
 		// properties
 
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", ""4.0.0-alpha.7"")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop1"")]
 		public string Prop1 => this.Prop1();
 
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", ""4.0.0-alpha.7"")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop2"")]
 		public string Prop2 => this.Prop2();
 
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", ""4.0.0-alpha.7"")]
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
 		[ImplementPropertyType(""prop3"")]
-		public string Prop3 => this.Value<string>(""prop3"");
+		public string Prop3 => this.Prop3();
+
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
+		[ImplementPropertyType(""prop4"")]
+		public string Prop4 => this.Prop4();
+
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
+		[ImplementPropertyType(""prop5"")]
+		public string Prop5 => this.Prop5();
 	}
 }
 ";

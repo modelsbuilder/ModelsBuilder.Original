@@ -35,20 +35,6 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
             Assert.AreEqual(Config.DefaultModelsNamespace, config.ModelsNamespace);
         }
 
-        [Test]
-        public void DefaultStaticMixinGetterPattern1()
-        {
-            var config = new Config(enable: true);
-            Assert.AreEqual(Config.DefaultStaticMixinGetterPattern, config.StaticMixinGetterPattern);
-        }
-
-        [Test]
-        public void DefaultStaticMixinGetterPattern2()
-        {
-            var config = new Config();
-            Assert.AreEqual(Config.DefaultStaticMixinGetterPattern, config.StaticMixinGetterPattern);
-        }
-
         [TestCase("c:/path/to/root", "~/dir/models", false, "c:\\path\\to\\root\\dir\\models")]
         [TestCase("c:/path/to/root", "~/../../dir/models", true, "c:\\path\\dir\\models")]
         [TestCase("c:/path/to/root", "c:/another/path/to/elsewhere", true, "c:\\another\\path\\to\\elsewhere")]

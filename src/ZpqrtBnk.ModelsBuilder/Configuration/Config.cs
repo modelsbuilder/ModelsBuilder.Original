@@ -25,12 +25,10 @@ namespace ZpqrtBnk.ModelsBuilder.Configuration
         internal const ModelsMode DefaultModelsMode = ModelsMode.Nothing;
 
         internal const bool DefaultAcceptUnsafeModelsDirectory = false;
-        internal const bool DefaultStaticMixinGetters = true;
         internal const bool DefaultFlagOutOfDateModels = true;
 
         internal const int DefaultDebugLevel = 0;
 
-        internal const string DefaultStaticMixinGetterPattern = "Get{0}";
         internal const LanguageVersion DefaultLanguageVersion = LanguageVersion.CSharp7_3;
         internal const string DefaultModelsNamespace = "Umbraco.Web.PublishedModels";
         internal const ClrNameSource DefaultClrNameSource = ClrNameSource.Alias; // for legacy reasons
@@ -55,12 +53,10 @@ namespace ZpqrtBnk.ModelsBuilder.Configuration
 
             // more switches
             AcceptUnsafeModelsDirectory = GetSetting("AcceptUnsafeModelsDirectory", DefaultAcceptUnsafeModelsDirectory);
-            StaticMixinGetters = GetSetting("StaticMixinGetters", DefaultStaticMixinGetters);
             FlagOutOfDateModels = GetSetting("FlagOutOfDateModels", DefaultFlagOutOfDateModels);
 
             // strings
             ModelsNamespace = GetSetting("ModelsNamespace", DefaultModelsNamespace);
-            StaticMixinGetterPattern = GetSetting("StaticMixinGetterPattern", DefaultStaticMixinGetterPattern);
 
             // others
             DebugLevel = GetSetting("DebugLevel", DefaultDebugLevel);
@@ -103,8 +99,6 @@ namespace ZpqrtBnk.ModelsBuilder.Configuration
             string modelsNamespace = DefaultModelsNamespace,
             bool enableFactory = DefaultEnableFactory,
             LanguageVersion languageVersion = DefaultLanguageVersion,
-            bool staticMixinGetters = DefaultStaticMixinGetters,
-            string staticMixinGetterPattern = DefaultStaticMixinGetterPattern,
             bool flagOutOfDateModels = DefaultFlagOutOfDateModels,
             ClrNameSource clrNameSource = DefaultClrNameSource,
             string modelsDirectory = DefaultModelsDirectory,
@@ -119,8 +113,6 @@ namespace ZpqrtBnk.ModelsBuilder.Configuration
             ModelsNamespace = modelsNamespace;
             EnableFactory = enableFactory;
             LanguageVersion = languageVersion;
-            StaticMixinGetters = staticMixinGetters;
-            StaticMixinGetterPattern = staticMixinGetterPattern;
             FlagOutOfDateModels = flagOutOfDateModels;
             ClrNameSource = clrNameSource;
             ModelsDirectory = modelsDirectory;
@@ -310,18 +302,6 @@ namespace ZpqrtBnk.ModelsBuilder.Configuration
         /// </summary>
         /// <remarks>Default value is <c>CSharp6</c>.</remarks>
         public LanguageVersion LanguageVersion { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether to generate static mixin getters.
-        /// </summary>
-        /// <remarks>Default value is <c>false</c> for backward compat reaons.</remarks>
-        public bool StaticMixinGetters { get; }
-
-        /// <summary>
-        /// Gets the string pattern for mixin properties static getter name.
-        /// </summary>
-        /// <remarks>Default value is "GetXxx". Standard string format.</remarks>
-        public string StaticMixinGetterPattern { get; }
 
         /// <summary>
         /// Gets a value indicating whether we should flag out-of-date models.

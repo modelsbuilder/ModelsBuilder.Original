@@ -294,7 +294,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             //if (!implements)
             //    return;
 
-            disco.SetStaticMixinMethod(classSymbol.Name, methodSymbol.Name, returnType.Name, paramType.Name);
+            //disco.SetStaticMixinMethod(classSymbol.Name, methodSymbol.Name, returnType.Name, paramType.Name);
         }
     }
 }

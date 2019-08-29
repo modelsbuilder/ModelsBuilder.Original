@@ -154,8 +154,8 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 sb.Append("\t}\n\n");
             }
 
-            // extension methods for varying properties
-            var extensionProperties = type.Properties.Where(x => !x.IsIgnored && x.Variations != ContentVariation.Nothing && !x.IsExtensionImplemented).ToList();
+            // write extension methods for properties
+            var extensionProperties = type.Properties.Where(x => !x.IsIgnored && !x.IsExtensionImplemented).ToList();
             if (extensionProperties.Count > 0)
             {
                 sb.AppendFormat("\t/// <summary>Provides extension methods for the {0}{1} {2}.</summary>\n",
@@ -167,7 +167,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 {
                     if (first) first = false;
                     else sb.Append("\n");
-                    WriteVaryingProperty(sb, type, prop);
+                    WritePropertyMethod(sb, type, prop);
                 }
                 sb.Append("\t}\n\n");
             }
@@ -245,11 +245,9 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         private void WriteContentTypeProperties(StringBuilder sb, TypeModel type)
         {
-            var staticMixinGetters = Config.StaticMixinGetters;
-
             // write the properties
             foreach (var prop in type.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
-                WriteProperty(sb, type, prop, staticMixinGetters && type.IsMixin ? type.ClrName : null);
+                WriteProperty(sb, prop);
 
             // no need to write the parent properties since we inherit from the parent
             // and the parent defines its own properties. need to write the mixins properties
@@ -261,51 +259,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 {
                     // exclude directly implemented properties
                     if (type.IgnoredMixinProperties.Contains(prop)) continue;
-
-                    if (staticMixinGetters)
-                        WriteMixinProperty(sb, prop, mixinType.ClrName);
-                    else
-                        WriteProperty(sb, mixinType, prop);
+                    WriteProperty(sb, prop);
                 }
         }
 
-        private void WriteMixinProperty(StringBuilder sb, PropertyModel property, string mixinClrName)
-        {
-            sb.Append("\n");
-
-            // Adds xml summary to each property containing
-            // property name and property description
-            if (!string.IsNullOrWhiteSpace(property.Name) || !string.IsNullOrWhiteSpace(property.Description))
-            {
-                sb.Append("\t\t///<summary>\n");
-
-                if (!string.IsNullOrWhiteSpace(property.Description))
-                    sb.AppendFormat("\t\t/// {0}: {1}\n", XmlCommentString(property.Name), XmlCommentString(property.Description));
-                else
-                    sb.AppendFormat("\t\t/// {0}\n", XmlCommentString(property.Name));
-
-                sb.Append("\t\t///</summary>\n");
-            }
-
-            WriteGeneratedCodeAttribute(sb, "\t\t");
-            sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
-
-            sb.Append("\t\tpublic ");
-            WriteClrType(sb, property.ClrTypeName);
-
-            sb.AppendFormat(" {0} => ",
-                property.ClrName);
-            WriteNonGenericClrType(sb, GetModelsNamespace() + "." + mixinClrName);
-            sb.AppendFormat(".{0}(this);\n",
-                MixinStaticGetterName(property.ClrName));
-        }
-
-        private static string MixinStaticGetterName(string clrName)
-        {
-            return string.Format(Config.StaticMixinGetterPattern, clrName);
-        }
-
-        private void WriteVaryingProperty(StringBuilder sb, TypeModel type, PropertyModel property)
+        private void WritePropertyMethod(StringBuilder sb, TypeModel type, PropertyModel property)
         {
             if (property.Errors != null) return;
 
@@ -329,23 +287,28 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteClrType(sb, property.ClrTypeName);
             sb.Append(" ");
             sb.Append(property.ClrName);
-            sb.AppendFormat("(this {0}{1} that, string culture = null, string segment = null)",
-                type.IsMixin ? "I" : "", type.ClrName);
-            sb.Append(" => that.Value");
+            sb.AppendFormat("(this {0}{1} that", type.IsMixin ? "I" : "", type.ClrName);
+            if (property.VariesByCulture())
+                sb.Append(", string culture = null");
+            if (property.VariesBySegment())
+                sb.Append(", string segment = null");
+            sb.Append(", Fallback fallback = default, string defaultValue = default)\n\t\t\t=> that.Value");
             if (property.ModelClrType != typeof(object))
             {
                 sb.Append("<");
                 WriteClrType(sb, property.ClrTypeName);
                 sb.Append(">");
             }
-            sb.AppendFormat("(\"{0}\", culture, segment);\n",
-                property.Alias);
+            sb.AppendFormat("(\"{0}\"", property.Alias);
+            if (property.VariesByCulture())
+                sb.Append(", culture: culture");
+            if (property.VariesBySegment())
+                sb.Append(", segment: segment");
+            sb.Append(", fallback: fallback, defaultValue: defaultValue);\n");
         }
 
-        private void WriteProperty(StringBuilder sb, TypeModel type, PropertyModel property, string mixinClrName = null)
+        private void WriteProperty(StringBuilder sb, PropertyModel property)
         {
-            var mixinStatic = mixinClrName != null;
-
             sb.Append("\n");
 
             if (property.Errors != null)
@@ -386,38 +349,9 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteGeneratedCodeAttribute(sb, "\t\t");
             sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
 
-            if (mixinStatic)
-            {
-                sb.Append("\t\tpublic ");
-                WriteClrType(sb, property.ClrTypeName);
-                sb.AppendFormat(" {0} => {1}(this);\n",
-                    property.ClrName, MixinStaticGetterName(property.ClrName));
-            }
-            else
-            {
-                if (property.Variations == ContentVariation.Nothing)
-                {
-                    sb.Append("\t\tpublic ");
-                    WriteClrType(sb, property.ClrTypeName);
-                    sb.AppendFormat(" {0} => this.Value",
-                        property.ClrName);
-                    if (property.ModelClrType != typeof(object))
-                    {
-                        sb.Append("<");
-                        WriteClrType(sb, property.ClrTypeName);
-                        sb.Append(">");
-                    }
-                    sb.AppendFormat("(\"{0}\");\n",
-                        property.Alias);
-                }
-                else
-                {
-                    sb.Append("\t\tpublic ");
-                    WriteClrType(sb, property.ClrTypeName);
-                    sb.AppendFormat(" {0} => this.{0}();\n",
-                        property.ClrName);
-                }
-            }
+            sb.Append("\t\tpublic ");
+            WriteClrType(sb, property.ClrTypeName);
+            sb.AppendFormat(" {0} => this.{0}();\n", property.ClrName);
 
             if (property.Errors != null)
             {
@@ -425,31 +359,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 sb.Append("\t\t *\n");
                 sb.Append("\t\t */\n");
             }
-
-            if (!mixinStatic) return;
-
-            var mixinStaticGetterName = MixinStaticGetterName(property.ClrName);
-
-            if (type.StaticMixinMethods.Contains(mixinStaticGetterName)) return;
-
-            sb.Append("\n");
-
-            if (!string.IsNullOrWhiteSpace(property.Name))
-                sb.AppendFormat("\t\t/// <summary>Static getter for {0}</summary>\n", XmlCommentString(property.Name));
-
-            WriteGeneratedCodeAttribute(sb, "\t\t");
-            sb.Append("\t\tpublic static ");
-            WriteClrType(sb, property.ClrTypeName);
-            sb.AppendFormat(" {0}(I{1} that) => that.Value",
-                mixinStaticGetterName, mixinClrName);
-            if (property.ModelClrType != typeof(object))
-            {
-                sb.Append("<");
-                WriteClrType(sb, property.ClrTypeName);
-                sb.Append(">");
-            }
-            sb.AppendFormat("(\"{0}\");\n",
-                property.Alias);
         }
 
         private static IEnumerable<string> SplitError(string error)

@@ -65,18 +65,7 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Plugin
                 ? $"<li><strong>{config.ModelsMode} models</strong> are enabled.</li>"
                 : "<li>No models mode is specified: models will <em>not</em> be generated.</li>");
 
-            sb.Append($"<li>Models namespace is <strong>{config.ModelsNamespace}</strong>.</li>");
-
-            sb.Append("<li>Static mixin getters are ");
-            sb.Append(config.StaticMixinGetters ? "enabled" : "disabled");
-            if (config.StaticMixinGetters)
-            {
-                sb.Append(". The pattern for getters is ");
-                sb.Append(string.IsNullOrWhiteSpace(config.StaticMixinGetterPattern)
-                    ? "not configured (will use default)"
-                    : $"\"{config.StaticMixinGetterPattern}\"");
-            }
-            sb.Append(".</li>");
+            sb.Append($"<li>Models namespace is <strong>{config.ModelsNamespace}</strong> but may be overriden by attribute.</li>");
 
             sb.Append("<li>Tracking of <strong>out-of-date models</strong> is ");
             sb.Append(config.FlagOutOfDateModels ? "enabled" : "not enabled");
