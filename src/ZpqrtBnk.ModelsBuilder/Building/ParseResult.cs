@@ -153,6 +153,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             _implementedExtensions[typeName].Add(propertyName);
         }
 
+        public void SetGeneratePropertyGetters(bool value)
+        {
+            GeneratePropertyGetters = value;
+        }
+
         #endregion
 
         #region Query
@@ -262,6 +267,8 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         }
 
         public string ModelsNamespace { get; private set; }
+
+        public bool GeneratePropertyGetters { get; private set; } = true;
 
         public IEnumerable<string> UsingNamespaces
         {

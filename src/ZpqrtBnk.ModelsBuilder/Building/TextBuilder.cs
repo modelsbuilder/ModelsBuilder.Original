@@ -232,12 +232,18 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
             // write the ctor
             if (!type.HasCtor)
-                sb.AppendFormat("\t\t// ctor\n\t\tpublic {0}(IPublished{1} content)\n\t\t\t: base(content)\n\t\t{{ }}\n\n",
+                sb.AppendFormat("\t\t// ctor\n\t\tpublic {0}(IPublished{1} content)\n\t\t\t: base(content)\n\t\t{{ }}\n",
                     type.ClrName, type.IsElement ? "Element" : "Content");
 
+            if (!type.HasCtor && ParseResult.GeneratePropertyGetters)
+                sb.Append("\n");
+
             // write the properties
-            sb.Append("\t\t// properties\n");
-            WriteContentTypeProperties(sb, type);
+            if (ParseResult.GeneratePropertyGetters)
+            {
+                sb.Append("\t\t// properties\n");
+                WriteContentTypeProperties(sb, type);
+            }
 
             // close the class declaration
             sb.Append("\t}\n");

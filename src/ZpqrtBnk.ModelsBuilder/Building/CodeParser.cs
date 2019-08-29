@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace ZpqrtBnk.ModelsBuilder.Building
@@ -234,11 +235,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                         break;
 
                     case "ZpqrtBnk.ModelsBuilder.ModelsBaseClassAttribute":
-                        var modelsBaseClass = (INamedTypeSymbol) attrData.ConstructorArguments[0].Value;
-                        if (modelsBaseClass is IErrorTypeSymbol)
-                            throw new Exception($"Invalid base class type \"{modelsBaseClass.Name}\".");
-                        disco.SetModelsBaseClassName(true, "*", SymbolDisplay.ToDisplayString(modelsBaseClass));
-                        break;
+                        throw new NotSupportedException("The ModelsBaseClassAttribute is not supported anymore.");
 
                     case "ZpqrtBnk.ModelsBuilder.ContentModelsBaseClassAttribute":
                         var contentArgsCount = attrData.ConstructorArguments.Length;
@@ -258,6 +255,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                         disco.SetModelsBaseClassName(false, elementAliasPattern, SymbolDisplay.ToDisplayString(elementModelsBaseClass));
                         break;
 
+                    // fixme obsolete but we keep it around for now
                     case "ZpqrtBnk.ModelsBuilder.ModelsNamespaceAttribute":
                         var modelsNamespace= (string) attrData.ConstructorArguments[0].Value;
                         disco.SetModelsNamespace(modelsNamespace);
@@ -266,6 +264,21 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                     case "ZpqrtBnk.ModelsBuilder.ModelsUsingAttribute":
                         var usingNamespace = (string)attrData.ConstructorArguments[0].Value;
                         disco.SetUsingNamespace(usingNamespace);
+                        break;
+
+                    case "ZpqrtBnk.ModelsBuilder.ModelsBuilderConfigureAttribute":
+                        foreach (var (argName, argValue) in attrData.NamedArguments)
+                        {
+                            switch (argName)
+                            {
+                                case nameof(ModelsBuilderConfigureAttribute.Namespace):
+                                    disco.SetModelsNamespace((string) argValue.Value);
+                                    break;
+                                case nameof(ModelsBuilderConfigureAttribute.GeneratePropertyGetters):
+                                    disco.SetGeneratePropertyGetters((bool) argValue.Value);
+                                    break;
+                            }
+                        }
                         break;
                 }
             }

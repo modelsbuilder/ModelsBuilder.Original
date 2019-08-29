@@ -55,6 +55,7 @@
     <Compile Include="Configuration\ClrNameSource.cs" />
     <Compile Include="ContentModelsBaseClassAttribute.cs" />
     <Compile Include="ElementModelsBaseClassAttribute.cs" />
+    <Compile Include="ModelsBuilderConfigureAttribute.cs" />
     <Compile Include="ModelsBuilderAssemblyAttribute.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
     <Compile Include="PureLiveAssemblyAttribute.cs" />

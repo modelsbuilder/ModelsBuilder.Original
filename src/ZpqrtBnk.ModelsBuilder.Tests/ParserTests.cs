@@ -102,5 +102,26 @@ namespace Foo
 
             var parseResult2 = new CodeParser().Parse(code, refs);
         }
+
+        [Test]
+        public void Parse_ModelsBuilderConfigureAttribute()
+        {
+            var code = new Dictionary<string, string>
+            {
+                { "assembly", @"
+using ZpqrtBnk.ModelsBuilder;
+[assembly:ModelsBuilderConfigure(Namespace=""foo"", GeneratePropertyGetters=false)]
+" }
+            };
+
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser().Parse(code, refs);
+            Assert.IsFalse(parseResult.GeneratePropertyGetters);
+        }
     }
 }
