@@ -2172,81 +2172,35 @@ namespace Umbraco.Web.PublishedModels
             Assert.AreEqual(expected, sb.ToString());
         }
 
-        [Test]
-        public void WriteClrType_WithUsing()
+        [TestCase(true, true, "Borked", typeof(global::System.Text.ASCIIEncoding), "System.Text.ASCIIEncoding")]
+        [TestCase(true, false, "Borked", typeof(global::System.Text.ASCIIEncoding), "ASCIIEncoding")]
+        [TestCase(false, true, "Borked", typeof(global::System.Text.ASCIIEncoding), "System.Text.ASCIIEncoding")]
+        [TestCase(false, false, "Borked", typeof(global::System.Text.ASCIIEncoding), "System.Text.ASCIIEncoding")]
+
+        [TestCase(true, true, "ZpqrtBnk.ModelsBuilder.Tests", typeof(global::System.Text.ASCIIEncoding), "global::System.Text.ASCIIEncoding")]
+        [TestCase(true, false, "ZpqrtBnk.ModelsBuilder.Tests", typeof(global::System.Text.ASCIIEncoding), "global::System.Text.ASCIIEncoding")]
+        [TestCase(false, true, "ZpqrtBnk.ModelsBuilder.Tests", typeof(global::System.Text.ASCIIEncoding), "global::System.Text.ASCIIEncoding")]
+        [TestCase(false, false, "ZpqrtBnk.ModelsBuilder.Tests", typeof(global::System.Text.ASCIIEncoding), "global::System.Text.ASCIIEncoding")]
+
+        [TestCase(true, true, "Borked", typeof(StringBuilder), "StringBuilder")]
+        [TestCase(true, false, "Borked", typeof(StringBuilder), "StringBuilder")]
+        [TestCase(false, true, "Borked", typeof(StringBuilder), "System.Text.StringBuilder")] // magic? using = not ambiguous
+        [TestCase(false, false, "Borked", typeof(StringBuilder), "System.Text.StringBuilder")]
+
+        [TestCase(true, true, "ZpqrtBnk.ModelsBuilder.Tests", typeof(StringBuilder), "StringBuilder")]
+        [TestCase(true, false, "ZpqrtBnk.ModelsBuilder.Tests", typeof(StringBuilder), "StringBuilder")]
+        [TestCase(false, true, "ZpqrtBnk.ModelsBuilder.Tests", typeof(StringBuilder), "global::System.Text.StringBuilder")] // magic? in ns = ambiguous
+        [TestCase(false, false, "ZpqrtBnk.ModelsBuilder.Tests", typeof(StringBuilder), "global::System.Text.StringBuilder")]
+        public void WriteClrType_Ambiguous_Ns(bool usingSystem, bool usingZb, string ns, Type type, string expected)
         {
             var builder = new TextBuilder();
-            builder.Using.Add("System.Text");
-            builder.ModelsNamespaceForTests = "ZpqrtBnk.ModelsBuilder.Tests.Models";
+            if (usingSystem) builder.Using.Add("System.Text");
+            if (usingZb) builder.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
+            builder.ModelsNamespaceForTests = ns;
             var sb = new StringBuilder();
-            builder.WriteClrType(sb, typeof(StringBuilder));
-            Assert.AreEqual("StringBuilder", sb.ToString());
-        }
+            builder.WriteClrType(sb, type);
 
-        [Test]
-        public void WriteClrTypeAnother_WithoutUsing()
-        {
-            var builder = new TextBuilder();
-            builder.ModelsNamespaceForTests = "ZpqrtBnk.ModelsBuilder.Tests.Models";
-            var sb = new StringBuilder();
-            builder.WriteClrType(sb, typeof(StringBuilder));
-            Assert.AreEqual("System.Text.StringBuilder", sb.ToString());
-        }
-
-        [Test]
-        public void WriteClrType_Ambiguous1()
-        {
-            var builder = new TextBuilder();
-            builder.Using.Add("System.Text");
-            builder.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
-            builder.ModelsNamespaceForTests = "SomeRandomNamespace";
-            var sb = new StringBuilder();
-            builder.WriteClrType(sb, typeof(global::System.Text.ASCIIEncoding));
-
-            // full type name is needed but not global::
-            Assert.AreEqual("System.Text.ASCIIEncoding", sb.ToString());
-        }
-
-        [Test]
-        public void WriteClrType_Ambiguous()
-        {
-            var builder = new TextBuilder();
-            builder.Using.Add("System.Text");
-            builder.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
-            builder.ModelsNamespaceForTests = "SomeBorkedNamespace";
-            var sb = new StringBuilder();
-            builder.WriteClrType(sb, typeof(global::System.Text.ASCIIEncoding));
-
-            // global:: is required
-            Assert.AreEqual("global::System.Text.ASCIIEncoding", sb.ToString());
-        }
-
-        [Test]
-        public void WriteClrType_Ambiguous2()
-        {
-            var builder = new TextBuilder();
-            builder.Using.Add("System.Text");
-            builder.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
-            builder.ModelsNamespaceForTests = "SomeRandomNamespace";
-            var sb = new StringBuilder();
-            builder.WriteClrType(sb, typeof(ASCIIEncoding));
-
-            // full type name is needed but not global::
-            Assert.AreEqual("ZpqrtBnk.ModelsBuilder.Tests.ASCIIEncoding", sb.ToString());
-        }
-
-        [Test]
-        public void WriteClrType_AmbiguousNot()
-        {
-            var builder = new TextBuilder();
-            builder.Using.Add("System.Text");
-            builder.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
-            builder.ModelsNamespaceForTests = "ZpqrtBnk.ModelsBuilder.Tests.Models";
-            var sb = new StringBuilder();
-            builder.WriteClrType(sb, typeof(ASCIIEncoding));
-
-            // type name is ok because of the namespace
-            Assert.AreEqual("ASCIIEncoding", sb.ToString());
+            Assert.AreEqual(expected, sb.ToString());
         }
 
         [Test]
@@ -2577,7 +2531,7 @@ public class ElementModelBase3 {}
         public class Class1 { }
     }
 
-// make it public to be ambiguous (see above)
+    // make it public to be ambiguous (see above)
     public class ASCIIEncoding
     {
         // can we handle nested types?

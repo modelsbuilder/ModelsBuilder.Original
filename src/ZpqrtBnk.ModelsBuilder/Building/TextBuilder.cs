@@ -481,21 +481,17 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             // if full type name matches a using clause, strip
             // so if we want Umbraco.Core.Models.IPublishedContent
             // and using Umbraco.Core.Models, then we just need IPublishedContent
+            // also works for the models namespace
             typeName = s;
             string typeUsing = null;
             var p = typeName.LastIndexOf('.');
             if (p > 0)
             {
                 var x = typeName.Substring(0, p);
-                if (Using.Contains(x))
+                if (Using.Contains(x) || x == ModelsNamespace)
                 {
                     typeName = typeName.Substring(p + 1);
                     typeUsing = x;
-                }
-                else if (x == ModelsNamespace) // that one is used by default
-                {
-                    typeName = typeName.Substring(p + 1);
-                    typeUsing = ModelsNamespace;
                 }
             }
 
