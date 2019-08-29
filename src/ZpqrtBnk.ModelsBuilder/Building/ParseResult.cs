@@ -120,11 +120,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             _contentInterfaces[contentName] = interfaceNames.ToArray();
         }
 
-        public void SetModelsBaseClassName(string modelsBaseClassName) // fixme kill
-        {
-            ModelsBaseClassName = modelsBaseClassName;
-        }
-
         public void SetModelsBaseClassName(bool isContent, string aliasPattern, string baseClassName)
         {
             _modelsBaseClassNames.Add(new ModelsBaseClassInfo(isContent, aliasPattern, baseClassName));
@@ -244,13 +239,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                     .FirstOrDefault(x => x != null))) return name;
             return null;
         }
-
-        public bool HasModelsBaseClassName
-        {
-            get { return !string.IsNullOrWhiteSpace(ModelsBaseClassName); }
-        }
-
-        public string ModelsBaseClassName { get; private set; }
 
         public string GetModelBaseClassName(bool isContent, string alias)
         {

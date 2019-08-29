@@ -32,7 +32,7 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
                 {"assembly", @"
 using ZpqrtBnk.ModelsBuilder;
 using Dang;
-[assembly:ModelsBaseClass(typeof(Whatever))]
+[assembly:ContentModelsBaseClass(typeof(Whatever))]
 namespace Dang
 {
 public class Whatever
@@ -49,8 +49,7 @@ public class Whatever
 
             var parseResult = new CodeParser().Parse(code, refs);
 
-            Assert.IsTrue(parseResult.HasModelsBaseClassName);
-            Assert.AreEqual("Dang.Whatever", parseResult.ModelsBaseClassName);
+            Assert.AreEqual("Dang.Whatever", parseResult.GetModelBaseClassName(true, "bah"));
         }
 
         [Test]

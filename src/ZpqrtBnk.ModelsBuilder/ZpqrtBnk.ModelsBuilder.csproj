@@ -71,7 +71,6 @@
     <Compile Include="ImplementPropertyTypeAttribute.cs" />
     <Compile Include="ImplementContentTypeAttribute.cs" />
     <Compile Include="ModelsUsingAttribute.cs" />
-    <Compile Include="ModelsBaseClassAttribute.cs" />
     <Compile Include="ModelsNamespaceAttribute.cs" />
     <Compile Include="RenameContentTypeAttribute.cs" />
     <Compile Include="Building\ParseResult.cs" />
