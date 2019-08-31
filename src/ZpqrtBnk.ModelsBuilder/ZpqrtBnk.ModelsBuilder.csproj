@@ -84,6 +84,7 @@
     <Compile Include="IgnoreContentTypeAttribute.cs" />
     <Compile Include="IgnorePropertyTypeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypeModelItemTypesExtensions.cs" />
     <Compile Include="Umbraco\LiveModelsProviderModule.cs" />
     <Compile Include="Umbraco\ModelsBuilderComposer.cs" />
     <Compile Include="Umbraco\ModelsBuilderInitializer.cs" />

@@ -1347,20 +1347,6 @@ namespace Umbraco.Web.PublishedModels
 	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel, IType1
 	{
-		// helpers
-#pragma warning disable 0109 // new is redundant
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new const string ModelTypeAlias = ""type1"";
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new static IPublishedContentType GetModelContentType()
-			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
-			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
-#pragma warning restore 0109
-
 		// ctor
 		public Type1(IPublishedContent content)
 			: base(content)
@@ -1410,20 +1396,6 @@ namespace Umbraco.Web.PublishedModels
 	[PublishedModel(""type2"")]
 	public partial class Type2 : PublishedContentModel, IType1
 	{
-		// helpers
-#pragma warning disable 0109 // new is redundant
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new const string ModelTypeAlias = ""type2"";
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new static IPublishedContentType GetModelContentType()
-			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
-			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
-#pragma warning restore 0109
-
 		// ctor
 		public Type2(IPublishedContent content)
 			: base(content)
@@ -1519,20 +1491,6 @@ namespace Umbraco.Web.PublishedModels
 	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
-		// helpers
-#pragma warning disable 0109 // new is redundant
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new const string ModelTypeAlias = ""type1"";
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new static IPublishedContentType GetModelContentType()
-			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
-			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
-#pragma warning restore 0109
-
 		// ctor
 		public Type1(IPublishedContent content)
 			: base(content)
@@ -1629,20 +1587,6 @@ namespace Umbraco.Web.PublishedModels
 	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
-		// helpers
-#pragma warning disable 0109 // new is redundant
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new const string ModelTypeAlias = ""type1"";
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new static IPublishedContentType GetModelContentType()
-			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
-			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
-#pragma warning restore 0109
-
 		// ctor
 		public Type1(IPublishedContent content)
 			: base(content)
@@ -1748,20 +1692,6 @@ namespace Umbraco.Web.PublishedModels
 	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
-		// helpers
-#pragma warning disable 0109 // new is redundant
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new const string ModelTypeAlias = ""type1"";
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new static IPublishedContentType GetModelContentType()
-			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
-			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
-#pragma warning restore 0109
-
 		// ctor
 		public Type1(IPublishedContent content)
 			: base(content)
@@ -1870,20 +1800,6 @@ namespace Umbraco.Web.PublishedModels
 	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
-		// helpers
-#pragma warning disable 0109 // new is redundant
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new const string ModelTypeAlias = ""type1"";
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new static IPublishedContentType GetModelContentType()
-			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
-			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
-#pragma warning restore 0109
-
 		// properties
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
@@ -1991,20 +1907,6 @@ namespace Umbraco.Web.PublishedModels
 	[PublishedModel(""type1"")]
 	public partial class Type2 : PublishedContentModel
 	{
-		// helpers
-#pragma warning disable 0109 // new is redundant
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new const string ModelTypeAlias = ""type1"";
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new static IPublishedContentType GetModelContentType()
-			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
-			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
-#pragma warning restore 0109
-
 		// properties
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
@@ -2355,20 +2257,6 @@ namespace Umbraco.Web.PublishedModels
 	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
-		// helpers
-#pragma warning disable 0109 // new is redundant
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new const string ModelTypeAlias = ""type1"";
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public new static IPublishedContentType GetModelContentType()
-			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""ZpqrtBnk.ModelsBuilder"", """ + version + @""")]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
-			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
-#pragma warning restore 0109
-
 		// ctor
 		public Type1(IPublishedContent content)
 			: base(content)
@@ -2527,6 +2415,217 @@ public class ElementModelBase3 {}
             Console.WriteLine(gen);
             Assert.IsTrue(gen.Contains("public partial class Type8 : ElementModelBase3"));
         }
+
+        [Test]
+        public void GenerateSimpleMeta()
+        {
+            // Umbraco returns nice, pascal-cased names
+
+            var types = new List<TypeModel>();
+            
+            var type1 = new TypeModel
+            {
+                Id = 1,
+                Alias = "type1",
+                ClrName = "Type1",
+                ParentId = 0,
+                BaseType = null,
+                ItemType = TypeModel.ItemTypes.Content,
+            };
+            type1.Properties.Add(new PropertyModel
+            {
+                Alias = "prop1",
+                ClrName = "Prop1",
+                ModelClrType = typeof(string),
+            });
+            types.Add(type1);
+
+            var type2 = new TypeModel
+            {
+                Id = 2,
+                Alias = "type2",
+                ClrName = "Type2",
+                ParentId = 0,
+                BaseType = null,
+                ItemType = TypeModel.ItemTypes.Content,
+            };
+            type2.Properties.Add(new PropertyModel
+            {
+                Alias = "prop1",
+                ClrName = "Prop1",
+                ModelClrType = typeof(string),
+            });
+            type2.Properties.Add(new PropertyModel
+            {
+                Alias = "prop2",
+                ClrName = "Prop2",
+                ModelClrType = typeof(string),
+            });
+            type2.Properties.Add(new PropertyModel
+            {
+                Alias = "prop3",
+                ClrName = "Prop3",
+                ModelClrType = typeof(string),
+            });
+            types.Add(type2);
+
+            var type3 = new TypeModel
+            {
+                Id = 3,
+                Alias = "type3",
+                ClrName = "Type3",
+                ParentId = 0,
+                BaseType = null,
+                ItemType = TypeModel.ItemTypes.Media,
+            };
+            types.Add(type3);
+
+            var code = new Dictionary<string, string>
+            {
+            };
+
+            var parseResult = new CodeParser().Parse(code);
+            var builder = new TextBuilder(types, parseResult);
+            var btypes = builder.TypeModels;
+
+            var sb = new StringBuilder();
+            builder.AppendMeta(sb, builder.GetModelsToGenerate());
+            var gen = sb.ToString();
+
+            var version = ApiVersion.Current.Version;
+            var expected = @"//------------------------------------------------------------------------------
+// <auto-generated>
+//   This code was generated by a tool.
+//
+//    ZpqrtBnk.ModelsBuilder v" + version + @"
+//
+//   Changes to this file will be lost if the code is regenerated.
+// </auto-generated>
+//------------------------------------------------------------------------------
+
+using System.CodeDom.Compiler;
+using Umbraco.Core.Models.PublishedContent;
+using ZpqrtBnk.ModelsBuilder.Umbraco;
+
+namespace Umbraco.Web.PublishedModels
+{
+	/// <summary>Models Builder</summary>
+	public static partial class MB
+	{
+		/// <summary>Gets Models Builder's generator name.</summary>
+		public const string Name = ""ZpqrtBnk.ModelsBuilder"";
+
+		/// <summary>Gets the Models Builder version that was used to generate the files.</summary>
+		public const string VersionString = ""4.0.0-alpha.6"";
+
+		/// <summary>Provides the content type published item types.</summary>
+		[GeneratedCodeAttribute(Name, VersionString)]
+		public static class ItemType
+		{
+			/// <summary>Gets the published item type of the Type1 content type.</summary>
+			public const PublishedItemType Type1 = PublishedItemType.Content;
+
+			/// <summary>Gets the published item type of the Type2 content type.</summary>
+			public const PublishedItemType Type2 = PublishedItemType.Content;
+
+			/// <summary>Gets the published item type of the Type3 content type.</summary>
+			public const PublishedItemType Type3 = PublishedItemType.Media;
+		}
+
+		/// <summary>Defines the content type alias constants.</summary>
+		[GeneratedCodeAttribute(Name, VersionString)]
+		public static class ContentAlias
+		{
+			/// <summary>Gets the alias of the Type1 content type.</summary>
+			public const string Type1 = ""type1"";
+
+			/// <summary>Gets the alias of the Type2 content type.</summary>
+			public const string Type2 = ""type2"";
+
+			/// <summary>Gets the alias of the Type3 content type.</summary>
+			public const string Type3 = ""type3"";
+		}
+
+		/// <summary>Defines the property type alias constants.</summary>
+		[GeneratedCodeAttribute(Name, VersionString)]
+		public static class PropertyAlias
+		{
+			/// <summary>Defines the property type alias constants for the Type1 content type.</summary>
+			public static class Type1
+			{
+				/// <summary>Gets the alias of the Type1.Prop1 property type.</summary>
+				public const string Prop1 = ""prop1"";
+			}
+
+			/// <summary>Defines the property type alias constants for the Type2 content type.</summary>
+			public static class Type2
+			{
+				/// <summary>Gets the alias of the Type2.Prop1 property type.</summary>
+				public const string Prop1 = ""prop1"";
+
+				/// <summary>Gets the alias of the Type2.Prop2 property type.</summary>
+				public const string Prop2 = ""prop2"";
+
+				/// <summary>Gets the alias of the Type2.Prop3 property type.</summary>
+				public const string Prop3 = ""prop3"";
+			}
+
+			/// <summary>Defines the property type alias constants for the Type3 content type.</summary>
+			public static class Type3
+			{
+			}
+		}
+
+		/// <summary>Provides the content types.</summary>
+		[GeneratedCodeAttribute(Name, VersionString)]
+		public static class ContentType
+		{
+			/// <summary>Gets the Type1 content type.</summary>
+			public static readonly IPublishedContentType Type1 = PublishedModelUtility.GetModelContentType(ItemType.Type1, ""type1"");
+
+			/// <summary>Gets the Type2 content type.</summary>
+			public static readonly IPublishedContentType Type2 = PublishedModelUtility.GetModelContentType(ItemType.Type2, ""type2"");
+
+			/// <summary>Gets the Type3 content type.</summary>
+			public static readonly IPublishedContentType Type3 = PublishedModelUtility.GetModelContentType(ItemType.Type3, ""type3"");
+		}
+
+		/// <summary>Provides the property types.</summary>
+		[GeneratedCodeAttribute(Name, VersionString)]
+		public static class PropertyType
+		{
+			/// <summary>Provides the property types for the Type1 content type.</summary>
+			public static class Type1
+			{
+				/// <summary>Gets the Type1.Prop1 property type.</summary>
+				public static readonly IPublishedPropertyType Prop1 = ContentType.Type1.GetPropertyType(PropertyAlias.Type1.Prop1);
+			}
+
+			/// <summary>Provides the property types for the Type2 content type.</summary>
+			public static class Type2
+			{
+				/// <summary>Gets the Type2.Prop1 property type.</summary>
+				public static readonly IPublishedPropertyType Prop1 = ContentType.Type2.GetPropertyType(PropertyAlias.Type2.Prop1);
+
+				/// <summary>Gets the Type2.Prop2 property type.</summary>
+				public static readonly IPublishedPropertyType Prop2 = ContentType.Type2.GetPropertyType(PropertyAlias.Type2.Prop2);
+
+				/// <summary>Gets the Type2.Prop3 property type.</summary>
+				public static readonly IPublishedPropertyType Prop3 = ContentType.Type2.GetPropertyType(PropertyAlias.Type2.Prop3);
+			}
+
+			/// <summary>Provides the property types for the Type3 content type.</summary>
+			public static class Type3
+			{
+			}
+		}
+	}
+}
+";
+            Console.WriteLine(gen);
+            Assert.AreEqual(expected.ClearLf(), gen);
+        }
+
 
         public class Class1 { }
     }
