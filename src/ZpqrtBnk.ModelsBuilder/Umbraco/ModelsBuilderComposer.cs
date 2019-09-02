@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Umbraco.Core;
+﻿using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache.NuCache;
@@ -26,14 +25,11 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
         private void ComposeForDefaultModelsFactory(Composition composition)
         {
-            composition.RegisterUnique<IPublishedModelFactory>(factory =>
-            {
-                var typeLoader = factory.GetInstance<TypeLoader>();
-                var types = typeLoader
-                    .GetTypes<PublishedElementModel>() // element models
-                    .Concat(typeLoader.GetTypes<PublishedContentModel>()); // content models
-                return new PublishedModelFactory(types);
-            });
+            composition.WithCollectionBuilder<ModelTypeCollectionBuilder>()
+                .Add(composition.TypeLoader.GetTypes<PublishedElementModel>())
+                .Add(composition.TypeLoader.GetTypes<PublishedContentModel>());
+
+            composition.RegisterUnique<IPublishedModelFactory>(factory => new PublishedModelFactory(factory.GetInstance<ModelTypeCollection>()));
         }
 
         private void ComposeForLiveModels(Composition composition)

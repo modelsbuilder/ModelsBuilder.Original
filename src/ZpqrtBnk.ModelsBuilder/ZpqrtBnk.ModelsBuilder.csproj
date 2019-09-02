@@ -52,6 +52,7 @@
     <Compile Include="Building\Generator.cs" />
     <Compile Include="Building\PropertyModelExtensions.cs" />
     <Compile Include="Building\TextHeaderWriter.cs" />
+    <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Configuration\ClrNameSource.cs" />
     <Compile Include="ContentModelsBaseClassAttribute.cs" />
     <Compile Include="ContentTypeModelInfo.cs" />
@@ -91,6 +92,8 @@
     <Compile Include="Umbraco\ModelsBuilderComposer.cs" />
     <Compile Include="Umbraco\ModelsBuilderInitializer.cs" />
     <Compile Include="Umbraco\ModelsGenerationError.cs" />
+    <Compile Include="Umbraco\ModelTypeCollection.cs" />
+    <Compile Include="Umbraco\ModelTypeCollectionBuilder.cs" />
     <Compile Include="Umbraco\UmbracoServices.cs" />
     <Compile Include="Umbraco\HashCombiner.cs" />
     <Compile Include="Umbraco\HashHelper.cs" />
