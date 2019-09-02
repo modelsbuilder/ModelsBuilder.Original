@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NUnit.Framework;
 using Microsoft.CodeAnalysis;
@@ -20,6 +21,21 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
         public TestBuilder(IList<TypeModel> typeModels, ParseResult parseResult)
             : base(typeModels, parseResult)
         { }
+
+        public override void AppendModel(StringBuilder sb, TypeModel typeModel)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void AppendModels(StringBuilder sb, IEnumerable<TypeModel> typeModels)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void AppendMeta(StringBuilder sb, IEnumerable<TypeModel> typeModels)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [TestFixture]

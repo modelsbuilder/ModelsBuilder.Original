@@ -34,6 +34,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
         private readonly int _debugLevel;
         private BuildManager _theBuildManager;
         private readonly Lazy<UmbracoServices> _umbracoServices;
+        private readonly IBuilderFactory _builderFactory;
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
         private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
@@ -42,9 +43,10 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
         private readonly Config _config;
 
-        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IProfilingLogger logger, Config config)
+        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IBuilderFactory builderFactory, IProfilingLogger logger, Config config)
         {
             _umbracoServices = umbracoServices;
+            _builderFactory = builderFactory;
             _logger = logger;
             _config = config;
             _ver = 1; // zero is for when we had no version
@@ -560,10 +562,12 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                 File.Delete(file);
 
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
-            var builder = new TextBuilder(typeModels, parseResult, _config.ModelsNamespace);
+            var builder = _builderFactory.CreateBuilder(typeModels, parseResult, _config.ModelsNamespace);
+            var modelsToGenerate = builder.GetModels().ToList();
 
             var codeBuilder = new StringBuilder();
-            builder.Generate(codeBuilder, builder.GetModelsToGenerate());
+            builder.AppendModels(codeBuilder, modelsToGenerate);
+            builder.AppendMeta(codeBuilder, modelsToGenerate);
             var code = codeBuilder.ToString();
 
             return code;

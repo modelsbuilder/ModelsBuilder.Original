@@ -19,7 +19,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
     /// <summary>
     /// Provides a base class for all builders.
     /// </summary>
-    internal abstract class Builder
+    public abstract class Builder : IBuilder
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Builder"/> class with a list of models to generate
@@ -89,7 +89,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// Gets the list of models to generate.
         /// </summary>
         /// <returns>The models to generate, ie those that are not ignored.</returns>
-        public IEnumerable<TypeModel> GetModelsToGenerate()
+        public IEnumerable<TypeModel> GetModels()
         {
             return TypeModels.Where(x => !x.IsContentIgnored);
         }
@@ -98,7 +98,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// Gets the list of all models.
         /// </summary>
         /// <remarks>Includes those that are ignored.</remarks>
-        internal IList<TypeModel> TypeModels { get; }
+        protected internal IList<TypeModel> TypeModels { get; }
 
         /// <summary>
         /// Prepares generation by processing the result of code parsing.
@@ -347,5 +347,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             // default
             return type.IsElement ? "PublishedElementModel" : "PublishedContentModel";
         }
+
+        public abstract void AppendModel(StringBuilder sb, TypeModel typeModel);
+
+        public abstract void AppendModels(StringBuilder sb, IEnumerable<TypeModel> typeModels);
+
+        public abstract void AppendMeta(StringBuilder sb, IEnumerable<TypeModel> typeModels);
     }
 }

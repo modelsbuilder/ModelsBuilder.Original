@@ -29,11 +29,13 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Umbraco
     public class ModelsBuilderController : UmbracoAuthorizedJsonController
     {
         private readonly UmbracoServices _umbracoServices;
+        private readonly IBuilderFactory _builderFactory;
         private readonly Config _config;
 
-        public ModelsBuilderController(UmbracoServices umbracoServices, Config config)
+        public ModelsBuilderController(UmbracoServices umbracoServices, IBuilderFactory builderFactory, Config config)
         {
             _umbracoServices = umbracoServices;
+            _builderFactory = builderFactory;
             _config = config;
         }
 
@@ -110,7 +112,7 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Umbraco
 
         private void GenerateModels(string modelsDirectory, string bin)
         {
-            Generator.GenerateModels(_umbracoServices, modelsDirectory, bin, _config.ModelsNamespace);
+            Generator.GenerateModels(_umbracoServices, _builderFactory, modelsDirectory, bin, _config.ModelsNamespace);
         }
 
         [DataContract]

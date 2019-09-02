@@ -8,7 +8,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 {
     public class Generator
     {
-        public static void GenerateModels(UmbracoServices umbracoServices, string modelsDirectory, string bin, string modelsNamespace)
+        public static void GenerateModels(UmbracoServices umbracoServices, IBuilderFactory builderFactory, string modelsDirectory, string bin, string modelsNamespace)
         {
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
@@ -20,13 +20,13 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
-            var builder = new TextBuilder(typeModels, parseResult, modelsNamespace);
-            var modelsToGenerate = builder.GetModelsToGenerate().ToList();
+            var builder = builderFactory.CreateBuilder(typeModels, parseResult, modelsNamespace);
+            var modelsToGenerate = builder.GetModels().ToList();
 
             foreach (var typeModel in modelsToGenerate)
             {
                 var sb = new StringBuilder();
-                builder.Generate(sb, typeModel);
+                builder.AppendModel(sb, typeModel);
                 var filename = Path.Combine(modelsDirectory, typeModel.ClrName + ".generated.cs");
                 File.WriteAllText(filename, sb.ToString());
             }
@@ -58,20 +58,20 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             OutOfDateModelsStatus.Clear();
         }
 
-        public static Dictionary<string, string> GetModels(UmbracoServices umbracoServices, string modelsNamespace, IDictionary<string, string> files)
+        public static Dictionary<string, string> GetModels(UmbracoServices umbracoServices, IBuilderFactory builderFactory, string modelsNamespace, IDictionary<string, string> files)
         {
             var typeModels = umbracoServices.GetAllTypes();
 
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(files);
-            var builder = new TextBuilder(typeModels, parseResult, modelsNamespace);
+            var builder = builderFactory.CreateBuilder(typeModels, parseResult, modelsNamespace);
 
             var models = new Dictionary<string, string>();
-            var modelsToGenerate = builder.GetModelsToGenerate().ToList();
+            var modelsToGenerate = builder.GetModels().ToList();
 
             foreach (var typeModel in modelsToGenerate)
             {
                 var sb = new StringBuilder();
-                builder.Generate(sb, typeModel);
+                builder.AppendModel(sb, typeModel);
                 models[typeModel.ClrName] = sb.ToString();
             }
 

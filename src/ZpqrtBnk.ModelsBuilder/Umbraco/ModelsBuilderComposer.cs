@@ -2,6 +2,7 @@
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache.NuCache;
+using ZpqrtBnk.ModelsBuilder.Building;
 using ZpqrtBnk.ModelsBuilder.Configuration;
 
 namespace ZpqrtBnk.ModelsBuilder.Umbraco
@@ -15,6 +16,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
             base.Compose(composition);
 
             composition.Register<UmbracoServices>(Lifetime.Singleton);
+            composition.Register<IBuilderFactory, TextBuilderFactory>(Lifetime.Singleton);
             composition.Configs.Add(() => new Config());
 
             if (composition.Configs.ModelsBuilder().ModelsMode == ModelsMode.PureLive)

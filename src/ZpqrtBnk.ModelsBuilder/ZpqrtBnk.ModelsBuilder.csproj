@@ -48,8 +48,11 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Building\TextBuilderFactory.cs" />
     <Compile Include="Building\CompilerException.cs" />
     <Compile Include="Building\Generator.cs" />
+    <Compile Include="Building\IBuilder.cs" />
+    <Compile Include="Building\IBuilderFactory.cs" />
     <Compile Include="Building\PropertyModelExtensions.cs" />
     <Compile Include="Building\TextHeaderWriter.cs" />
     <Compile Include="CompositionExtensions.cs" />

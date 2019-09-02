@@ -625,7 +625,7 @@ namespace Dang
             Assert.IsTrue(btype3.HasBase);
 
             var sb = new StringBuilder();
-            builder.Generate(sb, btype3);
+            builder.AppendModel(sb, btype3);
             var gen = sb.ToString();
             Console.WriteLine(gen);
 
@@ -1089,7 +1089,7 @@ namespace Dang
             Assert.AreEqual("Type1", btype1.ClrName);
 
             var sb = new StringBuilder();
-            builder.Generate(sb, btype1);
+            builder.AppendModel(sb, btype1);
             var gen = sb.ToString();
             Console.WriteLine(gen);
 
@@ -1203,7 +1203,7 @@ namespace Dang
             Assert.AreEqual("Type2", btype2.ClrName);
 
             var sb = new StringBuilder();
-            builder.Generate(sb, btype1);
+            builder.AppendModel(sb, btype1);
             var gen = sb.ToString();
             Console.WriteLine(gen);
 
@@ -1215,7 +1215,7 @@ namespace Dang
             Assert.Greater(0, gen.IndexOf("string Prop1c"));
 
             sb.Clear();
-            builder.Generate(sb, btype2);
+            builder.AppendModel(sb, btype2);
             gen = sb.ToString();
             Console.WriteLine(gen);
 
@@ -1295,8 +1295,8 @@ namespace Test
             var btypes = builder.TypeModels;
 
             var sb = new StringBuilder();
-            foreach (var model in builder.GetModelsToGenerate())
-                builder.Generate(sb, model);
+            foreach (var model in builder.GetModels())
+                builder.AppendModel(sb, model);
             var gen = sb.ToString();
 
             var version = ApiVersion.Current.Version;
@@ -1456,7 +1456,7 @@ namespace Umbraco.Web.PublishedModels
             var btypes = builder.TypeModels;
 
             var sb = new StringBuilder();
-            builder.Generate(sb, builder.GetModelsToGenerate().First());
+            builder.AppendModel(sb, builder.GetModels().First());
             var gen = sb.ToString();
 
             var version = ApiVersion.Current.Version;
@@ -1553,7 +1553,7 @@ using ZpqrtBnk.ModelsBuilder;
             var btypes = builder.TypeModels;
 
             var sb = new StringBuilder();
-            builder.Generate(sb, builder.GetModelsToGenerate().First());
+            builder.AppendModel(sb, builder.GetModels().First());
             var gen = sb.ToString();
 
             var version = ApiVersion.Current.Version;
@@ -1654,12 +1654,12 @@ namespace Umbraco.Web.PublishedModels
             builder.ModelsNamespace = "Umbraco.Web.PublishedModels";
 
             var sb1 = new StringBuilder();
-            builder.Generate(sb1, builder.GetModelsToGenerate().Skip(1).First());
+            builder.AppendModel(sb1, builder.GetModels().Skip(1).First());
             var gen1 = sb1.ToString();
             Console.WriteLine(gen1);
 
             var sb = new StringBuilder();
-            builder.Generate(sb, builder.GetModelsToGenerate().First());
+            builder.AppendModel(sb, builder.GetModels().First());
             var gen = sb.ToString();
 
             var version = ApiVersion.Current.Version;
@@ -1768,7 +1768,7 @@ public partial class Type1
             var btypes = builder.TypeModels;
 
             var sb = new StringBuilder();
-            builder.Generate(sb, builder.GetModelsToGenerate().First());
+            builder.AppendModel(sb, builder.GetModels().First());
             var gen = sb.ToString();
 
             var version = ApiVersion.Current.Version;
@@ -1875,7 +1875,7 @@ public partial class Type2
             var btypes = builder.TypeModels;
 
             var sb = new StringBuilder();
-            builder.Generate(sb, builder.GetModelsToGenerate().First());
+            builder.AppendModel(sb, builder.GetModels().First());
             var gen = sb.ToString();
 
             var version = ApiVersion.Current.Version;
@@ -1978,8 +1978,8 @@ namespace Umbraco.Web.PublishedModels
             var btypes = builder.TypeModels;
 
             var sb = new StringBuilder();
-            foreach (var model in builder.GetModelsToGenerate())
-                builder.Generate(sb, model);
+            foreach (var model in builder.GetModels())
+                builder.AppendModel(sb, model);
             var gen = sb.ToString();
 
             var version = typeof(Builder).Assembly.GetName().Version;
@@ -2043,8 +2043,8 @@ namespace Umbraco.Web.PublishedModels
             var btypes = builder.TypeModels;
 
             var sb = new StringBuilder();
-            foreach (var model in builder.GetModelsToGenerate())
-                builder.Generate(sb, model);
+            foreach (var model in builder.GetModels())
+                builder.AppendModel(sb, model);
             var gen = sb.ToString();
 
             Console.WriteLine(gen);
@@ -2215,7 +2215,7 @@ namespace Models
             var btypes = builder.TypeModels;
 
             var sb = new StringBuilder();
-            builder.Generate(sb, builder.GetModelsToGenerate().First());
+            builder.AppendModel(sb, builder.GetModels().First());
             var gen = sb.ToString();
 
             var version = ApiVersion.Current.Version;
@@ -2365,59 +2365,59 @@ public class ElementModelBase3 {}
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
-            var modelsToGenerate = builder.GetModelsToGenerate().ToList();
+            var modelsToGenerate = builder.GetModels().ToList();
 
             var sb = new StringBuilder();
-            builder.Generate(sb, modelsToGenerate[0]);
+            builder.AppendModel(sb, modelsToGenerate[0]);
             var gen = sb.ToString();
 
             Console.WriteLine(gen);
             Assert.IsTrue(gen.Contains("public partial class Type1 : ContentModelBase1"));
 
             sb = new StringBuilder();
-            builder.Generate(sb, modelsToGenerate[1]);
+            builder.AppendModel(sb, modelsToGenerate[1]);
             gen = sb.ToString();
 
             Console.WriteLine(gen);
             Assert.IsTrue(gen.Contains("public partial class Type2 : ContentModelBase1"));
 
             sb = new StringBuilder();
-            builder.Generate(sb, modelsToGenerate[2]);
+            builder.AppendModel(sb, modelsToGenerate[2]);
             gen = sb.ToString();
 
             Console.WriteLine(gen);
             Assert.IsTrue(gen.Contains("public partial class Type3 : ContentModelBase2"));
 
             sb = new StringBuilder();
-            builder.Generate(sb, modelsToGenerate[3]);
+            builder.AppendModel(sb, modelsToGenerate[3]);
             gen = sb.ToString();
 
             Console.WriteLine(gen);
             Assert.IsTrue(gen.Contains("public partial class Type4 : ContentModelBase3"));
             
             sb = new StringBuilder();
-            builder.Generate(sb, modelsToGenerate[4]);
+            builder.AppendModel(sb, modelsToGenerate[4]);
             gen = sb.ToString();
 
             Console.WriteLine(gen);
             Assert.IsTrue(gen.Contains("public partial class Type5 : ElementModelBase1"));
             
             sb = new StringBuilder();
-            builder.Generate(sb, modelsToGenerate[5]);
+            builder.AppendModel(sb, modelsToGenerate[5]);
             gen = sb.ToString();
 
             Console.WriteLine(gen);
             Assert.IsTrue(gen.Contains("public partial class Type6 : ElementModelBase1"));
 
             sb = new StringBuilder();
-            builder.Generate(sb, modelsToGenerate[6]);
+            builder.AppendModel(sb, modelsToGenerate[6]);
             gen = sb.ToString();
 
             Console.WriteLine(gen);
             Assert.IsTrue(gen.Contains("public partial class Type7 : ElementModelBase2"));
 
             sb = new StringBuilder();
-            builder.Generate(sb, modelsToGenerate[7]);
+            builder.AppendModel(sb, modelsToGenerate[7]);
             gen = sb.ToString();
 
             Console.WriteLine(gen);
@@ -2497,7 +2497,7 @@ public class ElementModelBase3 {}
             var btypes = builder.TypeModels;
 
             var sb = new StringBuilder();
-            builder.AppendMeta(sb, builder.GetModelsToGenerate());
+            builder.AppendMeta(sb, builder.GetModels());
             var gen = sb.ToString();
 
             var version = ApiVersion.Current.Version;

@@ -98,12 +98,12 @@ namespace Umbraco.Web.PublishedModels
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
-            var modelsToGenerate = builder.GetModelsToGenerate().ToList();
+            var modelsToGenerate = builder.GetModels().ToList();
 
             foreach (var modelToGenerate in modelsToGenerate)
             {
                 var sb = new StringBuilder();
-                builder.Generate(sb, modelToGenerate);
+                builder.AppendModel(sb, modelToGenerate);
                 var gen = sb.ToString();
                 Console.WriteLine(gen);
             }
@@ -187,12 +187,12 @@ namespace Umbraco.Web.PublishedModels
             var builder = new TextBuilder(types, parseResult);
             var btypes = builder.TypeModels;
 
-            var modelsToGenerate = builder.GetModelsToGenerate().ToList();
+            var modelsToGenerate = builder.GetModels().ToList();
 
             foreach (var modelToGenerate in modelsToGenerate)
             {
                 var sb = new StringBuilder();
-                builder.Generate(sb, modelToGenerate);
+                builder.AppendModel(sb, modelToGenerate);
                 var gen = sb.ToString();
                 Console.WriteLine(gen);
             }

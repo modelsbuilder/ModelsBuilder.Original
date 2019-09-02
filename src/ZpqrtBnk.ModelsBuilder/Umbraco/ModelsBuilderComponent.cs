@@ -5,6 +5,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Mvc;
+using ZpqrtBnk.ModelsBuilder.Building;
 using ZpqrtBnk.ModelsBuilder.Configuration;
 
 namespace ZpqrtBnk.ModelsBuilder.Umbraco
@@ -12,10 +13,11 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
     public class ModelsBuilderComponent : IComponent
     {
         private readonly UmbracoServices _umbracoServices;
+        private readonly IBuilderFactory _builderFactory;
 
         private readonly Config _config;
 
-        public ModelsBuilderComponent(UmbracoServices umbracoServices, Config config)
+        public ModelsBuilderComponent(UmbracoServices umbracoServices, IBuilderFactory builderFactory, Config config)
         {
             _umbracoServices = umbracoServices;
             _config = config;
@@ -30,7 +32,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
             // fixme LiveModelsProvider should not be static
             if (_config.ModelsMode.IsLiveNotPure())
-                LiveModelsProvider.Install(_umbracoServices);
+                LiveModelsProvider.Install(_umbracoServices, _builderFactory);
 
             // fixme OutOfDateModelsStatus should not be static
             if (_config.FlagOutOfDateModels)
