@@ -21,9 +21,41 @@ namespace ZpqrtBnk.ModelsBuilder.Building
     /// </summary>
     internal abstract class Builder
     {
-        private readonly IList<TypeModel> _typeModels;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Builder"/> class with a list of models to generate
+        /// and the result of code parsing.
+        /// </summary>
+        /// <param name="typeModels">The list of models to generate.</param>
+        /// <param name="parseResult">The result of code parsing.</param>
+        protected Builder(IList<TypeModel> typeModels, ParseResult parseResult)
+            : this(typeModels, parseResult, null)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Builder"/> class with a list of models to generate,
+        /// the result of code parsing, and a models namespace.
+        /// </summary>
+        /// <param name="typeModels">The list of models to generate.</param>
+        /// <param name="parseResult">The result of code parsing.</param>
+        /// <param name="modelsNamespace">The models namespace.</param>
+        protected Builder(IList<TypeModel> typeModels, ParseResult parseResult, string modelsNamespace)
+        {
+            TypeModels = typeModels ?? throw new ArgumentNullException(nameof(typeModels));
+            ParseResult = parseResult ?? throw new ArgumentNullException(nameof(parseResult));
+
+            // can be null or empty, we'll manage
+            ModelsNamespace = modelsNamespace;
+
+            // but we want it to prepare
+            Prepare();
+        }
+
+        // for unit tests only
+        protected Builder()
+        { }
 
         protected Dictionary<string, string> ModelsMap { get; } = new Dictionary<string, string>();
+
         protected ParseResult ParseResult { get; }
 
         private static Config Config => Current.Configs.ModelsBuilder();
@@ -59,47 +91,14 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <returns>The models to generate, ie those that are not ignored.</returns>
         public IEnumerable<TypeModel> GetModelsToGenerate()
         {
-            return _typeModels.Where(x => !x.IsContentIgnored);
+            return TypeModels.Where(x => !x.IsContentIgnored);
         }
 
         /// <summary>
         /// Gets the list of all models.
         /// </summary>
         /// <remarks>Includes those that are ignored.</remarks>
-        internal IList<TypeModel> TypeModels => _typeModels;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Builder"/> class with a list of models to generate
-        /// and the result of code parsing.
-        /// </summary>
-        /// <param name="typeModels">The list of models to generate.</param>
-        /// <param name="parseResult">The result of code parsing.</param>
-        protected Builder(IList<TypeModel> typeModels, ParseResult parseResult)
-            : this(typeModels, parseResult, null)
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Builder"/> class with a list of models to generate,
-        /// the result of code parsing, and a models namespace.
-        /// </summary>
-        /// <param name="typeModels">The list of models to generate.</param>
-        /// <param name="parseResult">The result of code parsing.</param>
-        /// <param name="modelsNamespace">The models namespace.</param>
-        protected Builder(IList<TypeModel> typeModels, ParseResult parseResult, string modelsNamespace)
-        {
-            _typeModels = typeModels ?? throw new ArgumentNullException(nameof(typeModels));
-            ParseResult = parseResult ?? throw new ArgumentNullException(nameof(parseResult));
-
-            // can be null or empty, we'll manage
-            ModelsNamespace = modelsNamespace;
-
-            // but we want it to prepare
-            Prepare();
-        }
-
-        // for unit tests only
-        protected Builder()
-        { }
+        internal IList<TypeModel> TypeModels { get; }
 
         /// <summary>
         /// Prepares generation by processing the result of code parsing.
@@ -110,20 +109,20 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// </remarks>
         private void Prepare()
         {
-            TypeModel.MapModelTypes(_typeModels, ModelsNamespace);
+            TypeModel.MapModelTypes(TypeModels, ModelsNamespace);
 
             var pureLive = Config.ModelsMode == ModelsMode.PureLive;
 
             // mark IsContentIgnored models that we discovered should be ignored
             // then propagate / ignore children of ignored contents
             // ignore content = don't generate a class for it, don't generate children
-            foreach (var typeModel in _typeModels.Where(x => ParseResult.IsIgnored(x.Alias)))
+            foreach (var typeModel in TypeModels.Where(x => ParseResult.IsIgnored(x.Alias)))
                 typeModel.IsContentIgnored = true;
-            foreach (var typeModel in _typeModels.Where(x => !x.IsContentIgnored && x.EnumerateBaseTypes().Any(xx => xx.IsContentIgnored)))
+            foreach (var typeModel in TypeModels.Where(x => !x.IsContentIgnored && x.EnumerateBaseTypes().Any(xx => xx.IsContentIgnored)))
                 typeModel.IsContentIgnored = true;
 
             // handle model renames
-            foreach (var typeModel in _typeModels.Where(x => ParseResult.IsContentRenamed(x.Alias)))
+            foreach (var typeModel in TypeModels.Where(x => ParseResult.IsContentRenamed(x.Alias)))
             {
                 typeModel.ClrName = ParseResult.ContentClrName(typeModel.Alias);
                 typeModel.IsRenamed = true;
@@ -131,16 +130,16 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             }
 
             // handle implement
-            foreach (var typeModel in _typeModels.Where(x => ParseResult.HasContentImplement(x.Alias)))
+            foreach (var typeModel in TypeModels.Where(x => ParseResult.HasContentImplement(x.Alias)))
             {
                 typeModel.HasImplement = true;
             }
 
             // mark OmitBase models that we discovered already have a base class
-            foreach (var typeModel in _typeModels.Where(x => ParseResult.HasContentBase(ParseResult.ContentClrName(x.Alias) ?? x.ClrName)))
+            foreach (var typeModel in TypeModels.Where(x => ParseResult.HasContentBase(ParseResult.ContentClrName(x.Alias) ?? x.ClrName)))
                 typeModel.HasBase = true;
 
-            foreach (var typeModel in _typeModels)
+            foreach (var typeModel in TypeModels)
             {
                 // mark IsRemoved properties that we discovered should be ignored
                 // ie is marked as ignored on type, or on any parent type
@@ -162,20 +161,20 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             // for the last one, don't throw in purelive, see comment
 
             // ensure we have no duplicates type names
-            foreach (var xx in _typeModels.Where(x => !x.IsContentIgnored).GroupBy(x => x.ClrName).Where(x => x.Count() > 1))
+            foreach (var xx in TypeModels.Where(x => !x.IsContentIgnored).GroupBy(x => x.ClrName).Where(x => x.Count() > 1))
                 throw new InvalidOperationException($"Type name \"{xx.Key}\" is used"
                     + $" for types with alias {string.Join(", ", xx.Select(x => x.ItemType + ":\"" + x.Alias + "\""))}. Names have to be unique."
                     + " Consider using an attribute to assign different names to conflicting types.");
 
             // ensure we have no duplicates property names
-            foreach (var typeModel in _typeModels.Where(x => !x.IsContentIgnored))
+            foreach (var typeModel in TypeModels.Where(x => !x.IsContentIgnored))
                 foreach (var xx in typeModel.Properties.Where(x => !x.IsIgnored).GroupBy(x => x.ClrName).Where(x => x.Count() > 1))
                     throw new InvalidOperationException($"Property name \"{xx.Key}\" in type {typeModel.ItemType}:\"{typeModel.Alias}\""
                         + $" is used for properties with alias {string.Join(", ", xx.Select(x => "\"" + x.Alias + "\""))}. Names have to be unique."
                         + " Consider using an attribute to assign different names to conflicting properties.");
 
             // ensure content & property type don't have identical name (csharp hates it)
-            foreach (var typeModel in _typeModels.Where(x => !x.IsContentIgnored))
+            foreach (var typeModel in TypeModels.Where(x => !x.IsContentIgnored))
             {
                 foreach (var xx in typeModel.Properties.Where(x => !x.IsIgnored && x.ClrName == typeModel.ClrName))
                 {
@@ -203,7 +202,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             //        xx.Alias));
 
             // discover interfaces that need to be declared / implemented
-            foreach (var typeModel in _typeModels)
+            foreach (var typeModel in TypeModels)
             {
                 // collect all the (non-removed) types implemented at parent level
                 // ie the parent content types and the mixins content types, recursively
@@ -232,7 +231,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             }
 
             // detect mixin properties that have local implementations
-            foreach (var typeModel in _typeModels)
+            foreach (var typeModel in TypeModels)
             {
                 foreach (var mixinProperty in typeModel.ImplementingInterfaces.SelectMany(x => x.Properties))
                 {
@@ -242,7 +241,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             }
 
             // ensure elements don't inherit from non-elements
-            foreach (var typeModel in _typeModels.Where(x => !x.IsContentIgnored && x.IsElement))
+            foreach (var typeModel in TypeModels.Where(x => !x.IsContentIgnored && x.IsElement))
             {
                 if (typeModel.BaseType != null && !typeModel.BaseType.IsElement)
                     throw new Exception($"Cannot generate model for type '{typeModel.Alias}' because it is an element type, but its parent type '{typeModel.BaseType.Alias}' is not.");
@@ -260,11 +259,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             }
 
             // handle ctor
-            foreach (var typeModel in _typeModels.Where(x => ParseResult.HasCtor(x.ClrName)))
+            foreach (var typeModel in TypeModels.Where(x => ParseResult.HasCtor(x.ClrName)))
                 typeModel.HasCtor = true;
 
             // handle extensions
-            foreach (var typeModel in _typeModels)
+            foreach (var typeModel in TypeModels)
             {
                 var typeFullName = typeModel.ClrName;
                 foreach (var propertyModel in typeModel.Properties)

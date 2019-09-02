@@ -42,8 +42,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         internal TextBuilder()
         { }
 
-        private static Config Config => Current.Configs.ModelsBuilder();
-
         #region Append Helpers
 
         private int _indent = 0;

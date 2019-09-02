@@ -64,7 +64,6 @@
     <Compile Include="PureLiveAssemblyAttribute.cs" />
     <Compile Include="ReferencedAssemblies.cs" />
     <Compile Include="Building\Builder.cs" />
-    <Compile Include="Building\CodeDomBuilder.cs" />
     <Compile Include="Building\CodeParser.cs" />
     <Compile Include="Building\Compiler.cs" />
     <Compile Include="Api\ApiVersion.cs" />
