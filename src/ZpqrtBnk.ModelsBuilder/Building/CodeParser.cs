@@ -277,6 +277,9 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                                 case nameof(ModelsBuilderConfigureAttribute.GeneratePropertyGetters):
                                     disco.SetGeneratePropertyGetters((bool) argValue.Value);
                                     break;
+                                case nameof(ModelsBuilderConfigureAttribute.MBClassName):
+                                    disco.SetMBClassName((string) argValue.Value);
+                                    break;
                             }
                         }
                         break;

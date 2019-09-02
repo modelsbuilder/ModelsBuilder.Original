@@ -2056,7 +2056,7 @@ namespace Umbraco.Web.PublishedModels
             var builder = new TextBuilder();
             builder.ModelsNamespaceForTests = "ModelsNamespace";
             var sb = new StringBuilder();
-            builder.WriteClrType(sb, input);
+            builder.AppendClrType(sb, input);
             Assert.AreEqual(expected, sb.ToString());
         }
 
@@ -2070,7 +2070,7 @@ namespace Umbraco.Web.PublishedModels
             builder.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
             builder.ModelsNamespaceForTests = "ModelsNamespace";
             var sb = new StringBuilder();
-            builder.WriteClrType(sb, input);
+            builder.AppendClrType(sb, input);
             Assert.AreEqual(expected, sb.ToString());
         }
 
@@ -2100,7 +2100,7 @@ namespace Umbraco.Web.PublishedModels
             if (usingZb) builder.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
             builder.ModelsNamespaceForTests = ns;
             var sb = new StringBuilder();
-            builder.WriteClrType(sb, type);
+            builder.AppendClrType(sb, type);
 
             Assert.AreEqual(expected, sb.ToString());
         }
@@ -2113,7 +2113,7 @@ namespace Umbraco.Web.PublishedModels
             builder.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
             builder.ModelsNamespaceForTests = "SomeRandomNamespace";
             var sb = new StringBuilder();
-            builder.WriteClrType(sb, typeof(ASCIIEncoding.Nested));
+            builder.AppendClrType(sb, typeof(ASCIIEncoding.Nested));
 
             // full type name is needed but not global::
             Assert.AreEqual("ZpqrtBnk.ModelsBuilder.Tests.ASCIIEncoding.Nested", sb.ToString());

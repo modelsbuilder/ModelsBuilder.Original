@@ -158,6 +158,12 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             GeneratePropertyGetters = value;
         }
 
+        // ReSharper disable once InconsistentNaming
+        public void SetMBClassName(string value)
+        {
+            MBClassName = value;
+        }
+
         #endregion
 
         #region Query
@@ -284,6 +290,9 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         {
             return _implementedExtensions.TryGetValue(typeFullName, out var props) && props.Contains(propertyClrName);
         }
+
+        // ReSharper disable once InconsistentNaming
+        public string MBClassName { get; private set; } = "MB";
 
         #endregion
     }

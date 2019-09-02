@@ -96,7 +96,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         private void AppendGeneratedCodeAttribute(StringBuilder sb)
         {
-            var mbName = "MB"; // fixme should be an option
+            var mbName = ParseResult.MBClassName;
             AppendLine(sb, $"[GeneratedCodeAttribute({mbName}.Name, {mbName}.VersionString)]");
         }
 
@@ -179,7 +179,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         public void AppendMeta(StringBuilder sb, IEnumerable<TypeModel> typeModels)
         {
             var typeModelsList = typeModels.ToList();
-            var mbName = "MB"; // fixme should be an option
+            var mbName = ParseResult.MBClassName;
 
             WriteHeader(sb);
 
@@ -548,7 +548,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             AppendGeneratedCodeAttribute(sb, "\t\t");
 
             sb.Append("\t\tpublic static ");
-            WriteClrType(sb, property.ClrTypeName);
+            AppendClrType(sb, property.ClrTypeName);
             sb.Append(" ");
             sb.Append(property.ClrName);
             sb.AppendFormat("(this {0}{1} that", type.IsMixin ? "I" : "", type.ClrName);
@@ -560,7 +560,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             if (property.ModelClrType != typeof(object))
             {
                 sb.Append("<");
-                WriteClrType(sb, property.ClrTypeName);
+                AppendClrType(sb, property.ClrTypeName);
                 sb.Append(">");
             }
             sb.AppendFormat("(\"{0}\"", property.Alias);
@@ -614,7 +614,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
 
             sb.Append("\t\tpublic ");
-            WriteClrType(sb, property.ClrTypeName);
+            AppendClrType(sb, property.ClrTypeName);
             sb.AppendFormat(" {0} => this.{0}();\n", property.ClrName);
 
             if (property.Errors != null)
@@ -667,7 +667,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString(property.Name));
             AppendGeneratedCodeAttribute(sb, "\t\t");
             sb.Append("\t\t");
-            WriteClrType(sb, property.ClrTypeName);
+            AppendClrType(sb, property.ClrTypeName);
             sb.AppendFormat(" {0} {{ get; }}\n",
                 property.ClrName);
 
@@ -681,58 +681,59 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         #region Clr Types
 
-        // internal for unit tests
-        internal void WriteClrType(StringBuilder sb, Type type)
+        // internal for tests
+        internal void AppendClrType(StringBuilder sb, Type type)
         {
             var s = type.ToString();
 
             if (type.IsGenericType)
             {
                 var p = s.IndexOf('`');
-                WriteNonGenericClrType(sb, s.Substring(0, p));
+                AppendNonGenericClrType(sb, s.Substring(0, p));
                 sb.Append("<");
                 var args = type.GetGenericArguments();
                 for (var i = 0; i < args.Length; i++)
                 {
                     if (i > 0) sb.Append(", ");
-                    WriteClrType(sb, args[i]);
+                    AppendClrType(sb, args[i]);
                 }
                 sb.Append(">");
             }
             else
             {
-                WriteNonGenericClrType(sb, s);
+                AppendNonGenericClrType(sb, s);
             }
         }
 
-        internal void WriteClrType(StringBuilder sb, string type)
+        // internal for tests
+        internal void AppendClrType(StringBuilder sb, string type)
         {
             var p = type.IndexOf('<');
             if (type.Contains('<'))
             {
-                WriteNonGenericClrType(sb, type.Substring(0, p));
+                AppendNonGenericClrType(sb, type.Substring(0, p));
                 sb.Append("<");
                 var args = type.Substring(p + 1).TrimEnd('>').Split(','); // fixme will NOT work with nested generic types
                 for (var i = 0; i < args.Length; i++)
                 {
                     if (i > 0) sb.Append(", ");
-                    WriteClrType(sb, args[i]);
+                    AppendClrType(sb, args[i]);
                 }
                 sb.Append(">");
             }
             else
             {
-                WriteNonGenericClrType(sb, type);
+                AppendNonGenericClrType(sb, type);
             }
         }
 
-        private void WriteNonGenericClrType(StringBuilder sb, string s)
+        private void AppendNonGenericClrType(StringBuilder sb, string s)
         {
             // map model types
             s = Regex.Replace(s, @"\{(.*)\}\[\*\]", m => ModelsMap[m.Groups[1].Value + "[]"]);
 
             // takes care eg of "System.Int32" vs. "int"
-            if (TypesMap.TryGetValue(s, out string typeName))
+            if (TypesMap.TryGetValue(s, out var typeName))
             {
                 sb.Append(typeName);
                 return;
@@ -798,13 +799,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             sb.Append(typeName);
         }
 
-        #endregion
-
-        private static string XmlCommentString(string s)
-        {
-            return s.Replace('<', '{').Replace('>', '}').Replace('\r', ' ').Replace('\n', ' ');
-        }
-
         private static readonly IDictionary<string, string> TypesMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "System.Int16", "short" },
@@ -824,5 +818,12 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             { "System.Double", "double" },
             { "System.Decimal", "decimal" }
         };
+
+        #endregion
+
+        private static string XmlCommentString(string s)
+        {
+            return s.Replace('<', '{').Replace('>', '}').Replace('\r', ' ').Replace('\n', ' ');
+        }
     }
 }

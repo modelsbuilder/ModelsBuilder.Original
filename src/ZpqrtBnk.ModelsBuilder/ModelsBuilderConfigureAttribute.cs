@@ -18,5 +18,11 @@ namespace ZpqrtBnk.ModelsBuilder
         /// Gets or sets a value indicating whether to generate property getters.
         /// </summary>
         public bool GeneratePropertyGetters { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the name of the MB class.
+        /// </summary>
+        // ReSharper disable once InconsistentNaming
+        public string MBClassName { get; set; }
     }
 }
