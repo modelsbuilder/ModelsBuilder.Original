@@ -21,14 +21,20 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
             var builder = new TextBuilder(typeModels, parseResult, modelsNamespace);
+            var modelsToGenerate = builder.GetModelsToGenerate().ToList();
 
-            foreach (var typeModel in builder.GetModelsToGenerate())
+            foreach (var typeModel in modelsToGenerate)
             {
                 var sb = new StringBuilder();
                 builder.Generate(sb, typeModel);
                 var filename = Path.Combine(modelsDirectory, typeModel.ClrName + ".generated.cs");
                 File.WriteAllText(filename, sb.ToString());
             }
+
+            var metaSb = new StringBuilder();
+            builder.AppendMeta(metaSb, modelsToGenerate);
+            var metaFilename = Path.Combine(modelsDirectory, parseResult.MBClassName + ".generated.cs"); ;
+            File.WriteAllText(metaFilename, metaSb.ToString());
 
             // the idea was to calculate the current hash and to add it as an extra file to the compilation,
             // in order to be able to detect whether a DLL is consistent with an environment - however the
@@ -60,12 +66,19 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             var builder = new TextBuilder(typeModels, parseResult, modelsNamespace);
 
             var models = new Dictionary<string, string>();
-            foreach (var typeModel in builder.GetModelsToGenerate())
+            var modelsToGenerate = builder.GetModelsToGenerate().ToList();
+
+            foreach (var typeModel in modelsToGenerate)
             {
                 var sb = new StringBuilder();
                 builder.Generate(sb, typeModel);
                 models[typeModel.ClrName] = sb.ToString();
             }
+
+            var metaSb = new StringBuilder();
+            builder.AppendMeta(metaSb, modelsToGenerate);
+            models[parseResult.MBClassName] = metaSb.ToString();
+
             return models;
         }
     }
