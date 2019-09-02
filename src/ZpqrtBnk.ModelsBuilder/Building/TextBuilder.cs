@@ -55,7 +55,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         private string NewLine => "\n";
 
-        // fixme - use it 
         private void AppendLine(StringBuilder sb, string text)
         {
             for (var i = 0; i < _indent; i++)
@@ -86,14 +85,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         // note that the blog post above clearly states that "Nor should it be applied at the type level if the type being generated is a partial class."
         // and since our models are partial classes, we have to apply the attribute against the individual members, not the class itself.
         //
-        private void AppendGeneratedCodeAttribute(StringBuilder sb, string tabs) // fixme obsolete
-        {
-            var indent = _indent;
-            _indent = tabs.Length;
-            AppendLine(sb, $"[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"ZpqrtBnk.ModelsBuilder\", \"{ApiVersion.Current.Version}\")]");
-            _indent = indent;
-        }
-
         private void AppendGeneratedCodeAttribute(StringBuilder sb)
         {
             var mbName = ParseResult.MBClassName;
@@ -118,6 +109,8 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
             foreach (var t in TypesUsing)
                 AppendLine(sb, $"using {t};");
+            if (!TypesUsing.Contains("System.CodeDom.Compiler"))
+                AppendLine(sb, "using System.CodeDom.Compiler;");
 
             AppendNewLine(sb);
             AppendLine(sb, $"namespace {GetModelsNamespace()}");
@@ -141,6 +134,8 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
             foreach (var t in TypesUsing)
                 AppendLine(sb, $"using {t};");
+            if (!TypesUsing.Contains("System.CodeDom.Compiler"))
+                AppendLine(sb, "using System.CodeDom.Compiler;");
 
             // assembly attributes marker
             AppendNewLine(sb);
@@ -177,7 +172,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         #region Meta
 
         /// <summary>
-        /// fixme
+        /// Appends Meta.
         /// </summary>
         /// <param name="sb">The string builder.</param>
         /// <param name="typeModels">The models to generate.</param>
@@ -237,7 +232,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         private void AppendMetaItemTypes(StringBuilder sb, IEnumerable<TypeModel> typeModels)
         {
             AppendLine(sb, "/// <summary>Provides the content type published item types.</summary>");
-            AppendLocalGeneratedCodeAttribute(sb); // fixme on type or?
+            AppendLocalGeneratedCodeAttribute(sb);
             AppendLine(sb, "public static class ItemType");
             AppendLine(sb, "{");
             IndentEnter();
@@ -256,6 +251,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         private void AppendMetaItemType(StringBuilder sb, TypeModel typeModel)
         {
             AppendLine(sb, $"/// <summary>Gets the published item type of the {typeModel.ClrName} content type.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
             AppendLine(sb, $"public const PublishedItemType {typeModel.ClrName} = PublishedItemType.{typeModel.ItemType.ToPublishedItemType()};");
         }
 
@@ -281,6 +277,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         private void AppendMetaContentTypeAlias(StringBuilder sb, TypeModel typeModel)
         {
             AppendLine(sb, $"/// <summary>Gets the alias of the {typeModel.ClrName} content type.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
             AppendLine(sb, $"public const string {typeModel.ClrName} = \"{typeModel.Alias}\";");
         }
 
@@ -306,6 +303,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         private void AppendMetaPropertyTypeAliases(StringBuilder sb, TypeModel typeModel)
         {
             AppendLine(sb, $"/// <summary>Defines the property type alias constants for the {typeModel.ClrName} content type.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
             AppendLine(sb, $"public static class {typeModel.ClrName}");
             AppendLine(sb, "{");
             IndentEnter();
@@ -324,6 +322,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         private void AppendMetaPropertyTypeAlias(StringBuilder sb, TypeModel typeModel, PropertyModel propertyModel)
         {
             AppendLine(sb, $"/// <summary>Gets the alias of the {typeModel.ClrName}.{propertyModel.ClrName} property type.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
             AppendLine(sb, $"public const string {propertyModel.ClrName} = \"{propertyModel.Alias}\";");
         }
 
@@ -349,6 +348,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         private void AppendContentType(StringBuilder sb, TypeModel typeModel)
         {
             AppendLine(sb, $"/// <summary>Gets the {typeModel.ClrName} content type.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
             AppendLine(sb, $"public static readonly IPublishedContentType {typeModel.ClrName} = PublishedModelUtility.GetModelContentType(ItemType.{typeModel.ClrName}, \"{typeModel.Alias}\");");
         }
 
@@ -374,6 +374,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         private void AppendPropertyTypes(StringBuilder sb, TypeModel typeModel)
         {
             AppendLine(sb, $"/// <summary>Provides the property types for the {typeModel.ClrName} content type.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
             AppendLine(sb, $"public static class {typeModel.ClrName}");
             AppendLine(sb, "{");
             IndentEnter();
@@ -392,6 +393,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         private void AppendPropertyType(StringBuilder sb, TypeModel typeModel, PropertyModel propertyModel)
         {
             AppendLine(sb, $"/// <summary>Gets the {typeModel.ClrName}.{propertyModel.ClrName} property type.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
             AppendLine(sb, $"public static readonly IPublishedPropertyType {propertyModel.ClrName} = ContentType.{typeModel.ClrName}.GetPropertyType(PropertyAlias.{typeModel.ClrName}.{propertyModel.ClrName});");
         }
 
@@ -401,51 +403,19 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         private void AppendContentTypeModel(StringBuilder sb, TypeModel type)
         {
-            string sep;
-
             // generate interface for mixins
             if (type.IsMixin)
+            {
                 AppendMixinInterface(sb, type);
+                AppendNewLine(sb);
+            }
 
             AppendExtensionMethods(sb, type);
+            AppendNewLine(sb);
 
-            // write the class declaration
-            if (type.IsRenamed)
-                sb.AppendFormat("\t// Content Type with alias \"{0}\"\n", type.Alias);
-            if (!string.IsNullOrWhiteSpace(type.Name))
-                sb.AppendFormat("\t/// <summary>{0}</summary>\n", XmlCommentString(type.Name));
-            // cannot do it now. see note in ImplementContentTypeAttribute
-            //if (!type.HasImplement)
-            //    sb.AppendFormat("\t[ImplementContentType(\"{0}\")]\n", type.Alias);
-            sb.AppendFormat("\t[PublishedModel(\"{0}\")]\n", type.Alias);
-            sb.AppendFormat("\tpublic partial class {0}", type.ClrName);
-            var inherits = type.HasBase
-                ? null // has its own base already
-                : (type.BaseType == null || type.BaseType.IsContentIgnored
-                    ? GetBaseClassName(type)
-                    : type.BaseType.ClrName);
-            if (inherits != null)
-                sb.AppendFormat(" : {0}", inherits);
-
-            sep = inherits == null ? ":" : ",";
-            if (type.IsMixin)
-            {
-                // if it's a mixin it implements its own interface
-                sb.AppendFormat("{0} I{1}", sep, type.ClrName);
-            }
-            else
-            {
-                // write the mixins, if any, as interfaces
-                // only if not a mixin because otherwise the interface already has them already
-                foreach (var mixinType in type.DeclaringInterfaces.OrderBy(x => x.ClrName))
-                {
-                    sb.AppendFormat("{0} I{1}", sep, mixinType.ClrName);
-                    sep = ",";
-                }
-            }
+            AppendClassDeclaration(sb, type);
 
             // begin class body
-            AppendNewLine(sb);
             AppendLine(sb, "{");
             IndentEnter();
 
@@ -458,7 +428,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
             // write the properties
             if (ParseResult.GeneratePropertyGetters)
-                AppendContentTypeProperties(sb, type);
+                AppendPropertyImplementations(sb, type);
 
             // close the class declaration
             IndentExit();
@@ -497,12 +467,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             foreach (var propertyModel in typeModel.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
             {
                 AppendNewLineBetween(sb, ref firstProperty);
-                WriteInterfaceProperty(sb, propertyModel);
+                AppendInterfaceProperty(sb, propertyModel);
             }
 
             IndentExit();
             AppendLine(sb, "}");
-            AppendNewLine(sb);
         }
 
         private void AppendExtensionMethods(StringBuilder sb, TypeModel typeModel)
@@ -521,11 +490,54 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             foreach (var propertyModel in extensionProperties)
             {
                 AppendNewLineBetween(sb, ref firstProperty);
-                AppendPropertyMethod(sb, typeModel, propertyModel);
+                AppendExtensionMethod(sb, typeModel, propertyModel);
             }
 
             IndentExit();
             AppendLine(sb, "}");
+        }
+
+        private void AppendClassDeclaration(StringBuilder sb, TypeModel typeModel)
+        {
+            if (typeModel.IsRenamed)
+                AppendLine(sb, $"// Content Type with alias \"{typeModel.Alias}\"");
+
+            if (!string.IsNullOrWhiteSpace(typeModel.Name))
+                AppendLine(sb, "/// <summary>{XmlCommentString(typeModel.Name)}</summary>");
+
+            // cannot do it now. see note in ImplementContentTypeAttribute
+            //if (!type.HasImplement)
+            //    sb.AppendFormat("\t[ImplementContentType(\"{0}\")]\n", type.Alias);
+
+            AppendLine(sb, $"[PublishedModel(\"{typeModel.Alias}\")]");
+            sb.Append($"{Indent}public partial class {typeModel.ClrName}");
+
+            var inherits = typeModel.HasBase
+                ? null // has its own base already
+                : (typeModel.BaseType == null || typeModel.BaseType.IsContentIgnored
+                    ? GetBaseClassName(typeModel)
+                    : typeModel.BaseType.ClrName);
+
+            if (inherits != null)
+                sb.Append($" : {inherits}");
+
+            var sep = inherits == null ? ":" : ",";
+            if (typeModel.IsMixin)
+            {
+                // if it's a mixin it implements its own interface
+                sb.Append($"{sep} I{typeModel.ClrName}");
+            }
+            else
+            {
+                // write the mixins, if any, as interfaces
+                // only if not a mixin because otherwise the interface already has them already
+                foreach (var mixinType in typeModel.DeclaringInterfaces.OrderBy(x => x.ClrName))
+                {
+                    sb.Append($"{sep} I{mixinType.ClrName}");
+                    sep = ",";
+                }
+            }
+
             AppendNewLine(sb);
         }
 
@@ -539,13 +551,13 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             AppendLine(sb, "{ }");
         }
 
-        private void AppendContentTypeProperties(StringBuilder sb, TypeModel type)
+        private void AppendPropertyImplementations(StringBuilder sb, TypeModel type)
         {
-            sb.Append("\t\t// properties\n");
+            AppendLine(sb, "// properties");
 
             // write the properties
             foreach (var prop in type.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
-                WriteProperty(sb, prop);
+                AppendPropertyImplementation(sb, prop);
 
             // no need to write the parent properties since we inherit from the parent
             // and the parent defines its own properties. need to write the mixins properties
@@ -557,11 +569,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 {
                     // exclude directly implemented properties
                     if (type.IgnoredMixinProperties.Contains(prop)) continue;
-                    WriteProperty(sb, prop);
+                    AppendPropertyImplementation(sb, prop);
                 }
         }
 
-        private void AppendPropertyMethod(StringBuilder sb, TypeModel typeModel, PropertyModel propertyModel)
+        private void AppendExtensionMethod(StringBuilder sb, TypeModel typeModel, PropertyModel propertyModel)
         {
             if (propertyModel.Errors != null) return;
 
@@ -569,19 +581,17 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             // property name and property description
             if (!string.IsNullOrWhiteSpace(propertyModel.Name) || !string.IsNullOrWhiteSpace(propertyModel.Description))
             {
-                sb.Append("\t\t///<summary>\n");
-
+                var summary = XmlCommentString(propertyModel.Name);
                 if (!string.IsNullOrWhiteSpace(propertyModel.Description))
-                    sb.AppendFormat("\t\t/// {0}: {1}\n", XmlCommentString(propertyModel.Name), XmlCommentString(propertyModel.Description));
-                else
-                    sb.AppendFormat("\t\t/// {0}\n", XmlCommentString(propertyModel.Name));
+                    summary += ": " + XmlCommentString(propertyModel.Description);
 
-                sb.Append("\t\t///</summary>\n");
+                AppendLine(sb, $"/// <summary>{summary}</summary>");
             }
 
-            AppendGeneratedCodeAttribute(sb, "\t\t");
+            AppendGeneratedCodeAttribute(sb);
 
-            sb.Append("\t\tpublic static ");
+            sb.Append(Indent);
+            sb.Append("public static ");
             AppendClrType(sb, propertyModel.ClrTypeName);
             sb.Append(" ");
             sb.Append(propertyModel.ClrName);
@@ -590,7 +600,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 sb.Append(", string culture = null");
             if (propertyModel.VariesBySegment())
                 sb.Append(", string segment = null");
-            sb.Append(", Fallback fallback = default, string defaultValue = default)\n\t\t\t=> that.Value");
+            sb.Append(", Fallback fallback = default, string defaultValue = default)");
+            sb.Append(NewLine);
+            IndentEnter();
+            sb.Append(Indent);
+            sb.Append("=> that.Value");
             if (propertyModel.ModelClrType != typeof(object))
             {
                 sb.Append("<");
@@ -602,115 +616,99 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 sb.Append(", culture: culture");
             if (propertyModel.VariesBySegment())
                 sb.Append(", segment: segment");
-            sb.Append(", fallback: fallback, defaultValue: defaultValue);\n");
+            sb.Append(", fallback: fallback, defaultValue: defaultValue);");
+            sb.Append(NewLine);
+            IndentExit();
         }
 
-        private void WriteProperty(StringBuilder sb, PropertyModel property)
+        private void AppendPropertyImplementation(StringBuilder sb, PropertyModel property)
         {
-            sb.Append("\n");
+            AppendNewLine(sb);
 
             if (property.Errors != null)
-            {
-                sb.Append("\t\t/*\n");
-                sb.Append("\t\t * THIS PROPERTY CANNOT BE IMPLEMENTED, BECAUSE:\n");
-                sb.Append("\t\t *\n");
-                var first = true;
-                foreach (var error in property.Errors)
-                {
-                    if (first) first = false;
-                    else sb.Append("\t\t *\n");
-                    foreach (var s in SplitError(error))
-                    {
-                        sb.Append("\t\t * ");
-                        sb.Append(s);
-                        sb.Append("\n");
-                    }
-                }
-                sb.Append("\t\t *\n");
-                sb.Append("\n");
-            }
+                AppendPropertyErrorsStart(sb, property.Errors);
 
             // Adds xml summary to each property containing
             // property name and property description
             if (!string.IsNullOrWhiteSpace(property.Name) || !string.IsNullOrWhiteSpace(property.Description))
             {
-                sb.Append("\t\t///<summary>\n");
-
+                var summary = XmlCommentString(property.Name);
                 if (!string.IsNullOrWhiteSpace(property.Description))
-                    sb.AppendFormat("\t\t/// {0}: {1}\n", XmlCommentString(property.Name), XmlCommentString(property.Description));
-                else
-                    sb.AppendFormat("\t\t/// {0}\n", XmlCommentString(property.Name));
+                    summary += ": " + XmlCommentString(property.Description);
 
-                sb.Append("\t\t///</summary>\n");
+                AppendLine(sb, $"/// <summary>{summary}</summary>");
             }
 
-            AppendGeneratedCodeAttribute(sb, "\t\t");
-            sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
-
-            sb.Append("\t\tpublic ");
+            AppendGeneratedCodeAttribute(sb);
+            AppendLine(sb, $"[ImplementPropertyType(\"{property.Alias}\")]");
+            sb.Append(Indent);
+            sb.Append("public ");
             AppendClrType(sb, property.ClrTypeName);
-            sb.AppendFormat(" {0} => this.{0}();\n", property.ClrName);
+            sb.Append($" {property.ClrName} => this.{property.ClrName}();");
+            AppendNewLine(sb);
 
             if (property.Errors != null)
-            {
-                sb.Append("\n");
-                sb.Append("\t\t *\n");
-                sb.Append("\t\t */\n");
-            }
+                AppendPropertyErrorsEnd(sb);
         }
 
-        private static IEnumerable<string> SplitError(string error)
-        {
-            var p = 0;
-            while (p < error.Length)
-            {
-                var n = p + 50;
-                while (n < error.Length && error[n] != ' ') n++;
-                if (n >= error.Length) break;
-                yield return error.Substring(p, n - p);
-                p = n + 1;
-            }
-            if (p < error.Length)
-                yield return error.Substring(p);
-        }
-
-        private void WriteInterfaceProperty(StringBuilder sb, PropertyModel property)
+        private void AppendInterfaceProperty(StringBuilder sb, PropertyModel property)
         {
             if (property.Errors != null)
-            {
-                sb.Append("\t\t/*\n");
-                sb.Append("\t\t * THIS PROPERTY CANNOT BE IMPLEMENTED, BECAUSE:\n");
-                sb.Append("\t\t *\n");
-                var first = true;
-                foreach (var error in property.Errors)
-                {
-                    if (first) first = false;
-                    else sb.Append("\t\t *\n");
-                    foreach (var s in SplitError(error))
-                    {
-                        sb.Append("\t\t * ");
-                        sb.Append(s);
-                        sb.Append("\n");
-                    }
-                }
-                sb.Append("\t\t *\n");
-                sb.Append("\n");
-            }
+                AppendPropertyErrorsStart(sb, property.Errors);
 
             if (!string.IsNullOrWhiteSpace(property.Name))
                 sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString(property.Name));
-            AppendGeneratedCodeAttribute(sb, "\t\t");
-            sb.Append("\t\t");
+
+            AppendGeneratedCodeAttribute(sb);
+            sb.Append(Indent);
             AppendClrType(sb, property.ClrTypeName);
-            sb.AppendFormat(" {0} {{ get; }}\n",
-                property.ClrName);
+            sb.Append($" {property.ClrName} {{ get; }}");
+            AppendNewLine(sb);
 
             if (property.Errors != null)
+                AppendPropertyErrorsEnd(sb);
+        }
+
+        private void AppendPropertyErrorsStart(StringBuilder sb, IEnumerable<string> errors)
+        {
+            AppendLine(sb, "/*");
+            AppendLine(sb, " * THIS PROPERTY CANNOT BE IMPLEMENTED, BECAUSE:");
+            AppendLine(sb, " *");
+
+            IEnumerable<string> SplitError(string error)
             {
-                sb.Append("\n");
-                sb.Append("\t\t *\n");
-                sb.Append("\t\t */\n");
+                var p = 0;
+                while (p < error.Length)
+                {
+                    var n = p + 50;
+                    while (n < error.Length && error[n] != ' ') n++;
+                    if (n >= error.Length) break;
+                    yield return error.Substring(p, n - p);
+                    p = n + 1;
+                }
+                if (p < error.Length)
+                    yield return error.Substring(p);
             }
+
+            var first = true;
+            foreach (var error in errors)
+            {
+                if (first) first = false;
+                else AppendLine(sb, " *");
+                foreach (var s in SplitError(error))
+                {
+                    AppendLine(sb, " *" + s);
+                }
+            }
+            AppendLine(sb, " *");
+            AppendNewLine(sb);
+            AppendLine(sb, " *");
+            AppendLine(sb, " */");
+        }
+
+        private void AppendPropertyErrorsEnd(StringBuilder sb)
+        {
+            AppendNewLine(sb);
         }
 
         #endregion
