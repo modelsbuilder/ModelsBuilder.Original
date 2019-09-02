@@ -233,7 +233,9 @@ namespace ZpqrtBnk.ModelsBuilder.Configuration
 
             if (config.StartsWith("~/"))
             {
-                var dir = Path.Combine(root, config.TrimStart("~/"));
+                var dir = HostingEnvironment.IsHosted
+                    ? HostingEnvironment.MapPath(config)
+                    : Path.Combine(root, config.TrimStart("~/"));
 
                 // sanitize - GetFullPath will take care of any relative
                 // segments in path, eg '../../foo.tmp' - it may throw a SecurityException
