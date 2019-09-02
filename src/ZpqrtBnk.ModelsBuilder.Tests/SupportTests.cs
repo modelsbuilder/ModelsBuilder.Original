@@ -108,5 +108,94 @@ namespace Umbraco.Web.PublishedModels
                 Console.WriteLine(gen);
             }
         }
+
+        [Test]
+        public void Issue132()
+        {
+            // Umbraco returns nice, pascal-cased names
+
+            var types = new List<TypeModel>();
+
+            var type1 = new TypeModel
+            {
+                Id = 1,
+                Alias = "seoComposition",
+                ClrName = "SeoComposition",
+                ParentId = 0,
+                BaseType = null,
+                ItemType = TypeModel.ItemTypes.Content,
+
+                IsMixin = true
+            };
+            types.Add(type1);
+
+            type1.Properties.Add(new PropertyModel
+            {
+                Alias = "metaDescription",
+                ClrName = "MetaDescription",
+                ClrTypeName = "string",
+                ModelClrType = typeof(string)
+            });
+
+            var type2 = new TypeModel
+            {
+                Id = 2,
+                Alias = "page",
+                ClrName = "Page",
+                ParentId = 0,
+                BaseType = null,
+                ItemType = TypeModel.ItemTypes.Content,
+
+                MixinTypes = { type1 }
+            };
+            types.Add(type2);
+
+            var type3 = new TypeModel
+            {
+                Id = 3,
+                Alias = "other",
+                ClrName = "Other",
+                ParentId = 0,
+                BaseType = null,
+                ItemType = TypeModel.ItemTypes.Content,
+
+                MixinTypes = { type1 }
+            };
+            types.Add(type3);
+
+            var code = new Dictionary<string, string>
+            {
+                {"assembly", @"
+using ZpqrtBnk.ModelsBuilder;
+
+namespace Umbraco.Web.PublishedModels
+{
+    [IgnorePropertyType(""metaDescription"")]
+    public partial class Page
+    { }
+}
+"}
+            };
+
+            var refs = new[]
+            {
+                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
+            };
+
+            var parseResult = new CodeParser { WriteDiagnostics = true }.Parse(code, refs);
+            var builder = new TextBuilder(types, parseResult);
+            var btypes = builder.TypeModels;
+
+            var modelsToGenerate = builder.GetModelsToGenerate().ToList();
+
+            foreach (var modelToGenerate in modelsToGenerate)
+            {
+                var sb = new StringBuilder();
+                builder.Generate(sb, modelToGenerate);
+                var gen = sb.ToString();
+                Console.WriteLine(gen);
+            }
+        }
     }
 }
