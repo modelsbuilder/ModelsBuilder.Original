@@ -2650,6 +2650,34 @@ namespace Umbraco.Web.PublishedModels
 			{
 			}
 		}
+
+		[GeneratedCodeAttribute(Name, VersionString)]
+		private readonly ContentTypeModelInfo[] _models = 
+		{
+			new ContentTypeModelInfo(""type1"", ""Type1"", typeof(Type1),
+				new PropertyTypeModelInfo(""prop1"", ""Prop1"", typeof(string))),
+			new ContentTypeModelInfo(""type2"", ""Type2"", typeof(Type2),
+				new PropertyTypeModelInfo(""prop1"", ""Prop1"", typeof(string)),
+				new PropertyTypeModelInfo(""prop2"", ""Prop2"", typeof(string)),
+				new PropertyTypeModelInfo(""prop3"", ""Prop3"", typeof(string))),
+			new ContentTypeModelInfo(""type3"", ""Type3"", typeof(Type3))
+		};
+
+		/// <summary>Gets the model infos.</summary>
+		[GeneratedCodeAttribute(Name, VersionString)]
+		public IReadOnlyCollection<ContentTypeModelInfo> Models => _models;
+
+		/// <summary>Gets the model infos for a content type.</summary>
+		[GeneratedCodeAttribute(Name, VersionString)]
+		public ContentTypeModelInfo Model(string alias) => _models.FirstOrDefault(x => x.Alias == alias);
+
+		/// <summary>Gets the model infos for a content type.</summary>
+		[GeneratedCodeAttribute(Name, VersionString)]
+		public ContentTypeModelInfo Model<TModel>() => _models.FirstOrDefault(x => x.ClrType == typeof(TModel));
+
+		/// <summary>Gets the model infos for a content type.</summary>
+		[GeneratedCodeAttribute(Name, VersionString)]
+		public ContentTypeModelInfo Model(Type typeofModel) => _models.FirstOrDefault(x => x.ClrType == typeofModel);
 	}
 }
 ";

@@ -54,9 +54,11 @@
     <Compile Include="Building\TextHeaderWriter.cs" />
     <Compile Include="Configuration\ClrNameSource.cs" />
     <Compile Include="ContentModelsBaseClassAttribute.cs" />
+    <Compile Include="ContentTypeModelInfo.cs" />
     <Compile Include="ElementModelsBaseClassAttribute.cs" />
     <Compile Include="ModelsBuilderConfigureAttribute.cs" />
     <Compile Include="ModelsBuilderAssemblyAttribute.cs" />
+    <Compile Include="PropertyTypeModelInfo.cs" />
     <Compile Include="PublishedElementExtensions.cs" />
     <Compile Include="PureLiveAssemblyAttribute.cs" />
     <Compile Include="ReferencedAssemblies.cs" />
