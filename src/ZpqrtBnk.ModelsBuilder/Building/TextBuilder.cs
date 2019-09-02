@@ -117,15 +117,17 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteHeader(sb);
 
             foreach (var t in TypesUsing)
-                sb.AppendFormat("using {0};\n", t);
+                AppendLine(sb, $"using {t};");
 
-            sb.Append("\n");
-            sb.AppendFormat("namespace {0}\n", GetModelsNamespace());
-            sb.Append("{\n");
+            AppendNewLine(sb);
+            AppendLine(sb, $"namespace {GetModelsNamespace()}");
+            AppendLine(sb, "{");
+            IndentEnter();
 
-            WriteContentType(sb, typeModel);
+            AppendContentTypeModel(sb, typeModel);
 
-            sb.Append("}\n");
+            IndentExit();
+            AppendLine(sb, "}");
         }
 
         /// <summary>
@@ -138,22 +140,25 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteHeader(sb);
 
             foreach (var t in TypesUsing)
-                sb.AppendFormat("using {0};\n", t);
+                AppendLine(sb, $"using {t};");
 
             // assembly attributes marker
-            sb.Append("\n//ASSATTR\n");
+            AppendNewLine(sb);
+            AppendLine(sb, "//ASSATTR");
 
-            sb.Append("\n");
-            sb.AppendFormat("namespace {0}\n", GetModelsNamespace());
-            sb.Append("{\n");
+            AppendNewLine(sb);
+            AppendLine(sb, $"namespace {GetModelsNamespace()}");
+            AppendLine(sb, "{");
+            IndentEnter();
 
             foreach (var typeModel in typeModels)
             {
-                WriteContentType(sb, typeModel);
-                sb.Append("\n");
+                AppendContentTypeModel(sb, typeModel);
+                AppendNewLine(sb);
             }
 
-            sb.Append("}\n");
+            IndentExit();
+            AppendLine(sb, "}");
         }
 
         #region Header
@@ -392,63 +397,17 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         #endregion
 
-        private void WriteContentType(StringBuilder sb, TypeModel type)
+        #region Models
+
+        private void AppendContentTypeModel(StringBuilder sb, TypeModel type)
         {
             string sep;
 
             // generate interface for mixins
             if (type.IsMixin)
-            {
-                // write the interface declaration
-                sb.AppendFormat("\t// Mixin Content Type with alias \"{0}\"\n", type.Alias);
-                if (!string.IsNullOrWhiteSpace(type.Name))
-                    sb.AppendFormat("\t/// <summary>{0}</summary>\n", XmlCommentString(type.Name));
-                sb.AppendFormat("\tpublic partial interface I{0}", type.ClrName);
-                var implements = type.BaseType == null || type.BaseType.IsContentIgnored
-                    ? (type.HasBase ? null : (type.IsElement ? "PublishedElement" : "PublishedContent"))
-                    : type.BaseType.ClrName;
-                if (implements != null)
-                    sb.AppendFormat(" : I{0}", implements);
+                AppendMixinInterface(sb, type);
 
-                // write the mixins
-                sep = implements == null ? ":" : ",";
-                foreach (var mixinType in type.DeclaringInterfaces.OrderBy(x => x.ClrName))
-                {
-                    sb.AppendFormat("{0} I{1}", sep, mixinType.ClrName);
-                    sep = ",";
-                }
-
-                sb.Append("\n\t{\n");
-
-                // write the properties - only the local (non-ignored) ones, we're an interface
-                var more = false;
-                foreach (var prop in type.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
-                {
-                    if (more) sb.Append("\n");
-                    more = true;
-                    WriteInterfaceProperty(sb, prop);
-                }
-
-                sb.Append("\t}\n\n");
-            }
-
-            // write extension methods for properties
-            var extensionProperties = type.Properties.Where(x => !x.IsIgnored && !x.IsExtensionImplemented).ToList();
-            if (extensionProperties.Count > 0)
-            {
-                sb.AppendFormat("\t/// <summary>Provides extension methods for the {0}{1} {2}.</summary>\n",
-                    type.IsMixin ? "I" : "", type.ClrName, type.IsMixin ? "interface" : "class");
-                sb.AppendFormat("\tpublic static partial class {0}Extensions\n", type.ClrName);
-                sb.Append("\t{\n");
-                var first = true;
-                foreach (var prop in extensionProperties)
-                {
-                    if (first) first = false;
-                    else sb.Append("\n");
-                    WritePropertyMethod(sb, type, prop);
-                }
-                sb.Append("\t}\n\n");
-            }
+            AppendExtensionMethods(sb, type);
 
             // write the class declaration
             if (type.IsRenamed)
@@ -486,29 +445,104 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             }
 
             // begin class body
-            sb.Append("\n\t{\n");
+            AppendNewLine(sb);
+            AppendLine(sb, "{");
+            IndentEnter();
 
             // write the ctor
             if (!type.HasCtor)
-                sb.AppendFormat("\t\t// ctor\n\t\tpublic {0}(IPublished{1} content)\n\t\t\t: base(content)\n\t\t{{ }}\n",
-                    type.ClrName, type.IsElement ? "Element" : "Content");
+                AppendConstructor(sb, type);
 
             if (!type.HasCtor && ParseResult.GeneratePropertyGetters)
-                sb.Append("\n");
+                AppendNewLine(sb);
 
             // write the properties
             if (ParseResult.GeneratePropertyGetters)
-            {
-                sb.Append("\t\t// properties\n");
-                WriteContentTypeProperties(sb, type);
-            }
+                AppendContentTypeProperties(sb, type);
 
             // close the class declaration
-            sb.Append("\t}\n");
+            IndentExit();
+            AppendLine(sb, "}");
         }
 
-        private void WriteContentTypeProperties(StringBuilder sb, TypeModel type)
+        private void AppendMixinInterface(StringBuilder sb, TypeModel typeModel)
         {
+            // write the interface declaration
+            AppendLine(sb, $"// Mixin Content Type with alias \"{typeModel.Alias}\"");
+            if (!string.IsNullOrWhiteSpace(typeModel.Name))
+                AppendLine(sb, $"/// <summary>{XmlCommentString(typeModel.Name)}</summary>");
+            sb.Append($"{Indent}public partial interface I{typeModel.ClrName}");
+
+            var implements = typeModel.BaseType == null || typeModel.BaseType.IsContentIgnored
+                ? (typeModel.HasBase ? null : (typeModel.IsElement ? "PublishedElement" : "PublishedContent"))
+                : typeModel.BaseType.ClrName;
+
+            if (implements != null)
+                sb.Append($" : I{implements}");
+
+            // write the mixins
+            var sep = implements == null ? ":" : ",";
+            foreach (var mixinType in typeModel.DeclaringInterfaces.OrderBy(x => x.ClrName))
+            {
+                sb.Append($"{sep} I{mixinType.ClrName}");
+                sep = ",";
+            }
+
+            AppendNewLine(sb);
+            AppendLine(sb, "{");
+            IndentEnter();
+
+            // write the properties - only the local (non-ignored) ones, we're an interface
+            var firstProperty = true;
+            foreach (var propertyModel in typeModel.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
+            {
+                AppendNewLineBetween(sb, ref firstProperty);
+                WriteInterfaceProperty(sb, propertyModel);
+            }
+
+            IndentExit();
+            AppendLine(sb, "}");
+            AppendNewLine(sb);
+        }
+
+        private void AppendExtensionMethods(StringBuilder sb, TypeModel typeModel)
+        {
+            // write extension methods for properties
+            var extensionProperties = typeModel.Properties.Where(x => !x.IsIgnored && !x.IsExtensionImplemented).ToList();
+            if (extensionProperties.Count == 0) return;
+
+            AppendLine(sb, $"/// <summary>Provides extension methods for the {(typeModel.IsMixin ? "I" : "")}{typeModel.ClrName} {(typeModel.IsMixin ? "interface" : "class")}.</summary>");
+            AppendLine(sb, $"public static partial class {typeModel.ClrName}Extensions");
+
+            AppendLine(sb, "{");
+            IndentEnter();
+
+            var firstProperty = true;
+            foreach (var propertyModel in extensionProperties)
+            {
+                AppendNewLineBetween(sb, ref firstProperty);
+                AppendPropertyMethod(sb, typeModel, propertyModel);
+            }
+
+            IndentExit();
+            AppendLine(sb, "}");
+            AppendNewLine(sb);
+        }
+
+        private void AppendConstructor(StringBuilder sb, TypeModel typeModel)
+        {
+            AppendLine(sb, "// ctor");
+            AppendLine(sb, $"public {typeModel.ClrName}(IPublished{(typeModel.IsElement ? "Element" : "Content")} content)");
+            IndentEnter();
+            AppendLine(sb, $": base(content)");
+            IndentExit();
+            AppendLine(sb, "{ }");
+        }
+
+        private void AppendContentTypeProperties(StringBuilder sb, TypeModel type)
+        {
+            sb.Append("\t\t// properties\n");
+
             // write the properties
             foreach (var prop in type.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
                 WriteProperty(sb, prop);
@@ -527,20 +561,20 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 }
         }
 
-        private void WritePropertyMethod(StringBuilder sb, TypeModel type, PropertyModel property)
+        private void AppendPropertyMethod(StringBuilder sb, TypeModel typeModel, PropertyModel propertyModel)
         {
-            if (property.Errors != null) return;
+            if (propertyModel.Errors != null) return;
 
             // Adds xml summary to each property containing
             // property name and property description
-            if (!string.IsNullOrWhiteSpace(property.Name) || !string.IsNullOrWhiteSpace(property.Description))
+            if (!string.IsNullOrWhiteSpace(propertyModel.Name) || !string.IsNullOrWhiteSpace(propertyModel.Description))
             {
                 sb.Append("\t\t///<summary>\n");
 
-                if (!string.IsNullOrWhiteSpace(property.Description))
-                    sb.AppendFormat("\t\t/// {0}: {1}\n", XmlCommentString(property.Name), XmlCommentString(property.Description));
+                if (!string.IsNullOrWhiteSpace(propertyModel.Description))
+                    sb.AppendFormat("\t\t/// {0}: {1}\n", XmlCommentString(propertyModel.Name), XmlCommentString(propertyModel.Description));
                 else
-                    sb.AppendFormat("\t\t/// {0}\n", XmlCommentString(property.Name));
+                    sb.AppendFormat("\t\t/// {0}\n", XmlCommentString(propertyModel.Name));
 
                 sb.Append("\t\t///</summary>\n");
             }
@@ -548,25 +582,25 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             AppendGeneratedCodeAttribute(sb, "\t\t");
 
             sb.Append("\t\tpublic static ");
-            AppendClrType(sb, property.ClrTypeName);
+            AppendClrType(sb, propertyModel.ClrTypeName);
             sb.Append(" ");
-            sb.Append(property.ClrName);
-            sb.AppendFormat("(this {0}{1} that", type.IsMixin ? "I" : "", type.ClrName);
-            if (property.VariesByCulture())
+            sb.Append(propertyModel.ClrName);
+            sb.AppendFormat("(this {0}{1} that", typeModel.IsMixin ? "I" : "", typeModel.ClrName);
+            if (propertyModel.VariesByCulture())
                 sb.Append(", string culture = null");
-            if (property.VariesBySegment())
+            if (propertyModel.VariesBySegment())
                 sb.Append(", string segment = null");
             sb.Append(", Fallback fallback = default, string defaultValue = default)\n\t\t\t=> that.Value");
-            if (property.ModelClrType != typeof(object))
+            if (propertyModel.ModelClrType != typeof(object))
             {
                 sb.Append("<");
-                AppendClrType(sb, property.ClrTypeName);
+                AppendClrType(sb, propertyModel.ClrTypeName);
                 sb.Append(">");
             }
-            sb.AppendFormat("(\"{0}\"", property.Alias);
-            if (property.VariesByCulture())
+            sb.AppendFormat("(\"{0}\"", propertyModel.Alias);
+            if (propertyModel.VariesByCulture())
                 sb.Append(", culture: culture");
-            if (property.VariesBySegment())
+            if (propertyModel.VariesBySegment())
                 sb.Append(", segment: segment");
             sb.Append(", fallback: fallback, defaultValue: defaultValue);\n");
         }
@@ -679,7 +713,9 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             }
         }
 
-        #region Clr Types
+        #endregion
+
+        #region CLR Types
 
         // internal for tests
         internal void AppendClrType(StringBuilder sb, Type type)
