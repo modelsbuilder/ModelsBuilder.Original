@@ -21,18 +21,18 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
             var builder = builderFactory.CreateBuilder(typeModels, parseResult, modelsNamespace);
-            var modelsToGenerate = builder.GetModels().ToList();
+            var modelsToGenerate = builder.GetContentTypeModels().ToList();
 
             foreach (var typeModel in modelsToGenerate)
             {
                 var sb = new StringBuilder();
-                builder.AppendModel(sb, typeModel);
+                builder.WriteContentTypeModel(sb, typeModel);
                 var filename = Path.Combine(modelsDirectory, typeModel.ClrName + ".generated.cs");
                 File.WriteAllText(filename, sb.ToString());
             }
 
             var metaSb = new StringBuilder();
-            builder.AppendMeta(metaSb, modelsToGenerate);
+            builder.WriteContentTypesMetadata(metaSb, modelsToGenerate);
             var metaFilename = Path.Combine(modelsDirectory, parseResult.MBClassName + ".generated.cs"); ;
             File.WriteAllText(metaFilename, metaSb.ToString());
 
@@ -52,7 +52,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                     ourFiles[file] = File.ReadAllText(file);
                 var compiler = new Compiler();
-                compiler.Compile(builder.GetModelsNamespace(), ourFiles, bin);
+                compiler.Compile(builder.ModelsNamespace, ourFiles, bin);
             }
 
             OutOfDateModelsStatus.Clear();
@@ -66,17 +66,17 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             var builder = builderFactory.CreateBuilder(typeModels, parseResult, modelsNamespace);
 
             var models = new Dictionary<string, string>();
-            var modelsToGenerate = builder.GetModels().ToList();
+            var modelsToGenerate = builder.GetContentTypeModels().ToList();
 
             foreach (var typeModel in modelsToGenerate)
             {
                 var sb = new StringBuilder();
-                builder.AppendModel(sb, typeModel);
+                builder.WriteContentTypeModel(sb, typeModel);
                 models[typeModel.ClrName] = sb.ToString();
             }
 
             var metaSb = new StringBuilder();
-            builder.AppendMeta(metaSb, modelsToGenerate);
+            builder.WriteContentTypesMetadata(metaSb, modelsToGenerate);
             models[parseResult.MBClassName] = metaSb.ToString();
 
             return models;

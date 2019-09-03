@@ -16,23 +16,23 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
     public interface IRandom2 : IRandom1
     {}
 
-    class TestBuilder : Builder
+    class TestBuilder : BuilderBase
     {
         public TestBuilder(IList<TypeModel> typeModels, ParseResult parseResult)
             : base(typeModels, parseResult)
         { }
 
-        public override void AppendModel(StringBuilder sb, TypeModel typeModel)
+        public override void WriteContentTypeModel(StringBuilder sb, TypeModel typeModel)
         {
             throw new NotImplementedException();
         }
 
-        public override void AppendModels(StringBuilder sb, IEnumerable<TypeModel> typeModels)
+        public override void WriteContentTypeModels(StringBuilder sb, IEnumerable<TypeModel> typeModels)
         {
             throw new NotImplementedException();
         }
 
-        public override void AppendMeta(StringBuilder sb, IEnumerable<TypeModel> typeModels)
+        public override void WriteContentTypesMetadata(StringBuilder sb, IEnumerable<TypeModel> typeModels)
         {
             throw new NotImplementedException();
         }

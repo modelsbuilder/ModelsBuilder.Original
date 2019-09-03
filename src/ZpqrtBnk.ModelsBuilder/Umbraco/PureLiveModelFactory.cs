@@ -563,11 +563,11 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
             var builder = _builderFactory.CreateBuilder(typeModels, parseResult, _config.ModelsNamespace);
-            var modelsToGenerate = builder.GetModels().ToList();
+            var modelsToGenerate = builder.GetContentTypeModels().ToList();
 
             var codeBuilder = new StringBuilder();
-            builder.AppendModels(codeBuilder, modelsToGenerate);
-            builder.AppendMeta(codeBuilder, modelsToGenerate);
+            builder.WriteContentTypeModels(codeBuilder, modelsToGenerate);
+            builder.WriteContentTypesMetadata(codeBuilder, modelsToGenerate);
             var code = codeBuilder.ToString();
 
             return code;

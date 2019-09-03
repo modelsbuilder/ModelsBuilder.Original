@@ -137,11 +137,11 @@ using ZpqrtBnk.ModelsBuilder;
             };
 
             var parseResult = new CodeParser().Parse(code1, refs);
-            var builder = new TextBuilder(types, parseResult);
+            var builder = new Builder(types, parseResult);
             var count = builder.Using.Count;
 
             parseResult = new CodeParser().Parse(code2, refs);
-            builder = new TextBuilder(types, parseResult);
+            builder = new Builder(types, parseResult);
 
             Assert.AreEqual(count + 1, builder.Using.Count);
             Assert.IsTrue(builder.Using.Contains("Foo.Bar.Nil"));
@@ -179,8 +179,8 @@ using ZpqrtBnk.ModelsBuilder;
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             Assert.IsTrue(parseResult.IsIgnored("type1"));
 
@@ -294,8 +294,8 @@ using ZpqrtBnk.ModelsBuilder;
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             Assert.IsTrue(parseResult.IsIgnored("type1"));
             Assert.IsTrue(parseResult.IsIgnored("type2"));
@@ -349,8 +349,8 @@ using ZpqrtBnk.ModelsBuilder;
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             Assert.IsTrue(parseResult.IsIgnored("type1"));
             Assert.IsFalse(parseResult.IsIgnored("type2"));
@@ -405,8 +405,8 @@ using ZpqrtBnk.ModelsBuilder;
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             Assert.IsTrue(parseResult.IsIgnored("type1"));
             Assert.IsFalse(parseResult.IsIgnored("type2"));
@@ -462,8 +462,8 @@ using ZpqrtBnk.ModelsBuilder;
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             Assert.IsFalse(parseResult.IsIgnored("type1"));
             Assert.IsFalse(parseResult.IsIgnored("type2"));
@@ -526,8 +526,8 @@ namespace Models
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             Assert.IsFalse(parseResult.IsIgnored("type1"));
             Assert.IsFalse(parseResult.IsIgnored("type2"));
@@ -609,8 +609,8 @@ namespace Dang
             };
 
             var parseResult = new CodeParser().Parse(code);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             Assert.AreEqual(3, btypes.Count);
             var btype1 = btypes[0];
@@ -625,7 +625,7 @@ namespace Dang
             Assert.IsTrue(btype3.HasBase);
 
             var sb = new StringBuilder();
-            builder.AppendModel(sb, btype3);
+            builder.WriteContentTypeModel(sb, btype3);
             var gen = sb.ToString();
             Console.WriteLine(gen);
 
@@ -677,8 +677,8 @@ namespace Models
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
 
@@ -742,8 +742,8 @@ namespace Models
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
             Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop2"));
@@ -803,8 +803,8 @@ namespace Models
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
 
@@ -857,8 +857,8 @@ namespace Models
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             Assert.AreEqual("Renamed1", parseResult.PropertyClrName("Type1", "prop1"));
             Assert.AreEqual("Renamed2", parseResult.PropertyClrName("Type1", "prop2"));
@@ -916,8 +916,8 @@ namespace Models
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             Assert.AreEqual("Renamed1", parseResult.PropertyClrName("Type1", "prop1"));
             Assert.AreEqual("Renamed2", parseResult.PropertyClrName("Type1", "prop2"));
@@ -971,8 +971,8 @@ namespace Models
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
 
@@ -1029,8 +1029,8 @@ namespace Models
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
 
@@ -1081,15 +1081,15 @@ namespace Dang
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             Assert.AreEqual(1, btypes.Count);
             var btype1 = btypes[0];
             Assert.AreEqual("Type1", btype1.ClrName);
 
             var sb = new StringBuilder();
-            builder.AppendModel(sb, btype1);
+            builder.WriteContentTypeModel(sb, btype1);
             var gen = sb.ToString();
             Console.WriteLine(gen);
 
@@ -1193,8 +1193,8 @@ namespace Dang
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             Assert.AreEqual(2, btypes.Count);
             var btype1 = btypes[0];
@@ -1203,7 +1203,7 @@ namespace Dang
             Assert.AreEqual("Type2", btype2.ClrName);
 
             var sb = new StringBuilder();
-            builder.AppendModel(sb, btype1);
+            builder.WriteContentTypeModel(sb, btype1);
             var gen = sb.ToString();
             Console.WriteLine(gen);
 
@@ -1215,7 +1215,7 @@ namespace Dang
             Assert.Greater(0, gen.IndexOf("string Prop1c"));
 
             sb.Clear();
-            builder.AppendModel(sb, btype2);
+            builder.WriteContentTypeModel(sb, btype2);
             gen = sb.ToString();
             Console.WriteLine(gen);
 
@@ -1291,12 +1291,12 @@ namespace Test
             };
 
             var parseResult = new CodeParser().Parse(code);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             var sb = new StringBuilder();
-            foreach (var model in builder.GetModels())
-                builder.AppendModel(sb, model);
+            foreach (var model in builder.GetContentTypeModels())
+                builder.WriteContentTypeModel(sb, model);
             var gen = sb.ToString();
 
             var version = ApiVersion.Current.Version;
@@ -1452,11 +1452,11 @@ namespace Umbraco.Web.PublishedModels
             };
 
             var parseResult = new CodeParser().Parse(code);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             var sb = new StringBuilder();
-            builder.AppendModel(sb, builder.GetModels().First());
+            builder.WriteContentTypeModel(sb, builder.GetContentTypeModels().First());
             var gen = sb.ToString();
 
             var version = ApiVersion.Current.Version;
@@ -1549,11 +1549,11 @@ using ZpqrtBnk.ModelsBuilder;
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             var sb = new StringBuilder();
-            builder.AppendModel(sb, builder.GetModels().First());
+            builder.WriteContentTypeModel(sb, builder.GetContentTypeModels().First());
             var gen = sb.ToString();
 
             var version = ApiVersion.Current.Version;
@@ -1648,18 +1648,16 @@ namespace Umbraco.Web.PublishedModels
             };
 
             var parseResult = new CodeParser().Parse(code);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
-
-            builder.ModelsNamespace = "Umbraco.Web.PublishedModels";
+            var builder = new Builder(types, parseResult, "Umbraco.Web.PublishedModels");
+            var btypes = builder.AllTypeModels;
 
             var sb1 = new StringBuilder();
-            builder.AppendModel(sb1, builder.GetModels().Skip(1).First());
+            builder.WriteContentTypeModel(sb1, builder.GetContentTypeModels().Skip(1).First());
             var gen1 = sb1.ToString();
             Console.WriteLine(gen1);
 
             var sb = new StringBuilder();
-            builder.AppendModel(sb, builder.GetModels().First());
+            builder.WriteContentTypeModel(sb, builder.GetContentTypeModels().First());
             var gen = sb.ToString();
 
             var version = ApiVersion.Current.Version;
@@ -1764,11 +1762,11 @@ public partial class Type1
 
             Assert.IsTrue(parseResult.HasCtor("Type1"));
 
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             var sb = new StringBuilder();
-            builder.AppendModel(sb, builder.GetModels().First());
+            builder.WriteContentTypeModel(sb, builder.GetContentTypeModels().First());
             var gen = sb.ToString();
 
             var version = ApiVersion.Current.Version;
@@ -1871,11 +1869,11 @@ public partial class Type2
             Assert.IsFalse(parseResult.HasCtor("Type1"));
             Assert.IsTrue(parseResult.HasCtor("Type2"));
 
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             var sb = new StringBuilder();
-            builder.AppendModel(sb, builder.GetModels().First());
+            builder.WriteContentTypeModel(sb, builder.GetContentTypeModels().First());
             var gen = sb.ToString();
 
             var version = ApiVersion.Current.Version;
@@ -1974,15 +1972,15 @@ namespace Umbraco.Web.PublishedModels
             };
 
             var parseResult = new CodeParser().Parse(code);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             var sb = new StringBuilder();
-            foreach (var model in builder.GetModels())
-                builder.AppendModel(sb, model);
+            foreach (var model in builder.GetContentTypeModels())
+                builder.WriteContentTypeModel(sb, model);
             var gen = sb.ToString();
 
-            var version = typeof(Builder).Assembly.GetName().Version;
+            var version = typeof(BuilderBase).Assembly.GetName().Version;
 
             var expected = @"//------------------------------------------------------------------------------
 // <auto-generated>
@@ -2038,13 +2036,12 @@ namespace Umbraco.Web.PublishedModels
             };
 
             var parseResult = new CodeParser().Parse(code);
-            var builder = new TextBuilder(types, parseResult);
-            builder.ModelsNamespace = "ZpqrtBnk.ModelsBuilder.Models"; // forces conflict with ZpqrtBnk.ModelsBuilder.Umbraco
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult, "ZpqrtBnk.ModelsBuilder.Models"); // forces conflict with ZpqrtBnk.ModelsBuilder.Umbraco
+            var btypes = builder.AllTypeModels;
 
             var sb = new StringBuilder();
-            foreach (var model in builder.GetModels())
-                builder.AppendModel(sb, model);
+            foreach (var model in builder.GetContentTypeModels())
+                builder.WriteContentTypeModel(sb, model);
             var gen = sb.ToString();
 
             Console.WriteLine(gen);
@@ -2060,7 +2057,7 @@ namespace Umbraco.Web.PublishedModels
         [TestCase("ZpqrtBnk.ModelsBuilder.Tests.BuilderTests.Class1", typeof(Class1))]
         public void WriteClrType(string expected, Type input)
         {
-            var builder = new TextBuilder();
+            var builder = new Builder(Array.Empty<TypeModel>(), ParseResult.Empty);
             builder.ModelsNamespaceForTests = "ModelsNamespace";
             var sb = new StringBuilder();
             builder.AppendClrType(sb, input);
@@ -2073,7 +2070,7 @@ namespace Umbraco.Web.PublishedModels
         [TestCase("BuilderTests.Class1", typeof(Class1))]
         public void WriteClrTypeUsing(string expected, Type input)
         {
-            var builder = new TextBuilder();
+            var builder = new Builder(Array.Empty<TypeModel>(), ParseResult.Empty);
             builder.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
             builder.ModelsNamespaceForTests = "ModelsNamespace";
             var sb = new StringBuilder();
@@ -2102,7 +2099,7 @@ namespace Umbraco.Web.PublishedModels
         [TestCase(false, false, "ZpqrtBnk.ModelsBuilder.Tests", typeof(StringBuilder), "global::System.Text.StringBuilder")]
         public void WriteClrType_Ambiguous_Ns(bool usingSystem, bool usingZb, string ns, Type type, string expected)
         {
-            var builder = new TextBuilder();
+            var builder = new Builder(Array.Empty<TypeModel>(), ParseResult.Empty);
             if (usingSystem) builder.Using.Add("System.Text");
             if (usingZb) builder.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
             builder.ModelsNamespaceForTests = ns;
@@ -2115,7 +2112,7 @@ namespace Umbraco.Web.PublishedModels
         [Test]
         public void WriteClrType_AmbiguousWithNested()
         {
-            var builder = new TextBuilder();
+            var builder = new Builder(Array.Empty<TypeModel>(), ParseResult.Empty);
             builder.Using.Add("System.Text");
             builder.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
             builder.ModelsNamespaceForTests = "SomeRandomNamespace";
@@ -2211,11 +2208,11 @@ namespace Models
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             var sb = new StringBuilder();
-            builder.AppendModel(sb, builder.GetModels().First());
+            builder.WriteContentTypeModel(sb, builder.GetContentTypeModels().First());
             var gen = sb.ToString();
 
             var version = ApiVersion.Current.Version;
@@ -2362,62 +2359,62 @@ public class ElementModelBase3 {}
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
-            var modelsToGenerate = builder.GetModels().ToList();
+            var modelsToGenerate = builder.GetContentTypeModels().ToList();
 
             var sb = new StringBuilder();
-            builder.AppendModel(sb, modelsToGenerate[0]);
+            builder.WriteContentTypeModel(sb, modelsToGenerate[0]);
             var gen = sb.ToString();
 
             Console.WriteLine(gen);
             Assert.IsTrue(gen.Contains("public partial class Type1 : ContentModelBase1"));
 
             sb = new StringBuilder();
-            builder.AppendModel(sb, modelsToGenerate[1]);
+            builder.WriteContentTypeModel(sb, modelsToGenerate[1]);
             gen = sb.ToString();
 
             Console.WriteLine(gen);
             Assert.IsTrue(gen.Contains("public partial class Type2 : ContentModelBase1"));
 
             sb = new StringBuilder();
-            builder.AppendModel(sb, modelsToGenerate[2]);
+            builder.WriteContentTypeModel(sb, modelsToGenerate[2]);
             gen = sb.ToString();
 
             Console.WriteLine(gen);
             Assert.IsTrue(gen.Contains("public partial class Type3 : ContentModelBase2"));
 
             sb = new StringBuilder();
-            builder.AppendModel(sb, modelsToGenerate[3]);
+            builder.WriteContentTypeModel(sb, modelsToGenerate[3]);
             gen = sb.ToString();
 
             Console.WriteLine(gen);
             Assert.IsTrue(gen.Contains("public partial class Type4 : ContentModelBase3"));
             
             sb = new StringBuilder();
-            builder.AppendModel(sb, modelsToGenerate[4]);
+            builder.WriteContentTypeModel(sb, modelsToGenerate[4]);
             gen = sb.ToString();
 
             Console.WriteLine(gen);
             Assert.IsTrue(gen.Contains("public partial class Type5 : ElementModelBase1"));
             
             sb = new StringBuilder();
-            builder.AppendModel(sb, modelsToGenerate[5]);
+            builder.WriteContentTypeModel(sb, modelsToGenerate[5]);
             gen = sb.ToString();
 
             Console.WriteLine(gen);
             Assert.IsTrue(gen.Contains("public partial class Type6 : ElementModelBase1"));
 
             sb = new StringBuilder();
-            builder.AppendModel(sb, modelsToGenerate[6]);
+            builder.WriteContentTypeModel(sb, modelsToGenerate[6]);
             gen = sb.ToString();
 
             Console.WriteLine(gen);
             Assert.IsTrue(gen.Contains("public partial class Type7 : ElementModelBase2"));
 
             sb = new StringBuilder();
-            builder.AppendModel(sb, modelsToGenerate[7]);
+            builder.WriteContentTypeModel(sb, modelsToGenerate[7]);
             gen = sb.ToString();
 
             Console.WriteLine(gen);
@@ -2493,11 +2490,11 @@ public class ElementModelBase3 {}
             };
 
             var parseResult = new CodeParser().Parse(code);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
             var sb = new StringBuilder();
-            builder.AppendMeta(sb, builder.GetModels());
+            builder.WriteContentTypesMetadata(sb, builder.GetContentTypeModels());
             var gen = sb.ToString();
 
             var version = ApiVersion.Current.Version;

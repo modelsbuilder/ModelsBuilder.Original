@@ -6,7 +6,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
     {
         public IBuilder CreateBuilder(IList<TypeModel> typeModels, ParseResult parseResult, string modelsNamespace = null)
         {
-            return new TextBuilder(typeModels, parseResult, modelsNamespace);
+            return new Builder(typeModels, parseResult, modelsNamespace);
         }
     }
 }

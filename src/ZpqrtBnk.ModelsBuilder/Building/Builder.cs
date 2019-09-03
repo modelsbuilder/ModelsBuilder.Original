@@ -2,24 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.PropertyEditors;
+using ZpqrtBnk.ModelsBuilder.Api;
 using ZpqrtBnk.ModelsBuilder.Configuration;
 
 namespace ZpqrtBnk.ModelsBuilder.Building
 {
-    // NOTE
-    // The idea was to have different types of builder, because I wanted to experiment with
-    // building code with CodeDom. Turns out more complicated than I thought and maybe not
-    // worth it at the moment, to we're using TextBuilder and its Generate method is specific.
-    //
-    // Keeping the code as-is for the time being...
-
     /// <summary>
-    /// Provides a base class for all builders.
+    /// Provides the default <see cref="IBuilder"/> implementation.
     /// </summary>
-    public abstract class Builder : IBuilder
+    public class Builder : BuilderBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Builder"/> class with a list of models to generate
@@ -27,8 +23,8 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// </summary>
         /// <param name="typeModels">The list of models to generate.</param>
         /// <param name="parseResult">The result of code parsing.</param>
-        protected Builder(IList<TypeModel> typeModels, ParseResult parseResult)
-            : this(typeModels, parseResult, null)
+        public Builder(IList<TypeModel> typeModels, ParseResult parseResult)
+            : base(typeModels, parseResult)
         { }
 
         /// <summary>
@@ -38,320 +34,882 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <param name="typeModels">The list of models to generate.</param>
         /// <param name="parseResult">The result of code parsing.</param>
         /// <param name="modelsNamespace">The models namespace.</param>
-        protected Builder(IList<TypeModel> typeModels, ParseResult parseResult, string modelsNamespace)
-        {
-            TypeModels = typeModels ?? throw new ArgumentNullException(nameof(typeModels));
-            ParseResult = parseResult ?? throw new ArgumentNullException(nameof(parseResult));
-
-            // can be null or empty, we'll manage
-            ModelsNamespace = modelsNamespace;
-
-            // but we want it to prepare
-            Prepare();
-        }
-
-        // for unit tests only
-        protected Builder()
+        public Builder(IList<TypeModel> typeModels, ParseResult parseResult, string modelsNamespace)
+            : base(typeModels, parseResult, modelsNamespace)
         { }
 
-        protected Dictionary<string, string> ModelsMap { get; } = new Dictionary<string, string>();
-
-        protected ParseResult ParseResult { get; }
-
-        private static Config Config => Current.Configs.ModelsBuilder();
-
-        // the list of assemblies that will be 'using' by default
-        protected readonly IList<string> TypesUsing = new List<string>
+        /// <inheritdoc />
+        public override void WriteContentTypeModel(StringBuilder sb, TypeModel typeModel)
         {
-            "System",
-            "System.Collections.Generic",
-            "System.Linq.Expressions",
-            "System.Web",
-            "Umbraco.Core.Models",
-            "Umbraco.Core.Models.PublishedContent",
-            "Umbraco.Web",
-            "ZpqrtBnk.ModelsBuilder",
-            "ZpqrtBnk.ModelsBuilder.Umbraco",
-        };
+            WriteHeader(sb);
 
-        /// <summary>
-        /// Gets or sets a value indicating the namespace to use for the models.
-        /// </summary>
-        /// <remarks>May be overriden by code attributes.</remarks>
-        public string ModelsNamespace { get; set; }
+            foreach (var t in Using)
+                AppendLine(sb, $"using {t};");
+            if (!Using.Contains("System.CodeDom.Compiler"))
+                AppendLine(sb, "using System.CodeDom.Compiler;");
 
-        /// <summary>
-        /// Gets the list of assemblies to add to the set of 'using' assemblies in each model file.
-        /// </summary>
-        public IList<string> Using => TypesUsing;
+            AppendNewLine(sb);
+            AppendLine(sb, $"namespace {ModelsNamespace}");
+            AppendLine(sb, "{");
+            IndentEnter();
 
-        /// <summary>
-        /// Gets the list of models to generate.
-        /// </summary>
-        /// <returns>The models to generate, ie those that are not ignored.</returns>
-        public IEnumerable<TypeModel> GetModels()
-        {
-            return TypeModels.Where(x => !x.IsContentIgnored);
+            AppendContentTypeModel(sb, typeModel);
+
+            IndentExit();
+            AppendLine(sb, "}");
         }
 
-        /// <summary>
-        /// Gets the list of all models.
-        /// </summary>
-        /// <remarks>Includes those that are ignored.</remarks>
-        protected internal IList<TypeModel> TypeModels { get; }
-
-        /// <summary>
-        /// Prepares generation by processing the result of code parsing.
-        /// </summary>
-        /// <remarks>
-        ///     Preparation includes figuring out from the existing code which models or properties should
-        ///     be ignored or renamed, etc. -- anything that comes from the attributes in the existing code.
-        /// </remarks>
-        private void Prepare()
+        /// <inheritdoc />
+        public override void WriteContentTypeModels(StringBuilder sb, IEnumerable<TypeModel> typeModels)
         {
-            TypeModel.MapModelTypes(TypeModels, ModelsNamespace);
+            WriteHeader(sb);
 
-            var pureLive = Config.ModelsMode == ModelsMode.PureLive;
+            foreach (var t in Using)
+                AppendLine(sb, $"using {t};");
+            if (!Using.Contains("System.CodeDom.Compiler"))
+                AppendLine(sb, "using System.CodeDom.Compiler;");
 
-            // mark IsContentIgnored models that we discovered should be ignored
-            // then propagate / ignore children of ignored contents
-            // ignore content = don't generate a class for it, don't generate children
-            foreach (var typeModel in TypeModels.Where(x => ParseResult.IsIgnored(x.Alias)))
-                typeModel.IsContentIgnored = true;
-            foreach (var typeModel in TypeModels.Where(x => !x.IsContentIgnored && x.EnumerateBaseTypes().Any(xx => xx.IsContentIgnored)))
-                typeModel.IsContentIgnored = true;
+            // assembly attributes marker
+            AppendNewLine(sb);
+            AppendLine(sb, "//ASSATTR");
 
-            // handle model renames
-            foreach (var typeModel in TypeModels.Where(x => ParseResult.IsContentRenamed(x.Alias)))
+            AppendNewLine(sb);
+            AppendLine(sb, $"namespace {ModelsNamespace}");
+            AppendLine(sb, "{");
+            IndentEnter();
+
+            foreach (var typeModel in typeModels)
             {
-                typeModel.ClrName = ParseResult.ContentClrName(typeModel.Alias);
-                typeModel.IsRenamed = true;
-                ModelsMap[typeModel.Alias] = typeModel.ClrName;
+                AppendContentTypeModel(sb, typeModel);
+                AppendNewLine(sb);
             }
 
-            // handle implement
-            foreach (var typeModel in TypeModels.Where(x => ParseResult.HasContentImplement(x.Alias)))
-            {
-                typeModel.HasImplement = true;
-            }
-
-            // mark OmitBase models that we discovered already have a base class
-            foreach (var typeModel in TypeModels.Where(x => ParseResult.HasContentBase(ParseResult.ContentClrName(x.Alias) ?? x.ClrName)))
-                typeModel.HasBase = true;
-
-            foreach (var typeModel in TypeModels)
-            {
-                // mark IsRemoved properties that we discovered should be ignored
-                // ie is marked as ignored on type, or on any parent type
-                var tm = typeModel;
-                foreach (var property in typeModel.Properties
-                    .Where(property => tm.EnumerateBaseTypes(true).Any(x => ParseResult.IsPropertyIgnored(ParseResult.ContentClrName(x.Alias) ?? x.ClrName, property.Alias))))
-                {
-                    property.IsIgnored = true;
-                }
-
-                // handle property renames
-                foreach (var property in typeModel.Properties)
-                    property.ClrName = ParseResult.PropertyClrName(ParseResult.ContentClrName(typeModel.Alias) ?? typeModel.ClrName, property.Alias) ?? property.ClrName;
-            }
-
-            // for the first two of these two tests,
-            //  always throw, even in purelive: cannot happen unless ppl start fidling with attributes to rename
-            //  things, and then they should pay attention to the generation error log - there's no magic here
-            // for the last one, don't throw in purelive, see comment
-
-            // ensure we have no duplicates type names
-            foreach (var xx in TypeModels.Where(x => !x.IsContentIgnored).GroupBy(x => x.ClrName).Where(x => x.Count() > 1))
-                throw new InvalidOperationException($"Type name \"{xx.Key}\" is used"
-                    + $" for types with alias {string.Join(", ", xx.Select(x => x.ItemType + ":\"" + x.Alias + "\""))}. Names have to be unique."
-                    + " Consider using an attribute to assign different names to conflicting types.");
-
-            // ensure we have no duplicates property names
-            foreach (var typeModel in TypeModels.Where(x => !x.IsContentIgnored))
-                foreach (var xx in typeModel.Properties.Where(x => !x.IsIgnored).GroupBy(x => x.ClrName).Where(x => x.Count() > 1))
-                    throw new InvalidOperationException($"Property name \"{xx.Key}\" in type {typeModel.ItemType}:\"{typeModel.Alias}\""
-                        + $" is used for properties with alias {string.Join(", ", xx.Select(x => "\"" + x.Alias + "\""))}. Names have to be unique."
-                        + " Consider using an attribute to assign different names to conflicting properties.");
-
-            // ensure content & property type don't have identical name (csharp hates it)
-            foreach (var typeModel in TypeModels.Where(x => !x.IsContentIgnored))
-            {
-                foreach (var xx in typeModel.Properties.Where(x => !x.IsIgnored && x.ClrName == typeModel.ClrName))
-                {
-                    if (!pureLive)
-                        throw new InvalidOperationException($"The model class for content type with alias \"{typeModel.Alias}\" is named \"{xx.ClrName}\"."
-                            + $" CSharp does not support using the same name for the property with alias \"{xx.Alias}\"."
-                            + " Consider using an attribute to assign a different name to the property.");
-
-                    // for purelive, will we generate a commented out properties with an error message,
-                    // instead of throwing, because then it kills the sites and ppl don't understand why
-                    xx.AddError($"The class {typeModel.ClrName} cannot implement this property, because"
-                        + $" CSharp does not support naming the property with alias \"{xx.Alias}\" with the same name as content type with alias \"{typeModel.Alias}\"."
-                        + " Consider using an attribute to assign a different name to the property.");
-
-                    // will not be implemented on interface nor class
-                    // note: we will still create the static getter, and implement the property on other classes...
-                }
-            }
-
-            // ensure we have no collision between base types
-            // NO: we may want to define a base class in a partial, on a model that has a parent
-            // we are NOT checking that the defined base type does maintain the inheritance chain
-            //foreach (var xx in _typeModels.Where(x => !x.IsContentIgnored).Where(x => x.BaseType != null && x.HasBase))
-            //    throw new InvalidOperationException(string.Format("Type alias \"{0}\" has more than one parent class.",
-            //        xx.Alias));
-
-            // discover interfaces that need to be declared / implemented
-            foreach (var typeModel in TypeModels)
-            {
-                // collect all the (non-removed) types implemented at parent level
-                // ie the parent content types and the mixins content types, recursively
-                var parentImplems = new List<TypeModel>();
-                if (typeModel.BaseType != null && !typeModel.BaseType.IsContentIgnored)
-                    TypeModel.CollectImplems(parentImplems, typeModel.BaseType);
-
-                // interfaces we must declare we implement (initially empty)
-                // ie this type's mixins, except those that have been removed,
-                // and except those that are already declared at the parent level
-                // in other words, DeclaringInterfaces is "local mixins"
-                var declaring = typeModel.MixinTypes
-                    .Where(x => !x.IsContentIgnored)
-                    .Except(parentImplems);
-                typeModel.DeclaringInterfaces.AddRange(declaring);
-
-                // interfaces we must actually implement (initially empty)
-                // if we declare we implement a mixin interface, we must actually implement
-                // its properties, all recursively (ie if the mixin interface implements...)
-                // so, starting with local mixins, we collect all the (non-removed) types above them
-                var mixinImplems = new List<TypeModel>();
-                foreach (var i in typeModel.DeclaringInterfaces)
-                    TypeModel.CollectImplems(mixinImplems, i);
-                // and then we remove from that list anything that is already declared at the parent level
-                typeModel.ImplementingInterfaces.AddRange(mixinImplems.Except(parentImplems));
-            }
-
-            // detect mixin properties that have local implementations
-            foreach (var typeModel in TypeModels)
-            {
-                foreach (var mixinProperty in typeModel.ImplementingInterfaces.SelectMany(x => x.Properties))
-                {
-                    if (ParseResult.IsPropertyIgnored(ParseResult.ContentClrName(typeModel.Alias) ?? typeModel.ClrName, mixinProperty.Alias))
-                        typeModel.IgnoredMixinProperties.Add(mixinProperty);
-                }
-            }
-
-            // ensure elements don't inherit from non-elements
-            foreach (var typeModel in TypeModels.Where(x => !x.IsContentIgnored && x.IsElement))
-            {
-                if (typeModel.BaseType != null && !typeModel.BaseType.IsElement)
-                    throw new Exception($"Cannot generate model for type '{typeModel.Alias}' because it is an element type, but its parent type '{typeModel.BaseType.Alias}' is not.");
-
-                var errs = typeModel.MixinTypes.Where(x => !x.IsElement).ToList();
-                if (errs.Count > 0)
-                    throw new Exception($"Cannot generate model for type '{typeModel.Alias}' because it is an element type, but it is composed of {string.Join(", ", errs.Select(x => "'" + x.Alias + "'"))} which {(errs.Count == 1 ? "is" : "are")} not.");
-            }
-
-            // register using types
-            foreach (var usingNamespace in ParseResult.UsingNamespaces)
-            {
-                if (!TypesUsing.Contains(usingNamespace))
-                    TypesUsing.Add(usingNamespace);
-            }
-
-            // handle ctor
-            foreach (var typeModel in TypeModels.Where(x => ParseResult.HasCtor(x.ClrName)))
-                typeModel.HasCtor = true;
-
-            // handle extensions
-            foreach (var typeModel in TypeModels)
-            {
-                var typeFullName = typeModel.ClrName;
-                foreach (var propertyModel in typeModel.Properties)
-                {
-                    propertyModel.IsExtensionImplemented = ParseResult.IsExtensionImplemented(typeFullName, propertyModel.ClrName);
-                }
-            }
+            IndentExit();
+            AppendLine(sb, "}");
         }
 
-        private SemanticModel _ambiguousSymbolsModel;
-        private int _ambiguousSymbolsPos;
+        #region Append Helpers
+
+        private int _indent = 0;
+
+        protected string Indent => new string('\t', _indent);
+
+        protected void IndentEnter() { _indent++; }
+
+        protected void IndentExit() { _indent--; }
+
+        protected string NewLine => "\n";
+
+        protected void AppendLine(StringBuilder sb, string text)
+        {
+            for (var i = 0; i < _indent; i++)
+                sb.Append('\t');
+            sb.Append(text);
+            sb.Append(NewLine);
+        }
+
+        protected void AppendNewLine(StringBuilder sb)
+        {
+            sb.Append(NewLine);
+        }
+
+        protected void AppendBetween(StringBuilder stringBuilder, ref bool first, string text)
+        {
+            if (first)
+                first = false;
+            else
+                stringBuilder.Append(text);
+        }
+
+        protected void AppendNewLineBetween(StringBuilder stringBuilder, ref bool first)
+        {
+            AppendBetween(stringBuilder, ref first, NewLine);
+        }
+
+        // writes an attribute that identifies code generated by a tool
+        // (helps reduce warnings, tools such as FxCop use it)
+        // see https://github.com/zpqrtbnk/Zbu.ModelsBuilder/issues/107
+        // see https://docs.microsoft.com/en-us/dotnet/api/system.codedom.compiler.generatedcodeattribute
+        // see https://blogs.msdn.microsoft.com/codeanalysis/2007/04/27/correct-usage-of-the-compilergeneratedattribute-and-the-generatedcodeattribute/
+        //
+        // note that the blog post above clearly states that "Nor should it be applied at the type level if the type being generated is a partial class."
+        // and since our models are partial classes, we have to apply the attribute against the individual members, not the class itself.
+        //
+        protected void AppendGeneratedCodeAttribute(StringBuilder sb)
+        {
+            var mbName = ParseResult.MBClassName;
+            AppendLine(sb, $"[GeneratedCodeAttribute({mbName}.Name, {mbName}.VersionString)]");
+        }
+
+        protected void AppendLocalGeneratedCodeAttribute(StringBuilder sb)
+        {
+            AppendLine(sb, "[GeneratedCodeAttribute(Name, VersionString)]");
+        }
+
+        #endregion
+
+        #region Header
+
+        /// <summary>
+        /// Outputs an "auto-generated" header to a string builder.
+        /// </summary>
+        /// <param name="sb">The string builder.</param>
+        public static void WriteHeader(StringBuilder sb)
+        {
+            TextHeaderWriter.WriteHeader(sb);
+        }
+
+        #endregion
+
+        #region Meta
+
+        /// <inheritdoc />
+        public override void WriteContentTypesMetadata(StringBuilder sb, IEnumerable<TypeModel> typeModels)
+        {
+            var typeModelsList = typeModels.ToList();
+            var mbName = ParseResult.MBClassName;
+
+            WriteHeader(sb);
+
+            //AppendLine(sb, "// ReSharper disable All");
+            //AppendNewLine(sb);
+
+            AppendLine(sb, "using System.CodeDom.Compiler;");
+            AppendLine(sb, "using Umbraco.Core.Models.PublishedContent;");
+            AppendLine(sb, "using ZpqrtBnk.ModelsBuilder.Umbraco;");
+
+            AppendNewLine(sb);
+            AppendLine(sb, $"namespace {ModelsNamespace}");
+            AppendLine(sb, "{");
+            IndentEnter();
+
+            AppendLine(sb, "/// <summary>Models Builder</summary>");
+            AppendLine(sb, $"public static partial class {mbName}");
+            AppendLine(sb, "{");
+            IndentEnter();
+
+            AppendLine(sb, "/// <summary>Gets Models Builder's generator name.</summary>");
+            AppendLine(sb, "public const string Name = \"ZpqrtBnk.ModelsBuilder\";");
+            AppendNewLine(sb);
+
+            AppendLine(sb, "/// <summary>Gets the Models Builder version that was used to generate the files.</summary>");
+            AppendLine(sb, $"public const string VersionString = \"{ApiVersion.Current.Version}\";");
+            AppendNewLine(sb);
+
+            AppendMetaItemTypes(sb, typeModelsList);
+            AppendNewLine(sb);
+
+            AppendMetaContentTypeAliases(sb, typeModelsList);
+            AppendNewLine(sb);
+
+            AppendMetaPropertyTypeAliases(sb, typeModelsList);
+            AppendNewLine(sb);
+
+            AppendContentTypes(sb, typeModelsList);
+            AppendNewLine(sb);
+
+            AppendPropertyTypes(sb, typeModelsList);
+            AppendNewLine(sb);
+
+            AppendMetaModels(sb, typeModelsList);
+
+            IndentExit();
+            AppendLine(sb, "}"); // MB class
+
+            IndentExit();
+            AppendLine(sb, "}"); // namespace
+        }
+
+        protected virtual void AppendMetaItemTypes(StringBuilder sb, IEnumerable<TypeModel> typeModels)
+        {
+            AppendLine(sb, "/// <summary>Provides the content type published item types.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
+            AppendLine(sb, "public static class ItemType");
+            AppendLine(sb, "{");
+            IndentEnter();
+
+            var firstType = true;
+            foreach (var typeModel in typeModels)
+            {
+                AppendNewLineBetween(sb, ref firstType);
+                AppendMetaItemType(sb, typeModel);
+            }
+
+            IndentExit();
+            AppendLine(sb, "}");
+        }
+
+        protected virtual void AppendMetaItemType(StringBuilder sb, TypeModel typeModel)
+        {
+            AppendLine(sb, $"/// <summary>Gets the published item type of the {typeModel.ClrName} content type.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
+            AppendLine(sb, $"public const PublishedItemType {typeModel.ClrName} = PublishedItemType.{typeModel.ItemType.ToPublishedItemType()};");
+        }
+
+        protected virtual void AppendMetaContentTypeAliases(StringBuilder sb, IEnumerable<TypeModel> typeModels)
+        {
+            AppendLine(sb, "/// <summary>Defines the content type alias constants.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
+            AppendLine(sb, "public static class ContentAlias");
+            AppendLine(sb, "{");
+            IndentEnter();
+
+            var firstType = true;
+            foreach (var typeModel in typeModels)
+            {
+                AppendNewLineBetween(sb, ref firstType);
+                AppendMetaContentTypeAlias(sb, typeModel);
+            }
+
+            IndentExit();
+            AppendLine(sb, "}");
+        }
+
+        protected virtual void AppendMetaContentTypeAlias(StringBuilder sb, TypeModel typeModel)
+        {
+            AppendLine(sb, $"/// <summary>Gets the alias of the {typeModel.ClrName} content type.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
+            AppendLine(sb, $"public const string {typeModel.ClrName} = \"{typeModel.Alias}\";");
+        }
+
+        protected virtual void AppendMetaPropertyTypeAliases(StringBuilder sb, IEnumerable<TypeModel> typeModels)
+        {
+            AppendLine(sb, "/// <summary>Defines the property type alias constants.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
+            AppendLine(sb, "public static class PropertyAlias");
+            AppendLine(sb, "{");
+            IndentEnter();
+
+            var firstType = true;
+            foreach (var typeModel in typeModels)
+            {
+                AppendNewLineBetween(sb, ref firstType);
+                AppendMetaPropertyTypeAliases(sb, typeModel);
+            }
+
+            IndentExit();
+            AppendLine(sb, "}");
+        }
+
+        protected virtual void AppendMetaPropertyTypeAliases(StringBuilder sb, TypeModel typeModel)
+        {
+            AppendLine(sb, $"/// <summary>Defines the property type alias constants for the {typeModel.ClrName} content type.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
+            AppendLine(sb, $"public static class {typeModel.ClrName}");
+            AppendLine(sb, "{");
+            IndentEnter();
+
+            var firstProperty = true;
+            foreach (var propertyModel in typeModel.Properties)
+            {
+                AppendNewLineBetween(sb, ref firstProperty);
+                AppendMetaPropertyTypeAlias(sb, typeModel, propertyModel);
+            }
+
+            IndentExit();
+            AppendLine(sb, "}");
+        }
+
+        protected virtual void AppendMetaPropertyTypeAlias(StringBuilder sb, TypeModel typeModel, PropertyModel propertyModel)
+        {
+            AppendLine(sb, $"/// <summary>Gets the alias of the {typeModel.ClrName}.{propertyModel.ClrName} property type.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
+            AppendLine(sb, $"public const string {propertyModel.ClrName} = \"{propertyModel.Alias}\";");
+        }
+
+        protected virtual void AppendContentTypes(StringBuilder sb, IEnumerable<TypeModel> typeModels)
+        {
+            AppendLine(sb, "/// <summary>Provides the content types.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
+            AppendLine(sb, "public static class ContentType");
+            AppendLine(sb, "{");
+            IndentEnter();
+
+            var firstType = true;
+            foreach (var typeModel in typeModels)
+            {
+                AppendNewLineBetween(sb, ref firstType);
+                AppendContentType(sb, typeModel);
+            }
+
+            IndentExit();
+            AppendLine(sb, "}");
+        }
+
+        protected virtual void AppendContentType(StringBuilder sb, TypeModel typeModel)
+        {
+            AppendLine(sb, $"/// <summary>Gets the {typeModel.ClrName} content type.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
+            AppendLine(sb, $"public static readonly IPublishedContentType {typeModel.ClrName} = PublishedModelUtility.GetModelContentType(ItemType.{typeModel.ClrName}, \"{typeModel.Alias}\");");
+        }
+
+        protected virtual void AppendPropertyTypes(StringBuilder sb, IEnumerable<TypeModel> typeModels)
+        {
+            AppendLine(sb, "/// <summary>Provides the property types.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
+            AppendLine(sb, "public static class PropertyType");
+            AppendLine(sb, "{");
+            IndentEnter();
+
+            var firstType = true;
+            foreach (var typeModel in typeModels)
+            {
+                AppendNewLineBetween(sb, ref firstType);
+                AppendPropertyTypes(sb, typeModel);
+            }
+
+            IndentExit();
+            AppendLine(sb, "}");
+        }
+
+        protected virtual void AppendPropertyTypes(StringBuilder sb, TypeModel typeModel)
+        {
+            AppendLine(sb, $"/// <summary>Provides the property types for the {typeModel.ClrName} content type.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
+            AppendLine(sb, $"public static class {typeModel.ClrName}");
+            AppendLine(sb, "{");
+            IndentEnter();
+
+            var firstProperty = true;
+            foreach (var propertyModel in typeModel.Properties)
+            {
+                AppendNewLineBetween(sb, ref firstProperty);
+                AppendPropertyType(sb, typeModel, propertyModel);
+            }
+
+            IndentExit();
+            AppendLine(sb, "}");
+        }
+
+        protected virtual void AppendPropertyType(StringBuilder sb, TypeModel typeModel, PropertyModel propertyModel)
+        {
+            AppendLine(sb, $"/// <summary>Gets the {typeModel.ClrName}.{propertyModel.ClrName} property type.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
+            AppendLine(sb, $"public static readonly IPublishedPropertyType {propertyModel.ClrName} = ContentType.{typeModel.ClrName}.GetPropertyType(PropertyAlias.{typeModel.ClrName}.{propertyModel.ClrName});");
+        }
+
+        protected virtual void AppendMetaModels(StringBuilder sb, IEnumerable<TypeModel> typeModels)
+        {
+            AppendLocalGeneratedCodeAttribute(sb);
+            AppendLine(sb, "private readonly ContentTypeModelInfo[] _models = ");
+            AppendLine(sb, "{");
+            IndentEnter();
+
+            var firstType = true;
+            foreach (var typeModel in typeModels)
+            {
+                AppendBetween(sb, ref firstType, $",{NewLine}");
+
+                sb.Append(Indent);
+                sb.Append($"new ContentTypeModelInfo(\"{typeModel.Alias}\", \"{typeModel.ClrName}\", typeof(");
+                AppendClrType(sb, typeModel.ClrName);
+                sb.Append(")");
+                if (typeModel.Properties.Count > 0)
+                {
+                    sb.Append(",");
+                    AppendNewLine(sb);
+                    IndentEnter();
+                    var firstProperty = true;
+                    foreach (var propertyModel in typeModel.Properties)
+                    {
+                        AppendBetween(sb, ref firstProperty, $",{NewLine}");
+                        sb.Append(Indent);
+                        sb.Append($"new PropertyTypeModelInfo(\"{propertyModel.Alias}\", \"{propertyModel.ClrName}\", typeof(");
+                        AppendClrType(sb, propertyModel.ClrTypeName);
+                        sb.Append("))");
+                    }
+                    IndentExit();
+                }
+
+                sb.Append(")");
+            }
+            AppendNewLine(sb);
+
+            IndentExit();
+            AppendLine(sb, "};");
+
+            AppendNewLine(sb);
+            AppendLine(sb, "/// <summary>Gets the model infos.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
+            AppendLine(sb, "public IReadOnlyCollection<ContentTypeModelInfo> Models => _models;");
+
+            AppendNewLine(sb);
+            AppendLine(sb, "/// <summary>Gets the model infos for a content type.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
+            AppendLine(sb, "public ContentTypeModelInfo Model(string alias) => _models.FirstOrDefault(x => x.Alias == alias);");
+
+            AppendNewLine(sb);
+            AppendLine(sb, "/// <summary>Gets the model infos for a content type.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
+            AppendLine(sb, "public ContentTypeModelInfo Model<TModel>() => _models.FirstOrDefault(x => x.ClrType == typeof(TModel));");
+
+            AppendNewLine(sb);
+            AppendLine(sb, "/// <summary>Gets the model infos for a content type.</summary>");
+            AppendLocalGeneratedCodeAttribute(sb);
+            AppendLine(sb, "public ContentTypeModelInfo Model(Type typeofModel) => _models.FirstOrDefault(x => x.ClrType == typeofModel);");
+        }
+
+        #endregion
+
+        #region Models
+
+        protected virtual void AppendContentTypeModel(StringBuilder sb, TypeModel type)
+        {
+            // generate interface for mixins
+            if (type.IsMixin)
+            {
+                AppendMixinInterface(sb, type);
+                AppendNewLine(sb);
+            }
+
+            AppendExtensionMethods(sb, type);
+            AppendNewLine(sb);
+
+            AppendClassDeclaration(sb, type);
+
+            // begin class body
+            AppendLine(sb, "{");
+            IndentEnter();
+
+            // write the ctor
+            if (!type.HasCtor)
+                AppendConstructor(sb, type);
+
+            if (!type.HasCtor && ParseResult.GeneratePropertyGetters)
+                AppendNewLine(sb);
+
+            // write the properties
+            if (ParseResult.GeneratePropertyGetters)
+                AppendPropertyImplementations(sb, type);
+
+            // close the class declaration
+            IndentExit();
+            AppendLine(sb, "}");
+        }
+
+        protected virtual void AppendMixinInterface(StringBuilder sb, TypeModel typeModel)
+        {
+            // write the interface declaration
+            AppendLine(sb, $"// Mixin Content Type with alias \"{typeModel.Alias}\"");
+            if (!string.IsNullOrWhiteSpace(typeModel.Name))
+                AppendLine(sb, $"/// <summary>{XmlCommentString(typeModel.Name)}</summary>");
+            sb.Append($"{Indent}public partial interface I{typeModel.ClrName}");
+
+            var implements = typeModel.BaseType == null || typeModel.BaseType.IsContentIgnored
+                ? (typeModel.HasBase ? null : (typeModel.IsElement ? "PublishedElement" : "PublishedContent"))
+                : typeModel.BaseType.ClrName;
+
+            if (implements != null)
+                sb.Append($" : I{implements}");
+
+            // write the mixins
+            var sep = implements == null ? ":" : ",";
+            foreach (var mixinType in typeModel.DeclaringInterfaces.OrderBy(x => x.ClrName))
+            {
+                sb.Append($"{sep} I{mixinType.ClrName}");
+                sep = ",";
+            }
+
+            AppendNewLine(sb);
+            AppendLine(sb, "{");
+            IndentEnter();
+
+            // write the properties - only the local (non-ignored) ones, we're an interface
+            var firstProperty = true;
+            foreach (var propertyModel in typeModel.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
+            {
+                AppendNewLineBetween(sb, ref firstProperty);
+                AppendInterfaceProperty(sb, propertyModel);
+            }
+
+            IndentExit();
+            AppendLine(sb, "}");
+        }
+
+        protected virtual void AppendExtensionMethods(StringBuilder sb, TypeModel typeModel)
+        {
+            // write extension methods for properties
+            var extensionProperties = typeModel.Properties.Where(x => !x.IsIgnored && !x.IsExtensionImplemented).ToList();
+            if (extensionProperties.Count == 0) return;
+
+            AppendLine(sb, $"/// <summary>Provides extension methods for the {(typeModel.IsMixin ? "I" : "")}{typeModel.ClrName} {(typeModel.IsMixin ? "interface" : "class")}.</summary>");
+            AppendLine(sb, $"public static partial class {typeModel.ClrName}Extensions");
+
+            AppendLine(sb, "{");
+            IndentEnter();
+
+            var firstProperty = true;
+            foreach (var propertyModel in extensionProperties)
+            {
+                AppendNewLineBetween(sb, ref firstProperty);
+                AppendExtensionMethod(sb, typeModel, propertyModel);
+            }
+
+            IndentExit();
+            AppendLine(sb, "}");
+        }
+
+        protected virtual void AppendClassDeclaration(StringBuilder sb, TypeModel typeModel)
+        {
+            if (typeModel.IsRenamed)
+                AppendLine(sb, $"// Content Type with alias \"{typeModel.Alias}\"");
+
+            if (!string.IsNullOrWhiteSpace(typeModel.Name))
+                AppendLine(sb, "/// <summary>{XmlCommentString(typeModel.Name)}</summary>");
+
+            // cannot do it now. see note in ImplementContentTypeAttribute
+            //if (!type.HasImplement)
+            //    sb.AppendFormat("\t[ImplementContentType(\"{0}\")]\n", type.Alias);
+
+            AppendLine(sb, $"[PublishedModel(\"{typeModel.Alias}\")]");
+            sb.Append($"{Indent}public partial class {typeModel.ClrName}");
+
+            var inherits = typeModel.HasBase
+                ? null // has its own base already
+                : (typeModel.BaseType == null || typeModel.BaseType.IsContentIgnored
+                    ? GetBaseClassName(typeModel)
+                    : typeModel.BaseType.ClrName);
+
+            if (inherits != null)
+                sb.Append($" : {inherits}");
+
+            var sep = inherits == null ? ":" : ",";
+            if (typeModel.IsMixin)
+            {
+                // if it's a mixin it implements its own interface
+                sb.Append($"{sep} I{typeModel.ClrName}");
+            }
+            else
+            {
+                // write the mixins, if any, as interfaces
+                // only if not a mixin because otherwise the interface already has them already
+                foreach (var mixinType in typeModel.DeclaringInterfaces.OrderBy(x => x.ClrName))
+                {
+                    sb.Append($"{sep} I{mixinType.ClrName}");
+                    sep = ",";
+                }
+            }
+
+            AppendNewLine(sb);
+        }
+
+        protected virtual void AppendConstructor(StringBuilder sb, TypeModel typeModel)
+        {
+            AppendLine(sb, "// ctor");
+            AppendLine(sb, $"public {typeModel.ClrName}(IPublished{(typeModel.IsElement ? "Element" : "Content")} content)");
+            IndentEnter();
+            AppendLine(sb, $": base(content)");
+            IndentExit();
+            AppendLine(sb, "{ }");
+        }
+
+        protected virtual void AppendPropertyImplementations(StringBuilder sb, TypeModel type)
+        {
+            AppendLine(sb, "// properties");
+
+            // write the properties
+            foreach (var prop in type.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
+                AppendPropertyImplementation(sb, prop);
+
+            // no need to write the parent properties since we inherit from the parent
+            // and the parent defines its own properties. need to write the mixins properties
+            // since the mixins are only interfaces and we have to provide an implementation.
+
+            // write the mixins properties
+            foreach (var mixinType in type.ImplementingInterfaces.OrderBy(x => x.ClrName))
+                foreach (var prop in mixinType.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
+                {
+                    // exclude directly implemented properties
+                    if (type.IgnoredMixinProperties.Contains(prop)) continue;
+                    AppendPropertyImplementation(sb, prop);
+                }
+        }
+
+        protected virtual void AppendExtensionMethod(StringBuilder sb, TypeModel typeModel, PropertyModel propertyModel)
+        {
+            if (propertyModel.Errors != null) return;
+
+            // Adds xml summary to each property containing
+            // property name and property description
+            if (!string.IsNullOrWhiteSpace(propertyModel.Name) || !string.IsNullOrWhiteSpace(propertyModel.Description))
+            {
+                var summary = XmlCommentString(propertyModel.Name);
+                if (!string.IsNullOrWhiteSpace(propertyModel.Description))
+                    summary += ": " + XmlCommentString(propertyModel.Description);
+
+                AppendLine(sb, $"/// <summary>{summary}</summary>");
+            }
+
+            AppendGeneratedCodeAttribute(sb);
+
+            sb.Append(Indent);
+            sb.Append("public static ");
+            AppendClrType(sb, propertyModel.ClrTypeName);
+            sb.Append(" ");
+            sb.Append(propertyModel.ClrName);
+            sb.AppendFormat("(this {0}{1} that", typeModel.IsMixin ? "I" : "", typeModel.ClrName);
+            if (propertyModel.VariesByCulture())
+                sb.Append(", string culture = null");
+            if (propertyModel.VariesBySegment())
+                sb.Append(", string segment = null");
+            sb.Append(", Fallback fallback = default, string defaultValue = default)");
+            sb.Append(NewLine);
+            IndentEnter();
+            sb.Append(Indent);
+            sb.Append("=> that.Value");
+            if (propertyModel.ModelClrType != typeof(object))
+            {
+                sb.Append("<");
+                AppendClrType(sb, propertyModel.ClrTypeName);
+                sb.Append(">");
+            }
+            sb.AppendFormat("(\"{0}\"", propertyModel.Alias);
+            if (propertyModel.VariesByCulture())
+                sb.Append(", culture: culture");
+            if (propertyModel.VariesBySegment())
+                sb.Append(", segment: segment");
+            sb.Append(", fallback: fallback, defaultValue: defaultValue);");
+            sb.Append(NewLine);
+            IndentExit();
+        }
+
+        protected virtual void AppendPropertyImplementation(StringBuilder sb, PropertyModel property)
+        {
+            AppendNewLine(sb);
+
+            if (property.Errors != null)
+                AppendPropertyErrorsStart(sb, property.Errors);
+
+            // Adds xml summary to each property containing
+            // property name and property description
+            if (!string.IsNullOrWhiteSpace(property.Name) || !string.IsNullOrWhiteSpace(property.Description))
+            {
+                var summary = XmlCommentString(property.Name);
+                if (!string.IsNullOrWhiteSpace(property.Description))
+                    summary += ": " + XmlCommentString(property.Description);
+
+                AppendLine(sb, $"/// <summary>{summary}</summary>");
+            }
+
+            AppendGeneratedCodeAttribute(sb);
+            AppendLine(sb, $"[ImplementPropertyType(\"{property.Alias}\")]");
+            sb.Append(Indent);
+            sb.Append("public ");
+            AppendClrType(sb, property.ClrTypeName);
+            sb.Append($" {property.ClrName} => this.{property.ClrName}();");
+            AppendNewLine(sb);
+
+            if (property.Errors != null)
+                AppendPropertyErrorsEnd(sb);
+        }
+
+        protected virtual void AppendInterfaceProperty(StringBuilder sb, PropertyModel property)
+        {
+            if (property.Errors != null)
+                AppendPropertyErrorsStart(sb, property.Errors);
+
+            if (!string.IsNullOrWhiteSpace(property.Name))
+                sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString(property.Name));
+
+            AppendGeneratedCodeAttribute(sb);
+            sb.Append(Indent);
+            AppendClrType(sb, property.ClrTypeName);
+            sb.Append($" {property.ClrName} {{ get; }}");
+            AppendNewLine(sb);
+
+            if (property.Errors != null)
+                AppendPropertyErrorsEnd(sb);
+        }
+
+        protected virtual void AppendPropertyErrorsStart(StringBuilder sb, IEnumerable<string> errors)
+        {
+            AppendLine(sb, "/*");
+            AppendLine(sb, " * THIS PROPERTY CANNOT BE IMPLEMENTED, BECAUSE:");
+            AppendLine(sb, " *");
+
+            IEnumerable<string> SplitError(string error)
+            {
+                var p = 0;
+                while (p < error.Length)
+                {
+                    var n = p + 50;
+                    while (n < error.Length && error[n] != ' ') n++;
+                    if (n >= error.Length) break;
+                    yield return error.Substring(p, n - p);
+                    p = n + 1;
+                }
+                if (p < error.Length)
+                    yield return error.Substring(p);
+            }
+
+            var first = true;
+            foreach (var error in errors)
+            {
+                if (first) first = false;
+                else AppendLine(sb, " *");
+                foreach (var s in SplitError(error))
+                {
+                    AppendLine(sb, " *" + s);
+                }
+            }
+            AppendLine(sb, " *");
+            AppendNewLine(sb);
+            AppendLine(sb, " *");
+            AppendLine(sb, " */");
+        }
+
+        protected virtual void AppendPropertyErrorsEnd(StringBuilder sb)
+        {
+            AppendNewLine(sb);
+        }
+
+        #endregion
+
+        #region CLR Types
 
         // internal for tests
-        internal void PrepareAmbiguousSymbols()
+        protected internal void AppendClrType(StringBuilder sb, Type type)
         {
-            var codeBuilder = new StringBuilder();
-            foreach (var t in TypesUsing)
-                codeBuilder.AppendFormat("using {0};\n", t);
+            var s = type.ToString();
 
-            codeBuilder.AppendFormat("namespace {0}\n{{ }}\n", GetModelsNamespace());
-
-            var compiler = new Compiler();
-            SyntaxTree[] trees;
-            var compilation = compiler.GetCompilation("MyCompilation", new Dictionary<string, string> { { "code", codeBuilder.ToString() } }, out trees);
-            var tree = trees[0];
-            _ambiguousSymbolsModel = compilation.GetSemanticModel(tree);
-
-            var namespaceSyntax = tree.GetRoot().DescendantNodes().OfType<NamespaceDeclarationSyntax>().First();
-            //var namespaceSymbol = model.GetDeclaredSymbol(namespaceSyntax);
-            _ambiguousSymbolsPos = namespaceSyntax.OpenBraceToken.SpanStart;
+            if (type.IsGenericType)
+            {
+                var p = s.IndexOf('`');
+                AppendNonGenericClrType(sb, s.Substring(0, p));
+                sb.Append("<");
+                var args = type.GetGenericArguments();
+                for (var i = 0; i < args.Length; i++)
+                {
+                    if (i > 0) sb.Append(", ");
+                    AppendClrType(sb, args[i]);
+                }
+                sb.Append(">");
+            }
+            else
+            {
+                AppendNonGenericClrType(sb, s);
+            }
         }
 
-        // looking for a simple symbol eg 'Umbraco' or 'String'
-        // expecting to match eg 'Umbraco' or 'System.String'
-        // returns true if either
-        // - more than 1 symbol is found (explicitely ambiguous)
-        // - 1 symbol is found BUT not matching (implicitely ambiguous)
-        protected bool IsAmbiguousSymbol(string symbol, string match)
+        // internal for tests
+        protected internal void AppendClrType(StringBuilder sb, string type)
         {
-            if (_ambiguousSymbolsModel == null)
-                PrepareAmbiguousSymbols();
-            if (_ambiguousSymbolsModel == null)
-                throw new Exception("Could not prepare ambiguous symbols.");
-            var symbols = _ambiguousSymbolsModel.LookupNamespacesAndTypes(_ambiguousSymbolsPos, null, symbol);
-
-            if (symbols.Length > 1) return true;
-            if (symbols.Length == 0) return false; // what else?
-
-            // only 1 - ensure it matches
-            var found = symbols[0].ToDisplayString();
-            var pos = found.IndexOf('<'); // generic?
-            if (pos > 0) found = found.Substring(0, pos); // strip
-            return found != match; // and compare
+            var p = type.IndexOf('<');
+            if (type.Contains('<'))
+            {
+                AppendNonGenericClrType(sb, type.Substring(0, p));
+                sb.Append("<");
+                var args = type.Substring(p + 1).TrimEnd('>').Split(','); // fixme will NOT work with nested generic types
+                for (var i = 0; i < args.Length; i++)
+                {
+                    if (i > 0) sb.Append(", ");
+                    AppendClrType(sb, args[i]);
+                }
+                sb.Append(">");
+            }
+            else
+            {
+                AppendNonGenericClrType(sb, type);
+            }
         }
 
-        internal string ModelsNamespaceForTests;
-
-        public string GetModelsNamespace()
+        private void AppendNonGenericClrType(StringBuilder sb, string s)
         {
-            if (ModelsNamespaceForTests != null)
-                return ModelsNamespaceForTests;
+            // map model types
+            s = Regex.Replace(s, @"\{(.*)\}\[\*\]", m => ModelsMap[m.Groups[1].Value + "[]"]);
 
-            // code attribute overrides everything
-            if (ParseResult.HasModelsNamespace)
-                return ParseResult.ModelsNamespace;
+            // takes care eg of "System.Int32" vs. "int"
+            if (TypesMap.TryGetValue(s, out var typeName))
+            {
+                sb.Append(typeName);
+                return;
+            }
 
-            // if builder was initialized with a namespace, use that one
-            if (!string.IsNullOrWhiteSpace(ModelsNamespace))
-                return ModelsNamespace;
+            // if full type name matches a using clause, strip
+            // so if we want Umbraco.Core.Models.IPublishedContent
+            // and using Umbraco.Core.Models, then we just need IPublishedContent
+            // also works for the models namespace
+            typeName = s;
+            string typeUsing = null;
+            var p = typeName.LastIndexOf('.');
+            if (p > 0)
+            {
+                var x = typeName.Substring(0, p);
+                if (Using.Contains(x) || x == ModelsNamespace)
+                {
+                    typeName = typeName.Substring(p + 1);
+                    typeUsing = x;
+                }
+            }
 
-            // default
-            // fixme - should NOT reference config here, should make ModelsNamespace mandatory
-            return Config.ModelsNamespace;
+            // nested types *after* using
+            typeName = typeName.Replace("+", ".");
+
+            // symbol to test is the first part of the name
+            // so if type name is Foo.Bar.Nil we want to ensure that Foo is not ambiguous
+            p = typeName.IndexOf('.');
+            var symbol = p > 0 ? typeName.Substring(0, p) : typeName;
+
+            // what we should find - WITHOUT any generic <T> thing - just the type
+            // no 'using' = the exact symbol
+            // a 'using' = using.symbol
+            var match = typeUsing == null ? symbol : (typeUsing + "." + symbol);
+
+            // if not ambiguous, be happy
+            if (!IsAmbiguousSymbol(symbol, match))
+            {
+                sb.Append(typeName);
+                return;
+            }
+
+            // symbol is ambiguous
+            // if no 'using', must prepend global::
+            if (typeUsing == null)
+            {
+                sb.Append("global::");
+                sb.Append(s.Replace("+", "."));
+                return;
+            }
+
+            // could fullname be non-ambiguous?
+            // note: all-or-nothing, not trying to segment the using clause
+            typeName = s.Replace("+", ".");
+            p = typeName.IndexOf('.');
+            symbol = typeName.Substring(0, p);
+            match = symbol;
+
+            // still ambiguous, must prepend global::
+            if (IsAmbiguousSymbol(symbol, match))
+                sb.Append("global::");
+
+            sb.Append(typeName);
         }
 
-        protected string GetBaseClassName(TypeModel type)
+        private static readonly IDictionary<string, string> TypesMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            var baseClassName = ParseResult.GetModelBaseClassName(!type.IsElement, type.Alias);
-            if (baseClassName != null) return baseClassName;
+            { "System.Int16", "short" },
+            { "System.Int32", "int" },
+            { "System.Int64", "long" },
+            { "System.String", "string" },
+            { "System.Object", "object" },
+            { "System.Boolean", "bool" },
+            { "System.Void", "void" },
+            { "System.Char", "char" },
+            { "System.Byte", "byte" },
+            { "System.UInt16", "ushort" },
+            { "System.UInt32", "uint" },
+            { "System.UInt64", "ulong" },
+            { "System.SByte", "sbyte" },
+            { "System.Single", "float" },
+            { "System.Double", "double" },
+            { "System.Decimal", "decimal" }
+        };
 
-            // default
-            return type.IsElement ? "PublishedElementModel" : "PublishedContentModel";
+        #endregion
+
+        protected static string XmlCommentString(string s)
+        {
+            return s.Replace('<', '{').Replace('>', '}').Replace('\r', ' ').Replace('\n', ' ');
         }
-
-        public abstract void AppendModel(StringBuilder sb, TypeModel typeModel);
-
-        public abstract void AppendModels(StringBuilder sb, IEnumerable<TypeModel> typeModels);
-
-        public abstract void AppendMeta(StringBuilder sb, IEnumerable<TypeModel> typeModels);
     }
 }

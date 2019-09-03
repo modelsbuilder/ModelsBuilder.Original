@@ -95,15 +95,15 @@ namespace Umbraco.Web.PublishedModels
             };
 
             var parseResult = new CodeParser{ WriteDiagnostics = true }.Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
-            var modelsToGenerate = builder.GetModels().ToList();
+            var modelsToGenerate = builder.GetContentTypeModels().ToList();
 
             foreach (var modelToGenerate in modelsToGenerate)
             {
                 var sb = new StringBuilder();
-                builder.AppendModel(sb, modelToGenerate);
+                builder.WriteContentTypeModel(sb, modelToGenerate);
                 var gen = sb.ToString();
                 Console.WriteLine(gen);
             }
@@ -184,15 +184,15 @@ namespace Umbraco.Web.PublishedModels
             };
 
             var parseResult = new CodeParser { WriteDiagnostics = true }.Parse(code, refs);
-            var builder = new TextBuilder(types, parseResult);
-            var btypes = builder.TypeModels;
+            var builder = new Builder(types, parseResult);
+            var btypes = builder.AllTypeModels;
 
-            var modelsToGenerate = builder.GetModels().ToList();
+            var modelsToGenerate = builder.GetContentTypeModels().ToList();
 
             foreach (var modelToGenerate in modelsToGenerate)
             {
                 var sb = new StringBuilder();
-                builder.AppendModel(sb, modelToGenerate);
+                builder.WriteContentTypeModel(sb, modelToGenerate);
                 var gen = sb.ToString();
                 Console.WriteLine(gen);
             }
