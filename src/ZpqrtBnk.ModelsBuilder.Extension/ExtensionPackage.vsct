@@ -74,7 +74,7 @@
         <CommandFlag>TextChanges</CommandFlag>
         -->
         <Strings>
-          <ButtonText>Build Models</ButtonText>
+          <ButtonText>Build Models (ZpqrtBnk)</ButtonText>
         </Strings>
       </Button>
     </Buttons>
