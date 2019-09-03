@@ -42,6 +42,15 @@
   # TASKS
   # ################################################################
 
+  $ubuild.DefineMethod("ClearBuild",
+  {
+	if (test-path $this.BuildTemp) { remove-item $this.BuildTemp -force -recurse -errorAction SilentlyContinue > $null }
+	if (test-path $this.BuildOutput) { remove-item $this.BuildOutput -force -recurse -errorAction SilentlyContinue > $null }
+
+	mkdir $this.BuildTemp > $null
+	mkdir $this.BuildOutput > $null
+  })
+
   $ubuild.DefineMethod("SetMoreUmbracoVersion",
   {
     param ( $semver )
@@ -166,8 +175,92 @@
   $ubuild.DefineMethod("PackageVsix",
   {
     Write-Host "Package ZpqrtBnk.ModelsBuilder.Extension"
-  	$this.CopyFile("$($this.SolutionRoot)\build.tmp\bin\ZpqrtBnk.ModelsBuilder.Extension.vsix",
-	    "$($this.BuildOutput)\ZpqrtBnk.ModelsBuilder.Extension-$($this.Version.Semver.ToString()).vsix")
+
+	$vsix = "$($this.SolutionRoot)\build.tmp\bin\ZpqrtBnk.ModelsBuilder.Extension.vsix"
+	$temp = "$($this.SolutionRoot)\build.tmp\bin\ZpqrtBnk.ModelsBuilder.Extension.temp"
+	$target = "$($this.BuildOutput)\ZpqrtBnk.ModelsBuilder.Extension-$($this.Version.Semver.ToString()).vsix"
+
+	[Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") | Out-Null
+	[System.IO.Compression.ZipFile]::ExtractToDirectory($vsix, $temp) | Out-Null
+
+	Remove-Item -Force -Recurse "$temp/x86"
+	Remove-Item -Force -Recurse "$temp/amd64"
+	Remove-Item -Force -Recurse "$temp/cs"
+	Remove-Item -Force -Recurse "$temp/de"
+	Remove-Item -Force -Recurse "$temp/es"
+	Remove-Item -Force -Recurse "$temp/fr"
+	Remove-Item -Force -Recurse "$temp/it"
+	Remove-Item -Force -Recurse "$temp/ja"
+	Remove-Item -Force -Recurse "$temp/ko"
+	Remove-Item -Force -Recurse "$temp/pl"
+	Remove-Item -Force -Recurse "$temp/pt-BR"
+	Remove-Item -Force -Recurse "$temp/ru"
+	Remove-Item -Force -Recurse "$temp/tr"
+	Remove-Item -Force -Recurse "$temp/zh-Hans"
+	Remove-Item -Force -Recurse "$temp/zh-Hant"
+
+	Remove-Item -Force "$temp/ClientDependency.*"
+	Remove-Item -Force "$temp/CSharpTest.*"
+	Remove-Item -Force "$temp/HtmlAgilityPack.*"
+	Remove-Item -Force "$temp/ImageProcessor.*"
+	Remove-Item -Force "$temp/LightInject.*"
+	Remove-Item -Force "$temp/Lucene.*"
+	Remove-Item -Force "$temp/Markdown.*"
+	Remove-Item -Force "$temp/MiniProfiler.*"
+	Remove-Item -Force "$temp/NPoco.*"
+	Remove-Item -Force "$temp/Serilog.*"
+	Remove-Item -Force "$temp/Superpower.*"
+	Remove-Item -Force "$temp/Umbraco.Examine.*"
+
+	Remove-Item -Force "$temp/*.pdb"
+
+	$manifest = Get-Content "$temp/manifest.json" | ConvertFrom-Json
+
+	$files = $manifest.files # is an array of objects (fixed size)
+	$nfiles = @()
+
+	foreach ($file in $files)
+	{
+		$fileName = $file.fileName
+
+		if ($fileName.StartsWith("/x86")) { continue }
+		if ($fileName.StartsWith("/amd64")) { continue }
+		if ($fileName.StartsWith("/cs")) { continue }
+		if ($fileName.StartsWith("/de")) { continue }
+		if ($fileName.StartsWith("/es")) { continue }
+		if ($fileName.StartsWith("/fr")) { continue }
+		if ($fileName.StartsWith("/it")) { continue }
+		if ($fileName.StartsWith("/ja")) { continue }
+		if ($fileName.StartsWith("/ko")) { continue }
+		if ($fileName.StartsWith("/pl")) { continue }
+		if ($fileName.StartsWith("/pt-BR")) { continue }
+		if ($fileName.StartsWith("/tr")) { continue }
+		if ($fileName.StartsWith("/zh-Hans")) { continue }
+		if ($fileName.StartsWith("/zh-Hant")) { continue }
+
+		if ($fileName.StartsWith("/ClientDependency.")) { continue }
+		if ($fileName.StartsWith("/CSharpTest.")) { continue }
+		if ($fileName.StartsWith("/HtmlAgilityPack.")) { continue }
+		if ($fileName.StartsWith("/ImageProcessor.")) { continue }
+		if ($fileName.StartsWith("/LightInject.")) { continue }
+		if ($fileName.StartsWith("/Lucene.")) { continue }
+		if ($fileName.StartsWith("/Markdown.")) { continue }
+		if ($fileName.StartsWith("/MiniProfiler.")) { continue }
+		if ($fileName.StartsWith("/NPoco.")) { continue }
+		if ($fileName.StartsWith("/Serilog.")) { continue }
+		if ($fileName.StartsWith("/Superpower.")) { continue }
+		if ($fileName.StartsWith("/Umbraco.Examine.")) { continue }
+
+		if ($fileName.EndsWith(".pdb")) { continue }
+
+		$nfiles += $file
+	}
+
+	$manifest.files = $nfiles
+
+	$manifest | ConvertTo-Json | Set-Content "$temp/manifest.json"
+
+	[System.IO.Compression.ZipFile]::CreateFromDirectory($temp, $target)
   })
 
   $ubuild.DefineMethod("VerifyNuGet",

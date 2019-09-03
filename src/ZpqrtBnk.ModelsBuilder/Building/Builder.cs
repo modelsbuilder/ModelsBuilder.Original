@@ -174,9 +174,20 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             //AppendLine(sb, "// ReSharper disable All");
             //AppendNewLine(sb);
 
-            AppendLine(sb, "using System.CodeDom.Compiler;");
-            AppendLine(sb, "using Umbraco.Core.Models.PublishedContent;");
-            AppendLine(sb, "using ZpqrtBnk.ModelsBuilder.Umbraco;");
+            var metaUsing = new HashSet<string>(Using);
+
+            metaUsing.Add("System");
+            metaUsing.Add("System.Linq");
+            metaUsing.Add("System");
+            metaUsing.Add("System.Linq");
+            metaUsing.Add("System.Collections.Generic");
+            metaUsing.Add("System.CodeDom.Compiler");
+            metaUsing.Add("Umbraco.Core.Models.PublishedContent");
+            metaUsing.Add("ZpqrtBnk.ModelsBuilder");
+            metaUsing.Add("ZpqrtBnk.ModelsBuilder.Umbraco");
+
+            foreach (var type in metaUsing)
+                AppendLine(sb, $"using {type};");
 
             AppendNewLine(sb);
             AppendLine(sb, $"namespace {ModelsNamespace}");
@@ -391,7 +402,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         protected virtual void AppendMetaModels(StringBuilder sb, IEnumerable<TypeModel> typeModels)
         {
             AppendLocalGeneratedCodeAttribute(sb);
-            AppendLine(sb, "private readonly ContentTypeModelInfo[] _models = ");
+            AppendLine(sb, "private static readonly ContentTypeModelInfo[] _models = ");
             AppendLine(sb, "{");
             IndentEnter();
 
@@ -402,7 +413,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
                 sb.Append(Indent);
                 sb.Append($"new ContentTypeModelInfo(\"{typeModel.Alias}\", \"{typeModel.ClrName}\", typeof(");
-                AppendClrType(sb, typeModel.ClrName);
+                AppendClrType(sb, ModelsNamespace + "." + typeModel.ClrName);
                 sb.Append(")");
                 if (typeModel.Properties.Count > 0)
                 {
@@ -431,22 +442,22 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             AppendNewLine(sb);
             AppendLine(sb, "/// <summary>Gets the model infos.</summary>");
             AppendLocalGeneratedCodeAttribute(sb);
-            AppendLine(sb, "public IReadOnlyCollection<ContentTypeModelInfo> Models => _models;");
+            AppendLine(sb, "public static IReadOnlyCollection<ContentTypeModelInfo> Models => _models;");
 
             AppendNewLine(sb);
             AppendLine(sb, "/// <summary>Gets the model infos for a content type.</summary>");
             AppendLocalGeneratedCodeAttribute(sb);
-            AppendLine(sb, "public ContentTypeModelInfo Model(string alias) => _models.FirstOrDefault(x => x.Alias == alias);");
+            AppendLine(sb, "public static ContentTypeModelInfo Model(string alias) => _models.FirstOrDefault(x => x.Alias == alias);");
 
             AppendNewLine(sb);
             AppendLine(sb, "/// <summary>Gets the model infos for a content type.</summary>");
             AppendLocalGeneratedCodeAttribute(sb);
-            AppendLine(sb, "public ContentTypeModelInfo Model<TModel>() => _models.FirstOrDefault(x => x.ClrType == typeof(TModel));");
+            AppendLine(sb, "public static ContentTypeModelInfo Model<TModel>() => _models.FirstOrDefault(x => x.ClrType == typeof(TModel));");
 
             AppendNewLine(sb);
             AppendLine(sb, "/// <summary>Gets the model infos for a content type.</summary>");
             AppendLocalGeneratedCodeAttribute(sb);
-            AppendLine(sb, "public ContentTypeModelInfo Model(Type typeofModel) => _models.FirstOrDefault(x => x.ClrType == typeofModel);");
+            AppendLine(sb, "public static ContentTypeModelInfo Model(Type typeofModel) => _models.FirstOrDefault(x => x.ClrType == typeofModel);");
         }
 
         #endregion
@@ -652,7 +663,9 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 sb.Append(", string culture = null");
             if (propertyModel.VariesBySegment())
                 sb.Append(", string segment = null");
-            sb.Append(", Fallback fallback = default, string defaultValue = default)");
+            sb.Append(", Fallback fallback = default, ");
+            AppendClrType(sb, propertyModel.ClrTypeName);
+            sb.Append(" defaultValue = default)");
             sb.Append(NewLine);
             IndentEnter();
             sb.Append(Indent);

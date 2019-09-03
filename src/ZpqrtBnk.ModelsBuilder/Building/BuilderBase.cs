@@ -296,8 +296,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             codeBuilder.AppendFormat("namespace {0}\n{{ }}\n", ModelsNamespace);
 
             var compiler = new Compiler();
-            SyntaxTree[] trees;
-            var compilation = compiler.GetCompilation("MyCompilation", new Dictionary<string, string> { { "code", codeBuilder.ToString() } }, out trees);
+            var compilation = compiler.GetCompilation("MyCompilation", new Dictionary<string, string> { { "code", codeBuilder.ToString() } }, out var trees);
             var tree = trees[0];
             _ambiguousSymbolsModel = compilation.GetSemanticModel(tree);
 

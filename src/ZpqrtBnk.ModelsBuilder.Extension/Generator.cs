@@ -66,7 +66,7 @@ namespace ZpqrtBnk.ModelsBuilder.Extension
             var text = new StringBuilder();
             text.AppendLine("Failed.");
             text.AppendLine();
-            text.AppendLine($"Exception: {e.GetType().Name}: {e.Message}");
+            text.AppendLine($"{e.GetType().Name}: {e.Message}");
             text.AppendLine(e.StackTrace);
 
             var inner = e.InnerException;

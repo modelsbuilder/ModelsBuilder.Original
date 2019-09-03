@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -55,9 +56,11 @@ namespace ZpqrtBnk.ModelsBuilder.Extension
         {
             base.OnContentRendered(e);
 
+            //var time = Stopwatch.StartNew();
             var generator = new Generator(_package, _sourceItem);
             generator.Progressed += (message, percent) => // invoked on main thread
             {
+                //Write($"[{time.ElapsedMilliseconds:000000}] ");
                 WriteLine(message);
                 Progress(percent);
             };

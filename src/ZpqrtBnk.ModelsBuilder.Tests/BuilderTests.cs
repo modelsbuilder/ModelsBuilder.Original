@@ -1391,7 +1391,7 @@ namespace Umbraco.Web.PublishedModels
 	public static partial class Type2Extensions
 	{
 		[GeneratedCodeAttribute(MB.Name, MB.VersionString)]
-		public static int Prop2(this Type2 that, Fallback fallback = default, string defaultValue = default)
+		public static int Prop2(this Type2 that, Fallback fallback = default, int defaultValue = default)
 			=> that.Value<int>(""prop2"", fallback: fallback, defaultValue: defaultValue);
 	}
 
@@ -1688,7 +1688,7 @@ namespace Umbraco.Web.PublishedModels
 	public static partial class Type1Extensions
 	{
 		[GeneratedCodeAttribute(MB.Name, MB.VersionString)]
-		public static IEnumerable<Foo> Foo(this Type1 that, Fallback fallback = default, string defaultValue = default)
+		public static IEnumerable<Foo> Foo(this Type1 that, Fallback fallback = default, IEnumerable<Foo> defaultValue = default)
 			=> that.Value<IEnumerable<Foo>>(""foo"", fallback: fallback, defaultValue: defaultValue);
 	}
 
@@ -2464,7 +2464,7 @@ public class ElementModelBase3 {}
             {
                 Alias = "prop2",
                 ClrName = "Prop2",
-                ModelClrType = typeof(string),
+                ModelClrType = typeof(global::System.Web.IHtmlString),
             });
             type2.Properties.Add(new PropertyModel
             {
@@ -2508,9 +2508,17 @@ public class ElementModelBase3 {}
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using System.CodeDom.Compiler;
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Web;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web;
+using ZpqrtBnk.ModelsBuilder;
 using ZpqrtBnk.ModelsBuilder.Umbraco;
+using System.Linq;
+using System.CodeDom.Compiler;
 
 namespace Umbraco.Web.PublishedModels
 {
@@ -2521,7 +2529,7 @@ namespace Umbraco.Web.PublishedModels
 		public const string Name = ""ZpqrtBnk.ModelsBuilder"";
 
 		/// <summary>Gets the Models Builder version that was used to generate the files.</summary>
-		public const string VersionString = ""4.0.0-alpha.6"";
+		public const string VersionString = """ + version + @""";
 
 		/// <summary>Provides the content type published item types.</summary>
 		[GeneratedCodeAttribute(Name, VersionString)]
@@ -2649,32 +2657,32 @@ namespace Umbraco.Web.PublishedModels
 		}
 
 		[GeneratedCodeAttribute(Name, VersionString)]
-		private readonly ContentTypeModelInfo[] _models = 
+		private static readonly ContentTypeModelInfo[] _models = 
 		{
 			new ContentTypeModelInfo(""type1"", ""Type1"", typeof(Type1),
 				new PropertyTypeModelInfo(""prop1"", ""Prop1"", typeof(string))),
 			new ContentTypeModelInfo(""type2"", ""Type2"", typeof(Type2),
 				new PropertyTypeModelInfo(""prop1"", ""Prop1"", typeof(string)),
-				new PropertyTypeModelInfo(""prop2"", ""Prop2"", typeof(string)),
+				new PropertyTypeModelInfo(""prop2"", ""Prop2"", typeof(IHtmlString)),
 				new PropertyTypeModelInfo(""prop3"", ""Prop3"", typeof(string))),
 			new ContentTypeModelInfo(""type3"", ""Type3"", typeof(Type3))
 		};
 
 		/// <summary>Gets the model infos.</summary>
 		[GeneratedCodeAttribute(Name, VersionString)]
-		public IReadOnlyCollection<ContentTypeModelInfo> Models => _models;
+		public static IReadOnlyCollection<ContentTypeModelInfo> Models => _models;
 
 		/// <summary>Gets the model infos for a content type.</summary>
 		[GeneratedCodeAttribute(Name, VersionString)]
-		public ContentTypeModelInfo Model(string alias) => _models.FirstOrDefault(x => x.Alias == alias);
+		public static ContentTypeModelInfo Model(string alias) => _models.FirstOrDefault(x => x.Alias == alias);
 
 		/// <summary>Gets the model infos for a content type.</summary>
 		[GeneratedCodeAttribute(Name, VersionString)]
-		public ContentTypeModelInfo Model<TModel>() => _models.FirstOrDefault(x => x.ClrType == typeof(TModel));
+		public static ContentTypeModelInfo Model<TModel>() => _models.FirstOrDefault(x => x.ClrType == typeof(TModel));
 
 		/// <summary>Gets the model infos for a content type.</summary>
 		[GeneratedCodeAttribute(Name, VersionString)]
-		public ContentTypeModelInfo Model(Type typeofModel) => _models.FirstOrDefault(x => x.ClrType == typeofModel);
+		public static ContentTypeModelInfo Model(Type typeofModel) => _models.FirstOrDefault(x => x.ClrType == typeofModel);
 	}
 }
 ";

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+               xmlns:asmv1="urn:schemas-microsoft-com:asm.v1">
   <!-- prevent Visual Studio from complaining about missing schema information -->
   <xs:schema>
     <xs:element name="configuration">
@@ -15,9 +16,31 @@
 		<compilation>
 		  <assemblies xdt:Transform="InsertIfMissing" />
 		  <assemblies>
+        <add assembly="Umbraco.ModelsBuilder"
+             xdt:Transform="Remove" xdt:Locator="Match(assembly)" />
         <add assembly="ZpqrtBnk.ModelsBuilder"
-          xdt:Transform="InsertIfMissing" xdt:Locator="Match(assembly)" />
+             xdt:Transform="InsertIfMissing" xdt:Locator="Match(assembly)" />
 		  </assemblies>
      </compilation>
 	</system.web>
+  <runtime>
+    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+      <dependentAssembly xdt:Transform="InsertIfMissing" xdt:Locator="Condition(asmv1:assemblyIdentity/@name='Microsoft.CodeAnalysis')">
+        <assemblyIdentity name="Microsoft.CodeAnalysis" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-0.0.0.0" newVersion="0.0.0.0" />
+      </dependentAssembly>
+      <dependentAssembly xdt:Transform="Replace" xdt:Locator="Condition(asmv1:assemblyIdentity/@name='Microsoft.CodeAnalysis')">
+        <assemblyIdentity name="Microsoft.CodeAnalysis" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-3.2.0.0" newVersion="3.2.0.0" />
+      </dependentAssembly>
+      <dependentAssembly xdt:Transform="InsertIfMissing" xdt:Locator="Condition(asmv1:assemblyIdentity/@name='Microsoft.CodeAnalysis.CSharp')">
+        <assemblyIdentity name="Microsoft.CodeAnalysis.CSharp" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-0.0.0.0" newVersion="0.0.0.0" />
+      </dependentAssembly>
+      <dependentAssembly xdt:Transform="Replace" xdt:Locator="Condition(asmv1:assemblyIdentity/@name='Microsoft.CodeAnalysis.CSharp')">
+        <assemblyIdentity name="Microsoft.CodeAnalysis.CSharp" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-3.2.0.0" newVersion="3.2.0.0" />
+      </dependentAssembly>
+    </assemblyBinding>
+  </runtime>
 </configuration>
