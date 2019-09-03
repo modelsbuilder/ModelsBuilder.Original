@@ -20,6 +20,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
         public ModelsBuilderComponent(UmbracoServices umbracoServices, IBuilderFactory builderFactory, Config config)
         {
             _umbracoServices = umbracoServices;
+            _builderFactory = builderFactory;
             _config = config;
         }
 
