@@ -190,6 +190,7 @@ namespace ZpqrtBnk.ModelsBuilder.Extension.VisualStudio
             throw new Exception("Panic: failed to get hierarchy.");
         }
 
+        /*
         // see http://msdn.microsoft.com/fr-fr/library/microsoft.visualstudio.shell.interop.ivsgeneratorprogress.generatorerror%28v=vs.90%29.aspx
         // level is ignored, line should be -1 if not specified
 
@@ -251,9 +252,11 @@ namespace ZpqrtBnk.ModelsBuilder.Extension.VisualStudio
         {
             ReportMessage(string.Format(format, args));
         }
+        */
 
         private static EnvDTE.DTE DTE => (EnvDTE.DTE)Package.GetGlobalService(typeof(EnvDTE.DTE));
 
+        /*
         private static IVsStatusbar StatusBar
         {
             get
@@ -283,6 +286,7 @@ namespace ZpqrtBnk.ModelsBuilder.Extension.VisualStudio
             bar.FreezeOutput(0);
             bar.Clear();
         }
+        */
 
         public static string GetSolution()
         {

@@ -40,7 +40,7 @@ namespace ZpqrtBnk.ModelsBuilder.Extension
             Text.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
 
             WriteLine("Models Builder " + ApiVersion.Current.Version);
-            WriteLine("");
+            WriteLine();
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -76,11 +76,13 @@ namespace ZpqrtBnk.ModelsBuilder.Extension
             Render(Text);
         }
 
-        public void WriteLine(string text)
+        public void WriteLine(string text = null)
         {
-            _text.Append(text);
+            if (!string.IsNullOrWhiteSpace(text))
+                _text.Append(text);
             _text.AppendLine();
             Text.Text = _text.ToString();
+            Text.ScrollToEnd();
             Render(Text);
         }
 

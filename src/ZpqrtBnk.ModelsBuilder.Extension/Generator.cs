@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Threading;
 using Umbraco.Core;
@@ -41,7 +42,6 @@ namespace ZpqrtBnk.ModelsBuilder.Extension
 
         private void Progress(string message, int percent)
         {
-            _dte.StatusBar.Progress(percent < 100, message, percent, 100);
             Progressed?.Invoke(message, percent);
         }
 
@@ -63,40 +63,30 @@ namespace ZpqrtBnk.ModelsBuilder.Extension
 
         private void HandleException(Exception e)
         {
-            var message = $"UmbracoModelsBuilder failed to generate code: {e.GetType().Name}: {e.Message}";
-
-            //cannot do this within a running Task - ComObject exception
-            //VisualStudioHelper.ReportError(pGenerateProgress, message);
-            VisualStudioHelper.ReportMessage(message);
-            VisualStudioHelper.ReportMessage(e.StackTrace);
+            var text = new StringBuilder();
+            text.AppendLine("Failed.");
+            text.AppendLine();
+            text.AppendLine($"Exception: {e.GetType().Name}: {e.Message}");
+            text.AppendLine(e.StackTrace);
 
             var inner = e.InnerException;
             while (inner != null)
             {
-                message = $"Inner: {inner.GetType().Name}: {inner.Message}";
-                VisualStudioHelper.ReportMessage(message);
-                VisualStudioHelper.ReportMessage(inner.StackTrace);
+                text.AppendLine();
+                text.AppendLine($"Inner: {inner.GetType().Name}: {inner.Message}");
+                text.AppendLine(inner.StackTrace);
                 inner = inner.InnerException;
             }
 
             if (e is AggregateException aggr)
                 foreach (var aggrInner in aggr.Flatten().InnerExceptions)
                 {
-                    message = $"AggregateInner: {aggrInner.GetType().Name}: {aggrInner.Message}";
-                    VisualStudioHelper.ReportMessage(message);
-                    VisualStudioHelper.ReportMessage(aggrInner.StackTrace);
+                    text.AppendLine();
+                    text.AppendLine($"AggregateInner: {aggrInner.GetType().Name}: {aggrInner.Message}");
+                    text.AppendLine(aggrInner.StackTrace);
                 }
 
-            Progress("Failed.", 100);
-
-            // Show a message box to prove we were here
-            VsShellUtilities.ShowMessageBox(
-                _package,
-                "See exception details in the General pane of the Output windows.",
-                "Failed to build models",
-                OLEMSGICON.OLEMSGICON_CRITICAL,
-                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            Progress(text.ToString(), 100);
         }
 
         private static string GetDefaultNameSpace(string projectNamespace, string relativePath)
@@ -123,7 +113,6 @@ namespace ZpqrtBnk.ModelsBuilder.Extension
         public async Task TryGenerateAsync(ProjectItem sourceItem)
         {
             await ProgressAsync("Build Models...", 0);
-            VisualStudioHelper.ReportMessage("Starting v{0} {1}.", ApiVersion.Current.Version, DateTime.Now);
 
             // save project before modifying it
             await ProgressAsync("Save project...", 5);
@@ -264,10 +253,6 @@ namespace ZpqrtBnk.ModelsBuilder.Extension
                 VisualStudioHelper.AddGeneratedItems(sourceItem, projectDirectory, relFilenames);
                 await TaskScheduler.Default;
             }
-
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-            VisualStudioHelper.ReportMessage("Done.");
-            await TaskScheduler.Default;
 
             await ProgressAsync("Done.", 100);
         }
