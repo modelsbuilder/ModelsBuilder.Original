@@ -107,6 +107,7 @@ namespace ZpqrtBnk.ModelsBuilder.Extension
         // https://www.c-sharpcorner.com/article/update-ui-with-wpf-dispatcher-and-tpl/
         private static void Render(DispatcherObject dispatcherObject)
         {
+            #pragma warning disable VSTHRD001 // bah
             dispatcherObject.Dispatcher.Invoke(() => { }, DispatcherPriority.Render);
         }
     }
