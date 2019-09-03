@@ -42,7 +42,6 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
 
             Expression expr = lambda;
             var loop = true;
-            string alias = null;
             while (loop)
             {
                 switch (expr.NodeType)
