@@ -24,5 +24,15 @@ namespace ZpqrtBnk.ModelsBuilder
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string MBClassName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the prefix for content type models.
+        /// </summary>
+        public string TypeModelPrefix { get; set; }
+
+        /// <summary>
+        /// Gets or sets the prefix for content type models.
+        /// </summary>
+        public string TypeModelSuffix { get; set; }
     }
 }

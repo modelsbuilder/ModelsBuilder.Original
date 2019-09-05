@@ -304,7 +304,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// Gets the CLR name for a type model.
         /// </summary>
         public virtual string GetClrName(TypeModel typeModel)
-            => GetClrName(typeModel.Name, typeModel.Alias);
+            => ParseResult.TypeModelPrefix + GetClrName(typeModel.Name, typeModel.Alias) + ParseResult.TypeModelSuffix;
 
         /// <summary>
         /// Gets the CLR name for a property model.

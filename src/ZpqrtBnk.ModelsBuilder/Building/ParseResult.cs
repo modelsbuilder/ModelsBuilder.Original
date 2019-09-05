@@ -161,7 +161,17 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         // ReSharper disable once InconsistentNaming
         public void SetMBClassName(string value)
         {
-            MBClassName = value;
+            MBClassName = string.IsNullOrWhiteSpace(value) ? "MB" : value;
+        }
+
+        public void SetTypeModelPrefix(string value)
+        {
+            TypeModelPrefix = string.IsNullOrWhiteSpace(value) ? string.Empty : value;
+        }
+
+        public void SetTypeModelSuffix(string value)
+        {
+            TypeModelSuffix = string.IsNullOrWhiteSpace(value) ? string.Empty : value;
         }
 
         #endregion
@@ -293,6 +303,10 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         // ReSharper disable once InconsistentNaming
         public string MBClassName { get; private set; } = "MB";
+
+        public string TypeModelPrefix { get; private set; } = "";
+
+        public string TypeModelSuffix { get; private set; } = "";
 
         #endregion
     }

@@ -280,6 +280,12 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                                 case nameof(ModelsBuilderConfigureAttribute.MBClassName):
                                     disco.SetMBClassName((string) argValue.Value);
                                     break;
+                                case nameof(ModelsBuilderConfigureAttribute.TypeModelPrefix):
+                                    disco.SetTypeModelPrefix((string) argValue.Value);
+                                    break;
+                                case nameof(ModelsBuilderConfigureAttribute.TypeModelSuffix):
+                                    disco.SetTypeModelSuffix((string) argValue.Value);
+                                    break;
                             }
                         }
                         break;
