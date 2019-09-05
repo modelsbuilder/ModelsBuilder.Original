@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using ZpqrtBnk.ModelsBuilder.Api;
@@ -22,6 +23,7 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
             Current.Reset();
             Current.UnlockConfigs();
             Current.Configs.Add(() => new Config());
+            Current.Configs.Add<IUmbracoSettingsSection>(() => new UmbracoSettingsSection());
         }
 
         [Test]
@@ -107,7 +109,6 @@ using ZpqrtBnk.ModelsBuilder;
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -156,7 +157,6 @@ using ZpqrtBnk.ModelsBuilder;
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -195,7 +195,6 @@ using ZpqrtBnk.ModelsBuilder;
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -251,7 +250,6 @@ public partial class Type1 : IHasXmlNode
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -261,7 +259,6 @@ public partial class Type1 : IHasXmlNode
             {
                 Id = 2,
                 Alias = "type2",
-                ClrName = "Type2",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -271,7 +268,6 @@ public partial class Type1 : IHasXmlNode
             {
                 Id = 3,
                 Alias = "ttype3",
-                ClrName = "Ttype3",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -316,7 +312,6 @@ using ZpqrtBnk.ModelsBuilder;
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -326,7 +321,6 @@ using ZpqrtBnk.ModelsBuilder;
             {
                 Id = 2,
                 Alias = "type2",
-                ClrName = "Type2",
                 ParentId = 1,
                 BaseType = type1,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -371,7 +365,6 @@ using ZpqrtBnk.ModelsBuilder;
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -381,7 +374,6 @@ using ZpqrtBnk.ModelsBuilder;
             {
                 Id = 2,
                 Alias = "type2",
-                ClrName = "Type2",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -429,7 +421,6 @@ using ZpqrtBnk.ModelsBuilder;
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -439,7 +430,6 @@ using ZpqrtBnk.ModelsBuilder;
             {
                 Id = 2,
                 Alias = "type2",
-                ClrName = "Type2",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -488,7 +478,6 @@ using ZpqrtBnk.ModelsBuilder;
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -498,7 +487,6 @@ using ZpqrtBnk.ModelsBuilder;
             {
                 Id = 2,
                 Alias = "type2",
-                ClrName = "Type2",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -550,7 +538,6 @@ namespace Models
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -559,7 +546,6 @@ namespace Models
             {
                 Id = 2,
                 Alias = "type2",
-                ClrName = "Type2",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -568,7 +554,6 @@ namespace Models
             {
                 Id = 3,
                 Alias = "type3",
-                ClrName = "Type3",
                 ParentId = 1,
                 BaseType = type1,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -642,7 +627,6 @@ namespace Dang
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -650,7 +634,6 @@ namespace Dang
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                ClrName = "Prop1",
                 ModelClrType = typeof(string),
             });
 
@@ -695,7 +678,6 @@ namespace Models
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -703,19 +685,16 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                ClrName = "Prop1",
                 ModelClrType = typeof(string),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop2",
-                ClrName = "Prop2",
                 ModelClrType = typeof(string),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "pprop3",
-                ClrName = "Pprop3",
                 ModelClrType = typeof(string),
             });
 
@@ -764,7 +743,6 @@ namespace Models
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -772,7 +750,6 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                ClrName = "Prop1",
                 ModelClrType = typeof(string),
             });
 
@@ -821,7 +798,6 @@ namespace Models
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -829,7 +805,6 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                ClrName = "Prop1",
                 ModelClrType = typeof(string),
             });
 
@@ -876,7 +851,6 @@ namespace Models
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -884,7 +858,6 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                ClrName = "Prop1",
                 ModelClrType = typeof(string),
             });
 
@@ -935,7 +908,6 @@ namespace Models
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -943,7 +915,6 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                ClrName = "Prop1",
                 ModelClrType = typeof(string),
             });
 
@@ -989,7 +960,6 @@ namespace Models
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -997,7 +967,6 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                ClrName = "Prop1",
                 ModelClrType = typeof(string),
             });
 
@@ -1045,7 +1014,6 @@ namespace Models
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -1053,7 +1021,6 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                ClrName = "Prop1",
                 ModelClrType = typeof(string),
             });
             var types = new[] { type1 };
@@ -1103,7 +1070,6 @@ namespace Dang
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -1111,26 +1077,22 @@ namespace Dang
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1a",
-                ClrName = "Prop1a",
                 ModelClrType = typeof(string),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1b",
-                ClrName = "Prop1b",
                 ModelClrType = typeof(string),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1c",
-                ClrName = "Prop1c",
                 ModelClrType = typeof(string),
             });
             var type2 = new TypeModel
             {
                 Id = 1,
                 Alias = "type2",
-                ClrName = "Type2",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -1138,7 +1100,6 @@ namespace Dang
             type2.Properties.Add(new PropertyModel
             {
                 Alias = "prop2",
-                ClrName = "Prop2",
                 ModelClrType = typeof(string),
             });
             var types = new[] { type1, type2 };
@@ -1237,7 +1198,6 @@ namespace Dang
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -1246,13 +1206,11 @@ namespace Dang
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1a",
-                ClrName = "Prop1a",
                 ModelClrType = typeof(string),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1b",
-                ClrName = "Prop1b",
                 ModelClrType = typeof(string),
             });
 
@@ -1260,7 +1218,6 @@ namespace Dang
             {
                 Id = 2,
                 Alias = "type2",
-                ClrName = "Type2",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -1269,7 +1226,6 @@ namespace Dang
             type2.Properties.Add(new PropertyModel
             {
                 Alias = "prop2",
-                ClrName = "Prop2",
                 ModelClrType = typeof(int),
             });
 
@@ -1433,7 +1389,6 @@ namespace Umbraco.Web.PublishedModels
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -1441,7 +1396,6 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                ClrName = "Prop1",
                 ModelClrType = typeof(string),
             });
 
@@ -1520,7 +1474,6 @@ namespace Umbraco.Web.PublishedModels
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -1528,7 +1481,6 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                ClrName = "Prop1",
                 ModelClrType = typeof(string),
             });
 
@@ -1611,7 +1563,6 @@ namespace Umbraco.Web.PublishedModels
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -1619,7 +1570,6 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "foo",
-                ClrName = "Foo",
                 ModelClrType = typeof(IEnumerable<>).MakeGenericType(ModelType.For("foo")),
             });
 
@@ -1627,7 +1577,6 @@ namespace Umbraco.Web.PublishedModels
             {
                 Id = 2,
                 Alias = "foo",
-                ClrName = "Foo",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Element,
@@ -1719,7 +1668,6 @@ namespace Umbraco.Web.PublishedModels
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -1727,7 +1675,6 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                ClrName = "Prop1",
                 ModelClrType = typeof(string),
             });
 
@@ -1823,7 +1770,6 @@ namespace Umbraco.Web.PublishedModels
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -1831,7 +1777,6 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                ClrName = "Prop1",
                 ModelClrType = typeof(string),
             });
 
@@ -1935,7 +1880,6 @@ namespace Umbraco.Web.PublishedModels
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -1944,7 +1888,6 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                ClrName = "Prop1",
                 ModelClrType = typeof(string),
             });
 
@@ -1952,7 +1895,6 @@ namespace Umbraco.Web.PublishedModels
             {
                 Id = 2,
                 Alias = "type2",
-                ClrName = "Type2",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -1961,7 +1903,6 @@ namespace Umbraco.Web.PublishedModels
             type2.Properties.Add(new PropertyModel
             {
                 Alias = "prop2",
-                ClrName = "Prop2",
                 ModelClrType = typeof(int),
             });
 
@@ -2005,7 +1946,6 @@ namespace Umbraco.Web.PublishedModels
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -2014,19 +1954,16 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                ClrName = "Prop1",
                 ModelClrType = typeof(IPublishedContent),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop2",
-                ClrName = "Prop2",
                 ModelClrType = typeof(global::System.Text.StringBuilder),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop3",
-                ClrName = "Prop3",
                 ModelClrType = typeof(global::Umbraco.Core.IO.FileSecurityException),
             });
             var types = new[] { type1 };
@@ -2132,7 +2069,6 @@ namespace Umbraco.Web.PublishedModels
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -2141,41 +2077,35 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                ClrName = "Prop1",
                 ModelClrType = typeof(string),
                 Variations = ContentVariation.Culture
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop2",
-                ClrName = "Prop2",
                 ModelClrType = typeof(string),
                 Variations = ContentVariation.Culture
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop3",
-                ClrName = "Prop3",
                 ModelClrType = typeof(string),
                 Variations = ContentVariation.Segment
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop4",
-                ClrName = "Prop4",
                 ModelClrType = typeof(string),
                 Variations = ContentVariation.CultureAndSegment
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop5",
-                ClrName = "Prop5",
                 ModelClrType = typeof(string)
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop6",
-                ClrName = "Prop6",
                 ModelClrType = typeof(string),
                 Variations = ContentVariation.Culture
             });
@@ -2309,7 +2239,6 @@ namespace Umbraco.Web.PublishedModels
                 {
                     Id = i,
                     Alias = "type" + i,
-                    ClrName = "Type" + i,
                     ParentId = 0,
                     BaseType = null,
                     ItemType = TypeModel.ItemTypes.Content
@@ -2322,7 +2251,6 @@ namespace Umbraco.Web.PublishedModels
                 {
                     Id = i + 4,
                     Alias = "type" + (i + 4),
-                    ClrName = "Type" + (i + 4),
                     ParentId = 0,
                     BaseType = null,
                     ItemType = TypeModel.ItemTypes.Element
@@ -2432,7 +2360,6 @@ public class ElementModelBase3 {}
             {
                 Id = 1,
                 Alias = "type1",
-                ClrName = "Type1",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -2440,7 +2367,6 @@ public class ElementModelBase3 {}
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                ClrName = "Prop1",
                 ModelClrType = typeof(string),
             });
             types.Add(type1);
@@ -2449,7 +2375,6 @@ public class ElementModelBase3 {}
             {
                 Id = 2,
                 Alias = "type2",
-                ClrName = "Type2",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -2457,19 +2382,16 @@ public class ElementModelBase3 {}
             type2.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
-                ClrName = "Prop1",
                 ModelClrType = typeof(string),
             });
             type2.Properties.Add(new PropertyModel
             {
                 Alias = "prop2",
-                ClrName = "Prop2",
                 ModelClrType = typeof(global::System.Web.IHtmlString),
             });
             type2.Properties.Add(new PropertyModel
             {
                 Alias = "prop3",
-                ClrName = "Prop3",
                 ModelClrType = typeof(string),
             });
             types.Add(type2);
@@ -2478,7 +2400,6 @@ public class ElementModelBase3 {}
             {
                 Id = 3,
                 Alias = "type3",
-                ClrName = "Type3",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Media,

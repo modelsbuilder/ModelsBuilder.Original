@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using ZpqrtBnk.ModelsBuilder.Building;
 using ZpqrtBnk.ModelsBuilder.Configuration;
 
@@ -21,6 +22,7 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
             Current.Reset();
             Current.UnlockConfigs();
             Current.Configs.Add(() => new Config());
+            Current.Configs.Add<IUmbracoSettingsSection>(() => new UmbracoSettingsSection());
         }
 
         [Test]

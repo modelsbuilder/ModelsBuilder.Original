@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Reflection;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Mvc;
@@ -71,8 +73,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                     // ensure is safe and always pascal cased, per razor standard
                     // + this is how we get the default model name in ZpqrtBnk.ModelsBuilder.Umbraco.Application
                     var alias = e.AdditionalData["ContentTypeAlias"].ToString();
-                    var name = template.Name; // will be the name of the content type since we are creating
-                    var className = UmbracoServices.GetClrName(name, alias);
+                    var className = Current.Factory.GetInstance<IPublishedModelFactory>().MapModelType(ModelType.For(alias)).Name; // FIXME classname only
 
                     var modelNamespace = _config.ModelsNamespace;
 

@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Strings;
 using ZpqrtBnk.ModelsBuilder.Configuration;
 
 namespace ZpqrtBnk.ModelsBuilder.Building
@@ -123,9 +125,21 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// </remarks>
         private void Prepare()
         {
-            TypeModel.MapModelTypes(AllTypeModels, ModelsNamespace);
-
             var pureLive = Config.ModelsMode == ModelsMode.PureLive;
+
+            // assign ClrName
+            foreach (var typeModel in AllTypeModels)
+            {
+                typeModel.ClrName = GetClrName(typeModel);
+
+                foreach (var propertyModel in typeModel.Properties)
+                {
+                    propertyModel.ClrName = GetClrName(propertyModel);
+                }
+            }
+
+            // then, use these names, map model type
+            TypeModel.MapModelTypes(AllTypeModels, ModelsNamespace);
 
             // mark IsContentIgnored models that we discovered should be ignored
             // then propagate / ignore children of ignored contents
@@ -283,6 +297,57 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 {
                     propertyModel.IsExtensionImplemented = ParseResult.IsExtensionImplemented(typeFullName, propertyModel.ClrName);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets the CLR name for a type model.
+        /// </summary>
+        public virtual string GetClrName(TypeModel typeModel)
+            => GetClrName(typeModel.Name, typeModel.Alias);
+
+        /// <summary>
+        /// Gets the CLR name for a property model.
+        /// </summary>
+        public virtual string GetClrName(PropertyModel propertyModel)
+            => GetClrName(propertyModel.Name, propertyModel.Alias);
+
+        /// <summary>
+        /// Gets the CLR name for a name, alias pair.
+        /// </summary>
+        public virtual string GetClrName(string name, string alias)
+        {
+            // ideally we should just be able to re-use Umbraco's alias,
+            // just upper-casing the first letter, however in v7 for backward
+            // compatibility reasons aliases derive from names via ToSafeAlias which is
+            //   PreFilter = ApplyUrlReplaceCharacters,
+            //   IsTerm = (c, leading) => leading
+            //     ? char.IsLetter(c) // only letters
+            //     : (char.IsLetterOrDigit(c) || c == '_'), // letter, digit or underscore
+            //   StringType = CleanStringType.Ascii | CleanStringType.UmbracoCase,
+            //   BreakTermsOnUpper = false
+            //
+            // but that is not ideal with acronyms and casing
+            // however we CANNOT change Umbraco
+            // so, adding a way to "do it right" deriving from name, here
+
+            switch (Config.ClrNameSource)
+            {
+                case ClrNameSource.RawAlias:
+                    // use Umbraco's alias
+                    return alias;
+
+                case ClrNameSource.Alias:
+                    // ModelsBuilder's legacy - but not ideal
+                    return alias.ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase);
+
+                case ClrNameSource.Name:
+                    // derive from name
+                    var source = name.TrimStart('_'); // because CleanStringType.ConvertCase accepts them
+                    return source.ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase | CleanStringType.Ascii);
+
+                default:
+                    throw new Exception("Invalid ClrNameSource.");
             }
         }
 
