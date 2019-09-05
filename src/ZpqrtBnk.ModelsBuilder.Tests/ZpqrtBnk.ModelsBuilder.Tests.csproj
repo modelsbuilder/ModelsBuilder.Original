@@ -52,6 +52,7 @@
     <Compile Include="CompilerTests.cs" />
     <Compile Include="ConfigTests.cs" />
     <Compile Include="CSharpCodeProviderTests.cs" />
+    <Compile Include="CustomBuilderTests.cs" />
     <Compile Include="ExpressionTests.cs" />
     <Compile Include="ExtensionsTests.cs" />
     <Compile Include="ParserTests.cs" />
