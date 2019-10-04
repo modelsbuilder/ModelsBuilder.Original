@@ -40,7 +40,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
         }
 
-        public static IPublishedPropertyType GetModelPropertyType<TModel, TValue>(IPublishedContentType contentType, Expression<Func<TModel, TValue>> selector)
+        public static string GetModelPropertyTypeAlias<TModel, TValue>(Expression<Func<TModel, TValue>> selector)
             //where TModel : PublishedContentModel // fixme PublishedContentModel _or_ PublishedElementModel
         {
             // fixme therefore, missing a check on TModel here
@@ -61,7 +61,15 @@ namespace Umbraco.ModelsBuilder.Umbraco
             if (string.IsNullOrWhiteSpace(attr?.Alias))
                 throw new InvalidOperationException($"Could not figure out property alias for property \"{expr.Member.Name}\".");
 
-            return contentType.GetPropertyType(attr.Alias);
+            return attr.Alias;
+        }
+
+        public static IPublishedPropertyType GetModelPropertyType<TModel, TValue>(IPublishedContentType contentType, Expression<Func<TModel, TValue>> selector)
+        //where TModel : PublishedContentModel // fixme PublishedContentModel _or_ PublishedElementModel
+        {
+            // fixme therefore, missing a check on TModel here
+
+            return contentType.GetPropertyType(GetModelPropertyTypeAlias(selector));
         }
     }
 }
