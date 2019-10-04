@@ -6,24 +6,20 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
+    /// <summary>
+    /// Utility class for published models.
+    /// </summary>
     public static class PublishedModelUtility
     {
-        // looks safer but probably useless... ppl should not call these methods directly
-        // and if they do... they have to take care about not doing stupid things
-
-        //public static PublishedPropertyType GetModelPropertyType2<T>(Expression<Func<T, object>> selector)
-        //    where T : PublishedContentModel
-        //{
-        //    var type = typeof (T);
-        //    var s1 = type.GetField("ModelTypeAlias", BindingFlags.Public | BindingFlags.Static);
-        //    var alias = (s1.IsLiteral && s1.IsInitOnly && s1.FieldType == typeof(string)) ? (string)s1.GetValue(null) : null;
-        //    var s2 = type.GetField("ModelItemType", BindingFlags.Public | BindingFlags.Static);
-        //    var itemType = (s2.IsLiteral && s2.IsInitOnly && s2.FieldType == typeof(PublishedItemType)) ? (PublishedItemType)s2.GetValue(null) : 0;
-
-        //    var contentType = PublishedContentType.Get(itemType, alias);
-        //    // etc...
-        //}
-
+        /// <summary>
+        /// Gets the published content type for the specified model <paramref name="alias" />.
+        /// </summary>
+        /// <param name="itemType">The published item type.</param>
+        /// <param name="alias">The model alias.</param>
+        /// <returns>
+        /// The published content type.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">itemType</exception>
         public static IPublishedContentType GetModelContentType(PublishedItemType itemType, string alias)
         {
             var facade = Current.UmbracoContext.PublishedSnapshot; // fixme inject!
@@ -40,18 +36,36 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
         }
 
-        public static string GetModelPropertyTypeAlias<TModel, TValue>(Expression<Func<TModel, TValue>> selector)
-            //where TModel : PublishedContentModel // fixme PublishedContentModel _or_ PublishedElementModel
+        /// <summary>
+        /// Gets the property type alias for the specified <paramref name="selector" />.
+        /// </summary>
+        /// <typeparam name="TModel">The type of the model.</typeparam>
+        /// <param name="selector">The selector.</param>
+        /// <returns>
+        /// The property type alias.
+        /// </returns>
+        public static string GetModelPropertyTypeAlias<TModel>(Expression<Func<TModel, object>> selector)
+            where TModel : IPublishedElement
         {
-            // fixme therefore, missing a check on TModel here
+            return GetModelPropertyTypeAlias<TModel, object>(selector);
+        }
 
+        /// <summary>
+        /// Gets the property type alias for the specified <paramref name="selector" />.
+        /// </summary>
+        /// <typeparam name="TModel">The type of the model.</typeparam>
+        /// <typeparam name="TValue">The type of the value.</typeparam>
+        /// <param name="selector">The selector.</param>
+        /// <returns>
+        /// The property type alias.
+        /// </returns>
+        public static string GetModelPropertyTypeAlias<TModel, TValue>(Expression<Func<TModel, TValue>> selector)
+            where TModel : IPublishedElement
+        {
             var expr = selector.Body as MemberExpression;
 
             if (expr == null)
                 throw new ArgumentException("Not a property expression.", nameof(selector));
-
-            // there _is_ a risk that contentType and T do not match
-            // see note above : accepted risk...
 
             var attr = expr.Member
                 .GetCustomAttributes(typeof (ImplementPropertyTypeAttribute), false)
@@ -64,11 +78,34 @@ namespace Umbraco.ModelsBuilder.Umbraco
             return attr.Alias;
         }
 
-        public static IPublishedPropertyType GetModelPropertyType<TModel, TValue>(IPublishedContentType contentType, Expression<Func<TModel, TValue>> selector)
-        //where TModel : PublishedContentModel // fixme PublishedContentModel _or_ PublishedElementModel
+        /// <summary>
+        /// Gets the published property type on the <paramref name="contentType" /> for the specified <paramref name="selector" />.
+        /// </summary>
+        /// <typeparam name="TModel">The type of the model.</typeparam>
+        /// <param name="contentType">The published content type.</param>
+        /// <param name="selector">The selector.</param>
+        /// <returns>
+        /// The published property type.
+        /// </returns>
+        public static IPublishedPropertyType GetModelPropertyType<TModel>(IPublishedContentType contentType, Expression<Func<TModel, object>> selector)
+            where TModel : IPublishedElement
         {
-            // fixme therefore, missing a check on TModel here
+            return GetModelPropertyType<TModel, object>(contentType, selector);
+        }
 
+        /// <summary>
+        /// Gets the published property type on the <paramref name="contentType" /> for the specified <paramref name="selector" />.
+        /// </summary>
+        /// <typeparam name="TModel">The type of the model.</typeparam>
+        /// <typeparam name="TValue">The type of the value.</typeparam>
+        /// <param name="contentType">The published content type.</param>
+        /// <param name="selector">The selector.</param>
+        /// <returns>
+        /// The published property type.
+        /// </returns>
+        public static IPublishedPropertyType GetModelPropertyType<TModel, TValue>(IPublishedContentType contentType, Expression<Func<TModel, TValue>> selector)
+            where TModel : IPublishedElement
+        {
             return contentType.GetPropertyType(GetModelPropertyTypeAlias(selector));
         }
     }
