@@ -1319,11 +1319,14 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public new static PublishedContentType GetModelContentType()
+		public new static IPublishedContentType GetModelContentType()
 			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		public static string GetModelPropertyTypeAlias<TValue>(Expression<Func<Type1, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyTypeAlias(selector);
 #pragma warning restore 0109
 
 		// ctor
@@ -1377,11 +1380,14 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public new static PublishedContentType GetModelContentType()
+		public new static IPublishedContentType GetModelContentType()
 			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		public static string GetModelPropertyTypeAlias<TValue>(Expression<Func<Type2, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyTypeAlias(selector);
 #pragma warning restore 0109
 
 		// ctor
@@ -1478,11 +1484,14 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public new static PublishedContentType GetModelContentType()
+		public new static IPublishedContentType GetModelContentType()
 			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		public static string GetModelPropertyTypeAlias<TValue>(Expression<Func<Type1, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyTypeAlias(selector);
 #pragma warning restore 0109
 
 		// ctor
@@ -1595,11 +1604,14 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public new static PublishedContentType GetModelContentType()
+		public new static IPublishedContentType GetModelContentType()
 			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		public static string GetModelPropertyTypeAlias<TValue>(Expression<Func<Type1, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyTypeAlias(selector);
 #pragma warning restore 0109
 
 		// ctor
@@ -1709,11 +1721,14 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public new static PublishedContentType GetModelContentType()
+		public new static IPublishedContentType GetModelContentType()
 			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type1, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		public static string GetModelPropertyTypeAlias<TValue>(Expression<Func<Type1, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyTypeAlias(selector);
 #pragma warning restore 0109
 
 		// properties
@@ -1822,11 +1837,14 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public new static PublishedContentType GetModelContentType()
+		public new static IPublishedContentType GetModelContentType()
 			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Type2, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder"", """ + version + @""")]
+		public static string GetModelPropertyTypeAlias<TValue>(Expression<Func<Type2, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyTypeAlias(selector);
 #pragma warning restore 0109
 
 		// properties

@@ -209,6 +209,10 @@ namespace Umbraco.ModelsBuilder.Building
             sb.AppendFormat("\t\tpublic static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<{0}, TValue>> selector)\n",
                 type.ClrName);
             sb.Append("\t\t\t=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);\n");
+            WriteGeneratedCodeAttribute(sb, "\t\t");
+            sb.AppendFormat("\t\tpublic static string GetModelPropertyTypeAlias<TValue>(Expression<Func<{0}, TValue>> selector)\n",
+                type.ClrName);
+            sb.Append("\t\t\t=> PublishedModelUtility.GetModelPropertyTypeAlias(selector);\n");
             sb.Append("#pragma warning restore 0109\n\n");
 
             // write the ctor
