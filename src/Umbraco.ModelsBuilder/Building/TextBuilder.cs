@@ -195,16 +195,20 @@ namespace Umbraco.ModelsBuilder.Building
             // as 'new' since parent has its own - or maybe not - disable warning
             sb.Append("\t\t// helpers\n");
             sb.Append("#pragma warning disable 0109 // new is redundant\n");
+            sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString("The alias of the model type."));
             WriteGeneratedCodeAttribute(sb, "\t\t");
             sb.AppendFormat("\t\tpublic new const string ModelTypeAlias = \"{0}\";\n",
                 type.Alias);
             var itemType = type.IsElement ? TypeModel.ItemTypes.Content : type.ItemType; // fixme
+            sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString("The <see cref=\"PublishedItemType\"/> this model represents."));
             WriteGeneratedCodeAttribute(sb, "\t\t");
             sb.AppendFormat("\t\tpublic new const PublishedItemType ModelItemType = PublishedItemType.{0};\n",
                 itemType);
+            sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString("Gets the <see cref=\"IPublishedContentType\"/> of the model type."));
             WriteGeneratedCodeAttribute(sb, "\t\t");
             sb.Append("\t\tpublic new static IPublishedContentType GetModelContentType()\n");
             sb.Append("\t\t\t=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);\n");
+            sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString("Gets the <see cref=\"IPublishedPropertyType\"/> for a model property based on the provided expression."));
             WriteGeneratedCodeAttribute(sb, "\t\t");
             sb.AppendFormat("\t\tpublic static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<{0}, TValue>> selector)\n",
                 type.ClrName);
@@ -213,7 +217,7 @@ namespace Umbraco.ModelsBuilder.Building
 
             // write the ctor
             if (!type.HasCtor)
-                sb.AppendFormat("\t\t// ctor\n\t\tpublic {0}(IPublished{1} content)\n\t\t\t: base(content)\n\t\t{{ }}\n\n",
+                sb.AppendFormat("\t\t// ctor\n\t\t/// <inheritdoc />\n\t\tpublic {0}(IPublished{1} content)\n\t\t\t: base(content)\n\t\t{{ }}\n\n",
                     type.ClrName, type.IsElement ? "Element" : "Content");
 
             // write the properties
