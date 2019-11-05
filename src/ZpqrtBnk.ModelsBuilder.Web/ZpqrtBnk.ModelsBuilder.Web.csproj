@@ -59,7 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="UmbracoCms.Web">
-      <Version>8.1.3</Version>
+      <Version>8.3.0-alpha.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

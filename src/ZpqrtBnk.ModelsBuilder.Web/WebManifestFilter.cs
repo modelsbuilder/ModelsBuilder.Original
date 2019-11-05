@@ -16,13 +16,6 @@ namespace ZpqrtBnk.ModelsBuilder.Web
 
         public void Filter(List<PackageManifest> manifests)
         {
-            // remove ModelsBuilder built-in manifest
-            // this disables models builder UI entirely (dashboards, buttons...)
-            var modelsBuilder = manifests.FirstOrDefault(x => x.Source.EndsWith("\\App_Plugins\\ModelsBuilder\\package.manifest"));
-
-            if (modelsBuilder != null)
-                manifests.Remove(modelsBuilder);
-
             // we deploy files, but not the manifest, which we include here
             // but only if BackOffice is enabled
 

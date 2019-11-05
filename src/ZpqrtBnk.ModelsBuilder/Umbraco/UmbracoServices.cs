@@ -63,7 +63,6 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
         private IList<TypeModel> GetTypes(PublishedItemType itemType, IContentTypeComposition[] contentTypes)
         {
             var typeModels = new List<TypeModel>();
-            var uniqueTypes = new HashSet<string>();
 
             // get the types and the properties
             foreach (var contentType in contentTypes)
@@ -78,12 +77,6 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                     Description = contentType.Description,
                     Variations = contentType.Variations
                 };
-
-                // of course this should never happen, but when it happens, better detect it
-                // else we end up with weird nullrefs everywhere
-                if (uniqueTypes.Contains(typeModel.ClrName))
-                    throw new Exception($"Panic: duplicate type ClrName \"{typeModel.ClrName}\".");
-                uniqueTypes.Add(typeModel.ClrName);
 
                 var publishedContentType = _publishedContentTypeFactory.CreateContentType(contentType);
                 switch (itemType)

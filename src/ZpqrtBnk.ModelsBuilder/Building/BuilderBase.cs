@@ -126,11 +126,18 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         private void Prepare()
         {
             var pureLive = Config.ModelsMode == ModelsMode.PureLive;
+            var uniqueTypes = new HashSet<string>();
 
             // assign ClrName
             foreach (var typeModel in AllTypeModels)
             {
                 typeModel.ClrName = GetClrName(typeModel);
+
+                // of course this should never happen, but when it happens, better detect it
+                // else we end up with weird nullrefs everywhere
+                if (uniqueTypes.Contains(typeModel.ClrName))
+                    throw new Exception($"Panic: duplicate type ClrName \"{typeModel.ClrName}\".");
+                uniqueTypes.Add(typeModel.ClrName);
 
                 foreach (var propertyModel in typeModel.Properties)
                 {

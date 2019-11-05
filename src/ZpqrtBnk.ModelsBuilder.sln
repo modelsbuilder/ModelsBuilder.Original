@@ -24,6 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModelsBuilder", "ModelsBuil
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuspecs", "Nuspecs", "{30368E85-95E0-4A26-AC5A-D8570DB16FDA}"
 	ProjectSection(SolutionItems) = preProject
+		..\build\Nuspecs\logo.png = ..\build\Nuspecs\logo.png
 		..\build\Nuspecs\ZpqrtBnk.ModelsBuilder.nuspec = ..\build\Nuspecs\ZpqrtBnk.ModelsBuilder.nuspec
 		..\build\Nuspecs\ZpqrtBnk.ModelsBuilder.Web.nuspec = ..\build\Nuspecs\ZpqrtBnk.ModelsBuilder.Web.nuspec
 	EndProjectSection

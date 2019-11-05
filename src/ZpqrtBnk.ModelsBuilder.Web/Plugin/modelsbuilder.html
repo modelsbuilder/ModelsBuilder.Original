@@ -3,11 +3,13 @@
     <umb-box>
         <umb-box-content>
 
+            <img style="float: left; margin: 0 10px 10px 0; width: 64px;" src="/App_Plugins/ZpqrtBnk.ModelsBuilder/logo.png" />
+
             <div ng-show="!vm.loading" class="pull-right">
                 <button type="button" class="btn" ng-click="vm.reload()"><span>Reload</span></button>
             </div>
 
-            <h3 class="bold">Models Builder</h3>
+            <h3 class="bold" style="margin-bottom: -.25em;">Models Builder</h3>
 
             <div ng-show="!vm.loading && vm.dashboard">
                 <div ng-bind-html="vm.dashboard.text|safe_html"></div>
@@ -26,7 +28,7 @@
                         </button>
                     </div>
                 </div>
-                
+
                 <div style="position: relative;">
                     <umb-loader ng-show="vm.generating || vm.loading"></umb-loader>
                 </div>

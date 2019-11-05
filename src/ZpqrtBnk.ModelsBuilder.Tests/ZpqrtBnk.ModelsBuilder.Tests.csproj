@@ -29,7 +29,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Moq">
-      <Version>4.13.0</Version>
+      <Version>4.13.1</Version>
     </PackageReference>
     <PackageReference Include="NUnit">
       <Version>3.12.0</Version>
@@ -38,7 +38,7 @@
       <Version>3.15.1</Version>
     </PackageReference>
     <PackageReference Include="UmbracoCms.Web">
-      <Version>8.1.3</Version>
+      <Version>8.3.0-alpha.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
