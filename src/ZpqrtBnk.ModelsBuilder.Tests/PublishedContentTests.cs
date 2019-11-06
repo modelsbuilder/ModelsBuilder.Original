@@ -41,6 +41,48 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
             Assert.AreEqual("val", nest.Prop);
         }
 
+        [Test]
+        public void Test2()
+        {
+            var type = UmbracoInternals.CreatePublishedContentType(1, "typ", new[]
+            {
+                UmbracoInternals.CreatePublishedPropertyType("prop", 1, "?")
+            });
+
+            var content = new TestElements.PublishedContent(type, new[]
+            {
+                new TestElements.PublishedProperty("prop", "val")
+            });
+
+            string value;
+
+            // test: content is IPublishedContent
+
+            // default version Value<T>() that ships with Core
+            value = content.Value("prop", fallback: Fallback.ToDefaultValue, defaultValue: "oops");
+
+            // default Value<T>() that ships with Core
+            value = content.Value<string>("prop");
+
+            // default Value() that ships with Core
+            value = (string) content.Value("prop");
+
+
+            var model = new ContentModel1(content);
+
+            // test: model is strongly typed
+
+            // default version Value() that ships with Core
+            value = model.Value("prop", fallback: Fallback.ToDefaultValue, defaultValue: "oops");
+
+            // fallback-function version of Value() that MB provides
+            value = model.Value("prop", fallback: x => x.Value<string>("prop"));
+
+            // nothing is ambiguous because of generics
+            value = (string) model.Value("prop"); // non-generic Value()
+            value = model.Value<string>("prop"); // generic Value<T>()
+        }
+
         public class ContentModel1 : PublishedContentModel
         {
             public ContentModel1(IPublishedContent content)

@@ -47,5 +47,26 @@ namespace Umbraco.Web
             
             return attribute.Alias;
         }
+
+        /// <summary>
+        /// Gets the value of a property.
+        /// </summary>
+        public static TValue Value<TModel, TValue>(this TModel model, string alias, string culture = null, string segment = null, Func<TModel, TValue> fallback = default)
+            where TModel : IPublishedElement
+        {
+            var property = model.GetProperty(alias);
+
+            // if we have a property, and it has a value, return that value
+            if (property != null && property.HasValue(culture, segment))
+                return property.Value<TValue>(culture, segment);
+
+            // else use the fallback method if any
+            if (fallback != null)
+                return fallback(model);
+
+            // else... if we have a property, at least let the converter return its own
+            // vision of 'no value' (could be an empty enumerable) - otherwise, default
+            return property == null ? default : property.Value<TValue>(culture, segment);
+        }
     }
 }

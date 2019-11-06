@@ -158,6 +158,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             GeneratePropertyGetters = value;
         }
 
+        public void SetGenerateFallbackFuncExtensionMethods(bool value)
+        {
+            GenerateFallbackFuncExtensionMethods = value;
+        }
+
         // ReSharper disable once InconsistentNaming
         public void SetMBClassName(string value)
         {
@@ -284,7 +289,9 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         public string ModelsNamespace { get; private set; }
 
-        public bool GeneratePropertyGetters { get; private set; } = true;
+        public bool GeneratePropertyGetters { get; private set; }
+
+        public bool GenerateFallbackFuncExtensionMethods { get; private set; }
 
         public IEnumerable<string> UsingNamespaces
         {

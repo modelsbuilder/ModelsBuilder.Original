@@ -58,6 +58,8 @@ using ZpqrtBnk.ModelsBuilder;
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
+            parseResult.SetGeneratePropertyGetters(true); // preserve legacy
+
             var builder = new CustomNamesBuilder(types, parseResult);
             var btypes = builder.AllTypeModels;
 

@@ -17,7 +17,12 @@ namespace ZpqrtBnk.ModelsBuilder
         /// <summary>
         /// Gets or sets a value indicating whether to generate property getters.
         /// </summary>
-        public bool GeneratePropertyGetters { get; set; } = true;
+        public bool GeneratePropertyGetters { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to generate fallback-function extension methods.
+        /// </summary>
+        public bool GenerateFallbackFuncExtensionMethods { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the MB class.
