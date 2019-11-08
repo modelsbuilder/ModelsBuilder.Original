@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ZpqrtBnk.ModelsBuilder
 {
@@ -13,15 +11,15 @@ namespace ZpqrtBnk.ModelsBuilder
             Alias = alias;
             ClrName = clrName;
             ClrType = clrType;
-            Properties = properties;
+            PropertyTypeInfos = properties;
         }
 
         public string Alias { get; }
         public string ClrName { get; }
         public Type ClrType { get; }
 
-        public IReadOnlyCollection<PropertyTypeModelInfo> Properties { get; }
+        public IReadOnlyCollection<PropertyTypeModelInfo> PropertyTypeInfos { get; }
 
-        public PropertyTypeModelInfo Property(string alias) => Properties.FirstOrDefault(x => x.Alias == alias);
+        public PropertyTypeModelInfo PropertyTypeInfo(string alias) => PropertyTypeInfos.FirstOrDefault(x => x.Alias == alias);
     }
 }

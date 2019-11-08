@@ -25,10 +25,14 @@ namespace ZpqrtBnk.ModelsBuilder
         public bool GenerateFallbackFuncExtensionMethods { get; set; }
 
         /// <summary>
-        /// Gets or sets the name of the MB class.
+        /// Gets or sets the name of the infos class.
         /// </summary>
-        // ReSharper disable once InconsistentNaming
-        public string MBClassName { get; set; }
+        public string ModelInfosClassName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the namespace of the infos class.
+        /// </summary>
+        public string ModelInfosClassNamespace { get; set; }
 
         /// <summary>
         /// Gets or sets the prefix for content type models.

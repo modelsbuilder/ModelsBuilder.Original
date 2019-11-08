@@ -1,40 +1,62 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using ZpqrtBnk.ModelsBuilder.Configuration;
 using ZpqrtBnk.ModelsBuilder.Umbraco;
 
 namespace ZpqrtBnk.ModelsBuilder.Building
 {
     public class Generator
     {
-        public static void GenerateModels(UmbracoServices umbracoServices, IBuilderFactory builderFactory, string modelsDirectory, string bin, string modelsNamespace)
+        private readonly UmbracoServices _umbracoServices;
+        private readonly IBuilderFactory _builderFactory;
+        private readonly ICodeWriterFactory _writerFactory;
+        private readonly Config _config;
+
+        public Generator(UmbracoServices umbracoServices, IBuilderFactory builderFactory, ICodeWriterFactory writerFactory, Config config)
+        {
+            _umbracoServices = umbracoServices;
+            _builderFactory = builderFactory;
+            _writerFactory = writerFactory;
+            _config = config;
+        }
+
+        public void GenerateModels(string modelsDirectory, string modelsNamespace, string bin)
         {
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
+            // delete all existing generated files
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                 File.Delete(file);
 
-            var typeModels = umbracoServices.GetAllTypes();
+            // get models from Umbraco
+            var models = _umbracoServices.GetAll();
 
+            // get our (non-generated) files and parse them
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
-            var builder = builderFactory.CreateBuilder(typeModels, parseResult, modelsNamespace);
-            var modelsToGenerate = builder.GetContentTypeModels().ToList();
+            
+            // create a builder, build a context, create a writer
+            var builder = _builderFactory.CreateBuilder();
+            var context = builder.Build(_config, parseResult, modelsNamespace, models);
+            var writer = _writerFactory.CreateWriter(context);
 
-            foreach (var typeModel in modelsToGenerate)
+            // write each model file
+            foreach (var typeModel in models.TypeModels)
             {
-                var sb = new StringBuilder();
-                builder.WriteContentTypeModel(sb, typeModel);
+                writer.Reset();
+                writer.WriteModelFile(typeModel);
                 var filename = Path.Combine(modelsDirectory, typeModel.ClrName + ".generated.cs");
-                File.WriteAllText(filename, sb.ToString());
+                File.WriteAllText(filename, writer.Code);
             }
 
-            var metaSb = new StringBuilder();
-            builder.WriteContentTypesMetadata(metaSb, modelsToGenerate);
-            var metaFilename = Path.Combine(modelsDirectory, parseResult.MBClassName + ".generated.cs"); ;
-            File.WriteAllText(metaFilename, metaSb.ToString());
+            // write the infos file
+            writer.Reset();
+            writer.WriteModelInfosFile(models);
+            var metaFilename = Path.Combine(modelsDirectory, context.ModelInfosClassName + ".generated.cs");
+            File.WriteAllText(metaFilename, writer.Code);
 
             // the idea was to calculate the current hash and to add it as an extra file to the compilation,
             // in order to be able to detect whether a DLL is consistent with an environment - however the
@@ -49,37 +71,47 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
             if (bin != null)
             {
+                // build
                 foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                     ourFiles[file] = File.ReadAllText(file);
                 var compiler = new Compiler();
-                compiler.Compile(builder.ModelsNamespace, ourFiles, bin);
+                compiler.Compile(context.ModelsNamespace, ourFiles, bin);
             }
 
             OutOfDateModelsStatus.Clear();
         }
 
-        public static Dictionary<string, string> GetModels(UmbracoServices umbracoServices, IBuilderFactory builderFactory, string modelsNamespace, IDictionary<string, string> files)
+        public Dictionary<string, string> GetModels(string modelsNamespace, IDictionary<string, string> files)
         {
-            var typeModels = umbracoServices.GetAllTypes();
+            // get models from Umbraco
+            var models = _umbracoServices.GetAll();
 
+            // parse the (non-generated) files
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(files);
-            var builder = builderFactory.CreateBuilder(typeModels, parseResult, modelsNamespace);
 
-            var models = new Dictionary<string, string>();
-            var modelsToGenerate = builder.GetContentTypeModels().ToList();
+            // create a builder, build a context, create a writer
+            var builder = _builderFactory.CreateBuilder();
+            var context = builder.Build(_config, parseResult, modelsNamespace, models);
+            var writer = _writerFactory.CreateWriter(context);
+            var generated = new Dictionary<string, string>();
 
-            foreach (var typeModel in modelsToGenerate)
+            // write each model file
+            foreach (var typeModel in models.TypeModels)
             {
-                var sb = new StringBuilder();
-                builder.WriteContentTypeModel(sb, typeModel);
-                models[typeModel.ClrName] = sb.ToString();
+                writer.Reset();
+                writer.WriteModelFile(typeModel);
+                generated[typeModel.ClrName] = writer.Code;
             }
 
-            var metaSb = new StringBuilder();
-            builder.WriteContentTypesMetadata(metaSb, modelsToGenerate);
-            models[parseResult.MBClassName] = metaSb.ToString();
+            if (generated.ContainsKey(parseResult.ModelInfoClassName))
+                throw new InvalidOperationException($"Collision, cannot use {parseResult.ModelInfoClassName} for both a content type and the infos class.");
 
-            return models;
+            // write the info files
+            writer.Reset();
+            writer.WriteModelInfosFile(models);
+            generated[parseResult.ModelInfoClassName] = writer.Code;
+
+            return generated;
         }
     }
 }

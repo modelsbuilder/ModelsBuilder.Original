@@ -10,19 +10,20 @@ using ZpqrtBnk.ModelsBuilder.Configuration;
 namespace ZpqrtBnk.ModelsBuilder.Umbraco
 {
     // supports LiveDll and LiveAppData - but not PureLive
-    public sealed class LiveModelsProvider
+    //public class LiveModelsComponent
+    public sealed class LiveModelsProvider // FIXME this should just be a component?
     {
         private static UmbracoServices _umbracoServices;
         private static IBuilderFactory _builderFactory;
+        private static ICodeWriterFactory _writerFactory;
+        private static Config _config;
         private static Mutex _mutex;
         private static int _req;
 
-        private static Config Config => Current.Configs.ModelsBuilder();
-
         // we do not manage pure live here
-        internal static bool IsEnabled => Config.ModelsMode.IsLiveNotPure();
+        internal static bool IsEnabled => _config.ModelsMode.IsLiveNotPure();
 
-        internal static void Install(UmbracoServices umbracoServices, IBuilderFactory builderFactory)
+        internal static void Install(UmbracoServices umbracoServices, IBuilderFactory builderFactory, ICodeWriterFactory writerFactory, Config config)
         {
             // just be sure
             if (!IsEnabled)
@@ -30,6 +31,8 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
             _umbracoServices = umbracoServices;
             _builderFactory = builderFactory;
+            _writerFactory = writerFactory;
+            _config = config;
 
             // initialize mutex
             // ApplicationId will look like "/LM/W3SVC/1/Root/AppName"
@@ -75,7 +78,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                 const int timeout = 2*60*1000; // 2 mins
                 _mutex.WaitOne(timeout); // wait until it is safe, and acquire
                 Current.Logger.Info<LiveModelsProvider>("Generate models now.");
-                GenerateModels(_umbracoServices, _builderFactory);
+                GenerateModels();
                 ModelsGenerationError.Clear();
                 Current.Logger.Info<LiveModelsProvider>("Generated.");
             }
@@ -94,17 +97,18 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
             }
         }
 
-        private static void GenerateModels(UmbracoServices umbracoServices, IBuilderFactory builderFactory)
+        private static void GenerateModels()
         {
-            var modelsDirectory = Config.ModelsDirectory;
-            var modelsNamespace = Config.ModelsNamespace;
+            var modelsDirectory = _config.ModelsDirectory;
+            var modelsNamespace = _config.ModelsNamespace;
 
             var bin = HostingEnvironment.MapPath("~/bin");
             if (bin == null)
                 throw new Exception("Panic: bin is null.");
 
             // EnableDllModels will recycle the app domain - but this request will end properly
-            Generator.GenerateModels(umbracoServices, builderFactory, modelsDirectory, Config.ModelsMode.IsAnyDll() ? bin : null, modelsNamespace);
+            var generator = new Generator(_umbracoServices, _builderFactory, _writerFactory, _config);
+            generator.GenerateModels(modelsDirectory, _config.ModelsMode.IsAnyDll() ? bin : null, modelsNamespace);
         }
     }
 }

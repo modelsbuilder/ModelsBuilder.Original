@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
 using ZpqrtBnk.ModelsBuilder.Building;
 using ZpqrtBnk.ModelsBuilder.Configuration;
 
@@ -30,6 +28,11 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
         private static Config Config => Current.Configs.ModelsBuilder();
 
         #region Services
+
+        public CodeModels GetAll()
+        {
+            return new CodeModels { TypeModels = GetAllTypes() };
+        }
 
         public IList<TypeModel> GetAllTypes()
         {

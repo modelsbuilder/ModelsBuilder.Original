@@ -31,20 +31,22 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Api
     {
         private readonly UmbracoServices _umbracoServices;
         private readonly IBuilderFactory _builderFactory;
+        private readonly ICodeWriterFactory _writerFactory;
+        private readonly Config _config;
 
-        public ModelsBuilderApiController(UmbracoServices umbracoServices, IBuilderFactory builderFactory)
+        public ModelsBuilderApiController(UmbracoServices umbracoServices, IBuilderFactory builderFactory, ICodeWriterFactory writerFactory, Config config)
         {
             _umbracoServices = umbracoServices;
             _builderFactory = builderFactory;
+            _writerFactory = writerFactory;
+            _config = config;
         }
-
-        private static Config Config => Current.Configs.ModelsBuilder();
 
         [HttpGet]
         [ApiBasicAuthFilter("settings")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage GetApiVersion()
         {
-            if (!Config.IsApiServer)
+            if (!_config.IsApiServer)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API server does not want to talk to you.");
 
             if (!ModelState.IsValid)
@@ -58,7 +60,7 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Api
         [ApiBasicAuthFilter("settings")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage ValidateClientVersion(ValidateClientVersionData data)
         {
-            if (!Config.IsApiServer)
+            if (!_config.IsApiServer)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API server does not want to talk to you.");
 
             if (!ModelState.IsValid || data == null || !data.IsValid)
@@ -75,7 +77,7 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Api
         [ApiBasicAuthFilter("settings")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage GetModels(GetModelsData data)
         {
-            if (!Config.IsApiServer)
+            if (!_config.IsApiServer)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API server does not want to talk to you.");
 
             if (!ModelState.IsValid || data == null || !data.IsValid)
@@ -85,7 +87,8 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Api
             if (!checkResult.Success)
                 return checkResult.Result;
 
-            var models = Generator.GetModels(_umbracoServices, _builderFactory, data.Namespace, data.Files);
+            var generator = new Generator(_umbracoServices, _builderFactory, _writerFactory, _config);
+            var models = generator.GetModels(data.Namespace, data.Files);
 
             return Request.CreateResponse(HttpStatusCode.OK, models, Configuration.Formatters.JsonFormatter);
         }

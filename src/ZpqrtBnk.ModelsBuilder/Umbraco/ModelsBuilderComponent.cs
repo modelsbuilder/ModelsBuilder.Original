@@ -16,13 +16,14 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
     {
         private readonly UmbracoServices _umbracoServices;
         private readonly IBuilderFactory _builderFactory;
-
+        private readonly ICodeWriterFactory _writerFactory;
         private readonly Config _config;
 
-        public ModelsBuilderComponent(UmbracoServices umbracoServices, IBuilderFactory builderFactory, Config config)
+        public ModelsBuilderComponent(UmbracoServices umbracoServices, IBuilderFactory builderFactory, ICodeWriterFactory writerFactory, Config config)
         {
             _umbracoServices = umbracoServices;
             _builderFactory = builderFactory;
+            _writerFactory = writerFactory;
             _config = config;
         }
 
@@ -35,7 +36,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
             // fixme LiveModelsProvider should not be static
             if (_config.ModelsMode.IsLiveNotPure())
-                LiveModelsProvider.Install(_umbracoServices, _builderFactory);
+                LiveModelsProvider.Install(_umbracoServices, _builderFactory, _writerFactory, _config);
 
             // fixme OutOfDateModelsStatus should not be static
             if (_config.FlagOutOfDateModels)

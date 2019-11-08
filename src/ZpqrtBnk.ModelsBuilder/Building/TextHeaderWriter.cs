@@ -20,7 +20,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             sb.Append("//   Changes to this file will be lost if the code is regenerated.\n");
             sb.Append("// </auto-generated>\n");
             sb.Append("//------------------------------------------------------------------------------\n");
-            sb.Append("\n");
         }
     }
 }

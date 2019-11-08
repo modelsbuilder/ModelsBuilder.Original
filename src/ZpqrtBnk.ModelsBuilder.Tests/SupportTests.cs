@@ -97,17 +97,15 @@ namespace Umbraco.Web.PublishedModels
             };
 
             var parseResult = new CodeParser{ WriteDiagnostics = true }.Parse(code, refs);
-            var builder = new Builder(types, parseResult);
-            var btypes = builder.AllTypeModels;
+            var builder = new Builder();
+            var context = builder.Build(new Config(), parseResult, null, new CodeModels { TypeModels = types });
+            var writer = new CodeWriter(context);
 
-            var modelsToGenerate = builder.GetContentTypeModels().ToList();
-
-            foreach (var modelToGenerate in modelsToGenerate)
+            foreach (var modelToGenerate in types)
             {
-                var sb = new StringBuilder();
-                builder.WriteContentTypeModel(sb, modelToGenerate);
-                var gen = sb.ToString();
-                Console.WriteLine(gen);
+                writer.Reset();
+                writer.WriteContentTypeModel(modelToGenerate);
+                Console.WriteLine(writer.Code);
             }
         }
 
@@ -186,17 +184,15 @@ namespace Umbraco.Web.PublishedModels
             };
 
             var parseResult = new CodeParser { WriteDiagnostics = true }.Parse(code, refs);
-            var builder = new Builder(types, parseResult);
-            var btypes = builder.AllTypeModels;
+            var builder = new Builder();
+            var context = builder.Build(new Config(), parseResult, null, new CodeModels { TypeModels = types });
+            var writer = new CodeWriter(context);
 
-            var modelsToGenerate = builder.GetContentTypeModels().ToList();
-
-            foreach (var modelToGenerate in modelsToGenerate)
+            foreach (var modelToGenerate in types)
             {
-                var sb = new StringBuilder();
-                builder.WriteContentTypeModel(sb, modelToGenerate);
-                var gen = sb.ToString();
-                Console.WriteLine(gen);
+                writer.Reset();
+                writer.WriteContentTypeModel(modelToGenerate);
+                Console.WriteLine(writer.Code);
             }
         }
     }

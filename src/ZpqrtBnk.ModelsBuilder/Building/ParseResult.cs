@@ -42,6 +42,8 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         private readonly List<ModelsBaseClassInfo> _modelsBaseClassNames
              = new List<ModelsBaseClassInfo>();
 
+        private string _modelInfosClassNamespace;
+
         public static readonly ParseResult Empty = new ParseResult();
 
         private class ModelsBaseClassInfo
@@ -163,10 +165,14 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             GenerateFallbackFuncExtensionMethods = value;
         }
 
-        // ReSharper disable once InconsistentNaming
-        public void SetMBClassName(string value)
+        public void SetModelInfosClassName(string value)
         {
-            MBClassName = string.IsNullOrWhiteSpace(value) ? "MB" : value;
+            ModelInfoClassName = string.IsNullOrWhiteSpace(value) ? "ModelInfos" : value;
+        }
+
+        public void SetModelInfosClassNamespace(string value)
+        {
+            _modelInfosClassNamespace = string.IsNullOrWhiteSpace(value) ? null : value;
         }
 
         public void SetTypeModelPrefix(string value)
@@ -308,8 +314,9 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             return _implementedExtensions.TryGetValue(typeFullName, out var props) && props.Contains(propertyClrName);
         }
 
-        // ReSharper disable once InconsistentNaming
-        public string MBClassName { get; private set; } = "MB";
+        public string ModelInfoClassName { get; private set; } = "ModelInfos";
+
+        public string ModelInfoClassNamespace => _modelInfosClassNamespace ?? ModelsNamespace ?? "Umbraco.Web.PublishedModels"; // FIXME
 
         public string TypeModelPrefix { get; private set; } = "";
 

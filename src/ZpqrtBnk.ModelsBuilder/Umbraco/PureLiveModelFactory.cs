@@ -35,6 +35,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
         private BuildManager _theBuildManager;
         private readonly Lazy<UmbracoServices> _umbracoServices;
         private readonly IBuilderFactory _builderFactory;
+        private readonly ICodeWriterFactory _writerFactory;
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
         private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
@@ -43,10 +44,11 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
         private readonly Config _config;
 
-        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IBuilderFactory builderFactory, IProfilingLogger logger, Config config)
+        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IBuilderFactory builderFactory, ICodeWriterFactory writerFactory, IProfilingLogger logger, Config config)
         {
             _umbracoServices = umbracoServices;
             _builderFactory = builderFactory;
+            _writerFactory = writerFactory;
             _logger = logger;
             _config = config;
             _ver = 1; // zero is for when we had no version
@@ -339,8 +341,8 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                     .ToDictionary(x => x, File.ReadAllText)
                 : new Dictionary<string, string>();
 
-            var typeModels = UmbracoServices.GetAllTypes();
-            var currentHash = HashHelper.Hash(ourFiles, typeModels);
+            var models = UmbracoServices.GetAll();
+            var currentHash = HashHelper.Hash(ourFiles, models.TypeModels); // TODO: hash 'models'
             var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
             var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
             var projFile = Path.Combine(modelsDirectory, "all.generated.cs");
@@ -455,15 +457,15 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
             _logger.Debug<PureLiveModelFactory>("Rebuilding models.");
 
             // generate code, save
-            var code = GenerateModelsCode(ourFiles, typeModels);
+            var code = GenerateModelsCode(ourFiles, models);
             // add extra attributes,
             //  PureLiveAssembly helps identifying Assemblies that contain PureLive models
             //  AssemblyVersion is so that we have a different version for each rebuild
             var ver = _ver == _skipver ? ++_ver : _ver;
             _ver++;
             code = code.Replace("//ASSATTR", $@"[assembly: PureLiveAssembly]
-[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = ""{currentHash}"")]
-[assembly:System.Reflection.AssemblyVersion(""0.0.0.{ver}"")]");
+[assembly: ModelsBuilderAssembly(PureLive = true, SourceHash = ""{currentHash}"")]
+[assembly: System.Reflection.AssemblyVersion(""0.0.0.{ver}"")]");
             File.WriteAllText(modelsSrcFile, code);
 
             // generate proj, save
@@ -552,7 +554,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
             return new Infos { ModelInfos = modelInfos.Count > 0 ? modelInfos : null, ModelTypeMap = map };
         }
 
-        private string GenerateModelsCode(IDictionary<string, string> ourFiles, IList<TypeModel> typeModels)
+        private string GenerateModelsCode(IDictionary<string, string> ourFiles, CodeModels models)
         {
             var modelsDirectory = _config.ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
@@ -562,15 +564,13 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                 File.Delete(file);
 
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
-            var builder = _builderFactory.CreateBuilder(typeModels, parseResult, _config.ModelsNamespace);
-            var modelsToGenerate = builder.GetContentTypeModels().ToList();
+            var builder = _builderFactory.CreateBuilder();
+            var context = builder.Build(_config, parseResult, _config.ModelsNamespace, models);
+            var writer = _writerFactory.CreateWriter(context);
 
-            var codeBuilder = new StringBuilder();
-            builder.WriteContentTypeModels(codeBuilder, modelsToGenerate);
-            builder.WriteContentTypesMetadata(codeBuilder, modelsToGenerate);
-            var code = codeBuilder.ToString();
+            writer.WriteSingleFile(models);
 
-            return code;
+            return writer.Code;
         }
 
         private static readonly Regex UsingRegex = new Regex("^using(.*);", RegexOptions.Compiled | RegexOptions.Multiline);

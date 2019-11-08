@@ -58,6 +58,9 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// </remarks>
         public TypeModel BaseType; // the parent type in Umbraco (type inherits its properties)
 
+        // FIXME explain
+        public string BaseClassName;
+
         /// <summary>
         /// Gets the list of properties that are defined by this model.
         /// </summary>
@@ -163,20 +166,17 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// </summary>
         public ItemTypes ItemType
         {
-            get { return _itemType; }
+            get => _itemType;
             set
             {
-                switch (value)
+                _itemType = value switch
                 {
-                    case ItemTypes.Element:
-                    case ItemTypes.Content:
-                    case ItemTypes.Media:
-                    case ItemTypes.Member:
-                        _itemType = value;
-                        break;
-                    default:
-                        throw new ArgumentException("value");
-                }
+                    ItemTypes.Element => value,
+                    ItemTypes.Content => value,
+                    ItemTypes.Media => value,
+                    ItemTypes.Member => value,
+                    _ => throw new ArgumentException("value")
+                };
             }
         }
 

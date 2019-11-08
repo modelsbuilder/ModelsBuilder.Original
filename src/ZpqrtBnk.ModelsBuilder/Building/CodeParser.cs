@@ -280,8 +280,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                                 case nameof(ModelsBuilderConfigureAttribute.GenerateFallbackFuncExtensionMethods):
                                     disco.SetGenerateFallbackFuncExtensionMethods((bool) argValue.Value);
                                     break;
-                                case nameof(ModelsBuilderConfigureAttribute.MBClassName):
-                                    disco.SetMBClassName((string) argValue.Value);
+                                case nameof(ModelsBuilderConfigureAttribute.ModelInfosClassName):
+                                    disco.SetModelInfosClassName((string) argValue.Value);
+                                    break;
+                                case nameof(ModelsBuilderConfigureAttribute.ModelInfosClassNamespace):
+                                    disco.SetModelInfosClassNamespace((string) argValue.Value);
                                     break;
                                 case nameof(ModelsBuilderConfigureAttribute.TypeModelPrefix):
                                     disco.SetTypeModelPrefix((string) argValue.Value);

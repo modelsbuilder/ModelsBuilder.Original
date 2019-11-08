@@ -16,12 +16,16 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
     [TestFixture]
     public class CustomBuilderTests
     {
+        private Config _config;
+
         [SetUp]
         public void Setup()
         {
+            _config = new Config();
+
             Current.Reset();
             Current.UnlockConfigs();
-            Current.Configs.Add(() => new Config());
+            Current.Configs.Add(() => _config);
             Current.Configs.Add<IUmbracoSettingsSection>(() => new UmbracoSettingsSection());
         }
 
@@ -42,7 +46,7 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
                 ModelClrType = typeof(string),
             });
 
-            var types = new[] { type1 };
+            var types = new List<TypeModel> { type1 };
 
             var code = new Dictionary<string, string>
             {
@@ -60,12 +64,11 @@ using ZpqrtBnk.ModelsBuilder;
             var parseResult = new CodeParser().Parse(code, refs);
             parseResult.SetGeneratePropertyGetters(true); // preserve legacy
 
-            var builder = new CustomNamesBuilder(types, parseResult);
-            var btypes = builder.AllTypeModels;
-
-            var sb = new StringBuilder();
-            builder.WriteContentTypeModel(sb, builder.GetContentTypeModels().First());
-            var gen = sb.ToString();
+            var builder = new CustomNamesBuilder();
+            var context = builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
+            var writer = new CodeWriter(context);
+            writer.WriteModelFile(types.First());
+            var gen = writer.Code;
 
             var version = ApiVersion.Current.Version;
             var expected = @"//------------------------------------------------------------------------------
@@ -91,28 +94,28 @@ using System.CodeDom.Compiler;
 
 namespace Umbraco.Web.PublishedModels
 {
-	/// <summary>Provides extension methods for the Type1Custom class.</summary>
-	public static partial class Type1CustomExtensions
-	{
-		[GeneratedCodeAttribute(MB.Name, MB.VersionString)]
-		public static string Prop1(this Type1Custom that, Fallback fallback = default, string defaultValue = default)
-			=> that.Value<string>(""prop1"", fallback: fallback, defaultValue: defaultValue);
-	}
+    /// <summary>Provides extension methods for the Type1Custom class.</summary>
+    public static partial class Type1CustomExtensions
+    {
+        /// <summary>Gets the value of the ""prop1"" property.</summary>
+        [GeneratedCodeAttribute(ModelInfos.Name, ModelInfos.VersionString)]
+        public static string Prop1(this Type1Custom that, Fallback fallback = default, string defaultValue = default)
+            => that.Value<string>(ModelInfos.ContentTypes.Type1Custom.Properties.Prop1.Alias, fallback: fallback, defaultValue: defaultValue);
+    }
 
-	[PublishedModel(""type1"")]
-	public partial class Type1Custom : PublishedContentModel
-	{
-		// ctor
-		public Type1Custom(IPublishedContent content)
-			: base(content)
-		{ }
+    /// <summary>Represents a ""type1"" content item.</summary>
+    [PublishedModel(ModelInfos.ContentTypes.Type1Custom.Alias)]
+    public partial class Type1Custom : PublishedContentModel
+    {
+        public Type1Custom(IPublishedContent content)
+            : base(content)
+        { }
 
-		// properties
-
-		[GeneratedCodeAttribute(MB.Name, MB.VersionString)]
-		[ImplementPropertyType(""prop1"")]
-		public string Prop1 => this.Prop1();
-	}
+        /// <summary>Gets the value of the ""prop1"" property.</summary>
+        [GeneratedCodeAttribute(ModelInfos.Name, ModelInfos.VersionString)]
+        [ImplementPropertyType(ModelInfos.ContentTypes.Type1Custom.Properties.Prop1.Alias)]
+        public string Prop1 => this.Prop1();
+    }
 }
 ";
             Console.WriteLine(gen);
@@ -121,17 +124,9 @@ namespace Umbraco.Web.PublishedModels
 
         private class CustomNamesBuilder : Builder
         {
-            public CustomNamesBuilder(IList<TypeModel> typeModels, ParseResult parseResult) 
-                : base(typeModels, parseResult)
-            { }
-
-            public CustomNamesBuilder(IList<TypeModel> typeModels, ParseResult parseResult, string modelsNamespace) 
-                : base(typeModels, parseResult, modelsNamespace)
-            { }
-
-            public override string GetClrName(TypeModel typeModel)
+            public override string GetClrName(TypeModel typeModel, ParseResult parseResult, Config config)
             {
-                return base.GetClrName(typeModel) + "Custom";
+                return base.GetClrName(typeModel, parseResult, config) + "Custom";
             }
         }
     }

@@ -16,7 +16,10 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
             base.Compose(composition);
 
             composition.Register<UmbracoServices>(Lifetime.Singleton);
-            composition.Register<IBuilderFactory, TextBuilderFactory>(Lifetime.Singleton);
+
+            composition.Register<IBuilderFactory, BuilderFactory>(Lifetime.Singleton);
+            composition.Register<ICodeWriterFactory, CodeWriterFactory>(Lifetime.Singleton);
+
             composition.Configs.Add(() => new Config());
 
             if (composition.Configs.ModelsBuilder().ModelsMode == ModelsMode.PureLive)
@@ -25,7 +28,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                 ComposeForDefaultModelsFactory(composition);
         }
 
-        private void ComposeForDefaultModelsFactory(Composition composition)
+        private static void ComposeForDefaultModelsFactory(Composition composition)
         {
             composition.WithCollectionBuilder<ModelTypeCollectionBuilder>()
                 .Add(composition.TypeLoader.GetTypes<PublishedElementModel>())
@@ -34,7 +37,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
             composition.RegisterUnique<IPublishedModelFactory>(factory => new PublishedModelFactory(factory.GetInstance<ModelTypeCollection>()));
         }
 
-        private void ComposeForLiveModels(Composition composition)
+        private static void ComposeForLiveModels(Composition composition)
         {
             composition.RegisterUnique<IPublishedModelFactory, PureLiveModelFactory>();
 

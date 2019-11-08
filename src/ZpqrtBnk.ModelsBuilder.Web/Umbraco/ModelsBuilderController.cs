@@ -30,12 +30,14 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Umbraco
     {
         private readonly UmbracoServices _umbracoServices;
         private readonly IBuilderFactory _builderFactory;
+        private readonly ICodeWriterFactory _writerFactory;
         private readonly Config _config;
 
-        public ModelsBuilderController(UmbracoServices umbracoServices, IBuilderFactory builderFactory, Config config)
+        public ModelsBuilderController(UmbracoServices umbracoServices, IBuilderFactory builderFactory, ICodeWriterFactory writerFactory, Config config)
         {
             _umbracoServices = umbracoServices;
             _builderFactory = builderFactory;
+            _writerFactory = writerFactory;
             _config = config;
         }
 
@@ -47,22 +49,20 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Umbraco
         {
             try
             {
-                var config = _config;
-
-                if (!config.ModelsMode.SupportsExplicitGeneration())
+                if (!_config.ModelsMode.SupportsExplicitGeneration())
                 {
                     var result2 = new BuildResult { Success = false, Message = "Models generation is not enabled." };
                     return Request.CreateResponse(HttpStatusCode.OK, result2, Configuration.Formatters.JsonFormatter);
                 }
 
-                var modelsDirectory = config.ModelsDirectory;
+                var modelsDirectory = _config.ModelsDirectory;
 
                 var bin = HostingEnvironment.MapPath("~/bin");
                 if (bin == null)
                     throw new Exception("Panic: bin is null.");
 
                 // EnableDllModels will recycle the app domain - but this request will end properly
-                GenerateModels(modelsDirectory, config.ModelsMode.IsAnyDll() ? bin : null);
+                GenerateModels(modelsDirectory, _config.ModelsMode.IsAnyDll() ? bin : null);
 
                 ModelsGenerationError.Clear();
             }
@@ -112,7 +112,8 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Umbraco
 
         private void GenerateModels(string modelsDirectory, string bin)
         {
-            Generator.GenerateModels(_umbracoServices, _builderFactory, modelsDirectory, bin, _config.ModelsNamespace);
+            var generator = new Generator(_umbracoServices, _builderFactory, _writerFactory, _config);
+            generator.GenerateModels(modelsDirectory, bin, _config.ModelsNamespace);
         }
 
         [DataContract]

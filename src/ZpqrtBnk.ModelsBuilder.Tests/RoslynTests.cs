@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NUnit.Framework;
 using Microsoft.CodeAnalysis;
@@ -16,27 +15,8 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
     public interface IRandom2 : IRandom1
     {}
 
-    class TestBuilder : BuilderBase
-    {
-        public TestBuilder(IList<TypeModel> typeModels, ParseResult parseResult)
-            : base(typeModels, parseResult)
-        { }
-
-        public override void WriteContentTypeModel(StringBuilder sb, TypeModel typeModel)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void WriteContentTypeModels(StringBuilder sb, IEnumerable<TypeModel> typeModels)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void WriteContentTypesMetadata(StringBuilder sb, IEnumerable<TypeModel> typeModels)
-        {
-            throw new NotImplementedException();
-        }
-    }
+    class TestBuilder : Builder
+    { }
 
     [TestFixture]
     public class RoslynTests
@@ -198,11 +178,7 @@ namespace Foo
 using System.Collections.Generic;
 using ZpqrtBnk.ModelsBuilder.Building;
 class MyBuilder : ZpqrtBnk.ModelsBuilder.Tests.TestBuilder
-{
-    public MyBuilder(IList<TypeModel> typeModels, ParseResult parseResult)
-        : base(typeModels, parseResult)
-    { }
-}
+{ }
 ";
 
             var tree = CSharpSyntaxTree.ParseText(code);
@@ -226,7 +202,7 @@ class MyBuilder : ZpqrtBnk.ModelsBuilder.Tests.TestBuilder
 
             // CS0012: The type '...' is defined in an assembly that is not referenced
             // CS0246: The type or namespace '...' could not be found
-            // CS0234: The nume or namespace name '...' does not exist in the namespace '...'
+            // CS0234: The type or namespace name '...' does not exist in the namespace '...'
             var diags = model.GetDiagnostics();
             if (diags.Length > 0)
             {
@@ -250,11 +226,7 @@ class MyBuilder : ZpqrtBnk.ModelsBuilder.Tests.TestBuilder
 using System.Collections.Generic;
 using ZpqrtBnk.ModelsBuilder.Building;
 class MyBuilder : ZpqrtBnk.ModelsBuilder.Tests.TestBuilder
-{
-    public MyBuilder(IList<TypeModel> typeModels, ParseResult parseResult)
-        : base(typeModels, parseResult)
-    { }
-}
+{ }
 ";
 
             var tree = CSharpSyntaxTree.ParseText(code);
@@ -276,7 +248,7 @@ class MyBuilder : ZpqrtBnk.ModelsBuilder.Tests.TestBuilder
                 options: options);
             var model = compilation.GetSemanticModel(tree);
 
-            var diags = model.GetDiagnostics();
+            var diags = model.GetDiagnostics().Where(x => x.Severity != DiagnosticSeverity.Hidden).ToArray();
             if (diags.Length > 0)
             {
                 foreach (var diag in diags)
