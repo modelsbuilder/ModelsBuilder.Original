@@ -30,15 +30,13 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Api
     public class ModelsBuilderApiController : UmbracoApiController // UmbracoAuthorizedApiController - for ASP.NET identity
     {
         private readonly UmbracoServices _umbracoServices;
-        private readonly IBuilderFactory _builderFactory;
-        private readonly ICodeWriterFactory _writerFactory;
+        private readonly ICodeFactory _codeFactory;
         private readonly Config _config;
 
-        public ModelsBuilderApiController(UmbracoServices umbracoServices, IBuilderFactory builderFactory, ICodeWriterFactory writerFactory, Config config)
+        public ModelsBuilderApiController(UmbracoServices umbracoServices, ICodeFactory codeFactory, Config config)
         {
             _umbracoServices = umbracoServices;
-            _builderFactory = builderFactory;
-            _writerFactory = writerFactory;
+            _codeFactory = codeFactory;
             _config = config;
         }
 
@@ -87,7 +85,7 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Api
             if (!checkResult.Success)
                 return checkResult.Result;
 
-            var generator = new Generator(_umbracoServices, _builderFactory, _writerFactory, _config);
+            var generator = new Generator(_umbracoServices, _codeFactory, _config);
             var models = generator.GetModels(data.Namespace, data.Files);
 
             return Request.CreateResponse(HttpStatusCode.OK, models, Configuration.Formatters.JsonFormatter);

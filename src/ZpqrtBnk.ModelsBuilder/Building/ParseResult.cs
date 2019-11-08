@@ -33,16 +33,12 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             = new Dictionary<string, string>();
         private readonly Dictionary<string, string[]> _contentInterfaces 
             = new Dictionary<string, string[]>();
-        private readonly List<string> _usingNamespaces
-            = new List<string>();
         private readonly HashSet<string> _withCtor
             = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         private readonly Dictionary<string, List<string>> _implementedExtensions
             = new Dictionary<string, List<string>>();
         private readonly List<ModelsBaseClassInfo> _modelsBaseClassNames
              = new List<ModelsBaseClassInfo>();
-
-        private string _modelInfosClassNamespace;
 
         public static readonly ParseResult Empty = new ParseResult();
 
@@ -132,11 +128,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             ModelsNamespace = modelsNamespace;
         }
 
-        public void SetUsingNamespace(string usingNamespace)
-        {
-            _usingNamespaces.Add(usingNamespace);
-        }
-
         public void SetHasCtor(string contentName)
         {
             _withCtor.Add(contentName);
@@ -153,36 +144,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 _implementedExtensions[typeName] = new List<string>();
 
             _implementedExtensions[typeName].Add(propertyName);
-        }
-
-        public void SetGeneratePropertyGetters(bool value)
-        {
-            GeneratePropertyGetters = value;
-        }
-
-        public void SetGenerateFallbackFuncExtensionMethods(bool value)
-        {
-            GenerateFallbackFuncExtensionMethods = value;
-        }
-
-        public void SetModelInfosClassName(string value)
-        {
-            ModelInfoClassName = string.IsNullOrWhiteSpace(value) ? "ModelInfos" : value;
-        }
-
-        public void SetModelInfosClassNamespace(string value)
-        {
-            _modelInfosClassNamespace = string.IsNullOrWhiteSpace(value) ? null : value;
-        }
-
-        public void SetTypeModelPrefix(string value)
-        {
-            TypeModelPrefix = string.IsNullOrWhiteSpace(value) ? string.Empty : value;
-        }
-
-        public void SetTypeModelSuffix(string value)
-        {
-            TypeModelSuffix = string.IsNullOrWhiteSpace(value) ? string.Empty : value;
         }
 
         #endregion
@@ -285,12 +246,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         public string ModelsNamespace { get; private set; }
 
-        public bool GeneratePropertyGetters { get; private set; }
-
-        public bool GenerateFallbackFuncExtensionMethods { get; private set; }
-
-        public IEnumerable<string> UsingNamespaces => _usingNamespaces;
-
         public bool HasCtor(string contentName)
         {
             return _withCtor.Contains(contentName);
@@ -300,18 +255,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         {
             return _implementedExtensions.TryGetValue(typeFullName, out var props) && props.Contains(propertyClrName);
         }
-
-        public bool HasModelInfoClassName => !string.IsNullOrWhiteSpace(ModelInfoClassName);
-
-        public string ModelInfoClassName { get; private set; }
-
-        public bool HasModelInfoClassNamespace => !string.IsNullOrWhiteSpace(ModelInfoClassNamespace);
-
-        public string ModelInfoClassNamespace { get; private set; }
-
-        public string TypeModelPrefix { get; private set; } = "";
-
-        public string TypeModelSuffix { get; private set; } = "";
 
         #endregion
     }

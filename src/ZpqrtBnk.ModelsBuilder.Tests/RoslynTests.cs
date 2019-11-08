@@ -15,7 +15,7 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
     public interface IRandom2 : IRandom1
     {}
 
-    class TestBuilder : Builder
+    class TestCodeModel : CodeModel
     { }
 
     [TestFixture]
@@ -177,7 +177,7 @@ namespace Foo
             const string code = @"
 using System.Collections.Generic;
 using ZpqrtBnk.ModelsBuilder.Building;
-class MyBuilder : ZpqrtBnk.ModelsBuilder.Tests.TestBuilder
+class MyBuilder : ZpqrtBnk.ModelsBuilder.Tests.TestCodeModel
 { }
 ";
 
@@ -225,7 +225,7 @@ class MyBuilder : ZpqrtBnk.ModelsBuilder.Tests.TestBuilder
             const string code = @"
 using System.Collections.Generic;
 using ZpqrtBnk.ModelsBuilder.Building;
-class MyBuilder : ZpqrtBnk.ModelsBuilder.Tests.TestBuilder
+class MyBuilder : ZpqrtBnk.ModelsBuilder.Tests.TestCodeModel
 { }
 ";
 

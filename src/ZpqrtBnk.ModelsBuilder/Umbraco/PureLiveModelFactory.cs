@@ -34,8 +34,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
         private readonly int _debugLevel;
         private BuildManager _theBuildManager;
         private readonly Lazy<UmbracoServices> _umbracoServices;
-        private readonly IBuilderFactory _builderFactory;
-        private readonly ICodeWriterFactory _writerFactory;
+        private readonly ICodeFactory _factory;
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
         private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
@@ -44,11 +43,10 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
         private readonly Config _config;
 
-        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, IBuilderFactory builderFactory, ICodeWriterFactory writerFactory, IProfilingLogger logger, Config config)
+        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, ICodeFactory factory, IProfilingLogger logger, Config config)
         {
             _umbracoServices = umbracoServices;
-            _builderFactory = builderFactory;
-            _writerFactory = writerFactory;
+            _factory = factory;
             _logger = logger;
             _config = config;
             _ver = 1; // zero is for when we had no version
@@ -344,10 +342,10 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
             // get models from Umbraco
             var model = new CodeModel
             {
-                TypeModels = UmbracoServices.GetAllTypes()
+                ContentTypeModels = UmbracoServices.GetAllTypes()
             };
 
-            var currentHash = HashHelper.Hash(ourFiles, model.TypeModels); // TODO: hash 'model' entirely
+            var currentHash = HashHelper.Hash(ourFiles, model.ContentTypeModels); // TODO: hash 'model' entirely
             var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
             var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
             var projFile = Path.Combine(modelsDirectory, "all.generated.cs");
@@ -569,9 +567,8 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                 File.Delete(file);
 
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
-            var builder = _builderFactory.CreateBuilder();
-            builder.Build(model, _config, parseResult, _config.ModelsNamespace);
-            var writer = _writerFactory.CreateWriter(model);
+            model.Apply(_config, parseResult, _config.ModelsNamespace);
+            var writer = _factory.CreateWriter(model);
 
             writer.WriteSingleFile(model);
 

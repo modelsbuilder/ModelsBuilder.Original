@@ -234,9 +234,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                         disco.SetRenamedContent(contentAliasToRename, contentRenamed, false);
                         break;
 
-                    case "ZpqrtBnk.ModelsBuilder.ModelsBaseClassAttribute":
-                        throw new NotSupportedException("The ModelsBaseClassAttribute is not supported anymore.");
-
                     case "ZpqrtBnk.ModelsBuilder.ContentModelsBaseClassAttribute":
                         var contentArgsCount = attrData.ConstructorArguments.Length;
                         var contentAliasPattern = contentArgsCount == 1 ? "*" : (string) attrData.ConstructorArguments[0].Value;
@@ -255,17 +252,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                         disco.SetModelsBaseClassName(false, elementAliasPattern, SymbolDisplay.ToDisplayString(elementModelsBaseClass));
                         break;
 
-                    // fixme obsolete but we keep it around for now
-                    case "ZpqrtBnk.ModelsBuilder.ModelsNamespaceAttribute":
-                        var modelsNamespace= (string) attrData.ConstructorArguments[0].Value;
-                        disco.SetModelsNamespace(modelsNamespace);
-                        break;
-
-                    case "ZpqrtBnk.ModelsBuilder.ModelsUsingAttribute":
-                        var usingNamespace = (string)attrData.ConstructorArguments[0].Value;
-                        disco.SetUsingNamespace(usingNamespace);
-                        break;
-
                     case "ZpqrtBnk.ModelsBuilder.ModelsBuilderConfigureAttribute":
                         foreach (var (argName, argValue) in attrData.NamedArguments)
                         {
@@ -273,24 +259,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                             {
                                 case nameof(ModelsBuilderConfigureAttribute.Namespace):
                                     disco.SetModelsNamespace((string) argValue.Value);
-                                    break;
-                                case nameof(ModelsBuilderConfigureAttribute.GeneratePropertyGetters):
-                                    disco.SetGeneratePropertyGetters((bool) argValue.Value);
-                                    break;
-                                case nameof(ModelsBuilderConfigureAttribute.GenerateFallbackFuncExtensionMethods):
-                                    disco.SetGenerateFallbackFuncExtensionMethods((bool) argValue.Value);
-                                    break;
-                                case nameof(ModelsBuilderConfigureAttribute.ModelInfosClassName):
-                                    disco.SetModelInfosClassName((string) argValue.Value);
-                                    break;
-                                case nameof(ModelsBuilderConfigureAttribute.ModelInfosClassNamespace):
-                                    disco.SetModelInfosClassNamespace((string) argValue.Value);
-                                    break;
-                                case nameof(ModelsBuilderConfigureAttribute.TypeModelPrefix):
-                                    disco.SetTypeModelPrefix((string) argValue.Value);
-                                    break;
-                                case nameof(ModelsBuilderConfigureAttribute.TypeModelSuffix):
-                                    disco.SetTypeModelSuffix((string) argValue.Value);
                                     break;
                             }
                         }

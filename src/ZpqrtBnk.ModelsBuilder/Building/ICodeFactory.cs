@@ -2,8 +2,10 @@
 
 namespace ZpqrtBnk.ModelsBuilder.Building
 {
-    public interface ICodeWriterFactory
+    public interface ICodeFactory
     {
+        CodeModel CreateModel();
+
         ICodeWriter CreateWriter(StringBuilder sb, CodeModel model);
     }
 }

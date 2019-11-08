@@ -30,16 +30,16 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
         {
             // Umbraco returns nice, pascal-cased names
 
-            var types = new List<TypeModel>();
+            var types = new List<ContentTypeModel>();
 
-            var type1 = new TypeModel
+            var type1 = new ContentTypeModel
             {
                 Id = 1,
                 Alias = "seoComposition",
                 ClrName = "SeoComposition",
                 ParentId = 0,
                 BaseType = null,
-                ItemType = TypeModel.ItemTypes.Content,
+                ItemType = ContentTypeModel.ItemTypes.Content,
 
                 IsMixin = true
             };
@@ -53,14 +53,14 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
                 ModelClrType = typeof(string)
             });
 
-            var type2 = new TypeModel
+            var type2 = new ContentTypeModel
             {
                 Id = 2,
                 Alias = "page",
                 ClrName = "Page",
                 ParentId = 0,
                 BaseType = null,
-                ItemType = TypeModel.ItemTypes.Content,
+                ItemType = ContentTypeModel.ItemTypes.Content,
 
                 MixinTypes = { type1 }
             };
@@ -97,8 +97,8 @@ namespace Umbraco.Web.PublishedModels
             };
 
             var parseResult = new CodeParser{ WriteDiagnostics = true }.Parse(code, refs);
-            var model = new CodeModel { TypeModels = types };
-            new Builder().Build(model, new Config(), parseResult, null);
+            var model = new CodeModel { ContentTypeModels = types };
+            model.Apply(new Config(), parseResult, null);
             var writer = new CodeWriter(model);
 
             foreach (var modelToGenerate in types)
@@ -114,16 +114,16 @@ namespace Umbraco.Web.PublishedModels
         {
             // Umbraco returns nice, pascal-cased names
 
-            var types = new List<TypeModel>();
+            var types = new List<ContentTypeModel>();
 
-            var type1 = new TypeModel
+            var type1 = new ContentTypeModel
             {
                 Id = 1,
                 Alias = "seoComposition",
                 ClrName = "SeoComposition",
                 ParentId = 0,
                 BaseType = null,
-                ItemType = TypeModel.ItemTypes.Content,
+                ItemType = ContentTypeModel.ItemTypes.Content,
 
                 IsMixin = true
             };
@@ -137,27 +137,27 @@ namespace Umbraco.Web.PublishedModels
                 ModelClrType = typeof(string)
             });
 
-            var type2 = new TypeModel
+            var type2 = new ContentTypeModel
             {
                 Id = 2,
                 Alias = "page",
                 ClrName = "Page",
                 ParentId = 0,
                 BaseType = null,
-                ItemType = TypeModel.ItemTypes.Content,
+                ItemType = ContentTypeModel.ItemTypes.Content,
 
                 MixinTypes = { type1 }
             };
             types.Add(type2);
 
-            var type3 = new TypeModel
+            var type3 = new ContentTypeModel
             {
                 Id = 3,
                 Alias = "other",
                 ClrName = "Other",
                 ParentId = 0,
                 BaseType = null,
-                ItemType = TypeModel.ItemTypes.Content,
+                ItemType = ContentTypeModel.ItemTypes.Content,
 
                 MixinTypes = { type1 }
             };
@@ -184,8 +184,8 @@ namespace Umbraco.Web.PublishedModels
             };
 
             var parseResult = new CodeParser { WriteDiagnostics = true }.Parse(code, refs);
-            var model = new CodeModel { TypeModels = types };
-            new Builder().Build(model, new Config(), parseResult, null);
+            var model = new CodeModel { ContentTypeModels = types };
+            model.Apply(new Config(), parseResult, null);
             var writer = new CodeWriter(model);
 
             foreach (var modelToGenerate in types)

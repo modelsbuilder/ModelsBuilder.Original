@@ -6,7 +6,7 @@
 
         string Code { get; }
 
-        void WriteModelFile(TypeModel model);
+        void WriteModelFile(ContentTypeModel model);
 
         void WriteModelInfosFile(CodeModel models);
 

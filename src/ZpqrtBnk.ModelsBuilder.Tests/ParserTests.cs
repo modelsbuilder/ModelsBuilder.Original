@@ -110,7 +110,7 @@ namespace Foo
             {
                 { "assembly", @"
 using ZpqrtBnk.ModelsBuilder;
-[assembly:ModelsBuilderConfigure(Namespace=""foo"", GeneratePropertyGetters=false)]
+[assembly:ModelsBuilderConfigure(Namespace=""foo"")]
 " }
             };
 
@@ -121,7 +121,7 @@ using ZpqrtBnk.ModelsBuilder;
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            Assert.IsFalse(parseResult.GeneratePropertyGetters);
+            Assert.AreEqual("foo", parseResult.ModelsNamespace);
         }
     }
 }

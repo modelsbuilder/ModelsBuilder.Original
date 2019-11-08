@@ -29,9 +29,9 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
         #region Services
 
-        public IList<TypeModel> GetAllTypes()
+        public IList<ContentTypeModel> GetAllTypes()
         {
-            var types = new List<TypeModel>();
+            var types = new List<ContentTypeModel>();
 
             types.AddRange(GetTypes(PublishedItemType.Content, _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray()));
             types.AddRange(GetTypes(PublishedItemType.Media, _mediaTypeService.GetAll().Cast<IContentTypeComposition>().ToArray()));
@@ -40,32 +40,32 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
             return EnsureDistinctAliases(types);
         }
 
-        public IList<TypeModel> GetContentTypes()
+        public IList<ContentTypeModel> GetContentTypes()
         {
             var contentTypes = _contentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
             return GetTypes(PublishedItemType.Content, contentTypes); // aliases have to be unique here
         }
 
-        public IList<TypeModel> GetMediaTypes()
+        public IList<ContentTypeModel> GetMediaTypes()
         {
             var contentTypes = _mediaTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
             return GetTypes(PublishedItemType.Media, contentTypes); // aliases have to be unique here
         }
 
-        public IList<TypeModel> GetMemberTypes()
+        public IList<ContentTypeModel> GetMemberTypes()
         {
             var memberTypes = _memberTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
             return GetTypes(PublishedItemType.Member, memberTypes); // aliases have to be unique here
         }
 
-        private IList<TypeModel> GetTypes(PublishedItemType itemType, IContentTypeComposition[] contentTypes)
+        private IList<ContentTypeModel> GetTypes(PublishedItemType itemType, IContentTypeComposition[] contentTypes)
         {
-            var typeModels = new List<TypeModel>();
+            var typeModels = new List<ContentTypeModel>();
 
             // get the types and the properties
             foreach (var contentType in contentTypes)
             {
-                var typeModel = new TypeModel
+                var typeModel = new ContentTypeModel
                 {
                     Id = contentType.Id,
                     Alias = contentType.Alias,
@@ -81,18 +81,18 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                 {
                     case PublishedItemType.Content:
                         typeModel.ItemType = publishedContentType.ItemType == PublishedItemType.Element
-                            ? TypeModel.ItemTypes.Element
-                            : TypeModel.ItemTypes.Content;
+                            ? ContentTypeModel.ItemTypes.Element
+                            : ContentTypeModel.ItemTypes.Content;
                         break;
                     case PublishedItemType.Media:
                         typeModel.ItemType = publishedContentType.ItemType == PublishedItemType.Element
-                            ? TypeModel.ItemTypes.Element
-                            : TypeModel.ItemTypes.Media;
+                            ? ContentTypeModel.ItemTypes.Element
+                            : ContentTypeModel.ItemTypes.Media;
                         break;
                     case PublishedItemType.Member:
                         typeModel.ItemType = publishedContentType.ItemType == PublishedItemType.Element
-                            ? TypeModel.ItemTypes.Element
-                            : TypeModel.ItemTypes.Member;
+                            ? ContentTypeModel.ItemTypes.Element
+                            : ContentTypeModel.ItemTypes.Member;
                         break;
                     default:
                         throw new InvalidOperationException(string.Format("Unsupported PublishedItemType \"{0}\".", itemType));
@@ -166,7 +166,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
             return typeModels;
         }
 
-        internal static IList<TypeModel> EnsureDistinctAliases(IList<TypeModel> typeModels)
+        internal static IList<ContentTypeModel> EnsureDistinctAliases(IList<ContentTypeModel> typeModels)
         {
             var groups = typeModels.GroupBy(x => x.Alias.ToLowerInvariant());
             foreach (var group in groups.Where(x => x.Count() > 1))

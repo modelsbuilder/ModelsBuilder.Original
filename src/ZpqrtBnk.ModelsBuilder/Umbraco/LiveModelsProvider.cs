@@ -14,8 +14,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
     public sealed class LiveModelsProvider // FIXME this should just be a component?
     {
         private static UmbracoServices _umbracoServices;
-        private static IBuilderFactory _builderFactory;
-        private static ICodeWriterFactory _writerFactory;
+        private static ICodeFactory _codeFactory;
         private static Config _config;
         private static Mutex _mutex;
         private static int _req;
@@ -23,15 +22,14 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
         // we do not manage pure live here
         internal static bool IsEnabled => _config.ModelsMode.IsLiveNotPure();
 
-        internal static void Install(UmbracoServices umbracoServices, IBuilderFactory builderFactory, ICodeWriterFactory writerFactory, Config config)
+        internal static void Install(UmbracoServices umbracoServices, ICodeFactory factory, Config config)
         {
             // just be sure
             if (!IsEnabled)
                 return;
 
             _umbracoServices = umbracoServices;
-            _builderFactory = builderFactory;
-            _writerFactory = writerFactory;
+            _codeFactory = factory;
             _config = config;
 
             // initialize mutex
@@ -107,7 +105,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                 throw new Exception("Panic: bin is null.");
 
             // EnableDllModels will recycle the app domain - but this request will end properly
-            var generator = new Generator(_umbracoServices, _builderFactory, _writerFactory, _config);
+            var generator = new Generator(_umbracoServices, _codeFactory, _config);
             generator.GenerateModels(modelsDirectory, _config.ModelsMode.IsAnyDll() ? bin : null, modelsNamespace);
         }
     }

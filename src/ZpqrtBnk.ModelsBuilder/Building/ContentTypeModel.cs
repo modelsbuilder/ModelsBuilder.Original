@@ -9,7 +9,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
     /// <summary>
     /// Represents a model.
     /// </summary>
-    public class TypeModel
+    public class ContentTypeModel
     {
         /// <summary>
         /// Gets the unique identifier of the corresponding content type.
@@ -56,7 +56,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         ///     <para>If the content type does not have a base content type, then returns <c>null</c>.</para>
         ///     <para>The current model inherits from its base model.</para>
         /// </remarks>
-        public TypeModel BaseType; // the parent type in Umbraco (type inherits its properties)
+        public ContentTypeModel BaseType; // the parent type in Umbraco (type inherits its properties)
 
         // FIXME explain
         public string BaseClassName;
@@ -72,19 +72,19 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// Gets the mixin models.
         /// </summary>
         /// <remarks>The current model implements mixins.</remarks>
-        public readonly List<TypeModel> MixinTypes = new List<TypeModel>();
+        public readonly List<ContentTypeModel> MixinTypes = new List<ContentTypeModel>();
 
         /// <summary>
         /// Gets the list of interfaces that this model needs to declare it implements.
         /// </summary>
         /// <remarks>Some of these interfaces may actually be implemented by a base model
         /// that this model inherits from.</remarks>
-        public readonly List<TypeModel> DeclaringInterfaces = new List<TypeModel>();
+        public readonly List<ContentTypeModel> DeclaringInterfaces = new List<ContentTypeModel>();
 
         /// <summary>
         /// Gets the list of interfaces that this model needs to actually implement.
         /// </summary>
-        public readonly List<TypeModel> ImplementingInterfaces = new List<TypeModel>();
+        public readonly List<ContentTypeModel> ImplementingInterfaces = new List<ContentTypeModel>();
 
         /// <summary>
         /// Gets the list of mixin properties that should be ignored because this model implements them directly.
@@ -186,7 +186,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <param name="types">The collection.</param>
         /// <param name="type">The type.</param>
         /// <remarks>Includes the specified type.</remarks>
-        internal static void CollectImplems(ICollection<TypeModel> types, TypeModel type)
+        internal static void CollectImplems(ICollection<ContentTypeModel> types, ContentTypeModel type)
         {
             if (!type.IsContentIgnored && types.Contains(type) == false)
                 types.Add(type);
@@ -202,7 +202,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <param name="andSelf">Indicates whether the enumeration should start with the current model
         /// or from its base model.</param>
         /// <returns>The base models.</returns>
-        public IEnumerable<TypeModel> EnumerateBaseTypes(bool andSelf = false)
+        public IEnumerable<ContentTypeModel> EnumerateBaseTypes(bool andSelf = false)
         {
             var typeModel = andSelf ? this : BaseType;
             while (typeModel != null)
@@ -215,7 +215,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <summary>
         /// Maps ModelType.
         /// </summary>
-        public static void MapModelTypes(IList<TypeModel> typeModels, string ns)
+        public static void MapModelTypes(IList<ContentTypeModel> typeModels, string ns)
         {
             var hasNs = !string.IsNullOrWhiteSpace(ns);
             var map = typeModels.ToDictionary(x => x.Alias, x => hasNs ? (ns + "." + x.ClrName) : x.ClrName);

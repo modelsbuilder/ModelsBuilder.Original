@@ -17,8 +17,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
             composition.Register<UmbracoServices>(Lifetime.Singleton);
 
-            composition.Register<IBuilderFactory, BuilderFactory>(Lifetime.Singleton);
-            composition.Register<ICodeWriterFactory, CodeWriterFactory>(Lifetime.Singleton);
+            composition.Register<ICodeFactory, CodeFactory>(Lifetime.Singleton);
 
             composition.Configs.Add(() => new Config());
 

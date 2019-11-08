@@ -6,7 +6,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 {
     class HashHelper
     {
-        public static string Hash(IDictionary<string, string> ourFiles, IEnumerable<TypeModel> typeModels)
+        public static string Hash(IDictionary<string, string> ourFiles, IEnumerable<ContentTypeModel> typeModels)
         {
             var hash = new HashCombiner();
 

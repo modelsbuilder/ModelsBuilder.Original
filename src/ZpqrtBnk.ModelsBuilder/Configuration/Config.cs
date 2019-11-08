@@ -31,7 +31,6 @@ namespace ZpqrtBnk.ModelsBuilder.Configuration
 
         internal const LanguageVersion DefaultLanguageVersion = LanguageVersion.CSharp7_3;
         internal const string DefaultModelsNamespace = "Umbraco.Web.PublishedModels";
-        internal const ClrNameSource DefaultClrNameSource = ClrNameSource.Alias; // for legacy reasons
         internal const string DefaultModelsDirectory = "~/App_Data/Models";
 
         /// <summary>
@@ -61,7 +60,6 @@ namespace ZpqrtBnk.ModelsBuilder.Configuration
             // others
             DebugLevel = GetSetting("DebugLevel", DefaultDebugLevel);
             LanguageVersion = GetSetting("LanguageVersion", DefaultLanguageVersion);
-            ClrNameSource = GetSetting("ClrNameSource", DefaultClrNameSource);
 
             // directory
             var directory = GetSetting("ModelsDirectory", "");
@@ -100,7 +98,6 @@ namespace ZpqrtBnk.ModelsBuilder.Configuration
             bool enableFactory = DefaultEnableFactory,
             LanguageVersion languageVersion = DefaultLanguageVersion,
             bool flagOutOfDateModels = DefaultFlagOutOfDateModels,
-            ClrNameSource clrNameSource = DefaultClrNameSource,
             string modelsDirectory = DefaultModelsDirectory,
             bool acceptUnsafeModelsDirectory = DefaultAcceptUnsafeModelsDirectory,
             int debugLevel = DefaultDebugLevel)
@@ -114,7 +111,6 @@ namespace ZpqrtBnk.ModelsBuilder.Configuration
             EnableFactory = enableFactory;
             LanguageVersion = languageVersion;
             FlagOutOfDateModels = flagOutOfDateModels;
-            ClrNameSource = clrNameSource;
             ModelsDirectory = modelsDirectory;
             AcceptUnsafeModelsDirectory = acceptUnsafeModelsDirectory;
             DebugLevel = debugLevel;
@@ -312,11 +308,6 @@ namespace ZpqrtBnk.ModelsBuilder.Configuration
         /// setting is activated the ~/App_Data/Models/ood.txt file is then created. When models are
         /// generated through the dashboard, the files is cleared. Default value is <c>false</c>.</remarks>
         public bool FlagOutOfDateModels { get; }
-
-        /// <summary>
-        /// Gets the CLR name source.
-        /// </summary>
-        public ClrNameSource ClrNameSource { get; }
 
         /// <summary>
         /// Gets the models directory.

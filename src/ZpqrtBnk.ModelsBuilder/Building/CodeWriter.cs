@@ -46,7 +46,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteIndentLine("[GeneratedCodeAttribute(Name, VersionString)]");
         }
 
-        public virtual void WritePropertyTypeAliasConstant(TypeModel typeModel, PropertyModel propertyModel)
+        public virtual void WritePropertyTypeAliasConstant(ContentTypeModel typeModel, PropertyModel propertyModel)
         {
             Write(CodeModel.ModelInfosClassName);
             Write(".ContentTypes.");
@@ -56,7 +56,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             Write(".Alias");
         }
 
-        public virtual void WriteContentTypeAliasConstant(TypeModel typeModel)
+        public virtual void WriteContentTypeAliasConstant(ContentTypeModel typeModel)
         {
             Write(CodeModel.ModelInfosClassName);
             Write(".ContentTypes.");
@@ -98,7 +98,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// Write a single content type model in a file.
         /// </summary>
         /// <param name="model"></param>
-        public virtual void WriteModelFile(TypeModel model)
+        public virtual void WriteModelFile(ContentTypeModel model)
         {
             WriteHeader();
             WriteLine();
@@ -137,7 +137,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteLine();
 
             WriteBlockStart($"namespace {CodeModel.ModelsNamespace}");
-            WriteContentTypeModels(models.TypeModels);
+            WriteContentTypeModels(models.ContentTypeModels);
             WriteBlockEnd();
 
             WriteLine();
@@ -171,7 +171,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         #region Write ContentType Models
 
-        public virtual void WriteContentTypeModels(IEnumerable<TypeModel> models)
+        public virtual void WriteContentTypeModels(IEnumerable<ContentTypeModel> models)
         {
             var first = true;
             foreach (var typeModel in models)
@@ -184,7 +184,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <summary>
         /// Appends a complete content type model.
         /// </summary>
-        public virtual void WriteContentTypeModel(TypeModel type)
+        public virtual void WriteContentTypeModel(ContentTypeModel type)
         {
             if (type.IsMixin)
             {
@@ -201,7 +201,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// Appends the interface declaration.
         /// </summary>
         /// <remarks>Appends the properties with <see cref="WriteInterfaceProperties"/>.</remarks>
-        protected virtual void WriteInterfaceDeclaration(TypeModel model)
+        protected virtual void WriteInterfaceDeclaration(ContentTypeModel model)
         {
             // write the interface declaration
             WriteIndentLine($"// Mixin Content Type with alias \"{model.Alias}\"");
@@ -237,7 +237,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// Appends the interface properties.
         /// </summary>
         /// <remarks>Appends each property with <see cref="WriteInterfaceProperty"/>.</remarks>
-        protected virtual void WriteInterfaceProperties(TypeModel model)
+        protected virtual void WriteInterfaceProperties(ContentTypeModel model)
         {
             // write the properties - only the local (non-ignored) ones, we're an interface
             var firstProperty = true;
@@ -273,7 +273,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// </summary>
         /// <remarks>Appends the constructor with <see cref="WriteClassConstructor"/>, and the properties
         /// with <see cref="WriteClassProperties"/>.</remarks>
-        protected virtual void WriteClassDeclaration(TypeModel model)
+        protected virtual void WriteClassDeclaration(ContentTypeModel model)
         {
             // append comments
             if (model.IsRenamed)
@@ -344,7 +344,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <summary>
         /// Appends the class constructor.
         /// </summary>
-        protected virtual void WriteClassConstructor(TypeModel model)
+        protected virtual void WriteClassConstructor(ContentTypeModel model)
         {
             WriteIndentLine($"public {model.ClrName}(IPublished{(model.IsElement ? "Element" : "Content")} content)");
             Indent();
@@ -357,7 +357,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// Appends the class properties.
         /// </summary>
         /// <remarks>Appends each property with <see cref="WriteClassProperty"/>.</remarks>
-        protected virtual void WriteClassProperties(TypeModel model)
+        protected virtual void WriteClassProperties(ContentTypeModel model)
         {
             // write the properties
             var first = true;
@@ -385,7 +385,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <summary>
         /// Appends a class property.
         /// </summary>
-        protected virtual void WriteClassProperty(TypeModel typeModel, PropertyModel propertyModel)
+        protected virtual void WriteClassProperty(ContentTypeModel typeModel, PropertyModel propertyModel)
         {
             if (propertyModel.Errors != null)
                 WritePropertyErrorsStart(propertyModel.Errors);
@@ -421,7 +421,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// Appends the extension methods.
         /// </summary>
         /// <remarks>Appends each property's methods with <see cref="WritePropertyExtensionMethods"/>.</remarks>
-        protected virtual void WriteExtensionsClass(TypeModel model)
+        protected virtual void WriteExtensionsClass(ContentTypeModel model)
         {
             // write extension methods for properties
             var extensionProperties = model.Properties.Where(x => !x.IsIgnored && !x.IsExtensionImplemented).ToList();
@@ -445,7 +445,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <summary>
         /// Appends the extension methods for a property.
         /// </summary>
-        protected virtual void WritePropertyExtensionMethods(TypeModel typeModel, PropertyModel propertyModel)
+        protected virtual void WritePropertyExtensionMethods(ContentTypeModel typeModel, PropertyModel propertyModel)
         {
             // append the extension method that mimics .Value(...)
             WriteStandardExtensionMethod(typeModel, propertyModel);
@@ -460,7 +460,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <summary>
         /// Appends the standard extension method.
         /// </summary>
-        protected virtual void WriteStandardExtensionMethod(TypeModel typeModel, PropertyModel propertyModel)
+        protected virtual void WriteStandardExtensionMethod(ContentTypeModel typeModel, PropertyModel propertyModel)
         {
             if (propertyModel.Errors != null) return;
 
@@ -517,7 +517,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <summary>
         /// Appends the fallback-function extension method.
         /// </summary>
-        protected virtual void WriteFallbackFuncExtensionMethod(TypeModel typeModel, PropertyModel propertyModel)
+        protected virtual void WriteFallbackFuncExtensionMethod(ContentTypeModel typeModel, PropertyModel propertyModel)
         {
             if (propertyModel.Errors != null) return;
 
@@ -639,10 +639,10 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteIndentLine($"public const string VersionString = \"{ApiVersion.Current.Version}\";");
             WriteLine();
 
-            WriteContentTypesInfos(models.TypeModels);
+            WriteContentTypesInfos(models.ContentTypeModels);
         }
 
-        protected virtual void WriteContentTypesInfos(IEnumerable<TypeModel> models)
+        protected virtual void WriteContentTypesInfos(IEnumerable<ContentTypeModel> models)
         {
             WriteContentTypesInfosClass(models);
             WriteLine();
@@ -670,7 +670,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteContentTypesInfosCollection(models);
         }
 
-        protected virtual void WriteContentTypesInfosClass(IEnumerable<TypeModel> models)
+        protected virtual void WriteContentTypesInfosClass(IEnumerable<ContentTypeModel> models)
         {
             WriteIndentLine("/// <summary>Provides information about content type models.</summary>");
             WriteBlockStart("public static class ContentTypes");
@@ -678,7 +678,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteBlockEnd();
         }
 
-        protected virtual void WriteContentTypesInfosClassBody(IEnumerable<TypeModel> models)
+        protected virtual void WriteContentTypesInfosClassBody(IEnumerable<ContentTypeModel> models)
         {
             var first = true;
             foreach (var model in models)
@@ -688,7 +688,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             }
         }
 
-        protected virtual void WriteContentTypesInfosCollection(IEnumerable<TypeModel> models)
+        protected virtual void WriteContentTypesInfosCollection(IEnumerable<ContentTypeModel> models)
         {
             WriteLocalGeneratedCodeAttribute();
             WriteBlockStart("private static readonly ContentTypeModelInfo[] _contentTypeInfos = ");
@@ -725,7 +725,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteIndentLine("};"); // beware of the ';'
         }
 
-        protected virtual void WriteContentTypeInfosClass(TypeModel model)
+        protected virtual void WriteContentTypeInfosClass(ContentTypeModel model)
         {
             WriteIndentLine($"/// <summary>Provides information about the {model.ClrName} content type.</summary>");
             WriteBlockStart($"public static class {model.ClrName}");
@@ -733,7 +733,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteBlockEnd();
         }
 
-        protected virtual void WriteContentTypeInfosClassBody(TypeModel model)
+        protected virtual void WriteContentTypeInfosClassBody(ContentTypeModel model)
         {
             WriteIndentLine($"public const PublishedItemType ItemType = PublishedItemType.{model.ItemType.ToPublishedItemType()};");
             WriteLine();
@@ -747,7 +747,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WritePropertyTypesInfosClass(model);
         }
 
-        protected virtual void WritePropertyTypesInfosClass(TypeModel model)
+        protected virtual void WritePropertyTypesInfosClass(ContentTypeModel model)
         {
             WriteIndentLine($"/// <summary>Provides information about the properties of the {model.ClrName} content type.</summary>");
             WriteBlockStart("public static class Properties");
@@ -755,7 +755,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteBlockEnd();
         }
 
-        protected virtual void WritePropertyTypesInfosClassBody(TypeModel model)
+        protected virtual void WritePropertyTypesInfosClassBody(ContentTypeModel model)
         {
             var first = true;
             foreach (var propertyModel in model.Properties) // FIXME exclude some?

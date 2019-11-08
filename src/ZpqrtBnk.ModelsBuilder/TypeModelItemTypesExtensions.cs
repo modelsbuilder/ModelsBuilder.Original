@@ -5,17 +5,17 @@ namespace ZpqrtBnk.ModelsBuilder
 {
     public static class TypeModelItemTypesExtensions
     {
-        public static PublishedItemType ToPublishedItemType(this TypeModel.ItemTypes itemType)
+        public static PublishedItemType ToPublishedItemType(this ContentTypeModel.ItemTypes itemType)
         {
             switch (itemType)
             {
-                case TypeModel.ItemTypes.Content:
+                case ContentTypeModel.ItemTypes.Content:
                     return PublishedItemType.Content;
-                case TypeModel.ItemTypes.Element:
+                case ContentTypeModel.ItemTypes.Element:
                     return PublishedItemType.Element;
-                case TypeModel.ItemTypes.Media:
+                case ContentTypeModel.ItemTypes.Media:
                     return PublishedItemType.Media;
-                case TypeModel.ItemTypes.Member:
+                case ContentTypeModel.ItemTypes.Member:
                     return PublishedItemType.Member;
                 default:
                     return PublishedItemType.Unknown;

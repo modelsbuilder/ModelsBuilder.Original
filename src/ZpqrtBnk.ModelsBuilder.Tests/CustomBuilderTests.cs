@@ -32,13 +32,13 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
         [Test]
         public void CustomNames()
         {
-            var type1 = new TypeModel
+            var type1 = new ContentTypeModel
             {
                 Id = 1,
                 Alias = "type1",
                 ParentId = 0,
                 BaseType = null,
-                ItemType = TypeModel.ItemTypes.Content,
+                ItemType = ContentTypeModel.ItemTypes.Content,
             };
             type1.Properties.Add(new PropertyModel
             {
@@ -46,7 +46,7 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
                 ModelClrType = typeof(string),
             });
 
-            var types = new List<TypeModel> { type1 };
+            var types = new List<ContentTypeModel> { type1 };
 
             var code = new Dictionary<string, string>
             {
@@ -62,10 +62,8 @@ using ZpqrtBnk.ModelsBuilder;
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            parseResult.SetGeneratePropertyGetters(true); // preserve legacy
-
-            var model = new CodeModel { TypeModels = types };
-            new CustomNamesBuilder().Build(model, _config, parseResult, null);
+            var model = new CustomNamesCodeModel { ContentTypeModels = types, GeneratePropertyGetters = true }; // preserve
+            model.Apply(_config, parseResult, null);
             var writer = new CodeWriter(model);
             writer.WriteModelFile(types.First());
             var gen = writer.Code;
@@ -122,11 +120,78 @@ namespace Umbraco.Web.PublishedModels
             Assert.AreEqual(expected.ClearLf(), gen);
         }
 
-        private class CustomNamesBuilder : Builder
+        private class CustomNamesCodeModel : CodeModel
         {
-            public override string GetClrName(TypeModel typeModel, ParseResult parseResult, Config config)
+            public override string GetClrName(ContentTypeModel typeModel)
             {
-                return base.GetClrName(typeModel, parseResult, config) + "Custom";
+                return base.GetClrName(typeModel) + "Custom";
+            }
+        }
+
+        // demo
+        // all config can be achieved in the model
+        //
+        private class ConfiguringCodeModel : CodeModel
+        {
+            public override void Apply(Config config, ParseResult parseResult, string modelsNamespace)
+            {
+                // replaces config
+                ClrNameSource = ClrNameSource.RawAlias;
+
+                // replaces [IgnoreContentTypeAttribute]
+                parseResult.SetIgnoredContent("contentAlias");
+
+                // replaces [RenameContentTypeAttribute]
+                parseResult.SetRenamedContent("contentAlias", "contentName", false); // FIXME withImplement?
+
+                // replaces [IgnorePropertyTypeAttribute] - though it was convenient?
+                parseResult.SetIgnoredProperty("", "propertyAlias"); // FIXME content name?
+
+                // replaces [RenamePropertyTypeAttribute] - though it was convenient?
+                parseResult.SetRenamedProperty("", "propertyAlias", "propertyName"); // FIXME content name?
+
+                // replaces [ContentModelsBaseClassAttribute]
+                parseResult.SetModelsBaseClassName(true, "pattern", "baseName");
+
+                // replaces [ElementModelsBaseClassAttribute]
+                parseResult.SetModelsBaseClassName(false, "pattern", "baseName");
+
+                // original apply
+                base.Apply(config, parseResult, modelsNamespace);
+
+                // replaces [ModelsBuilderConfigureAttribute]
+                ModelInfosClassName = "MB";
+                ModelInfosClassNamespace = "Models";
+                GeneratePropertyGetters = true;
+                GenerateFallbackFuncExtensionMethods = true;
+            }
+
+            // replaces [ModelsUsingAttribute]
+            protected override ISet<string> GetUsing()
+            {
+                var usings = base.GetUsing();
+                usings.Add("My.Project");
+                return usings;
+            }
+
+            public override string GetClrName(ContentTypeModel typeModel)
+            {
+                const string typeModelPrefix = "";
+                const string typeModelSuffix = "";
+
+                // replaces [ModelsBuilderConfigureAttribute]
+
+                return typeModelPrefix + base.GetClrName(typeModel) + typeModelSuffix;
+            }
+
+            public override string GetClrName(PropertyModel propertyModel)
+            {
+                const string propertyModelPrefix = "";
+                const string propertyModelSuffix = "";
+
+                // was not possible with [ModelsBuilderConfigureAttribute]
+
+                return propertyModelPrefix + base.GetClrName(propertyModel) + propertyModelSuffix;
             }
         }
     }

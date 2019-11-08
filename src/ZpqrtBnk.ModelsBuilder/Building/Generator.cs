@@ -10,15 +10,13 @@ namespace ZpqrtBnk.ModelsBuilder.Building
     public class Generator
     {
         private readonly UmbracoServices _umbracoServices;
-        private readonly IBuilderFactory _builderFactory;
-        private readonly ICodeWriterFactory _writerFactory;
+        private readonly ICodeFactory _factory;
         private readonly Config _config;
 
-        public Generator(UmbracoServices umbracoServices, IBuilderFactory builderFactory, ICodeWriterFactory writerFactory, Config config)
+        public Generator(UmbracoServices umbracoServices, ICodeFactory factory, Config config)
         {
             _umbracoServices = umbracoServices;
-            _builderFactory = builderFactory;
-            _writerFactory = writerFactory;
+            _factory = factory;
             _config = config;
         }
 
@@ -32,22 +30,21 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 File.Delete(file);
 
             // get models from Umbraco
-            var model = new CodeModel
-            {
-                TypeModels = _umbracoServices.GetAllTypes()
-            };
+            var model = _factory.CreateModel();
+            model.ContentTypeModels = _umbracoServices.GetAllTypes();
 
             // get our (non-generated) files and parse them
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
             
-            // create a builder, build a context, create a writer
-            var builder = _builderFactory.CreateBuilder();
-            builder.Build(model, _config, parseResult, modelsNamespace);
-            var writer = _writerFactory.CreateWriter(model);
+            // apply to model
+            model.Apply(_config, parseResult, modelsNamespace);
+
+            // create a writer
+            var writer = _factory.CreateWriter(model);
 
             // write each model file
-            foreach (var typeModel in model.TypeModels)
+            foreach (var typeModel in model.ContentTypeModels)
             {
                 writer.Reset();
                 writer.WriteModelFile(typeModel);
@@ -87,35 +84,34 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         public Dictionary<string, string> GetModels(string modelsNamespace, IDictionary<string, string> files)
         {
             // get models from Umbraco
-            var model = new CodeModel
-            {
-                TypeModels = _umbracoServices.GetAllTypes()
-            };
+            var model = _factory.CreateModel();
+            model.ContentTypeModels = _umbracoServices.GetAllTypes();
 
             // parse the (non-generated) files
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(files);
 
-            // create a builder, build a context, create a writer
-            var builder = _builderFactory.CreateBuilder();
-            builder.Build(model, _config, parseResult, modelsNamespace);
-            var writer = _writerFactory.CreateWriter(model);
+            // apply to model
+            model.Apply(_config, parseResult, modelsNamespace);
+
+            // create a writer
+            var writer = _factory.CreateWriter(model);
             var generated = new Dictionary<string, string>();
 
             // write each model file
-            foreach (var typeModel in model.TypeModels)
+            foreach (var typeModel in model.ContentTypeModels)
             {
                 writer.Reset();
                 writer.WriteModelFile(typeModel);
                 generated[typeModel.ClrName] = writer.Code;
             }
 
-            if (generated.ContainsKey(parseResult.ModelInfoClassName))
-                throw new InvalidOperationException($"Collision, cannot use {parseResult.ModelInfoClassName} for both a content type and the infos class.");
+            if (generated.ContainsKey(model.ModelInfosClassName))
+                throw new InvalidOperationException($"Collision, cannot use {model.ModelInfosClassName} for both a content type and the infos class.");
 
             // write the info files
             writer.Reset();
             writer.WriteModelInfosFile(model);
-            generated[parseResult.ModelInfoClassName] = writer.Code;
+            generated[model.ModelInfosClassName] = writer.Code;
 
             return generated;
         }
