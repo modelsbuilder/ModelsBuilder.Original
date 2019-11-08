@@ -61,9 +61,7 @@
     <Compile Include="Building\TextHeaderWriter.cs" />
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Configuration\ClrNameSource.cs" />
-    <Compile Include="ContentModelsBaseClassAttribute.cs" />
     <Compile Include="ContentTypeModelInfo.cs" />
-    <Compile Include="ElementModelsBaseClassAttribute.cs" />
     <Compile Include="ModelsBuilderConfigureAttribute.cs" />
     <Compile Include="ModelsBuilderAssemblyAttribute.cs" />
     <Compile Include="PropertyTypeModelInfo.cs" />
@@ -79,14 +77,12 @@
     <Compile Include="ConfigsExtensions.cs" />
     <Compile Include="ImplementPropertyTypeAttribute.cs" />
     <Compile Include="ImplementContentTypeAttribute.cs" />
-    <Compile Include="RenameContentTypeAttribute.cs" />
-    <Compile Include="Building\ParseResult.cs" />
+    <Compile Include="Building\ContentModelTransform.cs" />
     <Compile Include="RenamePropertyTypeAttribute.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Building\PropertyModel.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Building\ContentTypeModel.cs" />
-    <Compile Include="IgnoreContentTypeAttribute.cs" />
     <Compile Include="IgnorePropertyTypeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TypeModelItemTypesExtensions.cs" />

@@ -7,7 +7,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
     /// <summary>
     /// Contains the result of a code parsing.
     /// </summary>
-    public class ParseResult
+    public class ContentModelTransform
     {
         // "alias" is the umbraco alias
         // content "name" is the complete name eg Foo.Bar.Name
@@ -37,34 +37,14 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         private readonly Dictionary<string, List<string>> _implementedExtensions
             = new Dictionary<string, List<string>>();
-        private readonly List<ModelsBaseClassInfo> _modelsBaseClassNames
-             = new List<ModelsBaseClassInfo>();
 
-        public static readonly ParseResult Empty = new ParseResult();
-
-        private class ModelsBaseClassInfo
-        {
-            public ModelsBaseClassInfo(bool isContent, string aliasPattern, string baseClassName)
-            {
-                IsContent = isContent;
-                AliasPattern = aliasPattern;
-                BaseClassName = baseClassName;
-            }
-
-            public bool IsElement => !IsContent;
-
-            public bool IsContent { get; }
-
-            public string AliasPattern { get; }
-
-            public string BaseClassName { get; }
-        }
+        public static readonly ContentModelTransform Empty = new ContentModelTransform();
 
         #region Declare
 
         // content with that alias should not be generated
         // alias can end with a * (wildcard)
-        public void SetIgnoredContent(string contentAlias /*, bool ignoreContent, bool ignoreMixin, bool ignoreMixinProperties*/)
+        public void IgnoreContentType(string contentAlias /*, bool ignoreContent, bool ignoreMixin, bool ignoreMixinProperties*/)
         {
             //if (ignoreContent)
                 _ignoredContent.Add(contentAlias);
@@ -75,7 +55,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         }
 
         // content with that alias should be generated with a different name
-        public void SetRenamedContent(string contentAlias, string contentName, bool withImplement)
+        public void RenameContentType(string contentAlias, string contentName, bool withImplement)
         {
             _renamedContent[contentAlias] = contentName;
             if (withImplement)
@@ -116,11 +96,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         public void SetContentInterfaces(string contentName, IEnumerable<string> interfaceNames)
         {
             _contentInterfaces[contentName] = interfaceNames.ToArray();
-        }
-
-        public void SetModelsBaseClassName(bool isContent, string aliasPattern, string baseClassName)
-        {
-            _modelsBaseClassNames.Add(new ModelsBaseClassInfo(isContent, aliasPattern, baseClassName));
         }
 
         public void SetModelsNamespace(string modelsNamespace)
@@ -224,22 +199,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                     .Select(interfaceName => PropertyClrName(interfaceName, propertyAlias))
                     .FirstOrDefault(x => x != null))) return name;
             return null;
-        }
-
-        public string GetModelBaseClassName(bool isContent, string alias)
-        {
-            bool Match(string pattern, string s)
-            {
-                if (pattern == "*") return true;
-                if (pattern.StartsWith("*")) return s.EndsWith(pattern.Substring(1));
-                if (pattern.EndsWith("*")) return s.StartsWith(pattern.Substring(0, pattern.Length - 1));
-                return pattern == s;
-            }
-
-            var infos = _modelsBaseClassNames.Where(x => x.IsContent == isContent);
-            infos = infos.OrderByDescending(x => x.AliasPattern); // longest first... so at least '*' triggers last
-            var info = infos.FirstOrDefault(x => Match(x.AliasPattern, alias));
-            return info?.BaseClassName;
         }
 
         public bool HasModelsNamespace => !string.IsNullOrWhiteSpace(ModelsNamespace);

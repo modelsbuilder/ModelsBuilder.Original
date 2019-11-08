@@ -10,6 +10,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
     public class PropertyModel
     {
         /// <summary>
+        /// Gets the content type model.
+        /// </summary>
+        public ContentTypeModel ContentType;
+
+        /// <summary>
         /// Gets the alias of the property.
         /// </summary>
         public string Alias;

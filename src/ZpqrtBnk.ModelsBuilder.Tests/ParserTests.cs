@@ -47,7 +47,7 @@ namespace Foo
             {
                 Current.Configs.Add(() => new Config(languageVersion: LanguageVersion.CSharp5));
 
-                var parseResult1 = new CodeParser().Parse(code, refs);
+                var transform1 = new CodeParser().Parse(code, refs);
                 Assert.Fail("Expected CompilerException.");
             }
             catch (CompilerException e)
@@ -58,7 +58,7 @@ namespace Foo
 
             Current.Configs.Add(() => new Config(languageVersion: LanguageVersion.CSharp6));
 
-            var parseResult2 = new CodeParser().Parse(code, refs);
+            var transform2 = new CodeParser().Parse(code, refs);
         }
 
         [Test]
@@ -89,7 +89,7 @@ namespace Foo
             {
                 Current.Configs.Add(() => new Config(languageVersion: LanguageVersion.CSharp6));
 
-                var parseResult1 = new CodeParser().Parse(code, refs);
+                var transform1 = new CodeParser().Parse(code, refs);
                 Assert.Fail("Expected CompilerException.");
             }
             catch (CompilerException e)
@@ -100,7 +100,7 @@ namespace Foo
 
             Current.Configs.Add(() => new Config(languageVersion: LanguageVersion.CSharp7));
 
-            var parseResult2 = new CodeParser().Parse(code, refs);
+            var transform2 = new CodeParser().Parse(code, refs);
         }
 
         [Test]
@@ -120,8 +120,8 @@ using ZpqrtBnk.ModelsBuilder;
                 MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
             };
 
-            var parseResult = new CodeParser().Parse(code, refs);
-            Assert.AreEqual("foo", parseResult.ModelsNamespace);
+            var transform = new CodeParser().Parse(code, refs);
+            Assert.AreEqual("foo", transform.ModelsNamespace);
         }
     }
 }

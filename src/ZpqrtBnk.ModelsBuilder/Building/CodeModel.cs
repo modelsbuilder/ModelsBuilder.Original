@@ -115,15 +115,15 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         internal string ModelsNamespaceForTests;
 
-        protected virtual string GetModelsNamespace(Config config, ParseResult parseResult, string modelsNamespace)
+        protected virtual string GetModelsNamespace(Config config, ContentModelTransform transform, string modelsNamespace)
         {
             // test namespace overrides everything
             if (ModelsNamespaceForTests != null)
                 return ModelsNamespaceForTests;
 
             // code attribute overrides everything
-            if (parseResult.HasModelsNamespace)
-                return parseResult.ModelsNamespace;
+            if (transform.HasModelsNamespace)
+                return transform.ModelsNamespace;
 
             // if builder was initialized with a namespace, use that one
             if (!string.IsNullOrWhiteSpace(modelsNamespace))
@@ -153,8 +153,8 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <summary>
         /// Gets the Clr name for a type model.
         /// </summary>
-        public virtual string GetClrName(ContentTypeModel typeModel)
-            => GetClrName(typeModel.Name, typeModel.Alias);
+        public virtual string GetClrName(ContentTypeModel contentTypeModel)
+            => GetClrName(contentTypeModel.Name, contentTypeModel.Alias);
 
         /// <summary>
         /// Gets the Clr name for a property model.
@@ -201,23 +201,31 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             }
         }
 
+        /// <summary>
+        /// Gets the Clr name for the base class of a type model.
+        /// </summary>
+        public virtual string GetBaseClrName(ContentTypeModel contentTypeModel)
+        {
+            return contentTypeModel.IsElement ? "PublishedElementModel" : "PublishedContentModel";
+        }
+
         #endregion
 
-        #region Apply Configuration, ParseResult...
+        #region Apply Configuration, ContentModelTransform...
 
         /// <summary>
         /// Applies configuration and parse result to the model.
         /// </summary>
         /// <param name="config">The configuration.</param>
-        /// <param name="parseResult">The parse result.</param>
+        /// <param name="transform">The transform.</param>
         /// <param name="modelsNamespace">The models namespace.</param>
-        public virtual void Apply(Config config, ParseResult parseResult, string modelsNamespace)
+        public virtual void Apply(Config config, ContentModelTransform transform, string modelsNamespace)
         {
-            ModelsNamespace = GetModelsNamespace(config, parseResult, modelsNamespace);
+            ModelsNamespace = GetModelsNamespace(config, transform, modelsNamespace);
             Using = GetUsing();
 
             // apply the parse result to type models and context
-            ApplyToContentTypeModels(parseResult, config);
+            ApplyToContentTypeModels(transform, config);
 
             // filter types,
             // remove ignored types, remove ignored properties
@@ -230,8 +238,8 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// Applies configuration and parse result to the content type models.
         /// </summary>
         /// <param name="config">The configuration.</param>
-        /// <param name="parseResult">The parse result.</param>
-        public virtual void ApplyToContentTypeModels(ParseResult parseResult, Config config)
+        /// <param name="transform">The transform.</param>
+        public virtual void ApplyToContentTypeModels(ContentModelTransform transform, Config config)
         {
             var typeModels = ContentTypeModels;
             var pureLive = config.ModelsMode == ModelsMode.PureLive;
@@ -260,27 +268,27 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             // mark IsContentIgnored models that we discovered should be ignored
             // then propagate / ignore children of ignored contents
             // ignore content = don't generate a class for it, don't generate children
-            foreach (var typeModel in typeModels.Where(x => parseResult.IsIgnored(x.Alias)))
+            foreach (var typeModel in typeModels.Where(x => transform.IsIgnored(x.Alias)))
                 typeModel.IsContentIgnored = true;
             foreach (var typeModel in typeModels.Where(x => !x.IsContentIgnored && x.EnumerateBaseTypes().Any(xx => xx.IsContentIgnored)))
                 typeModel.IsContentIgnored = true;
 
             // handle model renames
-            foreach (var typeModel in typeModels.Where(x => parseResult.IsContentRenamed(x.Alias)))
+            foreach (var typeModel in typeModels.Where(x => transform.IsContentRenamed(x.Alias)))
             {
-                typeModel.ClrName = parseResult.ContentClrName(typeModel.Alias);
+                typeModel.ClrName = transform.ContentClrName(typeModel.Alias);
                 typeModel.IsRenamed = true;
                 ModelsMap[typeModel.Alias] = typeModel.ClrName;
             }
 
             // handle implement
-            foreach (var typeModel in typeModels.Where(x => parseResult.HasContentImplement(x.Alias)))
+            foreach (var typeModel in typeModels.Where(x => transform.HasContentImplement(x.Alias)))
             {
                 typeModel.HasImplement = true;
             }
 
             // mark OmitBase models that we discovered already have a base class
-            foreach (var typeModel in typeModels.Where(x => parseResult.HasContentBase(parseResult.ContentClrName(x.Alias) ?? x.ClrName)))
+            foreach (var typeModel in typeModels.Where(x => transform.HasContentBase(transform.ContentClrName(x.Alias) ?? x.ClrName)))
                 typeModel.HasBase = true;
 
             foreach (var typeModel in typeModels)
@@ -289,14 +297,14 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 // ie is marked as ignored on type, or on any parent type
                 var tm = typeModel;
                 foreach (var property in typeModel.Properties
-                    .Where(property => tm.EnumerateBaseTypes(true).Any(x => parseResult.IsPropertyIgnored(parseResult.ContentClrName(x.Alias) ?? x.ClrName, property.Alias))))
+                    .Where(property => tm.EnumerateBaseTypes(true).Any(x => transform.IsPropertyIgnored(transform.ContentClrName(x.Alias) ?? x.ClrName, property.Alias))))
                 {
                     property.IsIgnored = true;
                 }
 
                 // handle property renames
                 foreach (var property in typeModel.Properties)
-                    property.ClrName = parseResult.PropertyClrName(parseResult.ContentClrName(typeModel.Alias) ?? typeModel.ClrName, property.Alias) ?? property.ClrName;
+                    property.ClrName = transform.PropertyClrName(transform.ContentClrName(typeModel.Alias) ?? typeModel.ClrName, property.Alias) ?? property.ClrName;
             }
 
             // for the first two of these two tests,
@@ -379,7 +387,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             {
                 foreach (var mixinProperty in typeModel.ImplementingInterfaces.SelectMany(x => x.Properties))
                 {
-                    if (parseResult.IsPropertyIgnored(parseResult.ContentClrName(typeModel.Alias) ?? typeModel.ClrName, mixinProperty.Alias))
+                    if (transform.IsPropertyIgnored(transform.ContentClrName(typeModel.Alias) ?? typeModel.ClrName, mixinProperty.Alias))
                         typeModel.IgnoredMixinProperties.Add(mixinProperty);
                 }
             }
@@ -396,7 +404,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             }
 
             // handle ctor
-            foreach (var typeModel in typeModels.Where(x => parseResult.HasCtor(x.ClrName)))
+            foreach (var typeModel in typeModels.Where(x => transform.HasCtor(x.ClrName)))
                 typeModel.HasCtor = true;
 
             // handle extensions
@@ -405,15 +413,14 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 var typeFullName = typeModel.ClrName;
                 foreach (var propertyModel in typeModel.Properties)
                 {
-                    propertyModel.IsExtensionImplemented = parseResult.IsExtensionImplemented(typeFullName, propertyModel.ClrName);
+                    propertyModel.IsExtensionImplemented = transform.IsExtensionImplemented(typeFullName, propertyModel.ClrName);
                 }
             }
 
             // get base class names
             foreach (var typeModel in typeModels)
             {
-                typeModel.BaseClassName = parseResult.GetModelBaseClassName(!typeModel.IsElement, typeModel.Alias)
-                                            ?? (typeModel.IsElement ? "PublishedElementModel" : "PublishedContentModel");
+                typeModel.BaseClassName = GetBaseClrName(typeModel);
             }
         }
 

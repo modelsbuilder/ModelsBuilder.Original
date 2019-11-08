@@ -46,21 +46,21 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteIndentLine("[GeneratedCodeAttribute(Name, VersionString)]");
         }
 
-        public virtual void WritePropertyTypeAliasConstant(ContentTypeModel typeModel, PropertyModel propertyModel)
+        public virtual void WritePropertyTypeAliasConstant(PropertyModel model)
         {
             Write(CodeModel.ModelInfosClassName);
             Write(".ContentTypes.");
-            Write(typeModel.ClrName);
+            Write(model.ContentType.ClrName);
             Write(".Properties.");
-            Write(propertyModel.ClrName);
+            Write(model.ClrName);
             Write(".Alias");
         }
 
-        public virtual void WriteContentTypeAliasConstant(ContentTypeModel typeModel)
+        public virtual void WriteContentTypeAliasConstant(ContentTypeModel model)
         {
             Write(CodeModel.ModelInfosClassName);
             Write(".ContentTypes.");
-            Write(typeModel.ClrName);
+            Write(model.ClrName);
             Write(".Alias");
         }
 
@@ -115,7 +115,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <summary>
         /// Writes models in a single file.
         /// </summary>
-        public virtual void WriteSingleFile(CodeModel models)
+        public virtual void WriteSingleFile(CodeModel model)
         {
             WriteHeader();
             WriteLine();
@@ -137,17 +137,17 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteLine();
 
             WriteBlockStart($"namespace {CodeModel.ModelsNamespace}");
-            WriteContentTypeModels(models.ContentTypeModels);
+            WriteContentTypeModels(model.ContentTypeModels);
             WriteBlockEnd();
 
             WriteLine();
 
             WriteBlockStart($"namespace {CodeModel.ModelInfosClassNamespace}");
-            WriteModelInfosClass(models);
+            WriteModelInfosClass(model);
             WriteBlockEnd();
         }
 
-        public virtual void WriteModelInfosFile(CodeModel models)
+        public virtual void WriteModelInfosFile(CodeModel model)
         {
             WriteHeader();
             WriteLine();
@@ -163,7 +163,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteLine();
 
             WriteBlockStart($"namespace {CodeModel.ModelInfosClassNamespace}");
-            WriteModelInfosClass(models);
+            WriteModelInfosClass(model);
             WriteBlockEnd();
         }
 
@@ -184,17 +184,17 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <summary>
         /// Appends a complete content type model.
         /// </summary>
-        public virtual void WriteContentTypeModel(ContentTypeModel type)
+        public virtual void WriteContentTypeModel(ContentTypeModel model)
         {
-            if (type.IsMixin)
+            if (model.IsMixin)
             {
-                WriteInterfaceDeclaration(type);
+                WriteInterfaceDeclaration(model);
                 WriteLine();
             }
 
-            WriteExtensionsClass(type);
+            WriteExtensionsClass(model);
             WriteLine();
-            WriteClassDeclaration(type);
+            WriteClassDeclaration(model);
         }
 
         /// <summary>
@@ -364,7 +364,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             foreach (var prop in model.Properties.Where(x => !x.IsIgnored).OrderBy(x => x.ClrName))
             {
                 WriteLineBetween(ref first);
-                WriteClassProperty(model, prop);
+                WriteClassProperty(prop);
             }
 
             // no need to write the parent properties since we inherit from the parent
@@ -378,42 +378,42 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                     // exclude directly implemented properties
                     if (model.IgnoredMixinProperties.Contains(prop)) continue;
                     WriteLineBetween(ref first);
-                    WriteClassProperty(mixinType, prop);
+                    WriteClassProperty(prop);
                 }
         }
 
         /// <summary>
         /// Appends a class property.
         /// </summary>
-        protected virtual void WriteClassProperty(ContentTypeModel typeModel, PropertyModel propertyModel)
+        protected virtual void WriteClassProperty(PropertyModel model)
         {
-            if (propertyModel.Errors != null)
-                WritePropertyErrorsStart(propertyModel.Errors);
+            if (model.Errors != null)
+                WritePropertyErrorsStart(model.Errors);
 
             // Adds xml summary to each property containing
             // property name and property description
-            if (!string.IsNullOrWhiteSpace(propertyModel.Name) || !string.IsNullOrWhiteSpace(propertyModel.Description))
+            if (!string.IsNullOrWhiteSpace(model.Name) || !string.IsNullOrWhiteSpace(model.Description))
             {
-                var summary = XmlCommentString(propertyModel.Name);
-                if (!string.IsNullOrWhiteSpace(propertyModel.Description))
-                    summary += ": " + XmlCommentString(propertyModel.Description);
+                var summary = XmlCommentString(model.Name);
+                if (!string.IsNullOrWhiteSpace(model.Description))
+                    summary += ": " + XmlCommentString(model.Description);
 
                 WriteIndentLine($"/// <summary>{summary}</summary>");
             }
             else
             {
-                WriteIndentLine($"/// <summary>Gets the value of the \"{propertyModel.Alias}\" property.</summary>");
+                WriteIndentLine($"/// <summary>Gets the value of the \"{model.Alias}\" property.</summary>");
             }
 
             WriteGeneratedCodeAttribute();
             WriteIndent("[ImplementPropertyType(");
-            WritePropertyTypeAliasConstant(typeModel, propertyModel);
+            WritePropertyTypeAliasConstant(model);
             WriteLine(")]");
             WriteIndent("public ");
-            WriteClrType(propertyModel.ClrTypeName);
-            WriteLine($" {propertyModel.ClrName} => this.{propertyModel.ClrName}();");
+            WriteClrType(model.ClrTypeName);
+            WriteLine($" {model.ClrName} => this.{model.ClrName}();");
 
-            if (propertyModel.Errors != null)
+            if (model.Errors != null)
                 WritePropertyErrorsEnd();
         }
 
@@ -436,7 +436,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             foreach (var propertyModel in extensionProperties)
             {
                 WriteLineBetween(ref firstProperty);
-                WritePropertyExtensionMethods(model, propertyModel);
+                WritePropertyExtensionMethods(propertyModel);
             }
 
             WriteBlockEnd();
@@ -445,69 +445,69 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <summary>
         /// Appends the extension methods for a property.
         /// </summary>
-        protected virtual void WritePropertyExtensionMethods(ContentTypeModel typeModel, PropertyModel propertyModel)
+        protected virtual void WritePropertyExtensionMethods(PropertyModel model)
         {
             // append the extension method that mimics .Value(...)
-            WriteStandardExtensionMethod(typeModel, propertyModel);
+            WriteStandardExtensionMethod(model);
 
             if (CodeModel.GenerateFallbackFuncExtensionMethods)
             {
                 WriteLine();
-                WriteFallbackFuncExtensionMethod(typeModel, propertyModel);
+                WriteFallbackFuncExtensionMethod(model);
             }
         }
 
         /// <summary>
         /// Appends the standard extension method.
         /// </summary>
-        protected virtual void WriteStandardExtensionMethod(ContentTypeModel typeModel, PropertyModel propertyModel)
+        protected virtual void WriteStandardExtensionMethod(PropertyModel model)
         {
-            if (propertyModel.Errors != null) return;
+            if (model.Errors != null) return;
 
             // Adds xml summary to each property containing
             // property name and property description
-            if (!string.IsNullOrWhiteSpace(propertyModel.Name) || !string.IsNullOrWhiteSpace(propertyModel.Description))
+            if (!string.IsNullOrWhiteSpace(model.Name) || !string.IsNullOrWhiteSpace(model.Description))
             {
-                var summary = XmlCommentString(propertyModel.Name);
-                if (!string.IsNullOrWhiteSpace(propertyModel.Description))
-                    summary += ": " + XmlCommentString(propertyModel.Description);
+                var summary = XmlCommentString(model.Name);
+                if (!string.IsNullOrWhiteSpace(model.Description))
+                    summary += ": " + XmlCommentString(model.Description);
 
                 WriteIndentLine($"/// <summary>{summary}</summary>");
             }
             else
             {
-                WriteIndentLine($"/// <summary>Gets the value of the \"{propertyModel.Alias}\" property.</summary>");
+                WriteIndentLine($"/// <summary>Gets the value of the \"{model.Alias}\" property.</summary>");
             }
 
             WriteGeneratedCodeAttribute();
 
             WriteIndent("public static ");
-            WriteClrType(propertyModel.ClrTypeName);
+            WriteClrType(model.ClrTypeName);
             Write(" ");
-            Write(propertyModel.ClrName);
-            Write($"(this {(typeModel.IsMixin ? "I" : "")}{typeModel.ClrName} that");
-            if (propertyModel.VariesByCulture())
+            Write(model.ClrName);
+            Write($"(this {(model.ContentType.IsMixin ? "I" : "")}{model.ContentType.ClrName} that");
+            if (model.VariesByCulture())
                 Write(", string culture = null");
-            if (propertyModel.VariesBySegment())
+            if (model.VariesBySegment())
                 Write(", string segment = null");
             Write(", Fallback fallback = default, ");
-            WriteClrType(propertyModel.ClrTypeName);
+            WriteClrType(model.ClrTypeName);
             WriteLine(" defaultValue = default)");
             
             Indent();
 
             WriteIndent("=> that.Value");
-            if (propertyModel.ModelClrType != typeof(object))
+            if (model.ModelClrType != typeof(object))
             {
                 Write("<");
-                WriteClrType(propertyModel.ClrTypeName);
+                WriteClrType(model.ClrTypeName);
                 Write(">");
             }
             Write("(");
-            WritePropertyTypeAliasConstant(typeModel, propertyModel);
-            if (propertyModel.VariesByCulture())
+            WritePropertyTypeAliasConstant(model);
+            if (model.VariesByCulture())
                 Write(", culture: culture");
-            if (propertyModel.VariesBySegment())
+            if (model.VariesBySegment())
                 Write(", segment: segment");
             WriteLine(", fallback: fallback, defaultValue: defaultValue);");
 
@@ -517,58 +517,58 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <summary>
         /// Appends the fallback-function extension method.
         /// </summary>
-        protected virtual void WriteFallbackFuncExtensionMethod(ContentTypeModel typeModel, PropertyModel propertyModel)
+        protected virtual void WriteFallbackFuncExtensionMethod(PropertyModel model)
         {
-            if (propertyModel.Errors != null) return;
+            if (model.Errors != null) return;
 
             // Adds xml summary to each property containing
             // property name and property description
-            if (!string.IsNullOrWhiteSpace(propertyModel.Name) || !string.IsNullOrWhiteSpace(propertyModel.Description))
+            if (!string.IsNullOrWhiteSpace(model.Name) || !string.IsNullOrWhiteSpace(model.Description))
             {
-                var summary = XmlCommentString(propertyModel.Name);
-                if (!string.IsNullOrWhiteSpace(propertyModel.Description))
-                    summary += ": " + XmlCommentString(propertyModel.Description);
+                var summary = XmlCommentString(model.Name);
+                if (!string.IsNullOrWhiteSpace(model.Description))
+                    summary += ": " + XmlCommentString(model.Description);
 
                 WriteIndentLine($"/// <summary>{summary}</summary>");
             }
             else
             {
-                WriteIndentLine($"/// <summary>Gets the value of the \"{propertyModel.Alias}\" property.</summary>");
+                WriteIndentLine($"/// <summary>Gets the value of the \"{model.Alias}\" property.</summary>");
             }
 
             WriteGeneratedCodeAttribute();
 
             WriteIndent("public static ");
-            WriteClrType(propertyModel.ClrTypeName);
+            WriteClrType(model.ClrTypeName);
             Write(" ");
-            Write(propertyModel.ClrName);
-            Write($"(this {(typeModel.IsMixin ? "I" : "")}{typeModel.ClrName} that");
-            if (propertyModel.VariesByCulture())
+            Write(model.ClrName);
+            Write($"(this {(model.ContentType.IsMixin ? "I" : "")}{model.ContentType.ClrName} that");
+            if (model.VariesByCulture())
                 Write(", string culture = null");
-            if (propertyModel.VariesBySegment())
+            if (model.VariesBySegment())
                 Write(", string segment = null");
             Write(", Func<");
-            Write(typeModel.ClrName);
+            Write(model.ContentType.ClrName);
             Write(", ");
             //if (propertyModel.VariesByCulture())
             //    sb.Append("string, ");
             //if (propertyModel.VariesBySegment())
             //    sb.Append("string, ");
-            WriteClrType(propertyModel.ClrTypeName);
+            WriteClrType(model.ClrTypeName);
             WriteLine("> fallback = default)");
 
             Indent();
 
             WriteIndent("=> that.Value");
             Write("<");
-            Write(typeModel.ClrName);
+            Write(model.ContentType.ClrName);
             Write(", ");
-            WriteClrType(propertyModel.ClrTypeName); // always use the <,> overload to avoid conflicts
+            WriteClrType(model.ClrTypeName); // always use the <,> overload to avoid conflicts
             Write(">(");
-            WritePropertyTypeAliasConstant(typeModel, propertyModel);
-            if (propertyModel.VariesByCulture())
+            WritePropertyTypeAliasConstant(model);
+            if (model.VariesByCulture())
                 Write(", culture: culture");
-            if (propertyModel.VariesBySegment())
+            if (model.VariesBySegment())
                 Write(", segment: segment");
             WriteLine(", fallback: fallback);");
 

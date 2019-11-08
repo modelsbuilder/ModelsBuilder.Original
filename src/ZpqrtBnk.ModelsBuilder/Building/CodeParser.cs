@@ -26,7 +26,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <param name="files">A set of (filename,content) representing content to parse.</param>
         /// <returns>The result of the code parsing.</returns>
         /// <remarks>The set of files is a dictionary of name, content.</remarks>
-        public ParseResult Parse(IDictionary<string, string> files)
+        public ContentModelTransform Parse(IDictionary<string, string> files)
         {
             return Parse(files, Enumerable.Empty<PortableExecutableReference>());
         }
@@ -38,7 +38,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <param name="references">Assemblies to reference in compilations.</param>
         /// <returns>The result of the code parsing.</returns>
         /// <remarks>The set of files is a dictionary of name, content.</remarks>
-        public ParseResult Parse(IDictionary<string, string> files, IEnumerable<PortableExecutableReference> references)
+        public ContentModelTransform Parse(IDictionary<string, string> files, IEnumerable<PortableExecutableReference> references)
         {
             SyntaxTree[] trees;
             var compiler = new Compiler { References = references };
@@ -49,7 +49,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 foreach (var d in compilation.GetDiagnostics())
                     Console.WriteLine(d);
 
-            var disco = new ParseResult();
+            var disco = new ContentModelTransform();
             foreach (var tree in trees)
             {
                 Parse(disco, compilation, tree);
@@ -58,12 +58,12 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             return disco;
         }
 
-        public ParseResult ParseWithReferencedAssemblies(IDictionary<string, string> files)
+        public ContentModelTransform ParseWithReferencedAssemblies(IDictionary<string, string> files)
         {
             return Parse(files, ReferencedAssemblies.References);
         }
 
-        private static void Parse(ParseResult disco, CSharpCompilation compilation, SyntaxTree tree)
+        private static void Parse(ContentModelTransform disco, CSharpCompilation compilation, SyntaxTree tree)
         {
             var model = compilation.GetSemanticModel(tree);
 
@@ -149,7 +149,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             ParseAssemblySymbols(disco, compilation.Assembly);
         }
 
-        private static void ParseClassSymbols(ParseResult disco, ISymbol symbol)
+        private static void ParseClassSymbols(ContentModelTransform disco, ISymbol symbol)
         {
             foreach (var attrData in symbol.GetAttributes())
             {
@@ -178,13 +178,13 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                     //    break;
                     case "ZpqrtBnk.ModelsBuilder.ImplementContentTypeAttribute":
                         var contentAliasToRename = (string)attrData.ConstructorArguments[0].Value;
-                        disco.SetRenamedContent(contentAliasToRename, symbol.Name, true /*SymbolDisplay.ToDisplayString(symbol)*/);
+                        disco.RenameContentType(contentAliasToRename, symbol.Name, true /*SymbolDisplay.ToDisplayString(symbol)*/);
                         break;
                 }
             }
         }
 
-        private static void ParsePropertySymbols(ParseResult disco, ISymbol classSymbol, ISymbol symbol)
+        private static void ParsePropertySymbols(ContentModelTransform disco, ISymbol classSymbol, ISymbol symbol)
         {
             foreach (var attrData in symbol.GetAttributes())
             {
@@ -206,7 +206,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             }
         }
 
-        private static void ParseAssemblySymbols(ParseResult disco, ISymbol symbol)
+        private static void ParseAssemblySymbols(ContentModelTransform disco, ISymbol symbol)
         {
             foreach (var attrData in symbol.GetAttributes())
             {
@@ -219,39 +219,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 var attrClassName = SymbolDisplay.ToDisplayString(attrClassSymbol);
                 switch (attrClassName)
                 {
-                    case "ZpqrtBnk.ModelsBuilder.IgnoreContentTypeAttribute":
-                        var contentAliasToIgnore = (string)attrData.ConstructorArguments[0].Value;
-                        // see notes in IgnoreContentTypeAttribute
-                        //var ignoreContent = (bool)attrData.ConstructorArguments[1].Value;
-                        //var ignoreMixin = (bool)attrData.ConstructorArguments[1].Value;
-                        //var ignoreMixinProperties = (bool)attrData.ConstructorArguments[1].Value;
-                        disco.SetIgnoredContent(contentAliasToIgnore /*, ignoreContent, ignoreMixin, ignoreMixinProperties*/);
-                        break;
-
-                    case "ZpqrtBnk.ModelsBuilder.RenameContentTypeAttribute":
-                        var contentAliasToRename = (string) attrData.ConstructorArguments[0].Value;
-                        var contentRenamed = (string)attrData.ConstructorArguments[1].Value;
-                        disco.SetRenamedContent(contentAliasToRename, contentRenamed, false);
-                        break;
-
-                    case "ZpqrtBnk.ModelsBuilder.ContentModelsBaseClassAttribute":
-                        var contentArgsCount = attrData.ConstructorArguments.Length;
-                        var contentAliasPattern = contentArgsCount == 1 ? "*" : (string) attrData.ConstructorArguments[0].Value;
-                        var contentModelsBaseClass = (INamedTypeSymbol) attrData.ConstructorArguments[contentArgsCount - 1].Value;
-                        if (contentModelsBaseClass is IErrorTypeSymbol)
-                            throw new Exception($"Invalid content base class type \"{contentModelsBaseClass.Name}\".");
-                        disco.SetModelsBaseClassName(true, contentAliasPattern, SymbolDisplay.ToDisplayString(contentModelsBaseClass));
-                        break;
-
-                    case "ZpqrtBnk.ModelsBuilder.ElementModelsBaseClassAttribute":
-                        var elementArgsCount = attrData.ConstructorArguments.Length;
-                        var elementAliasPattern = elementArgsCount == 1 ? "*" : (string) attrData.ConstructorArguments[0].Value;
-                        var elementModelsBaseClass = (INamedTypeSymbol) attrData.ConstructorArguments[elementArgsCount - 1].Value;
-                        if (elementModelsBaseClass is IErrorTypeSymbol)
-                            throw new Exception($"Invalid element base class type \"{elementModelsBaseClass.Name}\".");
-                        disco.SetModelsBaseClassName(false, elementAliasPattern, SymbolDisplay.ToDisplayString(elementModelsBaseClass));
-                        break;
-
                     case "ZpqrtBnk.ModelsBuilder.ModelsBuilderConfigureAttribute":
                         foreach (var (argName, argValue) in attrData.NamedArguments)
                         {
@@ -267,7 +234,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             }
         }
 
-        private static void ParseMethodSymbol(ParseResult disco, ISymbol classSymbol, ISymbol symbol)
+        private static void ParseMethodSymbol(ContentModelTransform disco, ISymbol classSymbol, ISymbol symbol)
         {
             var methodSymbol = symbol as IMethodSymbol;
 

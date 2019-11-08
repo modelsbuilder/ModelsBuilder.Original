@@ -25,8 +25,6 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
             _publishedContentTypeFactory = publishedContentTypeFactory;
         }
 
-        private static Config Config => Current.Configs.ModelsBuilder();
-
         #region Services
 
         public IList<ContentTypeModel> GetAllTypes()
@@ -105,6 +103,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                     var propertyModel = new PropertyModel
                     {
                         Alias = propertyType.Alias,
+                        ContentType = typeModel,
 
                         Name = propertyType.Name,
                         Description = propertyType.Description,

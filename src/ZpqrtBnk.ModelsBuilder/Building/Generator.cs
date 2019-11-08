@@ -35,10 +35,10 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
             // get our (non-generated) files and parse them
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
-            var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
+            var transform = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
             
             // apply to model
-            model.Apply(_config, parseResult, modelsNamespace);
+            model.Apply(_config, transform, modelsNamespace);
 
             // create a writer
             var writer = _factory.CreateWriter(model);

@@ -1,6 +1,9 @@
 ﻿using System;
+using System.CodeDom;
+using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -17,6 +20,8 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using ZpqrtBnk.ModelsBuilder.Building;
 using ZpqrtBnk.ModelsBuilder.Configuration;
+using AssemblyBuilder = System.Web.Compilation.AssemblyBuilder;
+using CodeParser = ZpqrtBnk.ModelsBuilder.Building.CodeParser;
 using File = System.IO.File;
 
 namespace ZpqrtBnk.ModelsBuilder.Umbraco
@@ -566,8 +571,8 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                 File.Delete(file);
 
-            var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
-            model.Apply(_config, parseResult, _config.ModelsNamespace);
+            var transform = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
+            model.Apply(_config, transform, _config.ModelsNamespace);
             var writer = _factory.CreateWriter(model);
 
             writer.WriteSingleFile(model);
@@ -682,5 +687,47 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
         }
 
         #endregion
+    }
+
+    // though BuildManager knows how to compile an entire directory (eg App_Code),
+    // it does not expose it - we used to work around it by concatenating al files,
+    // but that is weird - we could do it with a custom BuildProvider but then it
+    // becomes complex - better do it properly with CodeDomProvider?
+
+    public static class ModelsBuildManager
+    {
+        public static Assembly BuildDirectory(string path)
+        {
+            var provider = CodeDomProvider.CreateProvider("C#");
+
+            var compilerParameters = new CompilerParameters
+            {
+                GenerateExecutable = false,
+                //GenerateInMemory = true,
+                //ReferencedAssemblies = { "System.dll", "System.Core.dll" },
+                IncludeDebugInformation = false,
+                CompilerOptions = "/platform:anycpu /out:FULLPATHTODLL?",
+                OutputAssembly = "models.dll" // fixme randomize (see BuildManager?)
+            };
+
+            // fixme: where should the compiled file go, to be "same as" BuildManager?
+
+            foreach (Assembly reference in BuildManager.GetReferencedAssemblies())
+                compilerParameters.ReferencedAssemblies.Add(reference.FullName);
+
+            var sources = Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories).Select(File.ReadAllText).ToArray();
+            var results = provider.CompileAssemblyFromSource(compilerParameters, sources);
+
+            if (results.Errors.Count == 0) 
+                return results.CompiledAssembly;
+
+            Console.WriteLine("{0} errors", results.Errors.Count);
+            foreach (CompilerError error in results.Errors)
+            {
+                Console.WriteLine("{0}: {1}", error.ErrorNumber, error.ErrorText);
+            }
+
+            throw new Exception("Failed.");
+        }
     }
 }

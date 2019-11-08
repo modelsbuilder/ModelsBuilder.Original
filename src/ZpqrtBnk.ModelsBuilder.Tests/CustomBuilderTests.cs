@@ -43,6 +43,7 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
 
@@ -61,9 +62,9 @@ using ZpqrtBnk.ModelsBuilder;
                 MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
             };
 
-            var parseResult = new CodeParser().Parse(code, refs);
+            var transform = new CodeParser().Parse(code, refs);
             var model = new CustomNamesCodeModel { ContentTypeModels = types, GeneratePropertyGetters = true }; // preserve
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
             var writer = new CodeWriter(model);
             writer.WriteModelFile(types.First());
             var gen = writer.Code;
@@ -122,9 +123,9 @@ namespace Umbraco.Web.PublishedModels
 
         private class CustomNamesCodeModel : CodeModel
         {
-            public override string GetClrName(ContentTypeModel typeModel)
+            public override string GetClrName(ContentTypeModel contentTypeModel)
             {
-                return base.GetClrName(typeModel) + "Custom";
+                return base.GetClrName(contentTypeModel) + "Custom";
             }
         }
 
@@ -133,37 +134,46 @@ namespace Umbraco.Web.PublishedModels
         //
         private class ConfiguringCodeModel : CodeModel
         {
-            public override void Apply(Config config, ParseResult parseResult, string modelsNamespace)
+            public override void Apply(Config config, ContentModelTransform transform, string modelsNamespace)
             {
                 // replaces config
                 ClrNameSource = ClrNameSource.RawAlias;
 
+                // FIXME active methods: IgnoreContentType() etc
+
                 // replaces [IgnoreContentTypeAttribute]
-                parseResult.SetIgnoredContent("contentAlias");
+                transform.IgnoreContentType("contentAlias");
 
                 // replaces [RenameContentTypeAttribute]
-                parseResult.SetRenamedContent("contentAlias", "contentName", false); // FIXME withImplement?
+                transform.RenameContentType("contentAlias", "contentName", false); // FIXME withImplement?
 
                 // replaces [IgnorePropertyTypeAttribute] - though it was convenient?
-                parseResult.SetIgnoredProperty("", "propertyAlias"); // FIXME content name?
+                transform.SetIgnoredProperty("", "propertyAlias"); // FIXME content name?
 
                 // replaces [RenamePropertyTypeAttribute] - though it was convenient?
-                parseResult.SetRenamedProperty("", "propertyAlias", "propertyName"); // FIXME content name?
+                transform.SetRenamedProperty("", "propertyAlias", "propertyName"); // FIXME content name?
 
-                // replaces [ContentModelsBaseClassAttribute]
-                parseResult.SetModelsBaseClassName(true, "pattern", "baseName");
-
-                // replaces [ElementModelsBaseClassAttribute]
-                parseResult.SetModelsBaseClassName(false, "pattern", "baseName");
-
-                // original apply
-                base.Apply(config, parseResult, modelsNamespace);
+                // apply
+                base.Apply(config, transform, modelsNamespace);
 
                 // replaces [ModelsBuilderConfigureAttribute]
                 ModelInfosClassName = "MB";
                 ModelInfosClassNamespace = "Models";
                 GeneratePropertyGetters = true;
                 GenerateFallbackFuncExtensionMethods = true;
+
+                // replaces [ModelsUsingAttribute]
+                Using.Add("My.Other.Project");
+            }
+
+            // replaces [ContentModelsBaseClassAttribute]
+            // replaces [ElementModelsBaseClassAttribute]
+            public override string GetBaseClrName(ContentTypeModel contentTypeModel)
+            {
+                // any kind of logic can go
+                if (!contentTypeModel.IsElement && contentTypeModel.Alias == "alias") return "Base";
+
+                return base.GetBaseClrName(contentTypeModel);
             }
 
             // replaces [ModelsUsingAttribute]
@@ -174,14 +184,14 @@ namespace Umbraco.Web.PublishedModels
                 return usings;
             }
 
-            public override string GetClrName(ContentTypeModel typeModel)
+            public override string GetClrName(ContentTypeModel contentTypeModel)
             {
                 const string typeModelPrefix = "";
                 const string typeModelSuffix = "";
 
                 // replaces [ModelsBuilderConfigureAttribute]
 
-                return typeModelPrefix + base.GetClrName(typeModel) + typeModelSuffix;
+                return typeModelPrefix + base.GetClrName(contentTypeModel) + typeModelSuffix;
             }
 
             public override string GetClrName(PropertyModel propertyModel)

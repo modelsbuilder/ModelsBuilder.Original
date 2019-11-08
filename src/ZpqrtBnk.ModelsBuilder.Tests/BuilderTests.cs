@@ -86,45 +86,6 @@ using System.CodeDom.Compiler;";
         }
 
         [Test]
-        public void ModelsBaseClassAttribute()
-        {
-            var sources = new Dictionary<string, string>
-            {
-                {"assembly", @"
-using ZpqrtBnk.ModelsBuilder;
-using Dang;
-[assembly:ContentModelsBaseClass(typeof(Whatever))]
-namespace Dang
-{
-public class Whatever
-{}
-}
-"}
-            };
-
-            var parseResult = new CodeParser().Parse(sources, CreateDefaultReferences());
-
-            Assert.AreEqual("Dang.Whatever", parseResult.GetModelBaseClassName(true, "bah"));
-        }
-
-        [Test]
-        public void ModelsNamespaceAttribute()
-        {
-            var sources = new Dictionary<string, string>
-            {
-                {"assembly", @"
-using ZpqrtBnk.ModelsBuilder;
-[assembly:ModelsNamespace(""Foo.Bar.Nil"")]
-"}
-            };
-
-            var parseResult = new CodeParser().Parse(sources, CreateDefaultReferences());
-
-            Assert.IsTrue(parseResult.HasModelsNamespace);
-            Assert.AreEqual("Foo.Bar.Nil", parseResult.ModelsNamespace);
-        }
-
-        [Test]
         public void ConfigureModelsNamespaceAttribute()
         {
             var sources = new Dictionary<string, string>
@@ -135,14 +96,14 @@ using ZpqrtBnk.ModelsBuilder;
 "}
             };
 
-            var parseResult = new CodeParser().Parse(sources, CreateDefaultReferences());
+            var transform = new CodeParser().Parse(sources, CreateDefaultReferences());
 
-            Assert.IsTrue(parseResult.HasModelsNamespace);
-            Assert.AreEqual("Foo.Bar.Nil", parseResult.ModelsNamespace);
+            Assert.IsTrue(transform.HasModelsNamespace);
+            Assert.AreEqual("Foo.Bar.Nil", transform.ModelsNamespace);
         }
 
         [Test]
-        public void ModelsUsingAttribute()
+        public void CustomizeUsing()
         {
             // Umbraco returns nice, pascal-cased names
 
@@ -157,38 +118,29 @@ using ZpqrtBnk.ModelsBuilder;
 
             var types = new List<ContentTypeModel> { type1 };
 
-            var code1 = new Dictionary<string, string>
+            var code = new Dictionary<string, string>
             {
                 {"assembly", @"
 using ZpqrtBnk.ModelsBuilder;
 "}
             };
 
-            var code2 = new Dictionary<string, string>
-            {
-                {"assembly", @"
-using ZpqrtBnk.ModelsBuilder;
-[assembly:ModelsUsing(""Foo.Bar.Nil"")]
-"}
-            };
+            var transform = new CodeParser().Parse(code, CreateDefaultReferences());
 
-            var refs = CreateDefaultReferences();
-
-            var parseResult = new CodeParser().Parse(code1, refs);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
             var count = model.Using.Count;
 
-            parseResult = new CodeParser().Parse(code2, refs);
             model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
+            model.Using.Add("Foo.Bar.Nil");
 
             Assert.AreEqual(count + 1, model.Using.Count);
             Assert.IsTrue(model.Using.Contains("Foo.Bar.Nil"));
         }
 
         [Test]
-        public void ContentTypeIgnore()
+        public void IgnoreContentType()
         {
             // Umbraco returns nice, pascal-cased names
 
@@ -204,18 +156,14 @@ using ZpqrtBnk.ModelsBuilder;
             var types = new List<ContentTypeModel> { type1 };
 
             var sources = new Dictionary<string, string>
-            {
-                {"assembly", @"
-using ZpqrtBnk.ModelsBuilder;
-[assembly:IgnoreContentType(""type1"")]
-"}
-            };
+            { };
 
-            var parseResult = new CodeParser().Parse(sources, CreateDefaultReferences());
+            var transform = new CodeParser().Parse(sources, CreateDefaultReferences());
+            transform.IgnoreContentType("type1");
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
 
-            Assert.IsTrue(parseResult.IsIgnored("type1"));
+            Assert.IsTrue(transform.IsIgnored("type1"));
 
             Assert.AreEqual(0, types.Count);
         }
@@ -274,7 +222,7 @@ public partial class Type1 : IHasXmlNode
         }
 
         [Test]
-        public void ContentTypeIgnoreWildcard()
+        public void IgnoreContentTypeWildcard()
         {
             // Umbraco returns nice, pascal-cased names
 
@@ -308,27 +256,36 @@ public partial class Type1 : IHasXmlNode
             var types = new List<ContentTypeModel> { type1, type2, type3 };
 
             var sources = new Dictionary<string, string>
-            {
-                {"assembly", @"
-using ZpqrtBnk.ModelsBuilder;
-[assembly:IgnoreContentType(""type*"")]
-"}
-            };
+            { };
 
-            var parseResult = new CodeParser().Parse(sources, CreateDefaultReferences());
-            var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            var transform = new CodeParser().Parse(sources, CreateDefaultReferences());
+            var model = new IgnoreContentTypeWildcardCodeModel { ContentTypeModels = types };
+            model.Apply(_config, transform, null);
 
-            Assert.IsTrue(parseResult.IsIgnored("type1"));
-            Assert.IsTrue(parseResult.IsIgnored("type2"));
-            Assert.IsFalse(parseResult.IsIgnored("ttype3"));
+            Assert.IsTrue(transform.IsIgnored("type1"));
+            Assert.IsTrue(transform.IsIgnored("type2"));
+            Assert.IsFalse(transform.IsIgnored("ttype3"));
 
             Assert.AreEqual(1, types.Count);
             Assert.AreEqual("ttype3", types[0].Alias);
         }
 
+        private class IgnoreContentTypeWildcardCodeModel : CodeModel
+        {
+            public override void Apply(Config config, ContentModelTransform transform, string modelsNamespace)
+            {
+                foreach (var contentTypeModel in ContentTypeModels)
+                {
+                    if (contentTypeModel.Alias.StartsWith("type"))
+                        transform.IgnoreContentType(contentTypeModel.Alias);
+                }
+
+                base.Apply(config, transform, modelsNamespace);
+            }
+        }
+
         [Test]
-        public void ContentTypeIgnoreParent()
+        public void IgnoreParentContentType()
         {
             // Umbraco returns nice, pascal-cased names
 
@@ -353,12 +310,7 @@ using ZpqrtBnk.ModelsBuilder;
             var types = new List<ContentTypeModel> { type1, type2 };
 
             var code = new Dictionary<string, string>
-            {
-                {"assembly", @"
-using ZpqrtBnk.ModelsBuilder;
-[assembly:IgnoreContentType(""type1"")]
-"}
-            };
+            { };
 
             var refs = new[]
             {
@@ -366,18 +318,19 @@ using ZpqrtBnk.ModelsBuilder;
                 MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
             };
 
-            var parseResult = new CodeParser().Parse(code, refs);
+            var transform = new CodeParser().Parse(code, refs);
+            transform.IgnoreContentType("type1");
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
 
-            Assert.IsTrue(parseResult.IsIgnored("type1"));
-            Assert.IsFalse(parseResult.IsIgnored("type2"));
+            Assert.IsTrue(transform.IsIgnored("type1"));
+            Assert.IsFalse(transform.IsIgnored("type2"));
 
             Assert.AreEqual(0, types.Count);
         }
 
         [Test]
-        public void ContentTypeIgnoreMixin()
+        public void IgnoreMixinContentType()
         {
             // Umbraco returns nice, pascal-cased names
 
@@ -403,12 +356,7 @@ using ZpqrtBnk.ModelsBuilder;
             var types = new List<ContentTypeModel> { type1, type2 };
 
             var code = new Dictionary<string, string>
-            {
-                {"assembly", @"
-using ZpqrtBnk.ModelsBuilder;
-[assembly:IgnoreContentType(""type1"")]
-"}
-            };
+            { };
 
             var refs = new[]
             {
@@ -416,12 +364,13 @@ using ZpqrtBnk.ModelsBuilder;
                 MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
             };
 
-            var parseResult = new CodeParser().Parse(code, refs);
+            var transform = new CodeParser().Parse(code, refs);
+            transform.IgnoreContentType("type1");
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
 
-            Assert.IsTrue(parseResult.IsIgnored("type1"));
-            Assert.IsFalse(parseResult.IsIgnored("type2"));
+            Assert.IsTrue(transform.IsIgnored("type1"));
+            Assert.IsFalse(transform.IsIgnored("type2"));
 
             Assert.AreEqual(1, types.Count);
             Assert.AreEqual("type2", types[0].Alias);
@@ -430,7 +379,7 @@ using ZpqrtBnk.ModelsBuilder;
         }
 
         [Test]
-        public void ContentTypeRenameOnAssembly()
+        public void RenameContentTypeWithTransform()
         {
             // Umbraco returns nice, pascal-cased names
 
@@ -455,12 +404,7 @@ using ZpqrtBnk.ModelsBuilder;
             var types = new List<ContentTypeModel> { type1, type2 };
 
             var code = new Dictionary<string, string>
-            {
-                {"assembly", @"
-using ZpqrtBnk.ModelsBuilder;
-[assembly:RenameContentType(""type1"", ""Renamed1"")]
-"}
-            };
+            { };
 
             var refs = new[]
             {
@@ -468,16 +412,17 @@ using ZpqrtBnk.ModelsBuilder;
                 MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
             };
 
-            var parseResult = new CodeParser().Parse(code, refs);
+            var transform = new CodeParser().Parse(code, refs);
+            transform.RenameContentType("type1", "Renamed1", false);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
 
-            Assert.IsFalse(parseResult.IsIgnored("type1"));
-            Assert.IsFalse(parseResult.IsIgnored("type2"));
-            Assert.IsTrue(parseResult.IsContentRenamed("type1"));
-            Assert.IsFalse(parseResult.IsContentRenamed("type2"));
-            Assert.AreEqual("Renamed1", parseResult.ContentClrName("type1"));
-            Assert.IsNull(parseResult.ContentClrName("type2"));
+            Assert.IsFalse(transform.IsIgnored("type1"));
+            Assert.IsFalse(transform.IsIgnored("type2"));
+            Assert.IsTrue(transform.IsContentRenamed("type1"));
+            Assert.IsFalse(transform.IsContentRenamed("type2"));
+            Assert.AreEqual("Renamed1", transform.ContentClrName("type1"));
+            Assert.IsNull(transform.ContentClrName("type2"));
 
             Assert.AreEqual(2, types.Count);
             Assert.AreEqual("Renamed1", types[0].ClrName);
@@ -485,7 +430,7 @@ using ZpqrtBnk.ModelsBuilder;
         }
 
         [Test]
-        public void ContentTypeRenameOnClass()
+        public void RenameContentTypeWithAttribute()
         {
             // Umbraco returns nice, pascal-cased names
 
@@ -528,16 +473,16 @@ namespace Models
                 MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
             };
 
-            var parseResult = new CodeParser().Parse(code, refs);
+            var transform = new CodeParser().Parse(code, refs);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
 
-            Assert.IsFalse(parseResult.IsIgnored("type1"));
-            Assert.IsFalse(parseResult.IsIgnored("type2"));
-            Assert.IsTrue(parseResult.IsContentRenamed("type1"));
-            Assert.IsFalse(parseResult.IsContentRenamed("type2"));
-            Assert.AreEqual("Renamed1", parseResult.ContentClrName("type1"));
-            Assert.IsNull(parseResult.ContentClrName("type2"));
+            Assert.IsFalse(transform.IsIgnored("type1"));
+            Assert.IsFalse(transform.IsIgnored("type2"));
+            Assert.IsTrue(transform.IsContentRenamed("type1"));
+            Assert.IsFalse(transform.IsContentRenamed("type2"));
+            Assert.AreEqual("Renamed1", transform.ContentClrName("type1"));
+            Assert.IsNull(transform.ContentClrName("type2"));
 
             Assert.AreEqual(2, types.Count);
             Assert.AreEqual("Renamed1", types[0].ClrName);
@@ -606,9 +551,9 @@ namespace Dang
 "}
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var transform = new CodeParser().Parse(code);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
             var writer = new CodeWriter(model);
 
             Assert.AreEqual(3, types.Count);
@@ -647,6 +592,7 @@ namespace Dang
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
 
@@ -672,11 +618,11 @@ namespace Models
                 MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
             };
 
-            var parseResult = new CodeParser().Parse(code, refs);
+            var transform = new CodeParser().Parse(code, refs);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
 
-            Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
+            Assert.IsTrue(transform.IsPropertyIgnored("Type1", "prop1"));
 
             Assert.AreEqual(1, types.Count);
             Assert.AreEqual(0, types[0].Properties.Count);
@@ -698,16 +644,19 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop2",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "pprop3",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
 
@@ -733,13 +682,13 @@ namespace Models
                 MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
             };
 
-            var parseResult = new CodeParser().Parse(code, refs);
+            var transform = new CodeParser().Parse(code, refs);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
 
-            Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
-            Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop2"));
-            Assert.IsFalse(parseResult.IsPropertyIgnored("Type1", "pprop3"));
+            Assert.IsTrue(transform.IsPropertyIgnored("Type1", "prop1"));
+            Assert.IsTrue(transform.IsPropertyIgnored("Type1", "prop2"));
+            Assert.IsFalse(transform.IsPropertyIgnored("Type1", "pprop3"));
 
             Assert.AreEqual(1, types.Count);
             Assert.AreEqual(1, types[0].Properties.Count);
@@ -761,6 +710,7 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
 
@@ -790,11 +740,11 @@ namespace Models
                 MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
             };
 
-            var parseResult = new CodeParser().Parse(code, refs);
+            var transform = new CodeParser().Parse(code, refs);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
 
-            Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
+            Assert.IsTrue(transform.IsPropertyIgnored("Type1", "prop1"));
 
             Assert.AreEqual(1, types.Count);
             Assert.AreEqual(0, types[0].Properties.Count);
@@ -816,6 +766,7 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
 
@@ -842,12 +793,12 @@ namespace Models
                 MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
             };
 
-            var parseResult = new CodeParser().Parse(code, refs);
+            var transform = new CodeParser().Parse(code, refs);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
 
-            Assert.AreEqual("Renamed1", parseResult.PropertyClrName("Type1", "prop1"));
-            Assert.AreEqual("Renamed2", parseResult.PropertyClrName("Type1", "prop2"));
+            Assert.AreEqual("Renamed1", transform.PropertyClrName("Type1", "prop1"));
+            Assert.AreEqual("Renamed2", transform.PropertyClrName("Type1", "prop2"));
 
             Assert.AreEqual(1, types.Count);
             Assert.IsTrue(types[0].Properties[0].ClrName == "Renamed1");
@@ -869,6 +820,7 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
 
@@ -899,12 +851,12 @@ namespace Models
                 MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
             };
 
-            var parseResult = new CodeParser().Parse(code, refs);
+            var transform = new CodeParser().Parse(code, refs);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
 
-            Assert.AreEqual("Renamed1", parseResult.PropertyClrName("Type1", "prop1"));
-            Assert.AreEqual("Renamed2", parseResult.PropertyClrName("Type1", "prop2"));
+            Assert.AreEqual("Renamed1", transform.PropertyClrName("Type1", "prop1"));
+            Assert.AreEqual("Renamed2", transform.PropertyClrName("Type1", "prop2"));
 
             Assert.AreEqual(1, types.Count);
             Assert.IsTrue(types[0].Properties[0].ClrName == "Renamed1");
@@ -926,6 +878,7 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
 
@@ -952,11 +905,11 @@ namespace Models
                 MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
             };
 
-            var parseResult = new CodeParser().Parse(code, refs);
+            var transform = new CodeParser().Parse(code, refs);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
 
-            Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
+            Assert.IsTrue(transform.IsPropertyIgnored("Type1", "prop1"));
 
             Assert.AreEqual(1, types.Count);
             Assert.AreEqual(0, types[0].Properties.Count);
@@ -978,6 +931,7 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
 
@@ -1008,11 +962,11 @@ namespace Models
                 MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
             };
 
-            var parseResult = new CodeParser().Parse(code, refs);
+            var transform = new CodeParser().Parse(code, refs);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
 
-            Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
+            Assert.IsTrue(transform.IsPropertyIgnored("Type1", "prop1"));
 
             Assert.AreEqual(1, types.Count);
             Assert.AreEqual(0, types[0].Properties.Count);
@@ -1032,6 +986,7 @@ namespace Models
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
             var types = new List<ContentTypeModel> { type1 };
@@ -1058,9 +1013,9 @@ namespace Dang
                 MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
             };
 
-            var parseResult = new CodeParser().Parse(code, refs);
+            var transform = new CodeParser().Parse(code, refs);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
             var writer = new CodeWriter(model);
 
             Assert.AreEqual(1, types.Count);
@@ -1088,16 +1043,19 @@ namespace Dang
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1a",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1b",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1c",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
             var type2 = new ContentTypeModel
@@ -1111,6 +1069,7 @@ namespace Dang
             type2.Properties.Add(new PropertyModel
             {
                 Alias = "prop2",
+                ContentType = type2,
                 ModelClrType = typeof(string),
             });
             var types = new List<ContentTypeModel> { type1, type2 };
@@ -1164,9 +1123,9 @@ namespace Dang
                 MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
             };
 
-            var parseResult = new CodeParser().Parse(code, refs);
+            var transform = new CodeParser().Parse(code, refs);
             var model = new CodeModel { ContentTypeModels = types, GeneratePropertyGetters = true }; // preserve
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
             var writer = new CodeWriter(model);
 
             Assert.AreEqual(2, types.Count);
@@ -1217,11 +1176,13 @@ namespace Dang
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1a",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1b",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
 
@@ -1237,6 +1198,7 @@ namespace Dang
             type2.Properties.Add(new PropertyModel
             {
                 Alias = "prop2",
+                ContentType = type2,
                 ModelClrType = typeof(int),
             });
 
@@ -1343,9 +1305,9 @@ namespace Umbraco.Web.PublishedModels
 }
 ";
 
-            var parseResult = new CodeParser().Parse(sources);
+            var transform = new CodeParser().Parse(sources);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
             model.GeneratePropertyGetters = true; // preserve
             var writer = new CodeWriter(model);
 
@@ -1373,6 +1335,7 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
 
@@ -1410,9 +1373,9 @@ namespace Umbraco.Web.PublishedModels
 }
 ";
 
-            var parseResult = new CodeParser().Parse(code);
+            var transform = new CodeParser().Parse(code);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
             model.GeneratePropertyGetters = true; // preserve
             var writer = new CodeWriter(model);
 
@@ -1439,6 +1402,7 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
 
@@ -1471,9 +1435,9 @@ namespace Umbraco.Web.PublishedModels
 }
 ";
 
-            var parseResult = new CodeParser().Parse(sources);
+            var transform = new CodeParser().Parse(sources);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
             var writer = new CodeWriter(model);
 
             writer.WriteModelFile(types.First());
@@ -1499,6 +1463,7 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
 
@@ -1536,9 +1501,9 @@ namespace Umbraco.Web.PublishedModels
 }
 ";
 
-            var parseResult = new CodeParser().Parse(sources);
+            var transform = new CodeParser().Parse(sources);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
             model.GenerateFallbackFuncExtensionMethods = true;
             var writer = new CodeWriter(model);
 
@@ -1565,6 +1530,7 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
 
@@ -1597,9 +1563,9 @@ namespace Umbraco.Web.PublishedModels
 }
 ";
 
-            var parseResult = new CodeParser().Parse(sources, CreateDefaultReferences());
+            var transform = new CodeParser().Parse(sources, CreateDefaultReferences());
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
             var writer = new CodeWriter(model);
 
             writer.WriteModelFile(types.First());
@@ -1625,6 +1591,7 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "foo",
+                ContentType = type1,
                 ModelClrType = typeof(IEnumerable<>).MakeGenericType(ModelType.For("foo")),
             });
 
@@ -1679,10 +1646,10 @@ namespace Umbraco.Web.PublishedModels
 }
 ";
 
-            var parseResult = new CodeParser().Parse(sources);
+            var transform = new CodeParser().Parse(sources);
 
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, "Umbraco.Web.PublishedModels");
+            model.Apply(_config, transform, "Umbraco.Web.PublishedModels");
             model.GeneratePropertyGetters = true; // preserve
             var writer = new CodeWriter(model);
 
@@ -1699,7 +1666,7 @@ namespace Umbraco.Web.PublishedModels
         }
 
         [Test]
-        public void PartialConstructor()
+        public void DetectPartialConstructor()
         {
             var type1 = new ContentTypeModel
             {
@@ -1712,6 +1679,7 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
 
@@ -1763,12 +1731,12 @@ namespace Umbraco.Web.PublishedModels
             var refs = CreateDefaultReferences();
             AddReference<IPublishedContent>(refs);
 
-            var parseResult = new CodeParser().Parse(sources, refs);
+            var transform = new CodeParser().Parse(sources, refs);
 
-            Assert.IsTrue(parseResult.HasCtor("Type1"));
+            Assert.IsTrue(transform.HasCtor("Type1"));
 
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
             model.GeneratePropertyGetters = true; // preserve
             var writer = new CodeWriter(model);
 
@@ -1780,7 +1748,7 @@ namespace Umbraco.Web.PublishedModels
         }
 
         [Test]
-        public void PartialConstructorWithRename()
+        public void DetectPartialConstructorWithRename()
         {
             var type1 = new ContentTypeModel
             {
@@ -1793,6 +1761,7 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
 
@@ -1804,8 +1773,6 @@ namespace Umbraco.Web.PublishedModels
 using ZpqrtBnk.ModelsBuilder;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-
-[assembly:RenameContentType(""type1"", ""Type2"")]
 
 public partial class Type2
 {
@@ -1847,13 +1814,14 @@ namespace Umbraco.Web.PublishedModels
             var refs = CreateDefaultReferences();
             AddReference<IPublishedContent>(refs);
 
-            var parseResult = new CodeParser().Parse(sources, refs);
+            var transform = new CodeParser().Parse(sources, refs);
+            transform.RenameContentType("type1", "Type2", false);
 
-            Assert.IsFalse(parseResult.HasCtor("Type1"));
-            Assert.IsTrue(parseResult.HasCtor("Type2"));
+            Assert.IsFalse(transform.HasCtor("Type1"));
+            Assert.IsTrue(transform.HasCtor("Type2"));
 
             var model = new CodeModel { ContentTypeModels = types, GeneratePropertyGetters = true }; // preserve
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
             model.GeneratePropertyGetters = true; // preserve
             var writer = new CodeWriter(model);
 
@@ -1883,6 +1851,7 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
 
@@ -1898,6 +1867,7 @@ namespace Umbraco.Web.PublishedModels
             type2.Properties.Add(new PropertyModel
             {
                 Alias = "prop2",
+                ContentType = type2,
                 ModelClrType = typeof(int),
             });
 
@@ -1906,9 +1876,9 @@ namespace Umbraco.Web.PublishedModels
             var sources = new Dictionary<string, string>
             { };
 
-            var parseResult = new CodeParser().Parse(sources);
+            var transform = new CodeParser().Parse(sources);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
             model.GeneratePropertyGetters = true; // preserve
             var writer = new CodeWriter(model);
 
@@ -1936,16 +1906,19 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(IPublishedContent),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop2",
+                ContentType = type1,
                 ModelClrType = typeof(global::System.Text.StringBuilder),
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop3",
+                ContentType = type1,
                 ModelClrType = typeof(global::Umbraco.Core.IO.FileSecurityException),
             });
             var types = new List<ContentTypeModel> { type1 };
@@ -1954,10 +1927,10 @@ namespace Umbraco.Web.PublishedModels
             {
             };
 
-            var parseResult = new CodeParser().Parse(code);
+            var transform = new CodeParser().Parse(code);
             // forces conflict with ZpqrtBnk.ModelsBuilder.Umbraco
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, "ZpqrtBnk.ModelsBuilder.Models");
+            model.Apply(_config, transform, "ZpqrtBnk.ModelsBuilder.Models");
             var writer = new CodeWriter(model);
 
             foreach (var typeModel in types)
@@ -1979,7 +1952,7 @@ namespace Umbraco.Web.PublishedModels
         {
             var model = new CodeModel();
             model.ModelsNamespaceForTests = "ModelsNamespace";
-            model.Apply(_config, ParseResult.Empty, null);
+            model.Apply(_config, ContentModelTransform.Empty, null);
             var writer = new CodeWriter(model);
 
             writer.WriteClrType(input);
@@ -1994,7 +1967,7 @@ namespace Umbraco.Web.PublishedModels
         {
             var model = new CodeModel();
             model.ModelsNamespaceForTests = "ModelsNamespace";
-            model.Apply(_config, ParseResult.Empty, null);
+            model.Apply(_config, ContentModelTransform.Empty, null);
             var writer = new CodeWriter(model);
 
             model.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
@@ -2026,7 +1999,7 @@ namespace Umbraco.Web.PublishedModels
         {
             var model = new CodeModel();
             model.ModelsNamespaceForTests = ns;
-            model.Apply(_config, ParseResult.Empty, null);
+            model.Apply(_config, ContentModelTransform.Empty, null);
             var writer = new CodeWriter(model);
 
             if (usingSystem) model.Using.Add("System.Text");
@@ -2042,7 +2015,7 @@ namespace Umbraco.Web.PublishedModels
         {
             var model = new CodeModel();
             model.ModelsNamespaceForTests = "SomeRandomNamespace";
-            model.Apply(_config, ParseResult.Empty, null);
+            model.Apply(_config, ContentModelTransform.Empty, null);
             var writer = new CodeWriter(model);
 
             model.Using.Add("System.Text");
@@ -2071,35 +2044,41 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
                 Variations = ContentVariation.Culture
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop2",
+                ContentType = type1,
                 ModelClrType = typeof(string),
                 Variations = ContentVariation.Culture
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop3",
+                ContentType = type1,
                 ModelClrType = typeof(string),
                 Variations = ContentVariation.Segment
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop4",
+                ContentType = type1,
                 ModelClrType = typeof(string),
                 Variations = ContentVariation.CultureAndSegment
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop5",
+                ContentType = type1,
                 ModelClrType = typeof(string)
             });
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop6",
+                ContentType = type1,
                 ModelClrType = typeof(string),
                 Variations = ContentVariation.Culture
             });
@@ -2198,9 +2177,9 @@ namespace Umbraco.Web.PublishedModels
             var refs = CreateDefaultReferences();
 
             // get the writer
-            var parseResult = new CodeParser().Parse(sources, refs);
+            var transform = new CodeParser().Parse(sources, refs);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
             model.GeneratePropertyGetters = true; // preserve
             var writer = new CodeWriter(model);
 
@@ -2223,7 +2202,7 @@ namespace Umbraco.Web.PublishedModels
         }
 
         [Test]
-        public void SelectiveBaseClass()
+        public void CustomizeContentTypeBaseClassName()
         {
             // Umbraco returns nice, pascal-cased names
 
@@ -2258,15 +2237,6 @@ namespace Umbraco.Web.PublishedModels
                 {"assembly", @"
 using ZpqrtBnk.ModelsBuilder;
 
-[assembly:ContentModelsBaseClass(typeof(ContentModelBase1))]
-[assembly:ElementModelsBaseClass(typeof(ElementModelBase1))]
-
-[assembly:ContentModelsBaseClass(""*3"", typeof(ContentModelBase2))]
-[assembly:ElementModelsBaseClass(""*7"", typeof(ElementModelBase2))]
-
-[assembly:ContentModelsBaseClass(""type4"", typeof(ContentModelBase3))]
-[assembly:ElementModelsBaseClass(""type8"", typeof(ElementModelBase3))]
-
 public class ContentModelBase1 {}
 public class ElementModelBase1 {}
 public class ContentModelBase2 {}
@@ -2276,15 +2246,9 @@ public class ElementModelBase3 {}
 "}
             };
 
-            var refs = new[]
-            {
-                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
-            };
-
-            var parseResult = new CodeParser().Parse(code, refs);
-            var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            var transform = new CodeParser().Parse(code, CreateDefaultReferences());
+            var model = new CustomizeContentTypeBaseClassNameCodeModel { ContentTypeModels = types };
+            model.Apply(_config, transform, null);
             var writer = new CodeWriter(model);
 
             writer.WriteContentTypeModel(types[0]);
@@ -2343,6 +2307,29 @@ public class ElementModelBase3 {}
             Assert.IsTrue(gen.Contains("public partial class Type8 : ElementModelBase3"));
         }
 
+        private class CustomizeContentTypeBaseClassNameCodeModel : CodeModel
+        {
+            public override string GetBaseClrName(ContentTypeModel contentTypeModel)
+            {
+
+                // FIXME attribute returned a TYPE now we want a NAME?
+
+                if (contentTypeModel.IsElement) {
+                    if (contentTypeModel.Alias.EndsWith("7", StringComparison.OrdinalIgnoreCase))
+                        return "ElementModelBase2";
+                    if (contentTypeModel.Alias.Equals("type8", StringComparison.OrdinalIgnoreCase))
+                        return "ElementModelBase3";
+                    return "ElementModelBase1";
+                }
+
+                if (contentTypeModel.Alias.EndsWith("3", StringComparison.OrdinalIgnoreCase))
+                    return "ContentModelBase2";
+                if (contentTypeModel.Alias.Equals("type4", StringComparison.OrdinalIgnoreCase))
+                    return "ContentModelBase3";
+                return "ContentModelBase1";
+            }
+        }
+
         [Test]
         public void GenerateSimpleMeta()
         {
@@ -2361,6 +2348,7 @@ public class ElementModelBase3 {}
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
             types.Add(type1);
@@ -2376,16 +2364,19 @@ public class ElementModelBase3 {}
             type2.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type2,
                 ModelClrType = typeof(string),
             });
             type2.Properties.Add(new PropertyModel
             {
                 Alias = "prop2",
+                ContentType = type2,
                 ModelClrType = typeof(global::System.Web.IHtmlString),
             });
             type2.Properties.Add(new PropertyModel
             {
                 Alias = "prop3",
+                ContentType = type2,
                 ModelClrType = typeof(string),
             });
             types.Add(type2);
@@ -2543,9 +2534,9 @@ namespace Umbraco.Web.PublishedModels
 }
 ";
 
-            var parseResult = new CodeParser().Parse(sources);
+            var transform = new CodeParser().Parse(sources);
             var model = new CodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
             var writer = new CodeWriter(model);
 
             writer.WriteModelInfosFile(model);
@@ -2581,6 +2572,7 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "prop1",
+                ContentType = type1,
                 ModelClrType = typeof(string),
             });
 
@@ -2618,9 +2610,9 @@ namespace Umbraco.Web.PublishedModels
 }
 ";
 
-            var parseResult = new CodeParser().Parse(sources, CreateDefaultReferences());
+            var transform = new CodeParser().Parse(sources, CreateDefaultReferences());
             var model = new PrefixSuffixCodeModel { ContentTypeModels = types };
-            model.Apply(_config, parseResult, null);
+            model.Apply(_config, transform, null);
             model.GeneratePropertyGetters = true; // preserve
             var writer = new CodeWriter(model);
 
@@ -2633,9 +2625,9 @@ namespace Umbraco.Web.PublishedModels
 
         public class PrefixSuffixCodeModel : CodeModel
         {
-            public override string GetClrName(ContentTypeModel typeModel)
+            public override string GetClrName(ContentTypeModel contentTypeModel)
             {
-                return "Xxx" + base.GetClrName(typeModel) + "Yyy";
+                return "Xxx" + base.GetClrName(contentTypeModel) + "Yyy";
             }
         }
 

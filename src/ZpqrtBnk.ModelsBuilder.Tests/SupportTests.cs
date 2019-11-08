@@ -48,6 +48,7 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "metaDescription",
+                ContentType = type1,
                 ClrName = "MetaDescription",
                 ClrTypeName = "string",
                 ModelClrType = typeof(string)
@@ -132,6 +133,7 @@ namespace Umbraco.Web.PublishedModels
             type1.Properties.Add(new PropertyModel
             {
                 Alias = "metaDescription",
+                ContentType = type1,
                 ClrName = "MetaDescription",
                 ClrTypeName = "string",
                 ModelClrType = typeof(string)

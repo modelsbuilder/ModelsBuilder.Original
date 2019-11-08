@@ -1,8 +1,6 @@
 ﻿using Umbraco.Web;
 using ZpqrtBnk.ModelsBuilder;
 
-[assembly: IgnoreContentType("ccc")]
-
 namespace ZpqrtBnk.ModelsBuilder.Tests
 {
     // don't create a model for ddd
