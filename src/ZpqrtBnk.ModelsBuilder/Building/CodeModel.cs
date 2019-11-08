@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace ZpqrtBnk.ModelsBuilder.Building
 {
-    public class CodeContext
+    public class CodeModel
     {
         private SemanticModel _ambiguousSymbolsModel;
         private int _ambiguousSymbolsPos;
@@ -29,6 +29,8 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         // FIXME make it a method MapModel() and explain
         public Dictionary<string, string> ModelsMap { get; } = new Dictionary<string, string>();
+
+        public IList<TypeModel> TypeModels { get; set; } = new List<TypeModel>();
 
         // internal for tests
         internal void PrepareAmbiguousSymbols()

@@ -29,11 +29,6 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
         #region Services
 
-        public CodeModels GetAll()
-        {
-            return new CodeModels { TypeModels = GetAllTypes() };
-        }
-
         public IList<TypeModel> GetAllTypes()
         {
             var types = new List<TypeModel>();

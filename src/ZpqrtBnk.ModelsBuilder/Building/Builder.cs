@@ -18,7 +18,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
     {
         internal string ModelsNamespaceForTests;
 
-        private string GetModelsNamespace(Config config, ParseResult parseResult, string modelsNamespace)
+        protected virtual string GetModelsNamespace(Config config, ParseResult parseResult, string modelsNamespace)
         {
             // test namespace overrides everything
             if (ModelsNamespaceForTests != null)
@@ -36,7 +36,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             return config.ModelsNamespace;
         }
 
-        private static ISet<string> GetUsing() => new HashSet<string>
+        protected virtual ISet<string> GetUsing() => new HashSet<string>
         {
             // initialize with default values
             "System",
@@ -50,35 +50,31 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             "ZpqrtBnk.ModelsBuilder.Umbraco",
         };
 
-        public CodeContext Build(Config config, ParseResult parseResult, string modelsNamespace, CodeModels models)
+        public virtual void Build(CodeModel model, Config config, ParseResult parseResult, string modelsNamespace)
         {
-            var context = new CodeContext
-            {
-                // general properties
-                ModelInfosClassName = parseResult.ModelInfoClassName,
-                ModelInfosClassNamespace = parseResult.ModelInfoClassNamespace,
+            // apply parse result to model
+            if (parseResult.HasModelInfoClassName) model.ModelInfosClassName = parseResult.ModelInfoClassName;
+            if (parseResult.HasModelInfoClassNamespace) model.ModelInfosClassNamespace = parseResult.ModelInfoClassNamespace;
 
-                // type models
-                GeneratePropertyGetters = parseResult.GeneratePropertyGetters,
-                GenerateFallbackFuncExtensionMethods = parseResult.GenerateFallbackFuncExtensionMethods,
-                ModelsNamespace = GetModelsNamespace(config, parseResult, modelsNamespace),
-                Using = GetUsing()
-            };
+            model.GeneratePropertyGetters = parseResult.GeneratePropertyGetters;
+            model.GenerateFallbackFuncExtensionMethods = parseResult.GenerateFallbackFuncExtensionMethods;
+
+            model.ModelsNamespace = GetModelsNamespace(config, parseResult, modelsNamespace);
+            model.Using = GetUsing();
 
             // apply the parse result to type models and context
-            BuildTypeModels(models.TypeModels, context, parseResult, config);
+            BuildTypeModels(model, parseResult, config);
 
             // filter types,
             // remove ignored types, remove ignored properties
-            models.TypeModels.RemoveAll(x => x.IsContentIgnored);
-            foreach (var model in models.TypeModels)
-                model.Properties.RemoveAll(x => x.IsIgnored);
-
-            return context;
+            model.TypeModels.RemoveAll(x => x.IsContentIgnored);
+            foreach (var typeModel in model.TypeModels)
+                typeModel.Properties.RemoveAll(x => x.IsIgnored);
         }
 
-        public virtual void BuildTypeModels(IList<TypeModel> typeModels, CodeContext context, ParseResult parseResult, Config config)
+        public virtual void BuildTypeModels(CodeModel model, ParseResult parseResult, Config config)
         {
+            var typeModels = model.TypeModels;
             var pureLive = config.ModelsMode == ModelsMode.PureLive;
             var uniqueTypes = new HashSet<string>();
 
@@ -100,7 +96,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             }
 
             // then, use these names, map model type
-            TypeModel.MapModelTypes(typeModels, context.ModelsNamespace);
+            TypeModel.MapModelTypes(typeModels, model.ModelsNamespace);
 
             // mark IsContentIgnored models that we discovered should be ignored
             // then propagate / ignore children of ignored contents
@@ -115,7 +111,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             {
                 typeModel.ClrName = parseResult.ContentClrName(typeModel.Alias);
                 typeModel.IsRenamed = true;
-                context.ModelsMap[typeModel.Alias] = typeModel.ClrName;
+                model.ModelsMap[typeModel.Alias] = typeModel.ClrName;
             }
 
             // handle implement
@@ -243,7 +239,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             // register using types
             foreach (var usingNamespace in parseResult.UsingNamespaces)
             {
-                context.Using.Add(usingNamespace); // 'using' is a set, will deduplicate
+                model.Using.Add(usingNamespace); // 'using' is a set, will deduplicate
             }
 
             // handle ctor

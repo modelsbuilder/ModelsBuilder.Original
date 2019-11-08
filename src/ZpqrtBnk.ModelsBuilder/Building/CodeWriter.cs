@@ -12,17 +12,17 @@ namespace ZpqrtBnk.ModelsBuilder.Building
     /// </summary>
     public class CodeWriter : CodeWriterBase, ICodeWriter
     {
-        public CodeWriter(StringBuilder text, CodeContext context) 
+        public CodeWriter(StringBuilder text, CodeModel model) 
             : base(text)
         {
-            Context = context;
+            CodeModel = model;
         }
 
-        public CodeWriter(CodeContext context)
-            : this(new StringBuilder(), context)
+        public CodeWriter(CodeModel model)
+            : this(new StringBuilder(), model)
         { }
 
-        protected CodeContext Context { get; }
+        protected CodeModel CodeModel { get; }
 
         #region Helpers
 
@@ -37,7 +37,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         //
         public virtual void WriteGeneratedCodeAttribute()
         {
-            var infos = Context.ModelInfosClassName;
+            var infos = CodeModel.ModelInfosClassName;
             WriteIndentLine($"[GeneratedCodeAttribute({infos}.Name, {infos}.VersionString)]");
         }
 
@@ -48,7 +48,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         public virtual void WritePropertyTypeAliasConstant(TypeModel typeModel, PropertyModel propertyModel)
         {
-            Write(Context.ModelInfosClassName);
+            Write(CodeModel.ModelInfosClassName);
             Write(".ContentTypes.");
             Write(typeModel.ClrName);
             Write(".Properties.");
@@ -58,7 +58,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         public virtual void WriteContentTypeAliasConstant(TypeModel typeModel)
         {
-            Write(Context.ModelInfosClassName);
+            Write(CodeModel.ModelInfosClassName);
             Write(".ContentTypes.");
             Write(typeModel.ClrName);
             Write(".Alias");
@@ -84,13 +84,13 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         private void WriteUsing(string ns)
         {
-            if (!Context.Using.Contains(ns))
+            if (!CodeModel.Using.Contains(ns))
                 WriteIndentLine($"using {ns};");
         }
 
         public virtual void WriteUsing()
         {
-            foreach (var t in Context.Using)
+            foreach (var t in CodeModel.Using)
                 WriteIndentLine($"using {t};");
         }
 
@@ -107,7 +107,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteUsing("System.CodeDom.Compiler");
             WriteLine();
 
-            WriteBlockStart($"namespace {Context.ModelsNamespace}");
+            WriteBlockStart($"namespace {CodeModel.ModelsNamespace}");
             WriteContentTypeModel(model);
             WriteBlockEnd();
         }
@@ -115,7 +115,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         /// <summary>
         /// Writes models in a single file.
         /// </summary>
-        public virtual void WriteSingleFile(CodeModels models)
+        public virtual void WriteSingleFile(CodeModel models)
         {
             WriteHeader();
             WriteLine();
@@ -136,18 +136,18 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteIndentLine("//ASSATTR");
             WriteLine();
 
-            WriteBlockStart($"namespace {Context.ModelsNamespace}");
+            WriteBlockStart($"namespace {CodeModel.ModelsNamespace}");
             WriteContentTypeModels(models.TypeModels);
             WriteBlockEnd();
 
             WriteLine();
 
-            WriteBlockStart($"namespace {Context.ModelInfosClassNamespace}");
+            WriteBlockStart($"namespace {CodeModel.ModelInfosClassNamespace}");
             WriteModelInfosClass(models);
             WriteBlockEnd();
         }
 
-        public virtual void WriteModelInfosFile(CodeModels models)
+        public virtual void WriteModelInfosFile(CodeModel models)
         {
             WriteHeader();
             WriteLine();
@@ -162,7 +162,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteUsing("ZpqrtBnk.ModelsBuilder.Umbraco");
             WriteLine();
 
-            WriteBlockStart($"namespace {Context.ModelInfosClassNamespace}");
+            WriteBlockStart($"namespace {CodeModel.ModelInfosClassNamespace}");
             WriteModelInfosClass(models);
             WriteBlockEnd();
         }
@@ -227,7 +227,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             WriteLine();
             WriteBlockStart();
 
-            if (Context.GeneratePropertyGetters)
+            if (CodeModel.GeneratePropertyGetters)
                 WriteInterfaceProperties(model);
 
             WriteBlockEnd();
@@ -330,11 +330,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             if (!model.HasCtor)
                 WriteClassConstructor(model);
 
-            if (!model.HasCtor && Context.GeneratePropertyGetters)
+            if (!model.HasCtor && CodeModel.GeneratePropertyGetters)
                 WriteLine();
 
             // write the properties
-            if (Context.GeneratePropertyGetters)
+            if (CodeModel.GeneratePropertyGetters)
                 WriteClassProperties(model);
 
             // close the class declaration
@@ -450,7 +450,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             // append the extension method that mimics .Value(...)
             WriteStandardExtensionMethod(typeModel, propertyModel);
 
-            if (Context.GenerateFallbackFuncExtensionMethods)
+            if (CodeModel.GenerateFallbackFuncExtensionMethods)
             {
                 WriteLine();
                 WriteFallbackFuncExtensionMethod(typeModel, propertyModel);
@@ -621,18 +621,18 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         #region Write Infos
 
-        protected virtual void WriteModelInfosClass(CodeModels models)
+        protected virtual void WriteModelInfosClass(CodeModel models)
         {
             WriteIndentLine("/// <summary>Provides information about models.</summary>");
-            WriteBlockStart($"public static partial class {Context.ModelInfosClassName}");
+            WriteBlockStart($"public static partial class {CodeModel.ModelInfosClassName}");
             WriteModelInfosClassBody(models);
             WriteBlockEnd();
         }
 
-        protected virtual void WriteModelInfosClassBody(CodeModels models)
+        protected virtual void WriteModelInfosClassBody(CodeModel models)
         {
             WriteIndentLine("/// <summary>Gets ModelsBuilder's generator name.</summary>");
-            WriteIndentLine($"public const string Name = \"{Context.GeneratorName}\";");
+            WriteIndentLine($"public const string Name = \"{CodeModel.GeneratorName}\";");
             WriteLine();
 
             WriteIndentLine("/// <summary>Gets the ModelsBuilder version that was used to generate the files.</summary>");
@@ -699,7 +699,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 WriteBetween(ref firstType, $",{NewLine}");
 
                 WriteIndent($"new ContentTypeModelInfo(\"{model.Alias}\", \"{model.ClrName}\", typeof(");
-                WriteClrType(Context.ModelsNamespace + "." + model.ClrName);
+                WriteClrType(CodeModel.ModelsNamespace + "." + model.ClrName);
                 Write(")");
                 if (model.Properties.Count > 0)
                 {
@@ -832,7 +832,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         private void WriteNonGenericClrType(string s)
         {
             // map model types
-            s = Regex.Replace(s, @"\{(.*)\}\[\*\]", m => Context.ModelsMap[m.Groups[1].Value + "[]"]);
+            s = Regex.Replace(s, @"\{(.*)\}\[\*\]", m => CodeModel.ModelsMap[m.Groups[1].Value + "[]"]);
 
             // takes care eg of "System.Int32" vs. "int"
             if (TypesMap.TryGetValue(s, out var typeName))
@@ -851,7 +851,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             if (p > 0)
             {
                 var x = typeName.Substring(0, p);
-                if (Context.Using.Contains(x) || x == Context.ModelsNamespace)
+                if (CodeModel.Using.Contains(x) || x == CodeModel.ModelsNamespace)
                 {
                     typeName = typeName.Substring(p + 1);
                     typeUsing = x;
@@ -872,7 +872,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             var match = typeUsing == null ? symbol : (typeUsing + "." + symbol);
 
             // if not ambiguous, be happy
-            if (!Context.IsAmbiguousSymbol(symbol, match))
+            if (!CodeModel.IsAmbiguousSymbol(symbol, match))
             {
                 Write(typeName);
                 return;
@@ -895,7 +895,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             match = symbol;
 
             // still ambiguous, must prepend global::
-            if (Context.IsAmbiguousSymbol(symbol, match))
+            if (CodeModel.IsAmbiguousSymbol(symbol, match))
                 Write("global::");
 
             Write(typeName);

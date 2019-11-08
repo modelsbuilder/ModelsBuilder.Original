@@ -64,9 +64,9 @@ using ZpqrtBnk.ModelsBuilder;
             var parseResult = new CodeParser().Parse(code, refs);
             parseResult.SetGeneratePropertyGetters(true); // preserve legacy
 
-            var builder = new CustomNamesBuilder();
-            var context = builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new CustomNamesBuilder().Build(model, _config, parseResult, null);
+            var writer = new CodeWriter(model);
             writer.WriteModelFile(types.First());
             var gen = writer.Code;
 

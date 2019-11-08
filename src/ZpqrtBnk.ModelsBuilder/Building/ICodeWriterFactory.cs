@@ -4,6 +4,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 {
     public interface ICodeWriterFactory
     {
-        ICodeWriter CreateWriter(StringBuilder sb, CodeContext context);
+        ICodeWriter CreateWriter(StringBuilder sb, CodeModel model);
     }
 }

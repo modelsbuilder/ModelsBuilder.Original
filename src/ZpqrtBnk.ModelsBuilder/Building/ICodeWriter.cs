@@ -8,8 +8,8 @@
 
         void WriteModelFile(TypeModel model);
 
-        void WriteModelInfosFile(CodeModels models);
+        void WriteModelInfosFile(CodeModel models);
 
-        void WriteSingleFile(CodeModels models);
+        void WriteSingleFile(CodeModel models);
     }
 }

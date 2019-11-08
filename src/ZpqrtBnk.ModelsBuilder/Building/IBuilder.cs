@@ -4,6 +4,6 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 {
     public interface IBuilder
     {
-        CodeContext Build(Config config, ParseResult parseResult, string modelsNamespace, CodeModels models);
+        void Build(CodeModel model, Config config, ParseResult parseResult, string modelsNamespace);
     }
 }

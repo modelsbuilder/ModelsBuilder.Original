@@ -97,9 +97,9 @@ namespace Umbraco.Web.PublishedModels
             };
 
             var parseResult = new CodeParser{ WriteDiagnostics = true }.Parse(code, refs);
-            var builder = new Builder();
-            var context = builder.Build(new Config(), parseResult, null, new CodeModels { TypeModels = types });
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, new Config(), parseResult, null);
+            var writer = new CodeWriter(model);
 
             foreach (var modelToGenerate in types)
             {
@@ -184,9 +184,9 @@ namespace Umbraco.Web.PublishedModels
             };
 
             var parseResult = new CodeParser { WriteDiagnostics = true }.Parse(code, refs);
-            var builder = new Builder();
-            var context = builder.Build(new Config(), parseResult, null, new CodeModels { TypeModels = types });
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, new Config(), parseResult, null);
+            var writer = new CodeWriter(model);
 
             foreach (var modelToGenerate in types)
             {

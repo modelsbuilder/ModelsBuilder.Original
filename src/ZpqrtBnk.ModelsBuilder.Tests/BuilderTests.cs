@@ -175,16 +175,16 @@ using ZpqrtBnk.ModelsBuilder;
             var refs = CreateDefaultReferences();
 
             var parseResult = new CodeParser().Parse(code1, refs);
-            var models = new CodeModels { TypeModels = types };
-            var context = new Builder().Build(_config, parseResult, null, models);
-            var count = context.Using.Count;
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
+            var count = model.Using.Count;
 
             parseResult = new CodeParser().Parse(code2, refs);
-            models = new CodeModels { TypeModels = types };
-            context = new Builder().Build(_config, parseResult, null, models);
+            model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
 
-            Assert.AreEqual(count + 1, context.Using.Count);
-            Assert.IsTrue(context.Using.Contains("Foo.Bar.Nil"));
+            Assert.AreEqual(count + 1, model.Using.Count);
+            Assert.IsTrue(model.Using.Contains("Foo.Bar.Nil"));
         }
 
         [Test]
@@ -212,8 +212,8 @@ using ZpqrtBnk.ModelsBuilder;
             };
 
             var parseResult = new CodeParser().Parse(sources, CreateDefaultReferences());
-            var builder = new Builder();
-            builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
 
             Assert.IsTrue(parseResult.IsIgnored("type1"));
 
@@ -316,8 +316,8 @@ using ZpqrtBnk.ModelsBuilder;
             };
 
             var parseResult = new CodeParser().Parse(sources, CreateDefaultReferences());
-            var models = new CodeModels { TypeModels = types };
-            new Builder().Build(_config, parseResult, null, models);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
 
             Assert.IsTrue(parseResult.IsIgnored("type1"));
             Assert.IsTrue(parseResult.IsIgnored("type2"));
@@ -367,8 +367,8 @@ using ZpqrtBnk.ModelsBuilder;
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new Builder();
-            builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
 
             Assert.IsTrue(parseResult.IsIgnored("type1"));
             Assert.IsFalse(parseResult.IsIgnored("type2"));
@@ -417,8 +417,8 @@ using ZpqrtBnk.ModelsBuilder;
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new Builder();
-            builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
 
             Assert.IsTrue(parseResult.IsIgnored("type1"));
             Assert.IsFalse(parseResult.IsIgnored("type2"));
@@ -469,8 +469,8 @@ using ZpqrtBnk.ModelsBuilder;
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new Builder();
-            builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
 
             Assert.IsFalse(parseResult.IsIgnored("type1"));
             Assert.IsFalse(parseResult.IsIgnored("type2"));
@@ -529,8 +529,8 @@ namespace Models
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new Builder();
-            builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
 
             Assert.IsFalse(parseResult.IsIgnored("type1"));
             Assert.IsFalse(parseResult.IsIgnored("type2"));
@@ -607,9 +607,9 @@ namespace Dang
             };
 
             var parseResult = new CodeParser().Parse(code);
-            var builder = new Builder();
-            var context = builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
+            var writer = new CodeWriter(model);
 
             Assert.AreEqual(3, types.Count);
             var btype1 = types[0];
@@ -673,8 +673,8 @@ namespace Models
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new Builder();
-            builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
 
             Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
 
@@ -734,8 +734,8 @@ namespace Models
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new Builder();
-            builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
 
             Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
             Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop2"));
@@ -791,8 +791,8 @@ namespace Models
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new Builder();
-            builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
 
             Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
 
@@ -843,8 +843,8 @@ namespace Models
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new Builder();
-            builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
 
             Assert.AreEqual("Renamed1", parseResult.PropertyClrName("Type1", "prop1"));
             Assert.AreEqual("Renamed2", parseResult.PropertyClrName("Type1", "prop2"));
@@ -900,8 +900,8 @@ namespace Models
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new Builder();
-            builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
 
             Assert.AreEqual("Renamed1", parseResult.PropertyClrName("Type1", "prop1"));
             Assert.AreEqual("Renamed2", parseResult.PropertyClrName("Type1", "prop2"));
@@ -953,8 +953,8 @@ namespace Models
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new Builder();
-            builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
 
             Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
 
@@ -1009,8 +1009,8 @@ namespace Models
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new Builder();
-            builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
 
             Assert.IsTrue(parseResult.IsPropertyIgnored("Type1", "prop1"));
 
@@ -1059,9 +1059,9 @@ namespace Dang
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new Builder();
-            var context = builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
+            var writer = new CodeWriter(model);
 
             Assert.AreEqual(1, types.Count);
             var btype1 = types[0];
@@ -1167,9 +1167,9 @@ namespace Dang
             var parseResult = new CodeParser().Parse(code, refs);
             parseResult.SetGeneratePropertyGetters(true); // preserve legacy
 
-            var builder = new Builder();
-            var context = builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
+            var writer = new CodeWriter(model);
 
             Assert.AreEqual(2, types.Count);
             var btype1 = types[0];
@@ -1346,13 +1346,13 @@ namespace Umbraco.Web.PublishedModels
 ";
 
             var parseResult = new CodeParser().Parse(sources);
-            var models = new CodeModels { TypeModels = types };
-            var context = new Builder().Build(_config, parseResult, null, models);
-            context.GeneratePropertyGetters = true; // preserve
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
+            model.GeneratePropertyGetters = true; // preserve
+            var writer = new CodeWriter(model);
 
-            foreach (var model in types)
-                writer.WriteModelFile(model);
+            foreach (var typeModel in types)
+                writer.WriteModelFile(typeModel);
             var generated = writer.Code;
 
             Console.WriteLine(generated);
@@ -1413,10 +1413,10 @@ namespace Umbraco.Web.PublishedModels
 ";
 
             var parseResult = new CodeParser().Parse(code);
-            var models = new CodeModels { TypeModels = types };
-            var context = new Builder().Build(_config, parseResult, null, models);
-            context.GeneratePropertyGetters = true; // preserve
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
+            model.GeneratePropertyGetters = true; // preserve
+            var writer = new CodeWriter(model);
 
             writer.WriteModelFile(types.First());
             var generated = writer.Code;
@@ -1474,9 +1474,9 @@ namespace Umbraco.Web.PublishedModels
 ";
 
             var parseResult = new CodeParser().Parse(sources);
-            var models = new CodeModels { TypeModels = types };
-            var context = new Builder().Build(_config, parseResult, null, models);
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
+            var writer = new CodeWriter(model);
 
             writer.WriteModelFile(types.First());
             var gen = writer.Code;
@@ -1539,10 +1539,10 @@ namespace Umbraco.Web.PublishedModels
 ";
 
             var parseResult = new CodeParser().Parse(sources);
-            var models = new CodeModels { TypeModels = types };
-            var context = new Builder().Build(_config, parseResult, null, models);
-            context.GenerateFallbackFuncExtensionMethods = true;
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
+            model.GenerateFallbackFuncExtensionMethods = true;
+            var writer = new CodeWriter(model);
 
             writer.WriteModelFile(types.First());
             var generated = writer.Code;
@@ -1600,9 +1600,9 @@ namespace Umbraco.Web.PublishedModels
 ";
 
             var parseResult = new CodeParser().Parse(sources, CreateDefaultReferences());
-            var models = new CodeModels { TypeModels = types };
-            var context = new Builder().Build(_config, parseResult, null, models);
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
+            var writer = new CodeWriter(model);
 
             writer.WriteModelFile(types.First());
             var generated = writer.Code;
@@ -1683,10 +1683,10 @@ namespace Umbraco.Web.PublishedModels
 
             var parseResult = new CodeParser().Parse(sources);
 
-            var models = new CodeModels { TypeModels = types };
-            var context = new Builder().Build(_config, parseResult, "Umbraco.Web.PublishedModels", models);
-            context.GeneratePropertyGetters = true; // preserve
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, "Umbraco.Web.PublishedModels");
+            model.GeneratePropertyGetters = true; // preserve
+            var writer = new CodeWriter(model);
 
             writer.WriteModelFile(types.Skip(1).First());
             var generated1 = writer.Code;
@@ -1769,10 +1769,10 @@ namespace Umbraco.Web.PublishedModels
 
             Assert.IsTrue(parseResult.HasCtor("Type1"));
 
-            var models = new CodeModels { TypeModels = types };
-            var context = new Builder().Build(_config, parseResult, null, models);
-            context.GeneratePropertyGetters = true; // preserve
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
+            model.GeneratePropertyGetters = true; // preserve
+            var writer = new CodeWriter(model);
 
             writer.WriteModelFile(types.First());
             var generated = writer.Code;
@@ -1855,10 +1855,10 @@ namespace Umbraco.Web.PublishedModels
             Assert.IsFalse(parseResult.HasCtor("Type1"));
             Assert.IsTrue(parseResult.HasCtor("Type2"));
 
-            var models = new CodeModels { TypeModels = types };
-            var context = new Builder().Build(_config, parseResult, null, models);
-            context.GeneratePropertyGetters = true; // preserve
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
+            model.GeneratePropertyGetters = true; // preserve
+            var writer = new CodeWriter(model);
 
             writer.WriteModelFile(types.First());
             var generated = writer.Code;
@@ -1910,13 +1910,13 @@ namespace Umbraco.Web.PublishedModels
             { };
 
             var parseResult = new CodeParser().Parse(sources);
-            var models = new CodeModels { TypeModels = types };
-            var context = new Builder().Build(_config, parseResult, null, models);
-            context.GeneratePropertyGetters = true; // preserve
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
+            model.GeneratePropertyGetters = true; // preserve
+            var writer = new CodeWriter(model);
 
-            foreach (var model in types)
-                writer.WriteContentTypeModel(model);
+            foreach (var typeModel in types)
+                writer.WriteContentTypeModel(typeModel);
             var generated = writer.Code;
 
             Console.WriteLine(generated);
@@ -1960,11 +1960,12 @@ namespace Umbraco.Web.PublishedModels
             var parseResult = new CodeParser().Parse(code);
             var builder = new Builder();
             // forces conflict with ZpqrtBnk.ModelsBuilder.Umbraco
-            var context = builder.Build(_config, parseResult, "ZpqrtBnk.ModelsBuilder.Models", new CodeModels { TypeModels = types });
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            builder.Build(model, _config, parseResult, "ZpqrtBnk.ModelsBuilder.Models");
+            var writer = new CodeWriter(model);
 
-            foreach (var model in types)
-                writer.WriteContentTypeModel(model);
+            foreach (var typeModel in types)
+                writer.WriteContentTypeModel(typeModel);
             var gen = writer.Code;
 
             Console.WriteLine(gen);
@@ -1982,8 +1983,9 @@ namespace Umbraco.Web.PublishedModels
         {
             var builder = new Builder();
             builder.ModelsNamespaceForTests = "ModelsNamespace";
-            var context = builder.Build(_config, ParseResult.Empty, null, new CodeModels());
-            var writer = new CodeWriter(context);
+            var model = new CodeModel();
+            builder.Build(model, _config, ParseResult.Empty, null);
+            var writer = new CodeWriter(model);
 
             writer.WriteClrType(input);
             Assert.AreEqual(expected, writer.Code);
@@ -1997,10 +1999,11 @@ namespace Umbraco.Web.PublishedModels
         {
             var builder = new Builder();
             builder.ModelsNamespaceForTests = "ModelsNamespace";
-            var context = builder.Build(_config, ParseResult.Empty, null, new CodeModels());
-            var writer = new CodeWriter(context);
+            var model = new CodeModel();
+            builder.Build(model, _config, ParseResult.Empty, null);
+            var writer = new CodeWriter(model);
 
-            context.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
+            model.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
 
             writer.WriteClrType(input);
             Assert.AreEqual(expected, writer.Code);
@@ -2029,11 +2032,12 @@ namespace Umbraco.Web.PublishedModels
         {
             var builder = new Builder();
             builder.ModelsNamespaceForTests = ns;
-            var context = builder.Build(_config, ParseResult.Empty, null, new CodeModels());
-            var writer = new CodeWriter(context);
+            var model = new CodeModel();
+            builder.Build(model, _config, ParseResult.Empty, null);
+            var writer = new CodeWriter(model);
 
-            if (usingSystem) context.Using.Add("System.Text");
-            if (usingZb) context.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
+            if (usingSystem) model.Using.Add("System.Text");
+            if (usingZb) model.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
 
             writer.WriteClrType(type);
 
@@ -2045,11 +2049,12 @@ namespace Umbraco.Web.PublishedModels
         {
             var builder = new Builder();
             builder.ModelsNamespaceForTests = "SomeRandomNamespace";
-            var context = builder.Build(_config, ParseResult.Empty, null, new CodeModels());
-            var writer = new CodeWriter(context);
+            var model = new CodeModel();
+            builder.Build(model, _config, ParseResult.Empty, null);
+            var writer = new CodeWriter(model);
 
-            context.Using.Add("System.Text");
-            context.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
+            model.Using.Add("System.Text");
+            model.Using.Add("ZpqrtBnk.ModelsBuilder.Tests");
 
             writer.WriteClrType(typeof(ASCIIEncoding.Nested));
 
@@ -2202,10 +2207,10 @@ namespace Umbraco.Web.PublishedModels
 
             // get the writer
             var parseResult = new CodeParser().Parse(sources, refs);
-            var models = new CodeModels { TypeModels = types };
-            var context = new Builder().Build(_config, parseResult, null, models);
-            context.GeneratePropertyGetters = true; // preserve
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
+            model.GeneratePropertyGetters = true; // preserve
+            var writer = new CodeWriter(model);
 
             // write
             writer.WriteModelFile(types.First());
@@ -2217,7 +2222,7 @@ namespace Umbraco.Web.PublishedModels
 
             // add model infos for compilation
             writer.Reset();
-            writer.WriteModelInfosFile(models);
+            writer.WriteModelInfosFile(model);
             sources["modelInfos"] = writer.Code;
             Console.WriteLine(sources["modelInfos"]);
 
@@ -2286,9 +2291,9 @@ public class ElementModelBase3 {}
             };
 
             var parseResult = new CodeParser().Parse(code, refs);
-            var builder = new Builder();
-            var context = builder.Build(_config, parseResult, null, new CodeModels { TypeModels = types });
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
+            var writer = new CodeWriter(model);
 
             writer.WriteContentTypeModel(types[0]);
             var gen = writer.Code;
@@ -2547,11 +2552,11 @@ namespace Umbraco.Web.PublishedModels
 ";
 
             var parseResult = new CodeParser().Parse(sources);
-            var models = new CodeModels { TypeModels = types };
-            var context = new Builder().Build(_config, parseResult, null, models);
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
+            var writer = new CodeWriter(model);
 
-            writer.WriteModelInfosFile(models);
+            writer.WriteModelInfosFile(model);
             var generated = writer.Code;
 
             Console.WriteLine(generated);
@@ -2628,10 +2633,10 @@ namespace Umbraco.Web.PublishedModels
 ";
 
             var parseResult = new CodeParser().Parse(sources, CreateDefaultReferences());
-            var models = new CodeModels { TypeModels = types };
-            var context = new Builder().Build(_config, parseResult, null, models);
-            context.GeneratePropertyGetters = true; // preserve
-            var writer = new CodeWriter(context);
+            var model = new CodeModel { TypeModels = types };
+            new Builder().Build(model, _config, parseResult, null);
+            model.GeneratePropertyGetters = true; // preserve
+            var writer = new CodeWriter(model);
 
             writer.WriteModelFile(types.First());
             var generated = writer.Code;

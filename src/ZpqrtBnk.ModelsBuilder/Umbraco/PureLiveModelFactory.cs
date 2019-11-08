@@ -341,8 +341,13 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                     .ToDictionary(x => x, File.ReadAllText)
                 : new Dictionary<string, string>();
 
-            var models = UmbracoServices.GetAll();
-            var currentHash = HashHelper.Hash(ourFiles, models.TypeModels); // TODO: hash 'models'
+            // get models from Umbraco
+            var model = new CodeModel
+            {
+                TypeModels = UmbracoServices.GetAllTypes()
+            };
+
+            var currentHash = HashHelper.Hash(ourFiles, model.TypeModels); // TODO: hash 'model' entirely
             var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
             var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
             var projFile = Path.Combine(modelsDirectory, "all.generated.cs");
@@ -457,7 +462,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
             _logger.Debug<PureLiveModelFactory>("Rebuilding models.");
 
             // generate code, save
-            var code = GenerateModelsCode(ourFiles, models);
+            var code = GenerateModelsCode(ourFiles, model);
             // add extra attributes,
             //  PureLiveAssembly helps identifying Assemblies that contain PureLive models
             //  AssemblyVersion is so that we have a different version for each rebuild
@@ -554,7 +559,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
             return new Infos { ModelInfos = modelInfos.Count > 0 ? modelInfos : null, ModelTypeMap = map };
         }
 
-        private string GenerateModelsCode(IDictionary<string, string> ourFiles, CodeModels models)
+        private string GenerateModelsCode(IDictionary<string, string> ourFiles, CodeModel model)
         {
             var modelsDirectory = _config.ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
@@ -565,10 +570,10 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
             var builder = _builderFactory.CreateBuilder();
-            var context = builder.Build(_config, parseResult, _config.ModelsNamespace, models);
-            var writer = _writerFactory.CreateWriter(context);
+            builder.Build(model, _config, parseResult, _config.ModelsNamespace);
+            var writer = _writerFactory.CreateWriter(model);
 
-            writer.WriteSingleFile(models);
+            writer.WriteSingleFile(model);
 
             return writer.Code;
         }

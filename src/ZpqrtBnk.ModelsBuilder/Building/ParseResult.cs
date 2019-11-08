@@ -230,14 +230,12 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         public string ContentClrName(string contentAlias)
         {
-            string name;
-            return (_renamedContent.TryGetValue(contentAlias, out name)) ? name : null;
+            return _renamedContent.TryGetValue(contentAlias, out var name) ? name : null;
         }
 
         public bool IsPropertyIgnored(string contentName, string propertyAlias)
         {
-            HashSet<string> ignores;
-            if (_ignoredProperty.TryGetValue(contentName, out ignores))
+            if (_ignoredProperty.TryGetValue(contentName, out var ignores))
             {
                 if (ignores.Contains(propertyAlias)) return true;
                 if (ignores
@@ -246,26 +244,21 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                         .Any(x => propertyAlias.StartsWith(x, StringComparison.InvariantCultureIgnoreCase)))
                     return true;
             }
-            string baseName;
-            if (_contentBase.TryGetValue(contentName, out baseName)
+
+            if (_contentBase.TryGetValue(contentName, out var baseName)
                 && IsPropertyIgnored(baseName, propertyAlias)) return true;
-            string[] interfaceNames;
-            if (_contentInterfaces.TryGetValue(contentName, out interfaceNames)
+            if (_contentInterfaces.TryGetValue(contentName, out var interfaceNames)
                 && interfaceNames.Any(interfaceName => IsPropertyIgnored(interfaceName, propertyAlias))) return true;
             return false;
         }
 
         public string PropertyClrName(string contentName, string propertyAlias)
         {
-            Dictionary<string, string> renames;
-            string name;
-            if (_renamedProperty.TryGetValue(contentName, out renames)
-                && renames.TryGetValue(propertyAlias, out name)) return name;
-            string baseName;
-            if (_contentBase.TryGetValue(contentName, out baseName)
+            if (_renamedProperty.TryGetValue(contentName, out var renames)
+                && renames.TryGetValue(propertyAlias, out var name)) return name;
+            if (_contentBase.TryGetValue(contentName, out var baseName)
                 && null != (name = PropertyClrName(baseName, propertyAlias))) return name;
-            string[] interfaceNames;
-            if (_contentInterfaces.TryGetValue(contentName, out interfaceNames)
+            if (_contentInterfaces.TryGetValue(contentName, out var interfaceNames)
                 && null != (name = interfaceNames
                     .Select(interfaceName => PropertyClrName(interfaceName, propertyAlias))
                     .FirstOrDefault(x => x != null))) return name;
@@ -288,10 +281,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             return info?.BaseClassName;
         }
 
-        public bool HasModelsNamespace
-        {
-            get { return !string.IsNullOrWhiteSpace(ModelsNamespace); }
-        }
+        public bool HasModelsNamespace => !string.IsNullOrWhiteSpace(ModelsNamespace);
 
         public string ModelsNamespace { get; private set; }
 
@@ -299,10 +289,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         public bool GenerateFallbackFuncExtensionMethods { get; private set; }
 
-        public IEnumerable<string> UsingNamespaces
-        {
-            get { return _usingNamespaces; }
-        }
+        public IEnumerable<string> UsingNamespaces => _usingNamespaces;
 
         public bool HasCtor(string contentName)
         {
@@ -314,9 +301,13 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             return _implementedExtensions.TryGetValue(typeFullName, out var props) && props.Contains(propertyClrName);
         }
 
-        public string ModelInfoClassName { get; private set; } = "ModelInfos";
+        public bool HasModelInfoClassName => !string.IsNullOrWhiteSpace(ModelInfoClassName);
 
-        public string ModelInfoClassNamespace => _modelInfosClassNamespace ?? ModelsNamespace ?? "Umbraco.Web.PublishedModels"; // FIXME
+        public string ModelInfoClassName { get; private set; }
+
+        public bool HasModelInfoClassNamespace => !string.IsNullOrWhiteSpace(ModelInfoClassNamespace);
+
+        public string ModelInfoClassNamespace { get; private set; }
 
         public string TypeModelPrefix { get; private set; } = "";
 

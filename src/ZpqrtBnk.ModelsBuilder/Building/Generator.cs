@@ -32,7 +32,10 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 File.Delete(file);
 
             // get models from Umbraco
-            var models = _umbracoServices.GetAll();
+            var model = new CodeModel
+            {
+                TypeModels = _umbracoServices.GetAllTypes()
+            };
 
             // get our (non-generated) files and parse them
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
@@ -40,11 +43,11 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             
             // create a builder, build a context, create a writer
             var builder = _builderFactory.CreateBuilder();
-            var context = builder.Build(_config, parseResult, modelsNamespace, models);
-            var writer = _writerFactory.CreateWriter(context);
+            builder.Build(model, _config, parseResult, modelsNamespace);
+            var writer = _writerFactory.CreateWriter(model);
 
             // write each model file
-            foreach (var typeModel in models.TypeModels)
+            foreach (var typeModel in model.TypeModels)
             {
                 writer.Reset();
                 writer.WriteModelFile(typeModel);
@@ -54,8 +57,8 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
             // write the infos file
             writer.Reset();
-            writer.WriteModelInfosFile(models);
-            var metaFilename = Path.Combine(modelsDirectory, context.ModelInfosClassName + ".generated.cs");
+            writer.WriteModelInfosFile(model);
+            var metaFilename = Path.Combine(modelsDirectory, model.ModelInfosClassName + ".generated.cs");
             File.WriteAllText(metaFilename, writer.Code);
 
             // the idea was to calculate the current hash and to add it as an extra file to the compilation,
@@ -75,7 +78,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
                 foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                     ourFiles[file] = File.ReadAllText(file);
                 var compiler = new Compiler();
-                compiler.Compile(context.ModelsNamespace, ourFiles, bin);
+                compiler.Compile(model.ModelsNamespace, ourFiles, bin);
             }
 
             OutOfDateModelsStatus.Clear();
@@ -84,19 +87,22 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         public Dictionary<string, string> GetModels(string modelsNamespace, IDictionary<string, string> files)
         {
             // get models from Umbraco
-            var models = _umbracoServices.GetAll();
+            var model = new CodeModel
+            {
+                TypeModels = _umbracoServices.GetAllTypes()
+            };
 
             // parse the (non-generated) files
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(files);
 
             // create a builder, build a context, create a writer
             var builder = _builderFactory.CreateBuilder();
-            var context = builder.Build(_config, parseResult, modelsNamespace, models);
-            var writer = _writerFactory.CreateWriter(context);
+            builder.Build(model, _config, parseResult, modelsNamespace);
+            var writer = _writerFactory.CreateWriter(model);
             var generated = new Dictionary<string, string>();
 
             // write each model file
-            foreach (var typeModel in models.TypeModels)
+            foreach (var typeModel in model.TypeModels)
             {
                 writer.Reset();
                 writer.WriteModelFile(typeModel);
@@ -108,7 +114,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
             // write the info files
             writer.Reset();
-            writer.WriteModelInfosFile(models);
+            writer.WriteModelInfosFile(model);
             generated[parseResult.ModelInfoClassName] = writer.Code;
 
             return generated;
