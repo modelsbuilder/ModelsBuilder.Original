@@ -203,7 +203,15 @@ namespace Umbraco.ModelsBuilder.Building
                         disco.SetElementModelsBaseClassName(SymbolDisplay.ToDisplayString(elementModelsBaseClass));
                         break;
 
-                    case "Umbraco.ModelsBuilder.ModelsNamespaceAttribute":
+										case "Umbraco.ModelsBuilder.SelectiveElementModelsBaseClassAttribute":
+											var selectiveElementModelsBaseClass = (INamedTypeSymbol)attrData.ConstructorArguments[0].Value;
+											if (selectiveElementModelsBaseClass is IErrorTypeSymbol)
+												throw new Exception($"Invalid base class type \"{selectiveElementModelsBaseClass.Name}\".");
+											var elementAliasToInclude = (string)attrData.ConstructorArguments[1].Value;
+											disco.SetSelectiveElement(elementAliasToInclude, SymbolDisplay.ToDisplayString(selectiveElementModelsBaseClass));
+											break;
+
+					case "Umbraco.ModelsBuilder.ModelsNamespaceAttribute":
                         var modelsNamespace= (string) attrData.ConstructorArguments[0].Value;
                         disco.SetModelsNamespace(modelsNamespace);
                         break;

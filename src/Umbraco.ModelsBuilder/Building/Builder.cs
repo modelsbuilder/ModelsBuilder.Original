@@ -332,7 +332,7 @@ namespace Umbraco.ModelsBuilder.Building
             if (ParseResult.HasModelsBaseClassName && !type.IsElement && !ParseResult.HasSelectiveModelsBaseClassName(type.Alias))
                 return ParseResult.ModelsBaseClassName;
 
-            if (ParseResult.HasElementModelsBaseClassName && type.IsElement && !ParseResult.HasSelectiveModelsBaseClassName(type.Alias))
+            if (ParseResult.HasElementModelsBaseClassName && type.IsElement && !ParseResult.HasSelectiveElementsModelsBaseClassName(type.Alias))
                 return ParseResult.ElementModelsBaseClassName;
 
             if (ParseResult.HasSelectiveModelsBaseClassName(type.Alias) && !type.IsElement) {
@@ -341,8 +341,15 @@ namespace Umbraco.ModelsBuilder.Building
                     return selectiveBaseClass;
             }
 
-            // default
-            return type.IsElement ? "PublishedElementModel" : "PublishedContentModel";
+						if (ParseResult.HasSelectiveElementsModelsBaseClassName(type.Alias) && type.IsElement)
+						{
+							var selectiveBaseClass = ParseResult.GetSelectiveElementsModelsBaseClassName(type.Alias);
+							if (!string.IsNullOrEmpty(selectiveBaseClass))
+								return selectiveBaseClass;
+						}
+
+			// default
+			return type.IsElement ? "PublishedElementModel" : "PublishedContentModel";
         }
     }
 }

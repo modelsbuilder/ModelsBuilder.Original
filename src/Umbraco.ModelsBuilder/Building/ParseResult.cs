@@ -41,6 +41,7 @@ namespace Umbraco.ModelsBuilder.Building
             = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
         private Dictionary<string, string> _selectiveModelsBaseClassNameOverides = new Dictionary<string, string>();
+        private Dictionary<string, string> _selectiveElementsModelsBaseClassNameOverides = new Dictionary<string, string>();
 
         public static readonly ParseResult Empty = new ParseResult();
 
@@ -90,8 +91,16 @@ namespace Umbraco.ModelsBuilder.Building
                 _selectiveModelsBaseClassNameOverides.Add(contentAlias, baseClassName);
         }
 
-        // content with that alias should be generated with a different name
-        public void SetRenamedContent(string contentAlias, string contentName, bool withImplement)
+		// element with that alias should included to be generated
+		// alias can end with a * (wildcard)
+		public void SetSelectiveElement(string contentAlias, string baseClassName)
+		{
+			if (!_selectiveElementsModelsBaseClassNameOverides.ContainsKey(contentAlias))
+				_selectiveElementsModelsBaseClassNameOverides.Add(contentAlias, baseClassName);
+		}
+
+		// content with that alias should be generated with a different name
+		public void SetRenamedContent(string contentAlias, string contentName, bool withImplement)
         {
             _renamedContent[contentAlias] = contentName;
             if (withImplement)
@@ -144,7 +153,8 @@ namespace Umbraco.ModelsBuilder.Building
             ElementModelsBaseClassName = elementModelsBaseClassName;
         }
 
-        public void SetModelsNamespace(string modelsNamespace)
+
+		public void SetModelsNamespace(string modelsNamespace)
         {
             ModelsNamespace = modelsNamespace;
         }
@@ -288,7 +298,9 @@ namespace Umbraco.ModelsBuilder.Building
             });
         }
 
-        public string GetSelectiveModelsBaseClassName(string key)
+
+
+		public string GetSelectiveModelsBaseClassName(string key)
         {
             if (_selectiveModelsBaseClassNameOverides.ContainsKey(key))
             {
@@ -312,7 +324,47 @@ namespace Umbraco.ModelsBuilder.Building
             return null;
         }
 
-        public bool HasElementModelsBaseClassName
+		public bool HasSelectiveElementsModelsBaseClassName(string key)
+		{
+			if (_selectiveElementsModelsBaseClassNameOverides.ContainsKey(key))
+				return true;
+
+			return _selectiveElementsModelsBaseClassNameOverides.Keys.Any(x =>
+			{
+				if (x.StartsWith("*"))
+				{
+					return key.EndsWith(x.Replace("*", string.Empty));
+				}
+				return key.StartsWith(x.Replace("*", string.Empty));
+			});
+		}
+
+
+		public string GetSelectiveElementsModelsBaseClassName(string key)
+		{
+			if (_selectiveElementsModelsBaseClassNameOverides.ContainsKey(key))
+			{
+				return _selectiveElementsModelsBaseClassNameOverides[key];
+			}
+
+			var retVal = _selectiveElementsModelsBaseClassNameOverides.SingleOrDefault(x =>
+			{
+				if (x.Key.StartsWith("*"))
+				{
+					return key.EndsWith(x.Key.Replace("*", string.Empty));
+				}
+				return key.StartsWith(x.Key.Replace("*", string.Empty));
+			});
+
+			if (!retVal.Equals(new KeyValuePair<string, string>()))
+			{
+				return retVal.Value;
+			}
+
+			return null;
+		}
+
+		public bool HasElementModelsBaseClassName
         {
             get { return !string.IsNullOrWhiteSpace(ElementModelsBaseClassName); }
         }
