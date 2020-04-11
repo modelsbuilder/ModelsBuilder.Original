@@ -3,7 +3,7 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace ZpqrtBnk.ModelsBuilder.Web
+namespace Our.ModelsBuilder.Web
 {
     public static class ApiRoute
     {
@@ -19,7 +19,7 @@ namespace ZpqrtBnk.ModelsBuilder.Web
 
             var url = umbracoPath + "/BackOffice/Api/" + controllerName;
             var route = RouteTable.Routes.MapHttpRoute(
-                "zpqrtbnk-modelsbuilder-" + controllerName.ToLowerInvariant(),
+                "our-modelsbuilder-" + controllerName.ToLowerInvariant(),
                 url + "/{action}/{id}",
                 new { controller = controllerName, id = UrlParameter.Optional });
 

@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
 
-namespace ZpqrtBnk.ModelsBuilder.Extension
+namespace Our.ModelsBuilder.Extension
 {
     // see http://msdn.microsoft.com/en-us/library/bb166195.aspx
 

@@ -4,260 +4,193 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Umbraco.Core;
+using Our.ModelsBuilder.Options;
+using Our.ModelsBuilder.Options.ContentTypes;
 using Umbraco.Core.Models.PublishedContent;
 
-namespace ZpqrtBnk.ModelsBuilder.Building
+namespace Our.ModelsBuilder.Building
 {
     /// <summary>
-    /// Implements code parsing.
+    /// Implements the default <see cref="ICodeParser"/>.
     /// </summary>
-    /// <remarks>Parses user's code and look for generator's instructions.</remarks>
-    internal class CodeParser
+    public class CodeParser : ICodeParser
     {
-        /// <summary>
-        /// Gets or sets a value indicating whether to write diagnostics to console, for debugging purposes.
-        /// </summary>
-        public bool WriteDiagnostics { get; set; }
+        private readonly LanguageVersion _languageVersion;
 
         /// <summary>
-        /// Parses a set of file.
+        /// Initializes a new instance of the <see cref="CodeParser"/> class.
         /// </summary>
-        /// <param name="files">A set of (filename,content) representing content to parse.</param>
-        /// <returns>The result of the code parsing.</returns>
-        /// <remarks>The set of files is a dictionary of name, content.</remarks>
-        public ContentModelTransform Parse(IDictionary<string, string> files)
+        public CodeParser(LanguageVersion languageVersion = LanguageVersion.Default)
         {
-            return Parse(files, Enumerable.Empty<PortableExecutableReference>());
+            _languageVersion = languageVersion;
         }
 
         /// <summary>
-        /// Parses a set of file.
+        /// Gets or sets a value indicating whether to write diagnostics to console (for tests).
         /// </summary>
-        /// <param name="files">A set of (filename,content) representing content to parse.</param>
-        /// <param name="references">Assemblies to reference in compilations.</param>
-        /// <returns>The result of the code parsing.</returns>
-        /// <remarks>The set of files is a dictionary of name, content.</remarks>
-        public ContentModelTransform Parse(IDictionary<string, string> files, IEnumerable<PortableExecutableReference> references)
+        public bool WriteDiagnostics { get; set; }
+
+        /// <inheritdoc />
+        public void Parse(IDictionary<string, string> files, CodeOptionsBuilder optionsBuilder, IEnumerable<PortableExecutableReference> references = null)
         {
-            SyntaxTree[] trees;
-            var compiler = new Compiler { References = references };
-            var compilation = compiler.GetCompilation("ZpqrtBnk.ModelsBuilder.Generated", files, out trees);
+            var compiler = new Compiler(_languageVersion) { References = references ?? Enumerable.Empty<PortableExecutableReference>() };
+            var compilation = compiler.GetCompilation("Our.ModelsBuilder.Generated", files, out var trees);
 
             // debug
             if (WriteDiagnostics)
                 foreach (var d in compilation.GetDiagnostics())
                     Console.WriteLine(d);
 
-            var disco = new ContentModelTransform();
             foreach (var tree in trees)
-            {
-                Parse(disco, compilation, tree);
-            }
-
-            return disco;
+                Parse(optionsBuilder.ContentTypes, compilation, tree);
         }
 
-        public ContentModelTransform ParseWithReferencedAssemblies(IDictionary<string, string> files)
-        {
-            return Parse(files, ReferencedAssemblies.References);
-        }
-
-        private static void Parse(ContentModelTransform disco, CSharpCompilation compilation, SyntaxTree tree)
+        private static void Parse(ContentTypesCodeOptionsBuilder transform, CSharpCompilation compilation, SyntaxTree tree)
         {
             var model = compilation.GetSemanticModel(tree);
 
-            //we quite probably have errors but that is normal
-            //var diags = model.GetDiagnostics();
-
-            var classDecls = tree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>();
-            var classSymbols = classDecls.Select(x => model.GetDeclaredSymbol(x)).ToList();
-            var interfaceDecls = tree.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>();
-
-            // extensions
-            foreach (var classSymbol in classSymbols.Where(x => x.IsStatic))
-            {
-                var methods = classSymbol.GetMembers().OfType<IMethodSymbol>().Where(x => x.IsExtensionMethod && !x.IsGenericMethod);
-
-                foreach (var method in methods)
-                {
-                    var parameters = method.Parameters;
-                    if (parameters.Length != 3) continue;
-
-                    bool IsStringType(ITypeSymbol type)
-                        => type.ToDisplayString() == "string";
-
-                    if (!IsStringType(parameters[1].Type) || !IsStringType(parameters[2].Type))
-                        continue;
-
-                    // the type here is *not* the type full name - only a symbol
-                    // at that point we may even be referencing a type that has not been generated
-                    // and then it will come out as 'Foo' *but* it may come out as 'Namespace.Foo'.
-                    // ParserResult will deal with it
-                    // TODO this could have consequences with duplicate names in namespaces?
-                    // but the only way would be to have an attribute to specify the alias = later
-                    var typeName = parameters[0].Type.ToDisplayString();
-                    var propertyName = method.Name;
-                    disco.SetImplementedExtension(typeName, propertyName);
-                }
-            }
+            // we quite probably have errors but that is normal, as we may for instance refer
+            // to types that have not been generated yet, etc.
+            //var diagnostics = model.GetDiagnostics();
 
             // classes
+            var classDeclarations = tree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>();
+            var classSymbols = classDeclarations.Select(x => model.GetDeclaredSymbol(x));
             foreach (var classSymbol in classSymbols)
             {
-                ParseClassSymbols(disco, classSymbol);
-
-                var baseClassSymbol = classSymbol.BaseType;
-                if (baseClassSymbol != null)
-                    //disco.SetContentBaseClass(SymbolDisplay.ToDisplayString(classSymbol), SymbolDisplay.ToDisplayString(baseClassSymbol));
-                    disco.SetContentBaseClass(classSymbol.Name, baseClassSymbol.Name);
-
-                var interfaceSymbols = classSymbol.Interfaces;
-                disco.SetContentInterfaces(classSymbol.Name, //SymbolDisplay.ToDisplayString(classSymbol),
-                    interfaceSymbols.Select(x => x.Name)); //SymbolDisplay.ToDisplayString(x)));
-
-                var hasCtor = classSymbol.Constructors
-                    .Any(x =>
-                    {
-                        if (x.IsStatic) return false;
-                        if (x.Parameters.Length != 1) return false;
-                        var type1 = x.Parameters[0].Type;
-                        var type2 = typeof (IPublishedContent);
-                        return type1.ToDisplayString() == type2.FullName;
-                    });
-
-                if (hasCtor)
-                    disco.SetHasCtor(classSymbol.Name);
-
-                foreach (var propertySymbol in classSymbol.GetMembers().Where(x => x is IPropertySymbol))
-                    ParsePropertySymbols(disco, classSymbol, propertySymbol);
-
-                foreach (var staticMethodSymbol in classSymbol.GetMembers().Where(x => x is IMethodSymbol))
-                    ParseMethodSymbol(disco, classSymbol, staticMethodSymbol);
+                if (classSymbol.IsStatic)
+                {
+                    // extension class
+                    var methodSymbols = classSymbol.GetMembers().OfType<IMethodSymbol>().Where(x => x.IsStatic && !x.IsGenericMethod);
+                    foreach (var methodSymbol in methodSymbols)
+                        ParseExtensions(transform, methodSymbol);
+                }
+                else
+                {
+                    // class
+                    ParseClassDeclaration(transform, classSymbol);
+                }
             }
 
             // interfaces
-            foreach (var interfaceSymbol in interfaceDecls.Select(x => model.GetDeclaredSymbol(x)))
+            var interfaceDeclarations = tree.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>();
+            var interfaceSymbols = interfaceDeclarations.Select(x => model.GetDeclaredSymbol(x));
+            foreach (var interfaceSymbol in interfaceSymbols)
             {
-                ParseClassSymbols(disco, interfaceSymbol);
-
-                var interfaceSymbols = interfaceSymbol.Interfaces;
-                disco.SetContentInterfaces(interfaceSymbol.Name, //SymbolDisplay.ToDisplayString(interfaceSymbol),
-                    interfaceSymbols.Select(x => x.Name)); // SymbolDisplay.ToDisplayString(x)));
+                ParseInterfaceDeclaration(transform, interfaceSymbol);
             }
-
-            ParseAssemblySymbols(disco, compilation.Assembly);
         }
 
-        private static void ParseClassSymbols(ContentModelTransform disco, ISymbol symbol)
+        private static bool IsObject(INamedTypeSymbol symbol)
         {
-            foreach (var attrData in symbol.GetAttributes())
+            return symbol.ContainingNamespace.ToString() == "System" && 
+                   symbol.Name == "Object";
+        }
+
+        // parse the partial class declaration, detecting
+        // - if the partial class defines a base class
+        // - the interfaces declared by the partial class
+        // - whether the partial class provides the constructor
+        // - FIXME properties implemented by the partial class
+        private static void ParseClassDeclaration(ContentTypesCodeOptionsBuilder transform, INamedTypeSymbol classSymbol)
+        {
+            // is a partial defining a base class?
+            var baseClassSymbol = classSymbol.BaseType;
+            if (!IsObject(baseClassSymbol)) // never null, but can be 'object'
             {
-                var attrClassSymbol = attrData.AttributeClass;
+                var className = baseClassSymbol.Name;
+                //var assemblyName = baseClassSymbol is IErrorTypeSymbol
+                //    ? ""
+                //    : baseClassSymbol.ContainingNamespace.ToString();
+                transform.ContentTypeModelHasBaseClass(classSymbol.Name, className);
+            }
 
-                // handle errors
-                if (attrClassSymbol is IErrorTypeSymbol) continue;
-                if (attrData.AttributeConstructor == null) continue;
+            // discover the interfaces
+            var interfaceSymbols = classSymbol.Interfaces;
+            foreach (var symbol in interfaceSymbols)
+                transform.ContentTypeModelHasInterface(classSymbol.Name, symbol.Name);
 
-                var attrClassName = SymbolDisplay.ToDisplayString(attrClassSymbol);
-                switch (attrClassName)
+            // is a partial implementing the constructor?
+            var hasConstructor = classSymbol.Constructors
+                .Any(x =>
                 {
-                    case "ZpqrtBnk.ModelsBuilder.IgnorePropertyTypeAttribute":
-                        var propertyAliasToIgnore = (string)attrData.ConstructorArguments[0].Value;
-                        disco.SetIgnoredProperty(symbol.Name /*SymbolDisplay.ToDisplayString(symbol)*/, propertyAliasToIgnore);
-                        break;
-                    case "ZpqrtBnk.ModelsBuilder.RenamePropertyTypeAttribute":
-                        var propertyAliasToRename = (string)attrData.ConstructorArguments[0].Value;
-                        var propertyRenamed = (string)attrData.ConstructorArguments[1].Value;
-                        disco.SetRenamedProperty(symbol.Name /*SymbolDisplay.ToDisplayString(symbol)*/, propertyAliasToRename, propertyRenamed);
-                        break;
-                    // that one causes all sorts of issues with references to Umbraco.Core in Roslyn
-                    //case "Umbraco.Core.Models.PublishedContent.PublishedContentModelAttribute":
-                    //    var contentAliasToRename = (string)attrData.ConstructorArguments[0].Value;
-                    //    disco.SetRenamedContent(contentAliasToRename, symbol.Name /*SymbolDisplay.ToDisplayString(symbol)*/);
-                    //    break;
-                    case "ZpqrtBnk.ModelsBuilder.ImplementContentTypeAttribute":
-                        var contentAliasToRename = (string)attrData.ConstructorArguments[0].Value;
-                        disco.RenameContentType(contentAliasToRename, symbol.Name, true /*SymbolDisplay.ToDisplayString(symbol)*/);
-                        break;
-                }
-            }
+                    if (x.IsStatic) return false;
+                    if (x.Parameters.Length != 1) return false;
+                    var type1 = x.Parameters[0].Type;
+                    var type2 = typeof(IPublishedContent);
+                    return type1.ToDisplayString() == type2.FullName;
+                });
+
+            if (hasConstructor)
+                transform.ContentTypeModelHasConstructor(classSymbol.Name);
+
+            // is the partial implementing some properties?
+            var propertySymbols = classSymbol.GetMembers().OfType<IPropertySymbol>();
+            foreach (var propertySymbol in propertySymbols)
+                ParsePropertySymbol(transform, classSymbol, propertySymbol);
         }
 
-        private static void ParsePropertySymbols(ContentModelTransform disco, ISymbol classSymbol, ISymbol symbol)
+        // parse the partial interface declaration, detecting
+        // - the interfaces declared by the partial interface
+        // - FIXME so no property?
+        private static void ParseInterfaceDeclaration(ContentTypesCodeOptionsBuilder transform, INamedTypeSymbol interfaceSymbol)
+        {
+            var interfaceSymbols = interfaceSymbol.Interfaces;
+            foreach (var symbol in interfaceSymbols)
+                transform.ContentTypeModelHasInterface(interfaceSymbol.Name, symbol.Name);
+        }
+
+        private static void ParsePropertySymbol(ContentTypesCodeOptionsBuilder transform, INamedTypeSymbol classSymbol, IPropertySymbol symbol)
         {
             foreach (var attrData in symbol.GetAttributes())
             {
                 var attrClassSymbol = attrData.AttributeClass;
+                var attrClassName = SymbolDisplay.ToDisplayString(attrClassSymbol);
 
                 // handle errors
                 if (attrClassSymbol is IErrorTypeSymbol) continue;
                 if (attrData.AttributeConstructor == null) continue;
 
-                var attrClassName = SymbolDisplay.ToDisplayString(attrClassSymbol);
                 // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (attrClassName)
                 {
-                    case "ZpqrtBnk.ModelsBuilder.ImplementPropertyTypeAttribute":
+                    case "Our.ModelsBuilder.ImplementPropertyTypeAttribute":
+                        if (attrData.ConstructorArguments.Length != 1)
+                            throw new InvalidOperationException("Invalid number of arguments for ImplementPropertyTypeAttribute.");
                         var propertyAliasToIgnore = (string)attrData.ConstructorArguments[0].Value;
-                        disco.SetIgnoredProperty(classSymbol.Name /*SymbolDisplay.ToDisplayString(classSymbol)*/, propertyAliasToIgnore);
+                        transform.IgnorePropertyType(ContentTypeIdentity.ClrName(classSymbol.Name), propertyAliasToIgnore);
                         break;
                 }
             }
         }
 
-        private static void ParseAssemblySymbols(ContentModelTransform disco, ISymbol symbol)
+        // FIXME should be "extensions" don't need to be true extension methods
+        private static void ParseExtensions(ContentTypesCodeOptionsBuilder transform, IMethodSymbol symbol)
         {
             foreach (var attrData in symbol.GetAttributes())
             {
                 var attrClassSymbol = attrData.AttributeClass;
+                var attrClassName = SymbolDisplay.ToDisplayString(attrClassSymbol);
 
                 // handle errors
                 if (attrClassSymbol is IErrorTypeSymbol) continue;
                 if (attrData.AttributeConstructor == null) continue;
 
-                var attrClassName = SymbolDisplay.ToDisplayString(attrClassSymbol);
+                // there isn't much we can guess from an extension method,
+                // the attribute has to be explicit about everything
+
+                // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (attrClassName)
                 {
-                    case "ZpqrtBnk.ModelsBuilder.ModelsBuilderConfigureAttribute":
-                        foreach (var (argName, argValue) in attrData.NamedArguments)
-                        {
-                            switch (argName)
-                            {
-                                case nameof(ModelsBuilderConfigureAttribute.Namespace):
-                                    disco.SetModelsNamespace((string) argValue.Value);
-                                    break;
-                            }
-                        }
+                    case "Our.ModelsBuilder.ImplementPropertyTypeAttribute":
+                        if (attrData.ConstructorArguments.Length != 2)
+                            throw new InvalidOperationException("Invalid number of arguments for ImplementPropertyTypeAttribute.");
+                        var contentTypeAlias = (string) attrData.ConstructorArguments[0].Value;
+                        var propertyTypeAlias = (string) attrData.ConstructorArguments[1].Value;
+                        transform.IgnorePropertyType(ContentTypeIdentity.Alias(contentTypeAlias), propertyTypeAlias);
                         break;
                 }
             }
-        }
-
-        private static void ParseMethodSymbol(ContentModelTransform disco, ISymbol classSymbol, ISymbol symbol)
-        {
-            var methodSymbol = symbol as IMethodSymbol;
-
-            if (methodSymbol == null
-                || !methodSymbol.IsStatic
-                || methodSymbol.IsGenericMethod
-                || methodSymbol.ReturnsVoid
-                || methodSymbol.IsExtensionMethod
-                || methodSymbol.Parameters.Length != 1)
-                return;
-
-            var returnType = methodSymbol.ReturnType;
-            var paramSymbol = methodSymbol.Parameters[0];
-            var paramType = paramSymbol.Type;
-
-            // cannot do this because maybe the param type is ISomething and we don't have
-            // that type yet - will be generated - so cannot put any condition on it really
-            //const string iPublishedContent = "Umbraco.Core.Models.IPublishedContent";
-            //var implements = paramType.AllInterfaces.Any(x => x.ToDisplayString() == iPublishedContent);
-            //if (!implements)
-            //    return;
-
-            //disco.SetStaticMixinMethod(classSymbol.Name, methodSymbol.Name, returnType.Name, paramType.Name);
         }
     }
 }

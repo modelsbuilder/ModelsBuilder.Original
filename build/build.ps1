@@ -35,7 +35,7 @@
     @{ Continue = $continue })
   if ($ubuild.OnError()) { return }
 
-  Write-Host "ZpqrtBnk.ModelsBuilder Build"
+  Write-Host "Our.ModelsBuilder Build"
   Write-Host "Umbraco.Build v$($ubuild.BuildVersion)"
 
   # ################################################################
@@ -57,7 +57,7 @@
 
     # Edit VSIX
     Write-Host "Update VSIX manifest."
-    $vsixFile = "$($this.SolutionRoot)\src\ZpqrtBnk.ModelsBuilder.Extension\source.extension.vsixmanifest"
+    $vsixFile = "$($this.SolutionRoot)\src\Our.ModelsBuilder.Extension\source.extension.vsixmanifest"
     [xml] $vsixXml = Get-Content $vsixFile
     $xmlNameTable = New-Object System.Xml.NameTable
     $xmlNameSpace = New-Object System.Xml.XmlNamespaceManager($xmlNameTable)
@@ -105,9 +105,9 @@
   {
     Write-Host "Restore NuGet"
     Write-Host "Logging to $($this.BuildTemp)\nuget.restore.log"
-    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\ZpqrtBnk.ModelsBuilder.sln" > "$($this.BuildTemp)\nuget.restore.log"
+    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\Our.ModelsBuilder.sln" > "$($this.BuildTemp)\nuget.restore.log"
     # temp - ignore errors, because of a circular dependency between U and MB
-    #   we'll eventually move ZpqrtBnk.ModelsBuilder (and only that one) into Core,
+    #   we'll eventually move Our.ModelsBuilder (and only that one) into Core,
     #   once I have decided what to do with the work-in-progress stuff
     #if (-not $?) { throw "Failed to restore NuGet packages." }
     $error.Clear()
@@ -130,7 +130,7 @@
 
     # beware of the weird double \\ at the end of paths
     # see http://edgylogic.com/blog/powershell-and-external-commands-done-right/
-    &$this.BuildEnv.VisualStudio.MsBuild "$src\ZpqrtBnk.ModelsBuilder.sln" `
+    &$this.BuildEnv.VisualStudio.MsBuild "$src\Our.ModelsBuilder.sln" `
       /p:WarningLevel=0 `
       /p:Configuration=$buildConfiguration `
       /p:Platform="Any CPU" `
@@ -150,35 +150,35 @@
 
   $ubuild.DefineMethod("PackageCore",
   {
-    Write-Host "Package ZpqrtBnk.ModelsBuilder"
+    Write-Host "Package Our.ModelsBuilder"
     $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
-    $copyright = "Copyright (C) ZpqrtBnk $((Get-Date).Year)"
-	  &$this.BuildEnv.NuGet pack "$nuspecs\ZpqrtBnk.ModelsBuilder.nuspec" `
+    $copyright = "Copyright (C) Our $((Get-Date).Year)"
+	  &$this.BuildEnv.NuGet pack "$nuspecs\Our.ModelsBuilder.nuspec" `
 	    -Properties copyright="$Copyright"`;solution="$($this.SolutionRoot)" `
 	    -Version "$($this.Version.Semver.ToString())" `
 	    -Verbosity detailed -OutputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.core.log"
-  	if (-not $?) { throw "Failed to pack NuGet ZpqrtBnk.ModelsBuilder." }
+  	if (-not $?) { throw "Failed to pack NuGet Our.ModelsBuilder." }
   })
 
   $ubuild.DefineMethod("PackageWeb",
   {
-    Write-Host "Package ZpqrtBnk.ModelsBuilder.Web"
+    Write-Host "Package Our.ModelsBuilder.Web"
     $nuspecs = "$($this.SolutionRoot)\build\NuSpecs"
-    $copyright = "Copyright (C) ZpqrtBnk $((Get-Date).Year)"
-	  &$this.BuildEnv.NuGet pack "$nuspecs\ZpqrtBnk.ModelsBuilder.Web.nuspec" `
+    $copyright = "Copyright (C) Our $((Get-Date).Year)"
+	  &$this.BuildEnv.NuGet pack "$nuspecs\Our.ModelsBuilder.Web.nuspec" `
 	    -Properties copyright="$Copyright"`;solution="$($this.SolutionRoot)" `
 	    -Version "$($this.Version.Semver.ToString())" `
 	    -Verbosity detailed -OutputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.web.log"
-  	if (-not $?) { throw "Failed to pack NuGet ZpqrtBnk.ModelsBuilder.Web." }
+  	if (-not $?) { throw "Failed to pack NuGet Our.ModelsBuilder.Web." }
   })
 
   $ubuild.DefineMethod("PackageVsix",
   {
-    Write-Host "Package ZpqrtBnk.ModelsBuilder.Extension"
+    Write-Host "Package Our.ModelsBuilder.Extension"
 
-    $vsix = "$($this.SolutionRoot)\build.tmp\bin\ZpqrtBnk.ModelsBuilder.Extension.vsix"
-    $temp = "$($this.SolutionRoot)\build.tmp\bin\ZpqrtBnk.ModelsBuilder.Extension.temp"
-    $target = "$($this.BuildOutput)\ZpqrtBnk.ModelsBuilder.Extension-$($this.Version.Semver.ToString()).vsix"
+    $vsix = "$($this.SolutionRoot)\build.tmp\bin\Our.ModelsBuilder.Extension.vsix"
+    $temp = "$($this.SolutionRoot)\build.tmp\bin\Our.ModelsBuilder.Extension.temp"
+    $target = "$($this.BuildOutput)\Our.ModelsBuilder.Extension-$($this.Version.Semver.ToString()).vsix"
 
     [Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") | Out-Null
     [System.IO.Compression.ZipFile]::ExtractToDirectory($vsix, $temp) | Out-Null
@@ -266,8 +266,8 @@
   $ubuild.DefineMethod("VerifyNuGet",
   {
     $this.VerifyNuGetConsistency(
-      ("ZpqrtBnk.ModelsBuilder", "ZpqrtBnk.ModelsBuilder.Web"),
-      ("ZpqrtBnk.ModelsBuilder", "ZpqrtBnk.ModelsBuilder.Web", "ZpqrtBnk.ModelsBuilder.Extension", "ZpqrtBnk.ModelsBuilder.Console"))
+      ("Our.ModelsBuilder", "Our.ModelsBuilder.Web"),
+      ("Our.ModelsBuilder", "Our.ModelsBuilder.Web", "Our.ModelsBuilder.Extension", "Our.ModelsBuilder.Console"))
   })
 
   $ubuild.DefineMethod("PostPackageHook",

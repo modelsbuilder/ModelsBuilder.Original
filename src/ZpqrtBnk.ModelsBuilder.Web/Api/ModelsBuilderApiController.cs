@@ -1,19 +1,18 @@
 ﻿using System.Net;
 using System.Net.Http;
+using Our.ModelsBuilder.Api;
+using Our.ModelsBuilder.Building;
+using Our.ModelsBuilder.Options;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-using ZpqrtBnk.ModelsBuilder.Api;
-using ZpqrtBnk.ModelsBuilder.Building;
-using ZpqrtBnk.ModelsBuilder.Configuration;
-using ZpqrtBnk.ModelsBuilder.Umbraco;
 // use the http one, not mvc, with api controllers!
 using HttpGetAttribute = System.Web.Http.HttpGetAttribute;
 using HttpPostAttribute = System.Web.Http.HttpPostAttribute;
 
-namespace ZpqrtBnk.ModelsBuilder.Web.Api
+namespace Our.ModelsBuilder.Web.Api
 {
     // read http://umbraco.com/follow-us/blog-archive/2014/1/17/heads-up,-breaking-change-coming-in-702-and-62.aspx
     // read http://our.umbraco.org/forum/developers/api-questions/43025-Web-API-authentication
@@ -29,22 +28,20 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Api
     //[UmbracoApplicationAuthorize(Constants.Applications.Settings)] // see ApiBasicAuthFilter - that one would be for ASP.NET identity
     public class ModelsBuilderApiController : UmbracoApiController // UmbracoAuthorizedApiController - for ASP.NET identity
     {
-        private readonly UmbracoServices _umbracoServices;
         private readonly ICodeFactory _codeFactory;
-        private readonly Config _config;
+        private readonly ModelsBuilderOptions _options;
 
-        public ModelsBuilderApiController(UmbracoServices umbracoServices, ICodeFactory codeFactory, Config config)
+        public ModelsBuilderApiController(ICodeFactory codeFactory, ModelsBuilderOptions options)
         {
-            _umbracoServices = umbracoServices;
             _codeFactory = codeFactory;
-            _config = config;
+            _options = options;
         }
 
         [HttpGet]
         [ApiBasicAuthFilter("settings")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage GetApiVersion()
         {
-            if (!_config.IsApiServer)
+            if (!_options.IsApiServer)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API server does not want to talk to you.");
 
             if (!ModelState.IsValid)
@@ -58,7 +55,7 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Api
         [ApiBasicAuthFilter("settings")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage ValidateClientVersion(ValidateClientVersionData data)
         {
-            if (!_config.IsApiServer)
+            if (!_options.IsApiServer)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API server does not want to talk to you.");
 
             if (!ModelState.IsValid || data == null || !data.IsValid)
@@ -75,7 +72,7 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Api
         [ApiBasicAuthFilter("settings")] // have to use our own, non-cookie-based, auth
         public HttpResponseMessage GetModels(GetModelsData data)
         {
-            if (!_config.IsApiServer)
+            if (!_options.IsApiServer)
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "API server does not want to talk to you.");
 
             if (!ModelState.IsValid || data == null || !data.IsValid)
@@ -85,7 +82,7 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Api
             if (!checkResult.Success)
                 return checkResult.Result;
 
-            var generator = new Generator(_umbracoServices, _codeFactory, _config);
+            var generator = new Generator(_codeFactory, _options);
             var models = generator.GetModels(data.Namespace, data.Files);
 
             return Request.CreateResponse(HttpStatusCode.OK, models, Configuration.Formatters.JsonFormatter);

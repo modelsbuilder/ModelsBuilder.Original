@@ -14,7 +14,7 @@
   <system.web>
 		<compilation>
 		  <assemblies>
-        <add assembly="ZpqrtBnk.ModelsBuilder"
+        <add assembly="Our.ModelsBuilder"
              xdt:Transform="Remove" xdt:Locator="Match(assembly)" />
         <add assembly="Umbraco.ModelsBuilder"
              xdt:Transform="InsertIfMissing" xdt:Locator="Match(assembly)" />

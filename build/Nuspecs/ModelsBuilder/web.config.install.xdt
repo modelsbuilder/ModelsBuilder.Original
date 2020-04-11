@@ -20,7 +20,7 @@
              xdt:Transform="Remove" xdt:Locator="Match(assembly)" />
         <add assembly="Umbraco.ModelsBuilder.Embedded"
              xdt:Transform="Remove" xdt:Locator="Match(assembly)" />
-        <add assembly="ZpqrtBnk.ModelsBuilder"
+        <add assembly="Our.ModelsBuilder"
              xdt:Transform="InsertIfMissing" xdt:Locator="Match(assembly)" />
 		  </assemblies>
      </compilation>

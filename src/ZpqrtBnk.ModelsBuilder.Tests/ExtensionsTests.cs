@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace ZpqrtBnk.ModelsBuilder.Tests
+namespace Our.ModelsBuilder.Tests
 {
     [TestFixture]
     public class ExtensionsTests

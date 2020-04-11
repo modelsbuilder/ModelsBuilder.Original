@@ -2,9 +2,9 @@
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("ZpqrtBnk ModelsBuilder")]
-[assembly: AssemblyCompany("ZpqrtBnk")]
-[assembly: AssemblyCopyright("Copyright © ZpqrtBnk 2013-2019")]
+[assembly: AssemblyProduct("Our ModelsBuilder")]
+[assembly: AssemblyCompany("The Umbraco Community")]
+[assembly: AssemblyCopyright("Copyright © The Umbraco Community 2013-2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -2,22 +2,20 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ZpqrtBnk.ModelsBuilder.Configuration;
-using ZpqrtBnk.ModelsBuilder.Umbraco;
+using Our.ModelsBuilder.Options;
+using Our.ModelsBuilder.Umbraco;
 
-namespace ZpqrtBnk.ModelsBuilder.Building
+namespace Our.ModelsBuilder.Building
 {
     public class Generator
     {
-        private readonly UmbracoServices _umbracoServices;
-        private readonly ICodeFactory _factory;
-        private readonly Config _config;
+        private readonly ICodeFactory _codeFactory;
+        private readonly ModelsBuilderOptions _options;
 
-        public Generator(UmbracoServices umbracoServices, ICodeFactory factory, Config config)
+        public Generator(ICodeFactory codeFactory, ModelsBuilderOptions options)
         {
-            _umbracoServices = umbracoServices;
-            _factory = factory;
-            _config = config;
+            _codeFactory = codeFactory;
+            _options = options;
         }
 
         public void GenerateModels(string modelsDirectory, string modelsNamespace, string bin)
@@ -29,34 +27,14 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                 File.Delete(file);
 
-            // get models from Umbraco
-            var model = _factory.CreateModel();
-            model.ContentTypeModels = _umbracoServices.GetAllTypes();
+            // get our (non-generated) files
+            var files = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
 
-            // get our (non-generated) files and parse them
-            var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
-            var transform = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
-            
-            // apply to model
-            model.Apply(_config, transform, modelsNamespace);
-
-            // create a writer
-            var writer = _factory.CreateWriter(model);
-
-            // write each model file
-            foreach (var typeModel in model.ContentTypeModels)
+            var codeModel = CreateModels(modelsNamespace, files, (name, code) =>
             {
-                writer.Reset();
-                writer.WriteModelFile(typeModel);
-                var filename = Path.Combine(modelsDirectory, typeModel.ClrName + ".generated.cs");
-                File.WriteAllText(filename, writer.Code);
-            }
-
-            // write the infos file
-            writer.Reset();
-            writer.WriteModelInfosFile(model);
-            var metaFilename = Path.Combine(modelsDirectory, model.ModelInfosClassName + ".generated.cs");
-            File.WriteAllText(metaFilename, writer.Code);
+                var filename = Path.Combine(modelsDirectory, name + ".generated.cs");
+                File.WriteAllText(filename, code);
+            });
 
             // the idea was to calculate the current hash and to add it as an extra file to the compilation,
             // in order to be able to detect whether a DLL is consistent with an environment - however the
@@ -64,7 +42,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             // calculate the hash. So... maybe that's not a good idea after all?
             /*
             var currentHash = HashHelper.Hash(ourFiles, typeModels);
-            ourFiles["models.hash.cs"] = $@"using ZpqrtBnk.ModelsBuilder;
+            ourFiles["models.hash.cs"] = $@"using Our.ModelsBuilder;
 [assembly:ModelsBuilderAssembly(SourceHash = ""{currentHash}"")]
 ";
             */
@@ -73,9 +51,10 @@ namespace ZpqrtBnk.ModelsBuilder.Building
             {
                 // build
                 foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
-                    ourFiles[file] = File.ReadAllText(file);
-                var compiler = new Compiler();
-                compiler.Compile(model.ModelsNamespace, ourFiles, bin);
+                    files[file] = File.ReadAllText(file);
+                var compiler = new Compiler(_options.LanguageVersion);
+                // FIXME what is the name of the DLL as soon as we accept several namespaces = an option?
+                compiler.Compile(codeModel.ModelsNamespace, files, bin);
             }
 
             OutOfDateModelsStatus.Clear();
@@ -83,37 +62,57 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
         public Dictionary<string, string> GetModels(string modelsNamespace, IDictionary<string, string> files)
         {
-            // get models from Umbraco
-            var model = _factory.CreateModel();
-            model.ContentTypeModels = _umbracoServices.GetAllTypes();
-
-            // parse the (non-generated) files
-            var parseResult = new CodeParser().ParseWithReferencedAssemblies(files);
-
-            // apply to model
-            model.Apply(_config, parseResult, modelsNamespace);
-
-            // create a writer
-            var writer = _factory.CreateWriter(model);
             var generated = new Dictionary<string, string>();
+            CreateModels(modelsNamespace, files, (name, code) => generated[name] = code);
+            return generated;
+        }
+
+        private CodeModel CreateModels(string modelsNamespace, IDictionary<string, string> sources, Action<string, string> acceptModel)
+        {
+            // get model data from Umbraco, and create a code model (via all the steps)
+            var modelData = _codeFactory.CreateCodeModelDataSource().GetCodeModelData();
+            var codeModel = CreateCodeModel(_codeFactory, sources, modelData, _options, modelsNamespace);
+
+            // create a code writer
+            var codeWriter = _codeFactory.CreateCodeWriter(codeModel);
 
             // write each model file
-            foreach (var typeModel in model.ContentTypeModels)
+            foreach (var contentTypeModel in codeModel.ContentTypes.ContentTypes)
             {
-                writer.Reset();
-                writer.WriteModelFile(typeModel);
-                generated[typeModel.ClrName] = writer.Code;
+                codeWriter.Reset();
+                codeWriter.WriteModelFile(contentTypeModel);
+
+                // detect name collision
+                if (contentTypeModel.ClrName == codeModel.ModelInfosClassName)
+                    throw new InvalidOperationException($"Collision, cannot use {codeModel.ModelInfosClassName} for both a content type and the infos class.");
+
+                acceptModel(contentTypeModel.ClrName, codeWriter.Code);
             }
 
-            if (generated.ContainsKey(model.ModelInfosClassName))
-                throw new InvalidOperationException($"Collision, cannot use {model.ModelInfosClassName} for both a content type and the infos class.");
-
             // write the info files
-            writer.Reset();
-            writer.WriteModelInfosFile(model);
-            generated[model.ModelInfosClassName] = writer.Code;
+            codeWriter.Reset();
+            codeWriter.WriteModelInfosFile();
+            acceptModel(codeModel.ModelInfosClassName, codeWriter.Code);
 
-            return generated;
+            return codeModel;
+        }
+
+        public static CodeModel CreateCodeModel(ICodeFactory codeFactory, IDictionary<string, string> sources, CodeModelData modelData, ModelsBuilderOptions options, string modelsNamespace = null)
+        {
+            // create an option builder
+            var optionsBuilder = codeFactory.CreateCodeOptionsBuilder();
+
+            // create a parser, and parse the (non-generated) files, updating the options builder
+            var parser = codeFactory.CreateCodeParser();
+            parser.Parse(sources, optionsBuilder, ReferencedAssemblies.References);
+
+            // apply namespace - may come from e.g. the Visual Studio extension - FIXME no?
+            if (!string.IsNullOrWhiteSpace(modelsNamespace))
+                optionsBuilder.SetModelsNamespace(modelsNamespace);
+
+            // create a code model builder, and build the code model
+            var codeModelBuilder = codeFactory.CreateCodeModelBuilder(options, optionsBuilder.CodeOptions);
+            return codeModelBuilder.Build(modelData);
         }
     }
 }

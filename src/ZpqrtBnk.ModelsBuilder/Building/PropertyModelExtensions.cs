@@ -1,13 +1,13 @@
 ﻿using Umbraco.Core.Models;
 
-namespace ZpqrtBnk.ModelsBuilder.Building
+namespace Our.ModelsBuilder.Building
 {
     public static class PropertyModelExtensions
     {
-        public static bool VariesByCulture(this PropertyModel property)
+        public static bool VariesByCulture(this PropertyTypeModel property)
             => (property.Variations & ContentVariation.Culture) > 0;
 
-        public static bool VariesBySegment(this PropertyModel property)
+        public static bool VariesBySegment(this PropertyTypeModel property)
             => (property.Variations & ContentVariation.Segment) > 0;
     }
 }

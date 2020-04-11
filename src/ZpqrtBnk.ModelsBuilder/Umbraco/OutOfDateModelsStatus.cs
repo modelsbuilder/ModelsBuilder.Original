@@ -1,18 +1,19 @@
 ﻿using System.IO;
+using Our.ModelsBuilder.Options;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Cache;
-using ZpqrtBnk.ModelsBuilder.Configuration;
 
-namespace ZpqrtBnk.ModelsBuilder.Umbraco
+namespace Our.ModelsBuilder.Umbraco
 {
     public sealed class OutOfDateModelsStatus
     {
-        private static Config Config => Current.Configs.ModelsBuilder();
-        
+        private static ModelsBuilderOptions Options => Current.Factory.GetInstance<ModelsBuilderOptions>();
+
         internal static void Install()
         {
             // just be sure
-            if (Config.FlagOutOfDateModels == false)
+            if (Options.FlagOutOfDateModels == false)
                 return;
 
             ContentTypeCacheRefresher.CacheUpdated += (sender, args) => Write();
@@ -21,7 +22,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
         private static string GetFlagPath()
         {
-            var modelsDirectory = Config.ModelsDirectory;
+            var modelsDirectory = Options.ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
             return Path.Combine(modelsDirectory, "ood.flag");
@@ -36,19 +37,19 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
         public static void Clear()
         {
-            if (Config.FlagOutOfDateModels == false) return;
+            if (Options.FlagOutOfDateModels == false) return;
             var path = GetFlagPath();
             if (path == null || !File.Exists(path)) return;
             File.Delete(path);
         }
 
-        public static bool IsEnabled => Config.FlagOutOfDateModels;
+        public static bool IsEnabled => Options.FlagOutOfDateModels;
 
         public static bool IsOutOfDate
         {
             get
             {
-                if (Config.FlagOutOfDateModels == false) return false;
+                if (Options.FlagOutOfDateModels == false) return false;
                 var path = GetFlagPath();
                 return path != null && File.Exists(path);
             }

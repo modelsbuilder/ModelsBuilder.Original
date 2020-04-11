@@ -2,9 +2,9 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("ZpqrtBnk ModelsBuilder Tests")]
-[assembly: AssemblyDescription("ZpqrtBnk ModelsBuilder Tests.")]
+[assembly: AssemblyTitle("Our ModelsBuilder Tests")]
+[assembly: AssemblyDescription("Our ModelsBuilder Tests.")]
 [assembly: Guid("5957b45a-c2c9-4913-be3f-6677ebf50294")]
 
 // dynamic assembly that is built during tests - do not remove!
-[assembly: InternalsVisibleTo("ZpqrtBnk.ModelsBuilder.RunTests")]
+[assembly: InternalsVisibleTo("Our.ModelsBuilder.RunTests")]

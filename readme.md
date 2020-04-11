@@ -1,6 +1,6 @@
 #### Umbraco Models Builder
 
-Copyright (C) Umbraco ZpqrtBnk 2013-2016
+Copyright (C) The Umbraco Community 2013-2020
 Distributed under the MIT license  
 
 A tool that can generate a complete set of strongly-typed published content models for Umbraco.
@@ -11,7 +11,7 @@ Requires Umbraco 7.1.4 or later.
 
 #### Documentation
 
-More infos, including a (hopefully) **complete documentation**, can be found in the [wiki](https://github.com/zpqrtbnk/Zbu.ModelsBuilder/wiki/Zbu.ModelsBuilder).
+More infos, including a (hopefully) **complete documentation**, can be found in the [wiki](https://github.com/zpqrtbnk/Our.ModelsBuilder/wiki/Our.ModelsBuilder).
 
 **WARNING** the documentation has not been updated for version 3 (Umbraco.ModelsBuilder) yet.
 

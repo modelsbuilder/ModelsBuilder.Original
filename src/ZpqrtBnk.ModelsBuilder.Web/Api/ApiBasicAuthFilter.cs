@@ -9,7 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
 
-namespace ZpqrtBnk.ModelsBuilder.Web.Api
+namespace Our.ModelsBuilder.Web.Api
 {
 
     //TODO: This needs to be changed:

@@ -1,11 +1,11 @@
-﻿using Umbraco.Core;
+﻿using Our.ModelsBuilder.Building;
+using Our.ModelsBuilder.Options;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache.NuCache;
-using ZpqrtBnk.ModelsBuilder.Building;
-using ZpqrtBnk.ModelsBuilder.Configuration;
 
-namespace ZpqrtBnk.ModelsBuilder.Umbraco
+namespace Our.ModelsBuilder.Umbraco
 {
     [ComposeBefore(typeof(NuCacheComposer))]
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
@@ -15,46 +15,35 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
         {
             base.Compose(composition);
 
+            // compose umbraco & the code factory
             composition.Register<UmbracoServices>(Lifetime.Singleton);
-
             composition.Register<ICodeFactory, CodeFactory>(Lifetime.Singleton);
 
-            composition.Configs.Add(() => new Config());
+            // compose configuration of options
+            composition.Configs.Add(() => new OptionsConfiguration());
+            composition.ConfigureOptions(OptionsWebConfigReader.ConfigureOptions);
+            composition.Register(factory => factory.GetInstance<OptionsConfiguration>().ModelsBuilderOptions, Lifetime.Singleton);
 
-            if (composition.Configs.ModelsBuilder().ModelsMode == ModelsMode.PureLive)
-                ComposeForLiveModels(composition);
-            else if (composition.Configs.ModelsBuilder().EnableFactory)
-                ComposeForDefaultModelsFactory(composition);
-        }
-
-        private static void ComposeForDefaultModelsFactory(Composition composition)
-        {
+            // always discover model types in code
+            // could be used with pure live, to provide some models,
+            // and then pure live would not generate them
             composition.WithCollectionBuilder<ModelTypeCollectionBuilder>()
                 .Add(composition.TypeLoader.GetTypes<PublishedElementModel>())
                 .Add(composition.TypeLoader.GetTypes<PublishedContentModel>());
 
-            composition.RegisterUnique<IPublishedModelFactory>(factory => new PublishedModelFactory(factory.GetInstance<ModelTypeCollection>()));
-        }
+            // create the appropriate factory, depending on options
+            composition.RegisterUnique<IPublishedModelFactory>(factory =>
+            {
+                var options = factory.GetInstance<Options.ModelsBuilderOptions>();
 
-        private static void ComposeForLiveModels(Composition composition)
-        {
-            composition.RegisterUnique<IPublishedModelFactory, PureLiveModelFactory>();
+                if (options.ModelsMode == ModelsMode.PureLive)
+                    return factory.CreateInstance<PureLiveModelFactory>();
+                
+                if (options.EnableFactory)
+                    return new PublishedModelFactory(factory.GetInstance<ModelTypeCollection>());
 
-            // the following would add @using statement in every view so user's don't
-            // have to do it - however, then noone understands where the @using statement
-            // comes from, and it cannot be avoided / removed --- DISABLED
-            //
-            /*
-            // no need for @using in views
-            // note:
-            //  we are NOT using the in-code attribute here, config is required
-            //  because that would require parsing the code... and what if it changes?
-            //  we can AddGlobalImport not sure we can remove one anyways
-            var modelsNamespace = Configuration.Config.ModelsNamespace;
-            if (string.IsNullOrWhiteSpace(modelsNamespace))
-                modelsNamespace = Configuration.Config.DefaultModelsNamespace;
-            System.Web.WebPages.Razor.WebPageRazorHost.AddGlobalImport(modelsNamespace);
-            */
+                return new NoopPublishedModelFactory();
+            });
         }
     }
 }

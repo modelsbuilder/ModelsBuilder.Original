@@ -1,7 +1,7 @@
 ﻿using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 
-namespace ZpqrtBnk.ModelsBuilder.Umbraco
+namespace Our.ModelsBuilder.Umbraco
 {
     /// <summary>
     /// Represents the collection builder for the <see cref="ModelTypeCollection"/>.

@@ -3,7 +3,7 @@
 
 using System;
 
-namespace ZpqrtBnk.ModelsBuilder.Extension
+namespace Our.ModelsBuilder.Extension
 {
     static class GuidList
     {

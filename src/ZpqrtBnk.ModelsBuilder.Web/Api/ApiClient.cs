@@ -4,9 +4,9 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Text;
-using ZpqrtBnk.ModelsBuilder.Api;
+using Our.ModelsBuilder.Api;
 
-namespace ZpqrtBnk.ModelsBuilder.Web.Api
+namespace Our.ModelsBuilder.Web.Api
 {
     public class ApiClient
     {

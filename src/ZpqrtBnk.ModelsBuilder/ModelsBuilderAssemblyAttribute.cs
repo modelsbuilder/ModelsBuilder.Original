@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ZpqrtBnk.ModelsBuilder
+namespace Our.ModelsBuilder
 {
     /// <summary>
     /// Indicates that an Assembly is a Models Builder assembly.

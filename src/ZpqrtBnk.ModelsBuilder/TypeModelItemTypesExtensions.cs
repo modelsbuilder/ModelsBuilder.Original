@@ -1,21 +1,21 @@
-﻿using Umbraco.Core.Models.PublishedContent;
-using ZpqrtBnk.ModelsBuilder.Building;
+﻿using Our.ModelsBuilder.Building;
+using Umbraco.Core.Models.PublishedContent;
 
-namespace ZpqrtBnk.ModelsBuilder
+namespace Our.ModelsBuilder
 {
     public static class TypeModelItemTypesExtensions
     {
-        public static PublishedItemType ToPublishedItemType(this ContentTypeModel.ItemTypes itemType)
+        public static PublishedItemType ToPublishedItemType(this ContentTypeKind contentTypeKind)
         {
-            switch (itemType)
+            switch (contentTypeKind)
             {
-                case ContentTypeModel.ItemTypes.Content:
+                case ContentTypeKind.Content:
                     return PublishedItemType.Content;
-                case ContentTypeModel.ItemTypes.Element:
+                case ContentTypeKind.Element:
                     return PublishedItemType.Element;
-                case ContentTypeModel.ItemTypes.Media:
+                case ContentTypeKind.Media:
                     return PublishedItemType.Media;
-                case ContentTypeModel.ItemTypes.Member:
+                case ContentTypeKind.Member:
                     return PublishedItemType.Member;
                 default:
                     return PublishedItemType.Unknown;

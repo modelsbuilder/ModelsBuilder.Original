@@ -1,26 +1,26 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using ZpqrtBnk.ModelsBuilder.Api;
-using ZpqrtBnk.ModelsBuilder.Web.Api;
+using Our.ModelsBuilder.Api;
+using Our.ModelsBuilder.Web.Api;
 using SysConsole = System.Console;
 
-namespace ZpqrtBnk.ModelsBuilder.Console
+namespace Our.ModelsBuilder.Console
 {
     class Program
     {
         static void Usage()
         {
-            SysConsole.WriteLine("Usage: ZpqrtBnk.ModelsBuilder.Console [-d <directory>] [-ns <namespace>] <api>");
+            SysConsole.WriteLine("Usage: Our.ModelsBuilder.Console [-d <directory>] [-ns <namespace>] <api>");
             SysConsole.WriteLine("\t<directory>: models directory");
             SysConsole.WriteLine("\t<namespace>: models namespace");
             SysConsole.WriteLine("\t<api>:       API uri, including user and password (%-encoded)");
-            SysConsole.WriteLine("Example: ZpqrtBnk.ModelsBuilder.Console -d c:/models -ns My.Models http://john%40doe.com:1234@example.com");
+            SysConsole.WriteLine("Example: Our.ModelsBuilder.Console -d c:/models -ns My.Models http://john%40doe.com:1234@example.com");
         }
 
         static void Main(string[] args)
         {
-            SysConsole.WriteLine("ZpqrtBnk.ModelsBuilder v{0}", ApiVersion.Current.Version);
+            SysConsole.WriteLine("Our.ModelsBuilder v{0}", ApiVersion.Current.Version);
 
             string apiUrl, apiUser, apiPassword;
             string modelsDirectory, modelsNamespace;

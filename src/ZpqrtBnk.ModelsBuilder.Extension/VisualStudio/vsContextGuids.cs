@@ -1,4 +1,4 @@
-﻿namespace ZpqrtBnk.ModelsBuilder.Extension.VisualStudio
+﻿namespace Our.ModelsBuilder.Extension.VisualStudio
 {
     public class vsContextGuids
     {

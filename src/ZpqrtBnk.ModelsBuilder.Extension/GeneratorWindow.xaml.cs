@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,9 +7,9 @@ using System.Windows.Threading;
 using EnvDTE;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
-using ZpqrtBnk.ModelsBuilder.Api;
+using Our.ModelsBuilder.Api;
 
-namespace ZpqrtBnk.ModelsBuilder.Extension
+namespace Our.ModelsBuilder.Extension
 {
     /// <summary>
     /// Interaction logic for GeneratorWindow.xaml

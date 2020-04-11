@@ -1,13 +1,14 @@
 ﻿using System.Web;
 using System.Web.Compilation;
-using ZpqrtBnk.ModelsBuilder.Umbraco;
+using Our.ModelsBuilder.Umbraco;
 
 [assembly: PreApplicationStartMethod(typeof(ModelsBuilderInitializer), "Initialize")]
 
-namespace ZpqrtBnk.ModelsBuilder.Umbraco
+namespace Our.ModelsBuilder.Umbraco
 {
     public static class ModelsBuilderInitializer
     {
+        // ReSharper disable once UnusedMember.Global, invoked by PreApplicationStartMethod
         public static void Initialize()
         {
             // for some reason, netstandard is missing from BuildManager.ReferencedAssemblies and yet, is part of

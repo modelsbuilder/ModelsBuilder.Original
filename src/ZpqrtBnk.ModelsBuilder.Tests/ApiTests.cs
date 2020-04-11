@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
-using ZpqrtBnk.ModelsBuilder.Web.Api;
+using Our.ModelsBuilder.Web.Api;
 
-namespace ZpqrtBnk.ModelsBuilder.Tests
+namespace Our.ModelsBuilder.Tests
 {
     [TestFixture]
     public class ApiTests
@@ -24,20 +24,20 @@ namespace ZpqrtBnk.ModelsBuilder.Tests
         public void GetModels()
         {
             const string text1 = @"
-using ZpqrtBnk.ModelsBuilder;
+using Our.ModelsBuilder;
 
 namespace Umbraco.Demo3.Core.Models
 {
-    [RenamePropertyType(""issued"", ""DateIssued"")]
+    //[RenamePropertyType(""issued"", ""DateIssued"")]
     public partial class NewsItem
     {
     }
 }
 ";
             const string text2 = @"
-using ZpqrtBnk.ModelsBuilder;
+using Our.ModelsBuilder;
 
-[assembly:IgnoreContentType(""product"")]
+//[assembly:IgnoreContentType(""product"")]
 ";
 
             var api = new ApiClient("http://umbraco.local", "user", "password");
@@ -46,7 +46,7 @@ using ZpqrtBnk.ModelsBuilder;
                 {"file1", text1},
                 {"file2", text2},
             };
-            var res = api.GetModels(ourFiles, "ZpqrtBnk.ModelsBuilder.Tests.Models");
+            var res = api.GetModels(ourFiles, "Our.ModelsBuilder.Tests.Models");
 
             foreach (var kvp in res)
             {

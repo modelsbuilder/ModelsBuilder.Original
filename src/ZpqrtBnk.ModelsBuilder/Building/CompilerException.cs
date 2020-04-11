@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ZpqrtBnk.ModelsBuilder.Building
+namespace Our.ModelsBuilder.Building
 {
     public class CompilerException : Exception
     {

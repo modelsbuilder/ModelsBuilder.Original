@@ -32,4 +32,4 @@
 
     init();
 }
-angular.module("umbraco").controller("ZpqrtBnk.ModelsBuilder.ModelsBuilderController", modelsBuilderController);
+angular.module("umbraco").controller("Our.ModelsBuilder.ModelsBuilderController", modelsBuilderController);

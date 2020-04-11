@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ZpqrtBnk.ModelsBuilder.Building;
+using Our.ModelsBuilder.Building;
 
-namespace ZpqrtBnk.ModelsBuilder.Umbraco
+namespace Our.ModelsBuilder.Umbraco
 {
     class HashHelper
     {
@@ -13,7 +13,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
             foreach (var kvp in ourFiles)
                 hash.Add(kvp.Key + "::" + kvp.Value);
 
-            // see ZpqrtBnk.ModelsBuilder.Umbraco.Application for what's important to hash
+            // see Our.ModelsBuilder.Umbraco.Application for what's important to hash
             // ie what comes from Umbraco (not computed by ModelsBuilder) and makes a difference
 
             foreach (var typeModel in typeModels.OrderBy(x => x.Alias))
@@ -25,8 +25,8 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                 hash.Add(typeModel.ParentId);
                 hash.Add(typeModel.Name);
                 hash.Add(typeModel.Description);
-                hash.Add(typeModel.ItemType.ToString());
-                hash.Add("MIXINS:" + string.Join(",", typeModel.MixinTypes.OrderBy(x => x.Id).Select(x => x.Id)));
+                hash.Add(typeModel.Kind.ToString());
+                hash.Add("MIXINS:" + string.Join(",", typeModel.MixinContentTypes.OrderBy(x => x.Id).Select(x => x.Id)));
 
                 foreach (var prop in typeModel.Properties.OrderBy(x => x.Alias))
                 {
@@ -35,7 +35,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                     hash.Add(prop.ClrName);
                     hash.Add(prop.Name);
                     hash.Add(prop.Description);
-                    hash.Add(prop.ModelClrType.ToString()); // see ModelType tests, want ToString() not FullName
+                    hash.Add(prop.ValueType.ToString()); // see ModelType tests, want ToString() not FullName
                 }
             }
 

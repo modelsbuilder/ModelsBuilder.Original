@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Reflection;
+using Our.ModelsBuilder.Building;
+using Our.ModelsBuilder.Options;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
@@ -7,37 +9,33 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Mvc;
-using ZpqrtBnk.ModelsBuilder.Building;
-using ZpqrtBnk.ModelsBuilder.Configuration;
 
-namespace ZpqrtBnk.ModelsBuilder.Umbraco
+namespace Our.ModelsBuilder.Umbraco
 {
     public class ModelsBuilderComponent : IComponent
     {
-        private readonly UmbracoServices _umbracoServices;
         private readonly ICodeFactory _codeFactory;
-        private readonly Config _config;
+        private readonly ModelsBuilderOptions _options;
 
-        public ModelsBuilderComponent(UmbracoServices umbracoServices, ICodeFactory codeFactory, Config config)
+        public ModelsBuilderComponent(ICodeFactory codeFactory, ModelsBuilderOptions options)
         {
-            _umbracoServices = umbracoServices;
             _codeFactory = codeFactory;
-            _config = config;
+            _options = options;
         }
 
         public void Initialize()
         {
             ContentModelBinder.ModelBindingException += ContentModelBinder_ModelBindingException;
 
-            if (_config.Enable)
+            if (_options.Enable)
                 FileService.SavingTemplate += FileService_SavingTemplate;
 
             // fixme LiveModelsProvider should not be static
-            if (_config.ModelsMode.IsLiveNotPure())
-                LiveModelsProvider.Install(_umbracoServices, _codeFactory, _config);
+            if (_options.ModelsMode.IsLiveNotPure())
+                LiveModelsProvider.Install(_codeFactory, _options);
 
             // fixme OutOfDateModelsStatus should not be static
-            if (_config.FlagOutOfDateModels)
+            if (_options.FlagOutOfDateModels)
                 OutOfDateModelsStatus.Install();
         }
 
@@ -54,7 +52,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
         {
             // don't do anything if the factory is not enabled
             // because, no factory = no models (even if generation is enabled)
-            if (!_config.EnableFactory) return;
+            if (!_options.EnableFactory) return;
 
             // don't do anything if this special key is not found
             if (!e.AdditionalData.ContainsKey("CreateTemplateForContentType")) return;
@@ -70,11 +68,11 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                 if (!template.HasIdentity && string.IsNullOrWhiteSpace(template.Content))
                 {
                     // ensure is safe and always pascal cased, per razor standard
-                    // + this is how we get the default model name in ZpqrtBnk.ModelsBuilder.Umbraco.Application
+                    // + this is how we get the default model name in Our.ModelsBuilder.Umbraco.Application
                     var alias = e.AdditionalData["ContentTypeAlias"].ToString();
                     var className = Current.Factory.GetInstance<IPublishedModelFactory>().MapModelType(ModelType.For(alias)).Name; // FIXME classname only
 
-                    var modelNamespace = _config.ModelsNamespace;
+                    var modelNamespace = _options.ModelsNamespace;
 
                     // we do not support configuring this at the moment, so just let Umbraco use its default value
                     //var modelNamespaceAlias = ...;

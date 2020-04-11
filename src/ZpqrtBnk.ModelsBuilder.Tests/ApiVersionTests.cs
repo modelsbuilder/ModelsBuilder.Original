@@ -1,9 +1,9 @@
 ﻿using System;
 using NUnit.Framework;
+using Our.ModelsBuilder.Api;
 using Semver;
-using ZpqrtBnk.ModelsBuilder.Api;
 
-namespace ZpqrtBnk.ModelsBuilder.Tests
+namespace Our.ModelsBuilder.Tests
 {
     [TestFixture]
     public class ApiVersionTests

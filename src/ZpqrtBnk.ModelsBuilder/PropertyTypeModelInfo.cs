@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ZpqrtBnk.ModelsBuilder
+namespace Our.ModelsBuilder
 {
     public class PropertyTypeModelInfo
     {

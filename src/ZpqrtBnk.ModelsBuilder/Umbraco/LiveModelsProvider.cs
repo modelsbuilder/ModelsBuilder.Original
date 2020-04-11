@@ -1,36 +1,34 @@
 ﻿using System;
 using System.Threading;
 using System.Web.Hosting;
+using Our.ModelsBuilder.Building;
+using Our.ModelsBuilder.Options;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Cache;
-using ZpqrtBnk.ModelsBuilder.Building;
-using ZpqrtBnk.ModelsBuilder.Configuration;
 
-namespace ZpqrtBnk.ModelsBuilder.Umbraco
+namespace Our.ModelsBuilder.Umbraco
 {
     // supports LiveDll and LiveAppData - but not PureLive
     //public class LiveModelsComponent
     public sealed class LiveModelsProvider // FIXME this should just be a component?
     {
-        private static UmbracoServices _umbracoServices;
         private static ICodeFactory _codeFactory;
-        private static Config _config;
+        private static ModelsBuilderOptions _options;
         private static Mutex _mutex;
         private static int _req;
 
         // we do not manage pure live here
-        internal static bool IsEnabled => _config.ModelsMode.IsLiveNotPure();
+        internal static bool IsEnabled => _options.ModelsMode.IsLiveNotPure();
 
-        internal static void Install(UmbracoServices umbracoServices, ICodeFactory factory, Config config)
+        internal static void Install(ICodeFactory factory, ModelsBuilderOptions options)
         {
             // just be sure
             if (!IsEnabled)
                 return;
 
-            _umbracoServices = umbracoServices;
             _codeFactory = factory;
-            _config = config;
+            _options = options;
 
             // initialize mutex
             // ApplicationId will look like "/LM/W3SVC/1/Root/AppName"
@@ -97,16 +95,16 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
         private static void GenerateModels()
         {
-            var modelsDirectory = _config.ModelsDirectory;
-            var modelsNamespace = _config.ModelsNamespace;
+            var modelsDirectory = _options.ModelsDirectory;
+            var modelsNamespace = _options.ModelsNamespace;
 
             var bin = HostingEnvironment.MapPath("~/bin");
             if (bin == null)
                 throw new Exception("Panic: bin is null.");
 
             // EnableDllModels will recycle the app domain - but this request will end properly
-            var generator = new Generator(_umbracoServices, _codeFactory, _config);
-            generator.GenerateModels(modelsDirectory, _config.ModelsMode.IsAnyDll() ? bin : null, modelsNamespace);
+            var generator = new Generator(_codeFactory, _options);
+            generator.GenerateModels(modelsDirectory, _options.ModelsMode.IsAnyDll() ? bin : null, modelsNamespace);
         }
     }
 }

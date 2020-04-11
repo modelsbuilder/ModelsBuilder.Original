@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace ZpqrtBnk.ModelsBuilder.Umbraco
+namespace Our.ModelsBuilder.Umbraco
 {
     // because, of course, it's internal in Umbraco
     // see also System.Web.Util.HashCodeCombiner

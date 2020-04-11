@@ -1,7 +1,7 @@
-﻿using Umbraco.Core.Composing;
-using ZpqrtBnk.ModelsBuilder.Umbraco;
+﻿using Our.ModelsBuilder.Umbraco;
+using Umbraco.Core.Composing;
 
-namespace ZpqrtBnk.ModelsBuilder
+namespace Our.ModelsBuilder
 {
     /// <summary>
     /// Provides extension methods for the <see cref="Composition"/> class.

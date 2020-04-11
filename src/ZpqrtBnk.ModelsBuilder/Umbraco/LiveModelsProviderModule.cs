@@ -1,10 +1,10 @@
 ﻿using System.Web;
-using ZpqrtBnk.ModelsBuilder.Umbraco;
+using Our.ModelsBuilder.Umbraco;
 
 // will install only if configuration says it needs to be installed
 [assembly: PreApplicationStartMethod(typeof(LiveModelsProviderModule), "Install")]
 
-namespace ZpqrtBnk.ModelsBuilder.Umbraco
+namespace Our.ModelsBuilder.Umbraco
 {
     // have to do this because it's the only way to subscribe to EndRequest,
     // module is installed by assembly attribute at the top of this file

@@ -1,180 +1,106 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
+using Our.ModelsBuilder.Building;
+using Our.ModelsBuilder.Options;
+using Our.ModelsBuilder.Umbraco;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using ZpqrtBnk.ModelsBuilder.Api;
-using ZpqrtBnk.ModelsBuilder.Building;
-using ZpqrtBnk.ModelsBuilder.Configuration;
 
-namespace ZpqrtBnk.ModelsBuilder.Tests
+namespace Our.ModelsBuilder.Tests
 {
     [TestFixture]
     public class CustomBuilderTests
     {
-        private Config _config;
+        // this should be the way to configure options
+        // but ... wouldn't it be nicer to register .Configure(options => options.ContentTypes.IgnoreContentType("")) ??
+        //
+        // could: inject ICodeFactory in a component,
+        //   then do factory.ConfigureCodeOptions(options => ...);
+        // 'cos if we supply a IRegister.ConfigureCodeOptions(...) extension method, WHERE would it store it?
+        // cannot store in the register, and so would need to be in composition
 
-        [SetUp]
-        public void Setup()
+        // ReSharper disable once UnusedMember.Global, reason: composer
+        public class ConfigureOptionsComposer : IOptionsComposer
         {
-            _config = new Config();
+            public void Compose(Composition composition)
+            {
+                composition.ConfigureOptions(options => { options.DebugLevel = 666; });
 
-            Current.Reset();
-            Current.UnlockConfigs();
-            Current.Configs.Add(() => _config);
-            Current.Configs.Add<IUmbracoSettingsSection>(() => new UmbracoSettingsSection());
+                composition.ConfigureCodeOptions(optionsBuilder =>
+                {
+                    // replaces [IgnoreContentTypeAttribute]
+                    // ignores a content type
+                    // TODO: also, .FlattenContentType etc - what else?
+                    // for anything more complex, override CodeBuilder.ContentTypes.GetContentTypeVisibility
+                    optionsBuilder.ContentTypes.IgnoreContentType("contentAlias");
+
+                    // replaces [RenameContentTypeAttribute]
+                    // defines the Clr name of a content type model
+                    // for anything more complex, override CodeBuilder.ContentTypes.GetContentTypeClrName
+                    optionsBuilder.ContentTypes.SetContentTypeClrName("contentAlias", "ContentClrName");
+
+                    // defines the namespace of a content type model
+                    // for anything more complex, override CodeBuilder.ContentTypes.GetContentTypeNamespace
+                    //options.SetContentTypeNamespace("contentAlias", "Some.Namespace");
+
+                    // replaces [IgnorePropertyTypeAttribute]
+                    // ignores a property type
+                    // TODO: also, .FlattenProperty etc - what else?
+                    // for anything more complex, override CodeBuilder.ContentTypes.GetPropertyTypeVisibility
+                    optionsBuilder.ContentTypes.IgnorePropertyType(ContentTypeIdentity.Alias("contentTypeAlias"), "propertyAlias");
+
+                    // replaces [RenamePropertyTypeAttribute]
+                    // FIXME and then if the attribute is gone, we can work with ContentType alias EXCLUSIVELY?
+                    // for anything more complex, override CodeBuilder.ContentTypes.GetPropertyTypeClrName
+                    optionsBuilder.ContentTypes.SetPropertyTypeClrName(ContentTypeIdentity.Alias("contentTypeAlias"), "propertyAlias", "PropertyClrName");
+
+                    // TODO: same for property type value Clr type
+                    // TODO: options.SetModelInfosClassName("")
+                    // TODO: options.ContentTypes.SetPropertyStyle(...)
+                    // TODO: options.ContentTypes.FallbackStyle = ...
+                });
+            }
         }
 
-        [Test]
-        public void CustomNames()
+        private class CustomCodeOptionsBuilder : CodeOptionsBuilder
         {
-            var type1 = new ContentTypeModel
+            public override CodeOptions CodeOptions
             {
-                Id = 1,
-                Alias = "type1",
-                ParentId = 0,
-                BaseType = null,
-                ItemType = ContentTypeModel.ItemTypes.Content,
-            };
-            type1.Properties.Add(new PropertyModel
-            {
-                Alias = "prop1",
-                ContentType = type1,
-                ModelClrType = typeof(string),
-            });
+                get
+                {
+                    // here we could tweak more things...
 
-            var types = new List<ContentTypeModel> { type1 };
+                    var options = base.CodeOptions;
 
-            var code = new Dictionary<string, string>
-            {
-                {"assembly", @"
-using ZpqrtBnk.ModelsBuilder;
-"}
-            };
+                    // here we could tweak more things...
 
-            var refs = new[]
-            {
-                MetadataReference.CreateFromFile(typeof (string).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof (ReferencedAssemblies).Assembly.Location)
-            };
-
-            var transform = new CodeParser().Parse(code, refs);
-            var model = new CustomNamesCodeModel { ContentTypeModels = types, GeneratePropertyGetters = true }; // preserve
-            model.Apply(_config, transform, null);
-            var writer = new CodeWriter(model);
-            writer.WriteModelFile(types.First());
-            var gen = writer.Code;
-
-            var version = ApiVersion.Current.Version;
-            var expected = @"//------------------------------------------------------------------------------
-// <auto-generated>
-//   This code was generated by a tool.
-//
-//    ZpqrtBnk.ModelsBuilder v" + version + @"
-//
-//   Changes to this file will be lost if the code is regenerated.
-// </auto-generated>
-//------------------------------------------------------------------------------
-
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Web;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web;
-using ZpqrtBnk.ModelsBuilder;
-using ZpqrtBnk.ModelsBuilder.Umbraco;
-using System.CodeDom.Compiler;
-
-namespace Umbraco.Web.PublishedModels
-{
-    /// <summary>Provides extension methods for the Type1Custom class.</summary>
-    public static partial class Type1CustomExtensions
-    {
-        /// <summary>Gets the value of the ""prop1"" property.</summary>
-        [GeneratedCodeAttribute(ModelInfos.Name, ModelInfos.VersionString)]
-        public static string Prop1(this Type1Custom that, Fallback fallback = default, string defaultValue = default)
-            => that.Value<string>(ModelInfos.ContentTypes.Type1Custom.Properties.Prop1.Alias, fallback: fallback, defaultValue: defaultValue);
-    }
-
-    /// <summary>Represents a ""type1"" content item.</summary>
-    [PublishedModel(ModelInfos.ContentTypes.Type1Custom.Alias)]
-    public partial class Type1Custom : PublishedContentModel
-    {
-        public Type1Custom(IPublishedContent content)
-            : base(content)
-        { }
-
-        /// <summary>Gets the value of the ""prop1"" property.</summary>
-        [GeneratedCodeAttribute(ModelInfos.Name, ModelInfos.VersionString)]
-        [ImplementPropertyType(ModelInfos.ContentTypes.Type1Custom.Properties.Prop1.Alias)]
-        public string Prop1 => this.Prop1();
-    }
-}
-";
-            Console.WriteLine(gen);
-            Assert.AreEqual(expected.ClearLf(), gen);
-        }
-
-        private class CustomNamesCodeModel : CodeModel
-        {
-            public override string GetClrName(ContentTypeModel contentTypeModel)
-            {
-                return base.GetClrName(contentTypeModel) + "Custom";
+                    return options;
+                }
             }
         }
 
         // demo
         // all config can be achieved in the model
         //
-        private class ConfiguringCodeModel : CodeModel
+        private class CustomCodeFactory : CodeFactory
         {
-            public override void Apply(Config config, ContentModelTransform transform, string modelsNamespace)
+            public CustomCodeFactory(UmbracoServices umbracoServices, OptionsConfiguration optionsConfiguration) 
+                : base(umbracoServices, optionsConfiguration)
+            { }
+
+            public override CodeOptionsBuilder CreateCodeOptionsBuilder()
+                => new CustomCodeOptionsBuilder();
+
+            public override ICodeModelBuilder CreateCodeModelBuilder(ModelsBuilderOptions options, CodeOptions codeOptions)
             {
-                // replaces config
-                ClrNameSource = ClrNameSource.RawAlias;
-
-                // FIXME active methods: IgnoreContentType() etc
-
-                // replaces [IgnoreContentTypeAttribute]
-                transform.IgnoreContentType("contentAlias");
-
-                // replaces [RenameContentTypeAttribute]
-                transform.RenameContentType("contentAlias", "contentName", false); // FIXME withImplement?
-
-                // replaces [IgnorePropertyTypeAttribute] - though it was convenient?
-                transform.SetIgnoredProperty("", "propertyAlias"); // FIXME content name?
-
-                // replaces [RenamePropertyTypeAttribute] - though it was convenient?
-                transform.SetRenamedProperty("", "propertyAlias", "propertyName"); // FIXME content name?
-
-                // apply
-                base.Apply(config, transform, modelsNamespace);
-
-                // replaces [ModelsBuilderConfigureAttribute]
-                ModelInfosClassName = "MB";
-                ModelInfosClassNamespace = "Models";
-                GeneratePropertyGetters = true;
-                GenerateFallbackFuncExtensionMethods = true;
-
-                // replaces [ModelsUsingAttribute]
-                Using.Add("My.Other.Project");
+                return new VeryCustomCodeModelBuilder(options, codeOptions);
             }
+        }
 
-            // replaces [ContentModelsBaseClassAttribute]
-            // replaces [ElementModelsBaseClassAttribute]
-            public override string GetBaseClrName(ContentTypeModel contentTypeModel)
-            {
-                // any kind of logic can go
-                if (!contentTypeModel.IsElement && contentTypeModel.Alias == "alias") return "Base";
-
-                return base.GetBaseClrName(contentTypeModel);
-            }
+        public class VeryCustomCodeModelBuilder : CodeModelBuilder
+        {
+            public VeryCustomCodeModelBuilder(ModelsBuilderOptions options, CodeOptions codeOptions) 
+                : base(options, codeOptions, new CustomContentTypesCodeModelBuilder(options, codeOptions))
+            { }
 
             // replaces [ModelsUsingAttribute]
             protected override ISet<string> GetUsing()
@@ -183,8 +109,25 @@ namespace Umbraco.Web.PublishedModels
                 usings.Add("My.Project");
                 return usings;
             }
+        }
 
-            public override string GetClrName(ContentTypeModel contentTypeModel)
+        public class CustomContentTypesCodeModelBuilder : ContentTypesCodeModelBuilder
+        {
+            public CustomContentTypesCodeModelBuilder(ModelsBuilderOptions options, CodeOptions codeOptions) 
+                : base(options, codeOptions)
+            { }
+
+            // replaces [ContentModelsBaseClassAttribute]
+            // replaces [ElementModelsBaseClassAttribute]
+            protected override string GetContentTypeBaseClassClrFullName(ContentTypeModel contentTypeModel, string modelsNamespace)
+            {
+                // any kind of logic can go
+                if (!contentTypeModel.IsElement && contentTypeModel.Alias == "alias") return "Base";
+
+                return base.GetContentTypeBaseClassClrFullName(contentTypeModel, modelsNamespace);
+            }
+
+            protected override string GetClrName(ContentTypeModel contentTypeModel)
             {
                 const string typeModelPrefix = "";
                 const string typeModelSuffix = "";
@@ -194,7 +137,7 @@ namespace Umbraco.Web.PublishedModels
                 return typeModelPrefix + base.GetClrName(contentTypeModel) + typeModelSuffix;
             }
 
-            public override string GetClrName(PropertyModel propertyModel)
+            protected override string GetClrName(PropertyTypeModel propertyModel)
             {
                 const string propertyModelPrefix = "";
                 const string propertyModelSuffix = "";

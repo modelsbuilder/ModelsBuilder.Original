@@ -7,28 +7,21 @@ using System.Reflection;
 using System.Web;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Umbraco.Core.Composing;
-using ZpqrtBnk.ModelsBuilder.Configuration;
+using Umbraco.Core;
 
-namespace ZpqrtBnk.ModelsBuilder.Building
+namespace Our.ModelsBuilder.Building
 {
     // main Roslyn compiler
     public class Compiler
     {
         private readonly LanguageVersion _languageVersion;
 
-        public Compiler()
-            : this(Config.LanguageVersion)
-        { }
-
-        public Compiler(LanguageVersion languageVersion)
+        public Compiler(LanguageVersion languageVersion = LanguageVersion.Default)
         {
             _languageVersion = languageVersion;
             References = ReferencedAssemblies.References;
             Debug = HttpContext.Current != null && HttpContext.Current.IsDebuggingEnabled;
         }
-
-        private static Config Config => Current.Configs.ModelsBuilder();
 
         // gets or sets the references
         public IEnumerable<PortableExecutableReference> References { get; set; }
@@ -36,50 +29,44 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         public bool Debug { get; set; }
 
         // gets a compilation
-        public CSharpCompilation GetCompilation(string assemblyName, IDictionary<string, string> files)
+        public CSharpCompilation GetCompilation(string assemblyName, IDictionary<string, string> sources)
         {
-            return GetCompilation(assemblyName, files, out _);
+            return GetCompilation(assemblyName, sources, out _);
         }
 
         // gets a compilation
         // used by CodeParser to get a "compilation" of the existing files
-        public CSharpCompilation GetCompilation(string assemblyName, IDictionary<string, string> files, out SyntaxTree[] trees)
+        public CSharpCompilation GetCompilation(string assemblyName, IDictionary<string, string> sources, out SyntaxTree[] trees)
         {
             var options = new CSharpParseOptions(_languageVersion);
-            trees = files.Select(x =>
+
+            trees = sources.Select(x =>
             {
-                var text = x.Value;
-                var tree = CSharpSyntaxTree.ParseText(text, /*options:*/ options);
+                var (path, text) = x;
+                var tree = CSharpSyntaxTree.ParseText(text, options, path);
                 var diagnostic = tree.GetDiagnostics().FirstOrDefault(y => y.Severity == DiagnosticSeverity.Error);
                 if (diagnostic != null)
-                    ThrowExceptionFromDiagnostic(x.Key, x.Value, diagnostic);
+                    ThrowExceptionFromDiagnostic(path, text, diagnostic);
                 return tree;
             }).ToArray();
-
-            var refs = References;
 
             var compilationOptions = new CSharpCompilationOptions(
                 OutputKind.DynamicallyLinkedLibrary,
                 assemblyIdentityComparer: DesktopAssemblyIdentityComparer.Default,
                 optimizationLevel: Debug ? OptimizationLevel.Debug : OptimizationLevel.Release
             );
-            var compilation = CSharpCompilation.Create(
-                assemblyName,
-                /*syntaxTrees:*/ trees,
-                /*references:*/ refs,
-                compilationOptions);
 
-            return compilation;
+            return CSharpCompilation.Create(assemblyName, trees, References, compilationOptions);
         }
 
         // compile files into a Dll
         // used by ModelsBuilderBackOfficeController in [Live]Dll mode, to compile the models to disk
-        public void Compile(string assemblyName, IDictionary<string, string> files, string binPath)
+        public void Compile(string assemblyName, IDictionary<string, string> sources, string binPath)
         {
             var assemblyPath = Path.Combine(binPath, assemblyName + ".dll");
             using (var stream = new FileStream(assemblyPath, FileMode.Create))
             {
-                Compile(assemblyName, files, stream);
+                Compile(assemblyName, sources, stream);
             }
 
             // this is how we'd create the pdb:
@@ -104,34 +91,30 @@ namespace ZpqrtBnk.ModelsBuilder.Building
         }
 
         // compile files into an assembly
-        public Assembly Compile(string assemblyName, IDictionary<string, string> files)
+        public Assembly Compile(string assemblyName, IDictionary<string, string> sources)
         {
-            using (var stream = new MemoryStream())
-            {
-                Compile(assemblyName, files, stream);
-                return Assembly.Load(stream.GetBuffer());
-            }
+            using var stream = new MemoryStream();
+            Compile(assemblyName, sources, stream);
+            return Assembly.Load(stream.GetBuffer());
         }
 
         // compile one file into an assembly
         public Assembly Compile(string assemblyName, string path, string code)
         {
-            using (var stream = new MemoryStream())
-            {
-                Compile(assemblyName, new Dictionary<string, string> { { path, code } }, stream);
-                return Assembly.Load(stream.GetBuffer());
-            }
+            using var stream = new MemoryStream();
+            Compile(assemblyName, new Dictionary<string, string> { { path, code } }, stream);
+            return Assembly.Load(stream.GetBuffer());
         }
 
         // compiles files into a stream
-        public void Compile(string assemblyName, IDictionary<string, string> files, Stream stream)
+        public void Compile(string assemblyName, IDictionary<string, string> sources, Stream stream)
         {
             // create the compilation
-            var compilation = GetCompilation(assemblyName, files);
+            var compilation = GetCompilation(assemblyName, sources);
 
             // check diagnostics for errors (not warnings)
             foreach (var diag in compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error))
-                ThrowExceptionFromDiagnostic(files, diag);
+                ThrowExceptionFromDiagnostic(sources, diag);
 
             // emit
             var result = compilation.Emit(stream);
@@ -139,7 +122,7 @@ namespace ZpqrtBnk.ModelsBuilder.Building
 
             // deal with errors
             var diagnostic = result.Diagnostics.First(x => x.Severity == DiagnosticSeverity.Error);
-            ThrowExceptionFromDiagnostic(files, diagnostic);
+            ThrowExceptionFromDiagnostic(sources, diagnostic);
         }
 
         // compiles one file into a stream

@@ -1,14 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Our.ModelsBuilder.Options;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
-using ZpqrtBnk.ModelsBuilder.Configuration;
 
-namespace ZpqrtBnk.ModelsBuilder.Umbraco
+namespace Our.ModelsBuilder.Umbraco
 {
     public static class ModelsGenerationError
     {
-        private static Config Config => Current.Configs.ModelsBuilder();
+        private static ModelsBuilderOptions Options => Current.Factory.GetInstance<ModelsBuilderOptions>();
 
         public static void Clear()
         {
@@ -52,11 +53,11 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
         private static string GetErrFile()
         {
-            var modelsDirectory = Config.ModelsDirectory;
-            if (!Directory.Exists(modelsDirectory))
-                return null;
+            var modelsDirectory = Options.ModelsDirectory;
 
-            return Path.Combine(modelsDirectory, "models.err");
+            return Directory.Exists(modelsDirectory) 
+                ? Path.Combine(modelsDirectory, "models.err") 
+                : null;
         }
     }
 }

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata minClientVersion="2.8.1">
+    <id>Our.ModelsBuilder</id>
+    <version>$version$</version>
+    <title>Our ModelsBuilder</title>
+    <authors>The Umbraco Community</authors>
+    <owners>The Umbraco Community</owners>
+    <license type="expression">MIT</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <iconUrl>https://raw.githubusercontent.com/ZpqrtBnk/Our.ModelsBuilder/v4/dev/etc/logo.png</iconUrl>
+    <!--<icon>img\logo.png</icon>-->
+    <description>Our ModelsBuilder for Umbraco.</description>
+    <projectUrl>https://github.com/ZpqrtBnk/Our.ModelsBuilder</projectUrl>
+    <copyright>$copyright$</copyright>
+    <language>en-US</language>
+    <tags>umbraco</tags>
+    <dependencies>
+      <group targetFramework="net472">
+        <dependency id="Microsoft.CodeAnalysis.CSharp" version="[3.3.1,4.0.0)" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <!-- our dlls -->
+    <file src="$solution$\build.tmp\bin\Our.ModelsBuilder.dll" target="lib\net472\Our.ModelsBuilder.dll" />
+    <file src="$solution$\build.tmp\bin\Our.ModelsBuilder.pdb" target="lib\net472\Our.ModelsBuilder.pdb" />
+
+    <!-- the icon -->
+    <!--<file src="$solution$\build\Nuspecs\logo.png" target="img\" />-->
+
+  </files>
+</package>

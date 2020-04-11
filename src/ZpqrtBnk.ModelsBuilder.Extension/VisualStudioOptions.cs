@@ -5,9 +5,9 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Xml;
-using ZpqrtBnk.ModelsBuilder.Extension.VisualStudio;
+using Our.ModelsBuilder.Extension.VisualStudio;
 
-namespace ZpqrtBnk.ModelsBuilder.Extension
+namespace Our.ModelsBuilder.Extension
 {
     public class VisualStudioOptions
     {

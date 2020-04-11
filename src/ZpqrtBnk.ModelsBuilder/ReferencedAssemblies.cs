@@ -7,7 +7,7 @@ using System.Web.Hosting;
 using Microsoft.CodeAnalysis;
 using Umbraco.Core;
 
-namespace ZpqrtBnk.ModelsBuilder
+namespace Our.ModelsBuilder
 {
     internal static class ReferencedAssemblies
     {
@@ -36,6 +36,9 @@ namespace ZpqrtBnk.ModelsBuilder
         /// </summary>
         public static IEnumerable<PortableExecutableReference> References => LazyReferences.Value;
 
+        /// <summary>
+        /// Gets the netstandard assembly.
+        /// </summary>
         public static Assembly GetNetStandardAssembly(List<Assembly> assemblies)
         {
             if (assemblies == null)
@@ -57,6 +60,9 @@ namespace ZpqrtBnk.ModelsBuilder
             return null;
         }
 
+        /// <summary>
+        /// Gets the netstandard assembly.
+        /// </summary>
         public static Assembly GetNetStandardAssembly()
         {
             // in PreApplicationStartMethod we cannot get BuildManager.Referenced assemblies, do it differently
@@ -149,43 +155,5 @@ namespace ZpqrtBnk.ModelsBuilder
             }
             return assemblies.Select(x => x.Location).Distinct();
         }
-
-
-        // ----
-
-        private static IEnumerable<Assembly> GetDeepReferencedAssemblies(Assembly assembly)
-        {
-            var visiting = new Stack<Assembly>();
-            var visited = new HashSet<Assembly>();
-
-            visiting.Push(assembly);
-            visited.Add(assembly);
-            while (visiting.Count > 0)
-            {
-                var visAsm = visiting.Pop();
-                foreach (var refAsm in visAsm.GetReferencedAssemblies()
-                    .Select(TryLoad)
-                    .Where(x => x != null && visited.Contains(x) == false))
-                {
-                    yield return refAsm;
-                    visiting.Push(refAsm);
-                    visited.Add(refAsm);
-                }
-            }
-        }
-
-        private static Assembly TryLoad(AssemblyName name)
-        {
-            try
-            {
-                return AppDomain.CurrentDomain.Load(name);
-            }
-            catch (Exception)
-            {
-                //Console.WriteLine(name);
-                return null;
-            }
-        }
-
     }
 }

@@ -3,17 +3,17 @@ using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Web.Hosting;
+using Our.ModelsBuilder.Building;
+using Our.ModelsBuilder.Options;
+using Our.ModelsBuilder.Umbraco;
+using Our.ModelsBuilder.Web.Plugin;
 using Umbraco.Web.Editors;
 using Umbraco.Web.WebApi.Filters;
-using ZpqrtBnk.ModelsBuilder.Building;
-using ZpqrtBnk.ModelsBuilder.Configuration;
-using ZpqrtBnk.ModelsBuilder.Umbraco;
-using ZpqrtBnk.ModelsBuilder.Web.Plugin;
 // use the http one, not mvc, with api controllers!
 using HttpGetAttribute = System.Web.Http.HttpGetAttribute;
 using HttpPostAttribute = System.Web.Http.HttpPostAttribute;
 
-namespace ZpqrtBnk.ModelsBuilder.Web.Umbraco
+namespace Our.ModelsBuilder.Web.Umbraco
 {
     // routed as /umbraco/BackOffice/Api/ModelsBuilder/{action}/{id}
 
@@ -28,15 +28,13 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Umbraco
     [UmbracoApplicationAuthorize(global::Umbraco.Core.Constants.Applications.Settings)]
     public class ModelsBuilderController : UmbracoAuthorizedJsonController
     {
-        private readonly UmbracoServices _umbracoServices;
         private readonly ICodeFactory _codeFactory;
-        private readonly Config _config;
+        private readonly ModelsBuilderOptions _options;
 
-        public ModelsBuilderController(UmbracoServices umbracoServices, ICodeFactory codeFactory, Config config)
+        public ModelsBuilderController(ICodeFactory codeFactory, ModelsBuilderOptions options)
         {
-            _umbracoServices = umbracoServices;
             _codeFactory = codeFactory;
-            _config = config;
+            _options = options;
         }
 
         // invoked by the dashboard
@@ -47,20 +45,20 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Umbraco
         {
             try
             {
-                if (!_config.ModelsMode.SupportsExplicitGeneration())
+                if (!_options.ModelsMode.SupportsExplicitGeneration())
                 {
                     var result2 = new BuildResult { Success = false, Message = "Models generation is not enabled." };
                     return Request.CreateResponse(HttpStatusCode.OK, result2, Configuration.Formatters.JsonFormatter);
                 }
 
-                var modelsDirectory = _config.ModelsDirectory;
+                var modelsDirectory = _options.ModelsDirectory;
 
                 var bin = HostingEnvironment.MapPath("~/bin");
                 if (bin == null)
                     throw new Exception("Panic: bin is null.");
 
                 // EnableDllModels will recycle the app domain - but this request will end properly
-                GenerateModels(modelsDirectory, _config.ModelsMode.IsAnyDll() ? bin : null);
+                GenerateModels(modelsDirectory, _options.ModelsMode.IsAnyDll() ? bin : null);
 
                 ModelsGenerationError.Clear();
             }
@@ -97,21 +95,23 @@ namespace ZpqrtBnk.ModelsBuilder.Web.Umbraco
 
         private Dashboard GetDashboardResult()
         {
+            var dashboardHelper = new DashboardUtilities(_options);
+
             return new Dashboard
             {
-                Enable = _config.Enable,
-                Text = DashboardHelper.Text(),
-                CanGenerate = DashboardHelper.CanGenerate(),
-                GenerateCausesRestart = DashboardHelper.GenerateCausesRestart(),
-                OutOfDateModels = DashboardHelper.AreModelsOutOfDate(),
-                LastError = DashboardHelper.LastError(),
+                Enable = _options.Enable,
+                Text = dashboardHelper.Text(),
+                CanGenerate = dashboardHelper.CanGenerate(),
+                GenerateCausesRestart = dashboardHelper.GenerateCausesRestart(),
+                OutOfDateModels = dashboardHelper.AreModelsOutOfDate(),
+                LastError = dashboardHelper.LastError(),
             };
         }
 
         private void GenerateModels(string modelsDirectory, string bin)
         {
-            var generator = new Generator(_umbracoServices, _codeFactory, _config);
-            generator.GenerateModels(modelsDirectory, bin, _config.ModelsNamespace);
+            var generator = new Generator(_codeFactory, _options);
+            generator.GenerateModels(modelsDirectory, bin, _options.ModelsNamespace);
         }
 
         [DataContract]

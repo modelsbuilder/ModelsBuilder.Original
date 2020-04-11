@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Core.Composing;
 
-namespace ZpqrtBnk.ModelsBuilder.Umbraco
+namespace Our.ModelsBuilder.Umbraco
 {
     /// <summary>
     /// Represents a collection of models for the PublishedModelFactory.

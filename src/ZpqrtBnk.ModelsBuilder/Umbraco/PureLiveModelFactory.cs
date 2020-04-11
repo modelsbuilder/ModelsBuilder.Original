@@ -1,9 +1,7 @@
 ﻿using System;
-using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,16 +13,14 @@ using System.Web;
 using System.Web.Compilation;
 using System.Web.Hosting;
 using System.Web.WebPages.Razor;
+using Our.ModelsBuilder.Building;
+using Our.ModelsBuilder.Options;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
-using ZpqrtBnk.ModelsBuilder.Building;
-using ZpqrtBnk.ModelsBuilder.Configuration;
-using AssemblyBuilder = System.Web.Compilation.AssemblyBuilder;
-using CodeParser = ZpqrtBnk.ModelsBuilder.Building.CodeParser;
 using File = System.IO.File;
 
-namespace ZpqrtBnk.ModelsBuilder.Umbraco
+namespace Our.ModelsBuilder.Umbraco
 {
     internal class PureLiveModelFactory : ILivePublishedModelFactory, IRegisteredObject
     {
@@ -38,22 +34,20 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
         private int _ver, _skipver;
         private readonly int _debugLevel;
         private BuildManager _theBuildManager;
-        private readonly Lazy<UmbracoServices> _umbracoServices;
-        private readonly ICodeFactory _factory;
-        private UmbracoServices UmbracoServices => _umbracoServices.Value;
+        private readonly ICodeFactory _codeFactory;
 
         private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
         private const string ProjVirt = "~/App_Data/Models/all.generated.cs";
         private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err" };
 
-        private readonly Config _config;
+        private readonly ModelsBuilderOptions _options;
 
-        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, ICodeFactory factory, IProfilingLogger logger, Config config)
+        // FIXME was lazy-injecting umbraco services, should lazy-inject code factory?
+        public PureLiveModelFactory(ICodeFactory codeFactory, IProfilingLogger logger, ModelsBuilderOptions options)
         {
-            _umbracoServices = umbracoServices;
-            _factory = factory;
+            _codeFactory = codeFactory;
             _logger = logger;
-            _config = config;
+            _options = options;
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
 
@@ -61,7 +55,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
             if (!HostingEnvironment.IsHosted) return;
 
-            var modelsDirectory = _config.ModelsDirectory;
+            var modelsDirectory = _options.ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
@@ -74,7 +68,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
             _watcher.EnableRaisingEvents = true;
 
             // get it here, this need to be fast
-            _debugLevel = _config.DebugLevel;
+            _debugLevel = _options.DebugLevel;
         }
 
         #region ILivePublishedModelFactory
@@ -211,7 +205,7 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
                 _hasModels = false;
                 _pendingRebuild = true;
 
-                var modelsDirectory = _config.ModelsDirectory;
+                var modelsDirectory = _options.ModelsDirectory;
                 if (!Directory.Exists(modelsDirectory))
                     Directory.CreateDirectory(modelsDirectory);
 
@@ -333,24 +327,20 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
 
         private Assembly GetModelsAssembly(bool forceRebuild)
         {
-            var modelsDirectory = _config.ModelsDirectory;
+            var modelsDirectory = _options.ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
             // must filter out *.generated.cs because we haven't deleted them yet!
-            var ourFiles = Directory.Exists(modelsDirectory)
+            var sources = Directory.Exists(modelsDirectory)
                 ? Directory.GetFiles(modelsDirectory, "*.cs")
                     .Where(x => !x.EndsWith(".generated.cs"))
                     .ToDictionary(x => x, File.ReadAllText)
                 : new Dictionary<string, string>();
 
-            // get models from Umbraco
-            var model = new CodeModel
-            {
-                ContentTypeModels = UmbracoServices.GetAllTypes()
-            };
+            var modelData = _codeFactory.CreateCodeModelDataSource().GetCodeModelData();
 
-            var currentHash = HashHelper.Hash(ourFiles, model.ContentTypeModels); // TODO: hash 'model' entirely
+            var currentHash = HashHelper.Hash(sources, modelData.ContentTypes); // TODO: hash 'model' entirely
             var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
             var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
             var projFile = Path.Combine(modelsDirectory, "all.generated.cs");
@@ -465,20 +455,19 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
             _logger.Debug<PureLiveModelFactory>("Rebuilding models.");
 
             // generate code, save
-            var code = GenerateModelsCode(ourFiles, model);
+            var code = GenerateModelsCode(sources, modelData);
             // add extra attributes,
-            //  PureLiveAssembly helps identifying Assemblies that contain PureLive models
+            //  ModelsBuilderAssembly identifies ModelsBuilder assemblies (and tags PureLive assemblies)
             //  AssemblyVersion is so that we have a different version for each rebuild
             var ver = _ver == _skipver ? ++_ver : _ver;
             _ver++;
-            code = code.Replace("//ASSATTR", $@"[assembly: PureLiveAssembly]
-[assembly: ModelsBuilderAssembly(PureLive = true, SourceHash = ""{currentHash}"")]
+            code = code.Replace("//ASSATTR", $@"[assembly: ModelsBuilderAssembly(PureLive = true, SourceHash = ""{currentHash}"")]
 [assembly: System.Reflection.AssemblyVersion(""0.0.0.{ver}"")]");
             File.WriteAllText(modelsSrcFile, code);
 
             // generate proj, save
-            ourFiles["models.generated.cs"] = code;
-            var proj = GenerateModelsProj(ourFiles);
+            sources["models.generated.cs"] = code;
+            var proj = GenerateModelsProj(sources);
             File.WriteAllText(projFile, proj);
 
             // compile and register
@@ -562,20 +551,21 @@ namespace ZpqrtBnk.ModelsBuilder.Umbraco
             return new Infos { ModelInfos = modelInfos.Count > 0 ? modelInfos : null, ModelTypeMap = map };
         }
 
-        private string GenerateModelsCode(IDictionary<string, string> ourFiles, CodeModel model)
+        private string GenerateModelsCode(IDictionary<string, string> sources, CodeModelData modelData)
         {
-            var modelsDirectory = _config.ModelsDirectory;
+            var modelsDirectory = _options.ModelsDirectory;
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
 
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                 File.Delete(file);
 
-            var transform = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
-            model.Apply(_config, transform, _config.ModelsNamespace);
-            var writer = _factory.CreateWriter(model);
+            // create a code writer (via all the steps)
+            var codeModel = Generator.CreateCodeModel(_codeFactory, sources, modelData, _options);
+            var writer = _codeFactory.CreateCodeWriter(codeModel);
 
-            writer.WriteSingleFile(model);
+            // write all as one single file
+            writer.WriteSingleFile();
 
             return writer.Code;
         }

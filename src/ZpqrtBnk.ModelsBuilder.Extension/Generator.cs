@@ -1,20 +1,19 @@
-﻿using EnvDTE;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EnvDTE;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
+using Our.ModelsBuilder.Building;
+using Our.ModelsBuilder.Extension.VisualStudio;
+using Our.ModelsBuilder.Web.Api;
 using Umbraco.Core;
-using ZpqrtBnk.ModelsBuilder.Api;
-using ZpqrtBnk.ModelsBuilder.Extension.VisualStudio;
-using ZpqrtBnk.ModelsBuilder.Web.Api;
 using Task = System.Threading.Tasks.Task;
 
-namespace ZpqrtBnk.ModelsBuilder.Extension
+namespace Our.ModelsBuilder.Extension
 {
     public class Generator
     {
@@ -94,7 +93,7 @@ namespace ZpqrtBnk.ModelsBuilder.Extension
             var parts = relativePath.Split(new[] { Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
             for (var i = 0; i < parts.Length; i++)
             {
-                parts[i] = Building.Compiler.CreateValidIdentifier(parts[i]);
+                parts[i] = Compiler.CreateValidIdentifier(parts[i]);
             }
             var relativeNameSpace = string.Join(".", parts);
 

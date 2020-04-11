@@ -1,24 +1,21 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
-using System.Web.Http;
+using Our.ModelsBuilder.Options;
+using Our.ModelsBuilder.Umbraco;
+using Our.ModelsBuilder.Validation;
+using Our.ModelsBuilder.Web.Api;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.ModelsBuilder.Embedded;
-using Umbraco.ModelsBuilder.Embedded.BackOffice;
 using Umbraco.Web;
 using Umbraco.Web.Editors;
 using Umbraco.Web.WebApi;
-using ZpqrtBnk.ModelsBuilder.Umbraco;
-using ZpqrtBnk.ModelsBuilder.Web.Api;
-using ContentTypeModelValidator = ZpqrtBnk.ModelsBuilder.Validation.ContentTypeModelValidator;
-using MediaTypeModelValidator = ZpqrtBnk.ModelsBuilder.Validation.MediaTypeModelValidator;
-using MemberTypeModelValidator = ZpqrtBnk.ModelsBuilder.Validation.MemberTypeModelValidator;
+using Embedded = Umbraco.ModelsBuilder.Embedded;
 
-namespace ZpqrtBnk.ModelsBuilder.Web
+namespace Our.ModelsBuilder.Web
 {
     [Disable]
-    public class NoopComposer : IComposer {
+    public class NoopComposer : IComposer 
+    {
         public void Compose(Composition composition)
         { }
     }
@@ -42,10 +39,11 @@ namespace ZpqrtBnk.ModelsBuilder.Web
     [DisableUmbracoModelsBuilder]
 
     // disable the embedded MB that ships with the CMS
-    [Disable(typeof(global::Umbraco.ModelsBuilder.Embedded.Compose.ModelsBuilderComposer))]
+    [Disable(typeof(Embedded.Compose.ModelsBuilderComposer))]
 
-    // after our own ZpqrtBnk ModelsBuilderComposer
+    // after our own Our ModelsBuilderComposer and options composers
     [ComposeAfter(typeof(ModelsBuilderComposer))]
+    [ComposeAfter(typeof(IOptionsComposer))]
 
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public class WebComposer : ComponentComposer<WebComponent>, IUserComposer
@@ -55,12 +53,12 @@ namespace ZpqrtBnk.ModelsBuilder.Web
             base.Compose(composition);
 
             // remove the embedded dashboard
-            composition.Dashboards().Remove<ModelsBuilderDashboard>();
+            composition.Dashboards().Remove<Embedded.ModelsBuilderDashboard>();
 
             // remove the embedded controller
             // (embedded code uses features via a component - convoluted
             composition.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
-                .Remove<ModelsBuilderDashboardController>();
+                .Remove<Embedded.BackOffice.ModelsBuilderDashboardController>();
 
             // add our manifest, depending on configuration
             composition.ManifestFilters().Append<WebManifestFilter>();
@@ -77,7 +75,11 @@ namespace ZpqrtBnk.ModelsBuilder.Web
             composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>()
                 .Clear();
 
-            if (composition.Configs.ModelsBuilder().EnableBackOffice)
+            // get the options
+            // NOTE: after that point, the options are frozen
+            var options = composition.Configs.GetConfig<OptionsConfiguration>().ModelsBuilderOptions;
+
+            if (options.EnableBackOffice)
             {
                 composition.WithCollectionBuilder<EditorValidatorCollectionBuilder>()
                     .Add<ContentTypeModelValidator>()
@@ -97,7 +99,7 @@ namespace ZpqrtBnk.ModelsBuilder.Web
             // do NOT add it to the collection - we will route it in the component, our way
             // fixme - explain why?
 
-            if (composition.Configs.ModelsBuilder().IsApiServer)
+            if (options.IsApiServer)
             {
                 // add the controller to the list of known controllers
                 //composition.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()

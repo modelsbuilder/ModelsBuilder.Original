@@ -4,10 +4,10 @@ using System.IO;
 using System.Windows.Interop;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
-using ZpqrtBnk.ModelsBuilder.Extension.VisualStudio;
+using Our.ModelsBuilder.Extension.VisualStudio;
 using Task = System.Threading.Tasks.Task;
 
-namespace ZpqrtBnk.ModelsBuilder.Extension
+namespace Our.ModelsBuilder.Extension
 {
     /// <summary>
     /// Command handler
