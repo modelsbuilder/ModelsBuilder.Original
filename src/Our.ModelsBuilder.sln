@@ -29,15 +29,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuspecs", "Nuspecs", "{3036
 		..\build\Nuspecs\Our.ModelsBuilder.Web.nuspec = ..\build\Nuspecs\Our.ModelsBuilder.Web.nuspec
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Our.ModelsBuilder", "ZpqrtBnk.ModelsBuilder\Our.ModelsBuilder.csproj", "{998FB014-303A-4146-B3E4-B927BAB0210F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Our.ModelsBuilder", "Our.ModelsBuilder\Our.ModelsBuilder.csproj", "{998FB014-303A-4146-B3E4-B927BAB0210F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Our.ModelsBuilder.Tests", "ZpqrtBnk.ModelsBuilder.Tests\Our.ModelsBuilder.Tests.csproj", "{CF597D44-04EA-4FD7-89C8-E4849D1355C8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Our.ModelsBuilder.Tests", "Our.ModelsBuilder.Tests\Our.ModelsBuilder.Tests.csproj", "{CF597D44-04EA-4FD7-89C8-E4849D1355C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Our.ModelsBuilder.Console", "ZpqrtBnk.ModelsBuilder.Console\Our.ModelsBuilder.Console.csproj", "{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Our.ModelsBuilder.Console", "Our.ModelsBuilder.Console\Our.ModelsBuilder.Console.csproj", "{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Our.ModelsBuilder.Web", "ZpqrtBnk.ModelsBuilder.Web\Our.ModelsBuilder.Web.csproj", "{2317BE7F-1723-4512-B863-5B6835E583A2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Our.ModelsBuilder.Web", "Our.ModelsBuilder.Web\Our.ModelsBuilder.Web.csproj", "{2317BE7F-1723-4512-B863-5B6835E583A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Our.ModelsBuilder.Extension", "ZpqrtBnk.ModelsBuilder.Extension\Our.ModelsBuilder.Extension.csproj", "{0419A43D-78C2-46C9-95A9-2470F224D60F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Our.ModelsBuilder.Extension", "Our.ModelsBuilder.Extension\Our.ModelsBuilder.Extension.csproj", "{0419A43D-78C2-46C9-95A9-2470F224D60F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

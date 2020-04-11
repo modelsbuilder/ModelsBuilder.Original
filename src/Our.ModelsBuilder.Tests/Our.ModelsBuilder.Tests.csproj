@@ -87,11 +87,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ZpqrtBnk.ModelsBuilder.Web\Our.ModelsBuilder.Web.csproj">
+    <ProjectReference Include="..\Our.ModelsBuilder.Web\Our.ModelsBuilder.Web.csproj">
       <Project>{2317be7f-1723-4512-b863-5b6835e583a2}</Project>
       <Name>Our.ModelsBuilder.Web</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ZpqrtBnk.ModelsBuilder\Our.ModelsBuilder.csproj">
+    <ProjectReference Include="..\Our.ModelsBuilder\Our.ModelsBuilder.csproj">
       <Project>{998fb014-303a-4146-b3e4-b927bab0210f}</Project>
       <Name>Our.ModelsBuilder</Name>
     </ProjectReference>

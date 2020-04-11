@@ -45,7 +45,7 @@
     <Compile Include="WebManifestFilter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ZpqrtBnk.ModelsBuilder\Our.ModelsBuilder.csproj">
+    <ProjectReference Include="..\Our.ModelsBuilder\Our.ModelsBuilder.csproj">
       <Project>{998fb014-303a-4146-b3e4-b927bab0210f}</Project>
       <Name>Our.ModelsBuilder</Name>
     </ProjectReference>
