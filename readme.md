@@ -11,7 +11,7 @@ Requires Umbraco 7.1.4 or later.
 
 #### Documentation
 
-More infos, including a (hopefully) **complete documentation**, can be found in the [wiki](https://github.com/zpqrtbnk/Our.ModelsBuilder/wiki/Our.ModelsBuilder).
+More infos, including a (hopefully) **complete documentation**, can be found in the [wiki](https://github.com/OurModelsBuilder/Our.ModelsBuilder/wiki).
 
 **WARNING** the documentation has not been updated for version 3 (Umbraco.ModelsBuilder) yet.
 
