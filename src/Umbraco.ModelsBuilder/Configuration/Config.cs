@@ -76,6 +76,7 @@ namespace Umbraco.ModelsBuilder.Configuration
 
             // default: false
             EnableApi = ConfigurationManager.AppSettings[prefix + "EnableApi"].InvariantEquals("true");
+            RenderLanguageFallback = ConfigurationManager.AppSettings[prefix + "RenderLanguageFallback"].InvariantEquals("true");
             AcceptUnsafeModelsDirectory = ConfigurationManager.AppSettings[prefix + "AcceptUnsafeModelsDirectory"].InvariantEquals("true");
 
             // default: true
@@ -163,6 +164,7 @@ namespace Umbraco.ModelsBuilder.Configuration
             bool enable = false,
             ModelsMode modelsMode = ModelsMode.Nothing,
             bool enableApi = true,
+            bool renderLanguageFallback = false,
             string modelsNamespace = null,
             bool enableFactory = true,
             LanguageVersion languageVersion = DefaultLanguageVersion,
@@ -178,6 +180,7 @@ namespace Umbraco.ModelsBuilder.Configuration
             ModelsMode = modelsMode;
 
             EnableApi = enableApi;
+            RenderLanguageFallback = renderLanguageFallback;
             ModelsNamespace = string.IsNullOrWhiteSpace(modelsNamespace) ? DefaultModelsNamespace : modelsNamespace;
             EnableFactory = enableFactory;
             LanguageVersion = languageVersion;
@@ -249,6 +252,14 @@ namespace Umbraco.ModelsBuilder.Configuration
         ///     and retrieve the content types. It needs to be enabled so the extension & tool can work.</para>
         /// </remarks>
         public bool EnableApi { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the generated code adds language fallback on variant properties.
+        /// </summary>
+        /// <remarks>
+        ///     <para>Default value is <c>false</c>.</para>
+        /// </remarks>
+        public bool RenderLanguageFallback { get; }
 
         /// <summary>
         /// Gets a value indicating whether the API is installed.

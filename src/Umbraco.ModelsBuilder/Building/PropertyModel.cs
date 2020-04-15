@@ -47,6 +47,11 @@ namespace Umbraco.ModelsBuilder.Building
         public bool IsIgnored;
 
         /// <summary>
+        /// Gets a value indicating whether this property allows varying by Culture.
+        /// </summary>
+        public bool IsCultureVariant;
+
+        /// <summary>
         /// Gets the generation errors for the property.
         /// </summary>
         /// <remarks>This should be null, unless something prevents the property from being
