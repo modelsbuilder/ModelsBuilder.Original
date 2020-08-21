@@ -33,9 +33,9 @@ namespace Our.ModelsBuilder.Tests.Model
             var localizationService = Mock.Of<ILocalizationService>();
             var langs = new[]
             {
-                new Language("fr") { Id = 1 }, 
-                new Language("en") { Id = 2 }, 
-                new Language("de") { Id = 3, FallbackLanguageId = 2 }, 
+                new Language("fr") { Id = 1 },
+                new Language("en") { Id = 2 },
+                new Language("de") { Id = 3, FallbackLanguageId = 2 },
                 new Language("dk") { Id = 4 }
             };
             Mock.Get(localizationService).Setup(x => x.GetLanguageByIsoCode(It.IsAny<string>()))
@@ -473,13 +473,9 @@ namespace Our.ModelsBuilder.Tests.Model
             public Thing(IPublishedContent content)
                 : base(content)
             { }
-            
-            // FIXME: this means:
-            // we should *not* define our own (no need for it)
-            // if we want to support pre-embedded, we need to detect it?
 
-            // beware! this *has* to be the embedded attribute
-            [global::Umbraco.ModelsBuilder.Embedded.ImplementPropertyType("someValue")]
+            // use our own attribute - we should know nothing about the embedded MB
+            [ImplementPropertyType("someValue")]
             public string SomeValue => ClassicThingExtensions.SomeValue(this);
         }
     }

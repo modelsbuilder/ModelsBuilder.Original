@@ -11,6 +11,7 @@ using Umbraco.Core.Models;
 namespace Our.ModelsBuilder.Tests
 {
     [TestFixture]
+    [Explicit("These tests need to be overhauled.")]
     public class BuilderTests : TestsBase
     {
         [Test]

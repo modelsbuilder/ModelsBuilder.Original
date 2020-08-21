@@ -10,9 +10,18 @@ namespace Our.ModelsBuilder
     public sealed class ImplementPropertyTypeAttribute : Attribute
     {
         public ImplementPropertyTypeAttribute(string propertyTypeAlias)
-        { }
+        {
+            PropertyTypeAlias = propertyTypeAlias;
+        }
 
         public ImplementPropertyTypeAttribute(string contentTypeAlias, string propertyTypeAlias)
-        { }
+            : this(propertyTypeAlias)
+        {
+            ContentTypeAlias = contentTypeAlias;
+        }
+
+        public string ContentTypeAlias { get; }
+
+        public string PropertyTypeAlias { get; }
     }
 }

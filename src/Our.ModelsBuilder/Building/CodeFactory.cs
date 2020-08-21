@@ -9,29 +9,36 @@ namespace Our.ModelsBuilder.Building
     /// </summary>
     public class CodeFactory : ICodeFactory
     {
-        private readonly UmbracoServices _umbracoServices;
-        private readonly OptionsConfiguration _optionsConfiguration;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="CodeFactory"/> class.
         /// </summary>
         public CodeFactory(UmbracoServices umbracoServices, OptionsConfiguration optionsConfiguration)
         {
-            _umbracoServices = umbracoServices;
-            _optionsConfiguration = optionsConfiguration;
+            UmbracoServices = umbracoServices;
+            OptionsConfiguration = optionsConfiguration;
         }
 
+        /// <summary>
+        /// Gets the Umbraco services.
+        /// </summary>
+        protected UmbracoServices UmbracoServices { get; }
+
+        /// <summary>
+        /// Gets the options configuration.
+        /// </summary>
+        protected OptionsConfiguration OptionsConfiguration { get; }
+
         /// <inheritdoc />
-        public ICodeModelDataSource CreateCodeModelDataSource()
-             => new CodeModelDataSource(_umbracoServices);
+        public virtual ICodeModelDataSource CreateCodeModelDataSource()
+             => new CodeModelDataSource(UmbracoServices);
 
         /// <inheritdoc />
         public virtual CodeOptionsBuilder CreateCodeOptionsBuilder()
-            => _optionsConfiguration.Configure(new CodeOptionsBuilder());
+            => OptionsConfiguration.Configure(new CodeOptionsBuilder());
 
         /// <inheritdoc />
         public virtual ICodeParser CreateCodeParser()
-            => new CodeParser(_optionsConfiguration.ModelsBuilderOptions.LanguageVersion);
+            => new CodeParser(OptionsConfiguration.ModelsBuilderOptions.LanguageVersion);
 
         /// <inheritdoc />
         public virtual ICodeModelBuilder CreateCodeModelBuilder(ModelsBuilderOptions options, CodeOptions codeOptions)

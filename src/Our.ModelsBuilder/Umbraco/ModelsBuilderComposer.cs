@@ -17,7 +17,7 @@ namespace Our.ModelsBuilder.Umbraco
 
             // compose umbraco & the code factory
             composition.Register<UmbracoServices>(Lifetime.Singleton);
-            composition.Register<ICodeFactory, CodeFactory>(Lifetime.Singleton);
+            composition.RegisterUnique<ICodeFactory, CodeFactory>();
 
             // compose configuration of options
             composition.Configs.Add(() => new OptionsConfiguration());
@@ -38,7 +38,7 @@ namespace Our.ModelsBuilder.Umbraco
 
                 if (options.ModelsMode == ModelsMode.PureLive)
                     return factory.CreateInstance<PureLiveModelFactory>();
-                
+
                 if (options.EnableFactory)
                     return new PublishedModelFactory(factory.GetInstance<ModelTypeCollection>());
 
