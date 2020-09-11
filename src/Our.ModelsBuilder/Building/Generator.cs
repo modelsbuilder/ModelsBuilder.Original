@@ -54,7 +54,7 @@ namespace Our.ModelsBuilder.Building
                     files[file] = File.ReadAllText(file);
                 var compiler = new Compiler(_options.LanguageVersion);
                 // FIXME what is the name of the DLL as soon as we accept several namespaces = an option?
-                compiler.Compile(codeModel.ModelsNamespace, files, bin);
+                compiler.Compile(codeModel.AssemblyName, files, bin);
             }
 
             OutOfDateModelsStatus.Clear();

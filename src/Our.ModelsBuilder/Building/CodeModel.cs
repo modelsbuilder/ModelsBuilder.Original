@@ -59,6 +59,20 @@ namespace Our.ModelsBuilder.Building
         /// </summary>
         // TODO: per-model namespace
         public string ModelsNamespace { get; set; }
+        public string CustomAssemblyName { get; set; }
+
+        public string AssemblyName
+        {
+            get
+            {
+                if (CustomAssemblyName != null)
+                {
+                    return CustomAssemblyName;
+                }
+
+                return ModelsNamespace;
+            }
+        }
 
         public ISet<string> Using { get; set; } = new HashSet<string>();
 
