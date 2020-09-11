@@ -111,7 +111,7 @@ namespace Our.ModelsBuilder.Web.Umbraco
         private void GenerateModels(string modelsDirectory, string bin)
         {
             var generator = new Generator(_codeFactory, _options);
-            generator.GenerateModels(modelsDirectory, bin, _options.ModelsNamespace);
+            generator.GenerateModels(modelsDirectory, _options.ModelsNamespace,bin);
         }
 
         [DataContract]
