@@ -45,5 +45,14 @@ namespace Our.ModelsBuilder.Options
         {
             CodeOptions.ModelsNamespace = modelsNamespace;
         }
+        /// <summary>
+        /// Sets the assembly name.
+        /// </summary>
+        /// <param name="modelsNamespace">The models namespace.</param>
+        public virtual void SetAssemblyNamespace(string assemblyName)
+        {
+            CodeOptions.CustomAssemblyName = assemblyName;
+        }
+    }
     }
 }
