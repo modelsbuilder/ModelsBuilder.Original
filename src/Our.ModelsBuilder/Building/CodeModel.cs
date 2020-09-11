@@ -59,8 +59,16 @@ namespace Our.ModelsBuilder.Building
         /// </summary>
         // TODO: per-model namespace
         public string ModelsNamespace { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the models assembly name.
+        /// </summary>
+        // TODO: per-model assembly name
         public string CustomAssemblyName { get; set; }
-
+        
+        /// <summary>
+        /// Gets models assembly name or fallback to the models namespace
+        /// </summary>
         public string AssemblyName
         {
             get
