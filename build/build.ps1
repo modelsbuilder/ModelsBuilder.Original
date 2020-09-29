@@ -1,5 +1,5 @@
 dotnet build ..\src\Our.ModelsBuilder.sln
-$version = Get-ChildItem ".\sem.ver" |  Get-Content
+$version = (Get-Command "..\src\Our.ModelsBuilder\bin\Release\Our.ModelsBuilder.dll").FileVersionInfo.ProductVersion
 $version 
 $nuspecs =  Get-ChildItem -Path ..\*\*.nuspec -Recurse -Force;
 $nuspecs | Foreach-Object { 
@@ -11,7 +11,7 @@ $nuspecs | Foreach-Object {
     $xml.package.metadata.version= $version.ToString()
 
     [xml]$xml.Save($_.FullName)
-    nuget pack $_.FullName
+    nuget pack $_.FullName -OutputDirectory "NugetPackages"
     $xml.package.metadata.version= ""
     [xml]$xml.Save($_.FullName)
 
