@@ -2,7 +2,8 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata minClientVersion="2.8.1">
     <id>Our.ModelsBuilder</id>
-    <version>$version$</version>
+    <version>
+    </version>
     <title>Our ModelsBuilder</title>
     <authors>The Umbraco Community</authors>
     <owners>The Umbraco Community</owners>
@@ -23,11 +24,9 @@
   </metadata>
   <files>
     <!-- our dlls -->
-    <file src=".\bin\Our.ModelsBuilder.dll" target="lib\net472\Our.ModelsBuilder.dll" />
-    <file src=".\build.tmp\bin\Our.ModelsBuilder.pdb" target="lib\net472\Our.ModelsBuilder.pdb" />
-
+    <file src="..\bin\Release\Our.ModelsBuilder.dll" target="lib\net472\Our.ModelsBuilder.dll" />
+    <file src="..\bin\Release\Our.ModelsBuilder.pdb" target="lib\net472\Our.ModelsBuilder.pdb" />
     <!-- the icon -->
     <!--<file src="$solution$\build\Nuspecs\logo.png" target="img\" />-->
-
   </files>
 </package>

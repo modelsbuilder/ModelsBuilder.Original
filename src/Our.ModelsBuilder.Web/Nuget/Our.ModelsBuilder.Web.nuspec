@@ -2,7 +2,8 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata minClientVersion="2.8.1">
     <id>Our.ModelsBuilder.Web</id>
-    <version></version>
+    <version>
+    </version>
     <title>Our ModelsBuilder Web</title>
     <authors>The Umbraco Community</authors>
     <owners>The Umbraco Community</owners>
@@ -12,7 +13,8 @@
     <!--<icon>img\logo.png</icon>-->
     <description>Our ModelsBuilder Web Integration for Umbraco.</description>
     <projectUrl>https://github.com/ZpqrtBnk/Our.ModelsBuilder</projectUrl>
-    <copyright></copyright>
+    <copyright>
+    </copyright>
     <language>en-US</language>
     <tags>umbraco</tags>
     <dependencies>
@@ -23,22 +25,17 @@
   </metadata>
   <files>
     <!-- our dlls -->
-    <file src=".\..\bin\Release\Our.ModelsBuilder.Web.dll" target="lib\net472\Our.ModelsBuilder.Web.dll" />
-    <file src=".\..\bin\Release\Our.ModelsBuilder.Web.pdb" target="lib\net472\Our.ModelsBuilder.Web.pdb" />
-
+    <file src="..\bin\Release\Our.ModelsBuilder.Web.dll" target="lib\net472\Our.ModelsBuilder.Web.dll" />
+    <file src="..\bin\Release\Our.ModelsBuilder.Web.pdb" target="lib\net472\Our.ModelsBuilder.Web.pdb" />
     <!-- content for the dashboard -->
-    <file src=".\..\Plugin\modelsbuilder.html" target="content\App_Plugins\Our.ModelsBuilder\modelsbuilder.html" />
-    <file src=".\..\Plugin\modelsbuilder.controller.js" target="content\App_Plugins\Our.ModelsBuilder\modelsbuilder.controller.js" />
-    <file src=".\..\Plugin\modelsbuilder.resource.js" target="content\App_Plugins\Our.ModelsBuilder\modelsbuilder.resource.js" />
-    <file src=".\..\Plugin\lang\en-US.xml" target="content\App_Plugins\Our.ModelsBuilder\lang\en-US.xml" />
-    <file src=".\..\build\Nuspecs\logo.png" target="content\App_Plugins\Our.ModelsBuilder\logo.png" />
-
+    <file src="..\Plugin\modelsbuilder.html" target="content\App_Plugins\Our.ModelsBuilder\modelsbuilder.html" />
+    <file src="..\Plugin\modelsbuilder.controller.js" target="content\App_Plugins\Our.ModelsBuilder\modelsbuilder.controller.js" />
+    <file src="..\Plugin\modelsbuilder.resource.js" target="content\App_Plugins\Our.ModelsBuilder\modelsbuilder.resource.js" />
+    <file src="..\Plugin\lang\en-US.xml" target="content\App_Plugins\Our.ModelsBuilder\lang\en-US.xml" />
     <!-- transforms -->
     <file src=".\web.config.install.xdt" target="content" />
     <file src=".\web.config.uninstall.xdt" target="content" />
-
     <!-- the icon -->
     <!--<file src=".\..\build\Nuspecs\logo.png" target="img\" />-->
-
   </files>
 </package>
