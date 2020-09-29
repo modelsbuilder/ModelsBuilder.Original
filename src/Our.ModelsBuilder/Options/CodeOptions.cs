@@ -31,5 +31,14 @@ namespace Our.ModelsBuilder.Options
         /// Gets the models namespace.
         /// </summary>
         public string ModelsNamespace { get; internal set; }
+        /// <summary>
+        /// Gets a value indicating whether a Custom assembly name has been specified.
+        /// </summary>
+        public bool HasCustomAssemblyName => !string.IsNullOrWhiteSpace(CustomAssemblyName);
+
+        /// <summary>
+        /// Gets the models assembly name.
+        /// </summary>
+        public string CustomAssemblyName { get; internal set; }
     }
 }
