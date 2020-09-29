@@ -123,6 +123,8 @@
     <Compile Include="Validation\MediaTypeModelValidator.cs" />
     <Compile Include="Validation\MemberTypeModelValidator.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Nuget\Our.ModelsBuilder.nuspec" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

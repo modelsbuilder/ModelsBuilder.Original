@@ -63,6 +63,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Nuget\Our.ModelsBuilder.Web.nuspec" />
+    <Content Include="Nuget\web.config.install.xdt" />
+    <Content Include="Nuget\web.config.uninstall.xdt" />
     <Content Include="Plugin\lang\en-US.xml" />
     <Content Include="Plugin\modelsbuilder.controller.js" />
     <Content Include="Plugin\modelsbuilder.html" />

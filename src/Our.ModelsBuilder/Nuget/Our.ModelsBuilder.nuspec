@@ -23,8 +23,8 @@
   </metadata>
   <files>
     <!-- our dlls -->
-    <file src="$solution$\build.tmp\bin\Our.ModelsBuilder.dll" target="lib\net472\Our.ModelsBuilder.dll" />
-    <file src="$solution$\build.tmp\bin\Our.ModelsBuilder.pdb" target="lib\net472\Our.ModelsBuilder.pdb" />
+    <file src=".\bin\Our.ModelsBuilder.dll" target="lib\net472\Our.ModelsBuilder.dll" />
+    <file src=".\build.tmp\bin\Our.ModelsBuilder.pdb" target="lib\net472\Our.ModelsBuilder.pdb" />
 
     <!-- the icon -->
     <!--<file src="$solution$\build\Nuspecs\logo.png" target="img\" />-->

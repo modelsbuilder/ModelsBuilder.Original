@@ -12,21 +12,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{C7
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{42C3FC1A-26BA-4FAB-9585-AC8C25449B8F}"
 	ProjectSection(SolutionItems) = preProject
-		..\build\build-bootstrap.ps1 = ..\build\build-bootstrap.ps1
 		..\build\build.ps1 = ..\build\build.ps1
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModelsBuilder", "ModelsBuilder", "{1FFB7043-4B35-4A92-80FC-A2306511C8D5}"
-	ProjectSection(SolutionItems) = preProject
-		..\build\Nuspecs\ModelsBuilder\web.config.install.xdt = ..\build\Nuspecs\ModelsBuilder\web.config.install.xdt
-		..\build\Nuspecs\ModelsBuilder\web.config.uninstall.xdt = ..\build\Nuspecs\ModelsBuilder\web.config.uninstall.xdt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuspecs", "Nuspecs", "{30368E85-95E0-4A26-AC5A-D8570DB16FDA}"
 	ProjectSection(SolutionItems) = preProject
 		..\build\Nuspecs\logo.png = ..\build\Nuspecs\logo.png
-		..\build\Nuspecs\Our.ModelsBuilder.nuspec = ..\build\Nuspecs\Our.ModelsBuilder.nuspec
-		..\build\Nuspecs\Our.ModelsBuilder.Web.nuspec = ..\build\Nuspecs\Our.ModelsBuilder.Web.nuspec
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Our.ModelsBuilder", "Our.ModelsBuilder\Our.ModelsBuilder.csproj", "{998FB014-303A-4146-B3E4-B927BAB0210F}"
@@ -69,7 +60,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{1FFB7043-4B35-4A92-80FC-A2306511C8D5} = {30368E85-95E0-4A26-AC5A-D8570DB16FDA}
 		{30368E85-95E0-4A26-AC5A-D8570DB16FDA} = {42C3FC1A-26BA-4FAB-9585-AC8C25449B8F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
