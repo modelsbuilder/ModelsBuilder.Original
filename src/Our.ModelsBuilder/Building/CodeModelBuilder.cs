@@ -63,6 +63,7 @@ namespace Our.ModelsBuilder.Building
             var model = new CodeModel(data, Options.LanguageVersion)
             {
                 ModelsNamespace = GetModelsNamespace(), 
+                CustomAssemblyName = GetAssemblyName(),
                 Using = GetUsing()
             };
 
@@ -72,6 +73,20 @@ namespace Our.ModelsBuilder.Building
 
             return model;
         }
+        public virtual string GetAssemblyName()
+        {
+            // use namespace from code options... or from options
+            var modelsNamespace = CodeOptions.HasCustomAssemblyName
+                ? CodeOptions.CustomAssemblyName
+                : Options.AssemblyName;
+
+            // otherwise, use const
+            if (string.IsNullOrWhiteSpace(modelsNamespace))
+                modelsNamespace = GetDefaultAssemblyName();
+
+            return modelsNamespace;
+        }
+        public virtual string GetDefaultAssemblyName() => null;
 
         protected virtual string GetDefaultModelsNamespace() => "Umbraco.Web.PublishedModels";
 

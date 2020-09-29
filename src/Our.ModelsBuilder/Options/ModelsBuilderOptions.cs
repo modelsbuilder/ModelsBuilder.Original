@@ -61,7 +61,7 @@ namespace Our.ModelsBuilder.Options
         /// </summary>
         /// <remarks>That value could be overriden by other (attribute in user's code...). Return default if no value was supplied.</remarks>
         public string ModelsNamespace { get; set; } = Defaults.ModelsNamespace;
-
+        public string AssemblyName { get; set; } = Defaults.ModelsNamespace;
         /// <summary>
         /// Gets the Roslyn parser language version.
         /// </summary>
