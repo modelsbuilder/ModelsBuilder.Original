@@ -2,19 +2,19 @@ trigger:
 - '*'
 
 pool:
-  name: "Azure Pipelines"
+  vmImage: 'windows-latest'
 
 stages:
 - stage: build
   displayName: Build
+
   jobs:
   - job: Build
     pool:
-      name: "Azure Pipelines"
+      pool:
+        vmImage: 'windows-latest'
     steps:
     - task: NuGetToolInstaller@1
-      inputs:
-        versionSpec: 
     - task: NuGetCommand@2
       inputs:
         command: 'restore'
@@ -23,16 +23,5 @@ stages:
     - task: VSBuild@1
       inputs:
         solution: '**\*.sln'
-    
-- stage: tests
-  displayName: Tests
 
-- stage: Release
-  displayName: Release
-  condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
-  jobs:
-  - deployment:
-    displayName: Release
-    pool:
-      name: Default
     
