@@ -22,6 +22,19 @@ stages:
     - task: VSBuild@1
       inputs:
         solution: '**\*.sln'
+    - task: PowerShell@2
+      inputs:
+        filePath: '$(System.DefaultWorkingDirectory)\build\SetVersion.ps1'
+    - task: NuGetCommand@2
+      inputs:
+        command: 'pack'
+        packagesToPack: '**/*.nuspec'
+        versioningScheme: 'off'
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(System.DefaultWorkingDirectory)'
+        Contents: '**\*test*.dll'
+        TargetFolder: '$(System.ArtifactStagingDirectory)'     
   - job: Test
     pool:
       vmImage: 'windows-2019'
@@ -33,4 +46,4 @@ stages:
           **\*test*.dll
           !**\*TestAdapter.dll
           !**\obj\**
-        searchFolder: '$(System.DefaultWorkingDirectory)'
+        searchFolder: ''
