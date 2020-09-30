@@ -2,15 +2,7 @@ trigger:
 - '*'
 
 pool:
-  name: Default
-
-variables:
-  image_name: mcr.microsoft.com/businesscentral/sandbox
-  container_name: Build
-  company_name: My Company
-  user_name: admin
-  password: P@ssword1
-  license_file: C:\Users\james.pearson.TECMAN\Desktop\Licence.flf
+  name: "Azure Pipelines"
 
 stages:
 - stage: build
@@ -18,7 +10,7 @@ stages:
   jobs:
   - job: Build
     pool:
-      name: Default
+      name: "Azure Pipelines"
     steps:
     - task: NuGetToolInstaller@1
       inputs:
