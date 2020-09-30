@@ -12,11 +12,11 @@
     <iconUrl>https://raw.githubusercontent.com/ZpqrtBnk/Our.ModelsBuilder/v4/dev/etc/logo.png</iconUrl>
     <!--<icon>img\logo.png</icon>-->
     <description>Our ModelsBuilder Web Integration for Umbraco.</description>
-    <projectUrl>https://github.com/ZpqrtBnk/Our.ModelsBuilder</projectUrl>
     <copyright>
     </copyright>
     <language>en-US</language>
     <tags>umbraco</tags>
+    <projectUrl>https://github.com/modelsbuilder/ModelsBuilder.Original</projectUrl>
     <dependencies>
       <group targetFramework="net472">
         <dependency id="Our.ModelsBuilder" version="[4.0.0-alpha,5.0.0)" />
