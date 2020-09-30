@@ -2,7 +2,7 @@ trigger:
 - '*'
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'windows-2019'
 
 stages:
 - stage: build
@@ -12,7 +12,7 @@ stages:
   - job: Build
     pool:
       pool:
-        vmImage: 'windows-latest'
+        vmImage: 'windows-2019'
     steps:
     - task: NuGetToolInstaller@1
     - task: NuGetCommand@2
