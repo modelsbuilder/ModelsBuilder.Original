@@ -2,27 +2,18 @@ trigger:
 - '*'
 
 pool:
-  name: Default
-
-variables:
-  image_name: mcr.microsoft.com/businesscentral/sandbox
-  container_name: Build
-  company_name: My Company
-  user_name: admin
-  password: P@ssword1
-  license_file: C:\Users\james.pearson.TECMAN\Desktop\Licence.flf
+  vmImage: 'windows-2019'
 
 stages:
 - stage: build
   displayName: Build
+
   jobs:
   - job: Build
     pool:
-      name: Default
+      vmImage: 'windows-2019'
     steps:
     - task: NuGetToolInstaller@1
-      inputs:
-        versionSpec: 
     - task: NuGetCommand@2
       inputs:
         command: 'restore'
@@ -31,16 +22,15 @@ stages:
     - task: VSBuild@1
       inputs:
         solution: '**\*.sln'
-    
-- stage: tests
-  displayName: Tests
-
-- stage: Release
-  displayName: Release
-  condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
-  jobs:
-  - deployment:
-    displayName: Release
+  - job: Test
     pool:
-      name: Default
-    
+      vmImage: 'windows-2019'
+    steps:
+    - task: VSTest@2
+      inputs:
+        testSelector: 'testAssemblies'
+        testAssemblyVer2: |
+          **\*test*.dll
+          !**\*TestAdapter.dll
+          !**\obj\**
+        searchFolder: '$(System.DefaultWorkingDirectory)'
