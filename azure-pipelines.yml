@@ -22,5 +22,15 @@ stages:
     - task: VSBuild@1
       inputs:
         solution: '**\*.sln'
-
-    
+  - job: Test
+    pool:
+      vmImage: 'windows-2019'
+    steps:
+    - task: VSTest@2
+      inputs:
+        testSelector: 'testAssemblies'
+        testAssemblyVer2: |
+          **\*test*.dll
+          !**\*TestAdapter.dll
+          !**\obj\**
+        searchFolder: '$(System.DefaultWorkingDirectory)'
