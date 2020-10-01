@@ -35,8 +35,8 @@ stages:
     - task: CopyFiles@2
       inputs:
         SourceFolder: '$(System.DefaultWorkingDirectory)'
-        Contents: '**\*Our.ModelsBuilder*test*'
-        TargetFolder: '$(System.ArtifactStagingDirectory)\drop'
+        Contents: '**\Our.ModelsBuilder.Tests.dll'
+        TargetFolder: '$(System.ArtifactStagingDirectory)\drop\'
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
