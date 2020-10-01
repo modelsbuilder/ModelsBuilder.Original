@@ -52,7 +52,7 @@ stages:
     - task: DownloadBuildArtifacts@0
       inputs:
         buildType: 'current'
-        artifactName: 'manifests'
+        downloadType: 'specific'
         itemPattern: '**\*test*.dll'
         downloadPath: '$(System.DefaultWorkingDirectory)'
     - task: VSTest@2
