@@ -41,7 +41,7 @@ stages:
         replaceExistingArchive: true
     - task: ArchiveFiles@2
       inputs:
-        rootFolderOrFile: 'src\Our.ModelsBuilder.Tests\NUnit3.TestAdapter.dll'
+        rootFolderOrFile: 'src\Our.ModelsBuilder.Tests\bin\DevOps\NUnit3.TestAdapter.dll'
         includeRootFolder: true
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/TestsAdapter.zip'
