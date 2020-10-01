@@ -42,17 +42,17 @@ stages:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
         publishLocation: 'Container'
+- stage: test
+  displayName: test
+  jobs:
   - job: Test
     pool:
       vmImage: 'windows-2019'
     steps:
     - task: DownloadBuildArtifacts@0
       inputs:
-        buildType: 'specific'
-        project: 'da55b2db-f813-43b0-98a8-dcc236b7f9c5'
-        pipeline: '1'
-        buildVersionToDownload: 'latest'
-        downloadType: 'specific'
+        buildType: 'current'
+        artifactName: 'manifests'
         itemPattern: '**\*test*.dll'
         downloadPath: '$(System.DefaultWorkingDirectory)'
     - task: VSTest@2
