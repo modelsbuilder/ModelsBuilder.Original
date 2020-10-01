@@ -29,6 +29,9 @@
     <WarningLevel>4</WarningLevel>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DevOps|AnyCPU' ">
+    <OutputPath>bin\DevOps\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Moq">
       <Version>4.13.1</Version>

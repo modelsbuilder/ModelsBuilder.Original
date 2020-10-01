@@ -36,6 +36,9 @@
     <LangVersion>latest</LangVersion>
 
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DevOps|AnyCPU' ">
+    <OutputPath>bin\DevOps\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Xml" />

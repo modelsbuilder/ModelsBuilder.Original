@@ -25,8 +25,8 @@
   </metadata>
   <files>
     <!-- our dlls -->
-    <file src="..\bin\Release\Our.ModelsBuilder.Web.dll" target="lib\net472\Our.ModelsBuilder.Web.dll" />
-    <file src="..\bin\Release\Our.ModelsBuilder.Web.pdb" target="lib\net472\Our.ModelsBuilder.Web.pdb" />
+    <file src="..\bin\DevOps\Our.ModelsBuilder.Web.dll" target="lib\net472\Our.ModelsBuilder.Web.dll" />
+    <file src="..\bin\DevOps\Our.ModelsBuilder.Web.pdb" target="lib\net472\Our.ModelsBuilder.Web.pdb" />
     <!-- content for the dashboard -->
     <file src="..\Plugin\modelsbuilder.html" target="content\App_Plugins\Our.ModelsBuilder\modelsbuilder.html" />
     <file src="..\Plugin\modelsbuilder.controller.js" target="content\App_Plugins\Our.ModelsBuilder\modelsbuilder.controller.js" />
