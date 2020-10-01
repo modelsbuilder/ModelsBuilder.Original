@@ -62,7 +62,7 @@ stages:
       inputs:
         buildType: 'current'
         downloadType: 'specific'
-        itemPattern: '**\Tests.zip'
+        itemPattern: '**\Tests*.zip'
         downloadPath: '$(System.DefaultWorkingDirectory)'
     - task: ExtractFiles@1
       inputs:
