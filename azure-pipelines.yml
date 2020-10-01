@@ -59,8 +59,8 @@ stages:
         downloadPath: '$(System.DefaultWorkingDirectory)'
     - task: ExtractFiles@1
       inputs:
-        archiveFilePatterns: '**/*.zip'
-        destinationFolder: '$(System.DefaultWorkingDirectory)\'
+        archiveFilePatterns: '**/Tests.zip'
+        destinationFolder: '$(System.DefaultWorkingDirectory)\test'
         cleanDestinationFolder: true    
     - task: VSTest@2
       inputs:
@@ -69,4 +69,4 @@ stages:
           **\*test*.dll
           !**\*TestAdapter.dll
           !**\obj\**
-        searchFolder: '$(System.DefaultWorkingDirectory)'
+        searchFolder: '$(System.DefaultWorkingDirectory)\test'
