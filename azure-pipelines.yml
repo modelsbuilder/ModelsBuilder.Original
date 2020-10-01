@@ -36,11 +36,25 @@ stages:
       inputs:
         SourceFolder: '$(System.DefaultWorkingDirectory)'
         Contents: '**\*test*.dll'
-        TargetFolder: '$(System.ArtifactStagingDirectory)'     
+        TargetFolder: '$(System.ArtifactStagingDirectory)'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
   - job: Test
     pool:
       vmImage: 'windows-2019'
     steps:
+    - task: DownloadBuildArtifacts@0
+      inputs:
+        buildType: 'specific'
+        project: 'da55b2db-f813-43b0-98a8-dcc236b7f9c5'
+        pipeline: '1'
+        buildVersionToDownload: 'latest'
+        downloadType: 'specific'
+        itemPattern: '**\*test*.dll'
+        downloadPath: '$(System.DefaultWorkingDirectory)'
     - task: VSTest@2
       inputs:
         testSelector: 'testAssemblies'
@@ -48,4 +62,4 @@ stages:
           **\*test*.dll
           !**\*TestAdapter.dll
           !**\obj\**
-        searchFolder: ''
+        searchFolder: '$(System.DefaultWorkingDirectory)'
