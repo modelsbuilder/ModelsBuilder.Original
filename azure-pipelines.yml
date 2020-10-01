@@ -35,8 +35,8 @@ stages:
     - task: CopyFiles@2
       inputs:
         SourceFolder: '$(System.DefaultWorkingDirectory)'
-        Contents: '**\*test*.dll'
-        TargetFolder: '$(System.ArtifactStagingDirectory)'
+        Contents: '**\*Our.ModelsBuilder*test*'
+        TargetFolder: '$(System.ArtifactStagingDirectory)\drop'
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
@@ -53,7 +53,7 @@ stages:
       inputs:
         buildType: 'current'
         downloadType: 'specific'
-        itemPattern: '**\*test*.dll'
+        itemPattern: '**\*Our.ModelsBuilder*test*.dll'
         downloadPath: '$(System.DefaultWorkingDirectory)'
     - task: VSTest@2
       inputs:
