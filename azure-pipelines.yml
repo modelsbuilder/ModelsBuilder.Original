@@ -32,12 +32,13 @@ stages:
         command: 'pack'
         packagesToPack: '**/*.nuspec'
         versioningScheme: 'off'
-    - task: CopyFiles@2
+    - task: ArchiveFiles@2
       inputs:
-        SourceFolder: '$(System.DefaultWorkingDirectory)'
-        Contents: '**\Our.ModelsBuilder.Tests.dll'
-        flattenFolders: true
-        TargetFolder: '$(System.ArtifactStagingDirectory)'
+        rootFolderOrFile: 'src\Our.ModelsBuilder.Tests\bin\DevOps\Our.ModelsBuilder.Tests.dll'
+        includeRootFolder: true
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/Tests.zip'
+        replaceExistingArchive: true
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
@@ -54,8 +55,13 @@ stages:
       inputs:
         buildType: 'current'
         downloadType: 'specific'
-        itemPattern: '**\*Our.ModelsBuilder*test*.dll'
+        itemPattern: '**\Tests.zip'
         downloadPath: '$(System.DefaultWorkingDirectory)'
+    - task: ExtractFiles@1
+      inputs:
+        archiveFilePatterns: '**/*.zip'
+        destinationFolder: '$(System.DefaultWorkingDirectory)\'
+        cleanDestinationFolder: true    
     - task: VSTest@2
       inputs:
         testSelector: 'testAssemblies'
