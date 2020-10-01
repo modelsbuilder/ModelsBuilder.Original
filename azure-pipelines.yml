@@ -36,7 +36,8 @@ stages:
       inputs:
         SourceFolder: '$(System.DefaultWorkingDirectory)'
         Contents: '**\Our.ModelsBuilder.Tests.dll'
-        TargetFolder: '$(System.ArtifactStagingDirectory)\drop\'
+        flattenFolders: true
+        TargetFolder: '$(System.ArtifactStagingDirectory)'
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
