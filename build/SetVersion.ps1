@@ -1,5 +1,5 @@
 Write-Host "Get version"
-$version = (Get-Command "..\src\Our.ModelsBuilder\bin\Release\Our.ModelsBuilder.dll").FileVersionInfo.ProductVersion
+$version = (Get-Command "..\src\Our.ModelsBuilder\bin\DevOps\Our.ModelsBuilder.dll").FileVersionInfo.ProductVersion
 $version 
 $nuspecs =  Get-ChildItem -Path ..\*\*.nuspec -Recurse -Force;
 $nuspecs | Foreach-Object { 
