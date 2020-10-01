@@ -39,6 +39,13 @@ stages:
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/Tests.zip'
         replaceExistingArchive: true
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: 'src\Our.ModelsBuilder.Tests\NUnit3.TestAdapter.dll'
+        includeRootFolder: true
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/TestsAdapter.zip'
+        replaceExistingArchive: true
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
@@ -62,6 +69,11 @@ stages:
         archiveFilePatterns: '**/Tests.zip'
         destinationFolder: '$(System.DefaultWorkingDirectory)\test'
         cleanDestinationFolder: true    
+    - task: ExtractFiles@1
+      inputs:
+        archiveFilePatterns: '**/TestsAdapter.zip'
+        destinationFolder: '$(System.DefaultWorkingDirectory)\test'
+        cleanDestinationFolder: false    
     - task: VSTest@2
       inputs:
         testSelector: 'testAssemblies'
