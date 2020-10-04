@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="1E869FFD-E0BF-43EB-A1E2-7AFDE3E0A3AD" Version="8.1.5.190719002" Language="en-US" Publisher="ZpqrtBnk" />
+    <Identity Id="1E869FFD-E0BF-43EB-A1E2-7AFDE3E0A3AD" Version="8.1.6.201004001" Language="en-US" Publisher="ZpqrtBnk" />
     <DisplayName>Umbraco ModelsBuilder Extension</DisplayName>
     <Description xml:space="preserve">Umbraco Visual Studio extension for generating strongly typed models.</Description>
     <MoreInfo>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</MoreInfo>
