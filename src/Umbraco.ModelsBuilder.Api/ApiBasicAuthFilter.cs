@@ -7,7 +7,6 @@ using System.Web.Http.Controllers;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.ModelsBuilder.Api
@@ -73,8 +72,9 @@ namespace Umbraco.ModelsBuilder.Api
             var username = ApiClient.DecodeTokenElement(credentials[0]);
             var password = ApiClient.DecodeTokenElement(credentials[1]);
 
-            var provider = Membership.Providers[Constants.Security.UserMembershipProviderName];
-            if (provider == null || !provider.ValidateUser(username, password))
+            var valid = Web.Composing.Current.UmbracoContext.Security.ValidateBackOfficeCredentials(username, password);
+
+            if (!valid)
                 return null;
             var user = Current.Services.UserService.GetByUsername(username);
             if (!user.IsApproved || user.IsLockedOut)
