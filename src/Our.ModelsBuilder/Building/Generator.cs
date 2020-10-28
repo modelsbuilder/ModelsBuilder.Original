@@ -11,13 +11,22 @@ namespace Our.ModelsBuilder.Building
     {
         private readonly ICodeFactory _codeFactory;
         private readonly ModelsBuilderOptions _options;
-
+        public static EventHandler<CodeGenerationArgs> CustomActionOnGeneration;
+        protected virtual void OnGeneration(CodeGenerationArgs e)
+        {
+            CustomActionOnGeneration?.Invoke(this, e);
+        }
+        public static EventHandler<CodeCompilationsArgs> CustomActionOnCompiliation;
+        protected virtual void OnCompiliation(CodeCompilationsArgs e)
+        {
+            CustomActionOnCompiliation?.Invoke(this, e);
+        }
         public Generator(ICodeFactory codeFactory, ModelsBuilderOptions options)
         {
             _codeFactory = codeFactory;
             _options = options;
         }
-
+        
         public void GenerateModels(string modelsDirectory, string modelsNamespace, string bin)
         {
             if (!Directory.Exists(modelsDirectory))
@@ -35,7 +44,7 @@ namespace Our.ModelsBuilder.Building
                 var filename = Path.Combine(modelsDirectory, name + ".generated.cs");
                 File.WriteAllText(filename, code);
             });
-
+            OnGeneration(new CodeGenerationArgs(_codeFactory,_options));
             // the idea was to calculate the current hash and to add it as an extra file to the compilation,
             // in order to be able to detect whether a DLL is consistent with an environment - however the
             // environment *might not* contain the local partial files, and thus it could be impossible to
@@ -46,17 +55,19 @@ namespace Our.ModelsBuilder.Building
 [assembly:ModelsBuilderAssembly(SourceHash = ""{currentHash}"")]
 ";
             */
-
+        
             if (bin != null)
             {
                 // build
                 foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                     files[file] = File.ReadAllText(file);
                 var compiler = new Compiler(_options.LanguageVersion);
+                OnCompiliation(new CodeCompilationsArgs(_options.LanguageVersion, files));
                 // FIXME what is the name of the DLL as soon as we accept several namespaces = an option?
                 compiler.Compile(codeModel.AssemblyName, files, bin);
+               
             }
-
+            
             OutOfDateModelsStatus.Clear();
         }
 

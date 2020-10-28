@@ -9,7 +9,7 @@ using Umbraco.Core;
 
 namespace Our.ModelsBuilder
 {
-    internal static class ReferencedAssemblies
+    public sealed class ReferencedAssemblies
     {
         private static readonly Lazy<IEnumerable<string>> LazyLocations;
         private static readonly Lazy<IEnumerable<PortableExecutableReference>> LazyReferences;

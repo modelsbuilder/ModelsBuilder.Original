@@ -48,6 +48,8 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Building\CodeCompilationsArgs.cs" />
+    <Compile Include="Building\CodeGenerationArgs.cs" />
     <Compile Include="Building\CodeModel.cs" />
     <Compile Include="Building\CodeModelBuilder.cs" />
     <Compile Include="Building\CodeModelData.cs" />
