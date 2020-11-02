@@ -154,7 +154,9 @@ namespace Umbraco.ModelsBuilder.Umbraco
                         ClrName = GetClrName(propertyType.Name, propertyType.Alias),
 
                         Name = propertyType.Name,
-                        Description = propertyType.Description
+                        Description = propertyType.Description,
+
+                        IsCultureVariant = propertyType.Variations == ContentVariation.Culture
                     };
 
                     var publishedPropertyType = publishedContentType.GetPropertyType(propertyType.Alias);

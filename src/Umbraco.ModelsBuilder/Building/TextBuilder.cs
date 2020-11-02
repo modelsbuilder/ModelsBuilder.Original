@@ -344,8 +344,16 @@ namespace Umbraco.ModelsBuilder.Building
                     WriteClrType(sb, property.ClrTypeName);
                     sb.Append(">");
                 }
-                sb.AppendFormat("(\"{0}\");\n",
-                    property.Alias);
+                if (property.IsCultureVariant && Config.RenderLanguageFallback)
+                {
+                    sb.AppendFormat("(\"{0}\", fallback: Fallback.ToLanguage);\n",
+                        property.Alias);
+                }
+                else
+                {
+                    sb.AppendFormat("(\"{0}\");\n",
+                        property.Alias);
+                }
             }
 
             if (property.Errors != null)
@@ -377,8 +385,16 @@ namespace Umbraco.ModelsBuilder.Building
                 WriteClrType(sb, property.ClrTypeName);
                 sb.Append(">");
             }
-            sb.AppendFormat("(\"{0}\");\n",
-                property.Alias);
+            if (property.IsCultureVariant && Config.RenderLanguageFallback)
+            {
+                sb.AppendFormat("(\"{0}\", fallback: Fallback.ToLanguage);\n",
+                    property.Alias);
+            }
+            else
+            {
+                sb.AppendFormat("(\"{0}\");\n",
+                    property.Alias);
+            }
         }
 
         private static IEnumerable<string> SplitError(string error)
