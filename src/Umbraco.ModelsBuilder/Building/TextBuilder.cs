@@ -266,7 +266,7 @@ namespace Umbraco.ModelsBuilder.Building
             WriteGeneratedCodeAttribute(sb, "\t\t");
             sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
 
-            sb.Append("\t\tpublic ");
+            sb.Append("\t\tpublic virtual ");
             WriteClrType(sb, property.ClrTypeName);
 
             sb.AppendFormat(" {0} => ",
@@ -334,7 +334,7 @@ namespace Umbraco.ModelsBuilder.Building
             }
             else
             {
-                sb.Append("\t\tpublic ");
+                sb.Append("\t\tpublic virtual ");
                 WriteClrType(sb, property.ClrTypeName);
                 sb.AppendFormat(" {0} => this.Value",
                     property.ClrName);
