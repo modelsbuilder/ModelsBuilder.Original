@@ -93,6 +93,7 @@ namespace Our.ModelsBuilder.Umbraco
                     var propertyTypeModel = new PropertyTypeModel
                     {
                         Alias = propertyType.Alias,
+                        EditorAlias = propertyType.PropertyEditorAlias,
                         ContentType = contentTypeModel,
 
                         Name = propertyType.Name,

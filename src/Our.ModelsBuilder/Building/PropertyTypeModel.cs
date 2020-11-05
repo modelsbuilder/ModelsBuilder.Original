@@ -21,6 +21,11 @@ namespace Our.ModelsBuilder.Building
         /// Gets or sets the alias of the property.
         /// </summary>
         public string Alias { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the alias of the editor Alias of the property.
+        /// </summary>
+        public string EditorAlias { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the property.
