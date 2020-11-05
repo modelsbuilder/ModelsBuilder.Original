@@ -40,6 +40,9 @@ namespace Umbraco.ModelsBuilder.Building
         private readonly HashSet<string> _withCtor
             = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
+        private Dictionary<string, string> _selectiveModelsBaseClassNameOverides = new Dictionary<string, string>();
+        private Dictionary<string, string> _selectiveElementsModelsBaseClassNameOverides = new Dictionary<string, string>();
+
         public static readonly ParseResult Empty = new ParseResult();
 
         private class StaticMixinMethodInfo
@@ -80,8 +83,24 @@ namespace Umbraco.ModelsBuilder.Building
             //    _ignoredMixinProperties.Add(contentAlias);
         }
 
-        // content with that alias should be generated with a different name
-        public void SetRenamedContent(string contentAlias, string contentName, bool withImplement)
+        // content with that alias should included to be generated
+        // alias can end with a * (wildcard)
+        public void SetSelectiveContent(string contentAlias, string baseClassName)
+        {
+            if (!_selectiveModelsBaseClassNameOverides.ContainsKey(contentAlias))
+                _selectiveModelsBaseClassNameOverides.Add(contentAlias, baseClassName);
+        }
+
+		// element with that alias should included to be generated
+		// alias can end with a * (wildcard)
+		public void SetSelectiveElement(string contentAlias, string baseClassName)
+		{
+			if (!_selectiveElementsModelsBaseClassNameOverides.ContainsKey(contentAlias))
+				_selectiveElementsModelsBaseClassNameOverides.Add(contentAlias, baseClassName);
+		}
+
+		// content with that alias should be generated with a different name
+		public void SetRenamedContent(string contentAlias, string contentName, bool withImplement)
         {
             _renamedContent[contentAlias] = contentName;
             if (withImplement)
@@ -129,7 +148,13 @@ namespace Umbraco.ModelsBuilder.Building
             ModelsBaseClassName = modelsBaseClassName;
         }
 
-        public void SetModelsNamespace(string modelsNamespace)
+        public void SetElementModelsBaseClassName(string elementModelsBaseClassName)
+        {
+            ElementModelsBaseClassName = elementModelsBaseClassName;
+        }
+
+
+		public void SetModelsNamespace(string modelsNamespace)
         {
             ModelsNamespace = modelsNamespace;
         }
@@ -161,11 +186,16 @@ namespace Umbraco.ModelsBuilder.Building
             return IsContentOrMixinIgnored(contentAlias, _ignoredContent);
         }
 
+        public bool IsIncluded(string contentAlias)
+        {
+            return IsContentOrMixinIncluded(contentAlias, _ignoredContent);
+        }
+
         //public bool IsMixinIgnored(string contentAlias)
         //{
         //    return IsContentOrMixinIgnored(contentAlias, _ignoredMixin);
         //}
-        
+
         //public bool IsMixinPropertiesIgnored(string contentAlias)
         //{
         //    return IsContentOrMixinIgnored(contentAlias, _ignoredMixinProperties);
@@ -175,6 +205,15 @@ namespace Umbraco.ModelsBuilder.Building
         {
             if (ignored.Contains(contentAlias)) return true;
             return ignored
+                .Where(x => x.EndsWith("*"))
+                .Select(x => x.Substring(0, x.Length - 1))
+                .Any(x => contentAlias.StartsWith(x, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private static bool IsContentOrMixinIncluded(string contentAlias, HashSet<string> included)
+        {
+            if (included.Contains(contentAlias)) return true;
+            return included
                 .Where(x => x.EndsWith("*"))
                 .Select(x => x.Substring(0, x.Length - 1))
                 .Any(x => contentAlias.StartsWith(x, StringComparison.InvariantCultureIgnoreCase));
@@ -244,7 +283,97 @@ namespace Umbraco.ModelsBuilder.Building
             get { return !string.IsNullOrWhiteSpace(ModelsBaseClassName); }
         }
 
+        public bool HasSelectiveModelsBaseClassName(string key)
+        {
+            if (_selectiveModelsBaseClassNameOverides.ContainsKey(key))
+                return true;
+
+            return _selectiveModelsBaseClassNameOverides.Keys.Any(x =>
+            {
+                if (x.StartsWith("*"))
+                {
+                    return key.EndsWith(x.Replace("*", string.Empty));
+                }
+                return key.StartsWith(x.Replace("*", string.Empty));
+            });
+        }
+
+
+
+		public string GetSelectiveModelsBaseClassName(string key)
+        {
+            if (_selectiveModelsBaseClassNameOverides.ContainsKey(key))
+            {
+                return _selectiveModelsBaseClassNameOverides[key];
+            }
+
+            var retVal = _selectiveModelsBaseClassNameOverides.SingleOrDefault(x =>
+            {
+                if (x.Key.StartsWith("*"))
+                {
+                    return key.EndsWith(x.Key.Replace("*", string.Empty));
+                }
+                return key.StartsWith(x.Key.Replace("*", string.Empty));
+            });
+
+            if(!retVal.Equals(new KeyValuePair<string,string>()))
+            {
+                return retVal.Value;
+            }
+
+            return null;
+        }
+
+		public bool HasSelectiveElementsModelsBaseClassName(string key)
+		{
+			if (_selectiveElementsModelsBaseClassNameOverides.ContainsKey(key))
+				return true;
+
+			return _selectiveElementsModelsBaseClassNameOverides.Keys.Any(x =>
+			{
+				if (x.StartsWith("*"))
+				{
+					return key.EndsWith(x.Replace("*", string.Empty));
+				}
+				return key.StartsWith(x.Replace("*", string.Empty));
+			});
+		}
+
+
+		public string GetSelectiveElementsModelsBaseClassName(string key)
+		{
+			if (_selectiveElementsModelsBaseClassNameOverides.ContainsKey(key))
+			{
+				return _selectiveElementsModelsBaseClassNameOverides[key];
+			}
+
+			var retVal = _selectiveElementsModelsBaseClassNameOverides.SingleOrDefault(x =>
+			{
+				if (x.Key.StartsWith("*"))
+				{
+					return key.EndsWith(x.Key.Replace("*", string.Empty));
+				}
+				return key.StartsWith(x.Key.Replace("*", string.Empty));
+			});
+
+			if (!retVal.Equals(new KeyValuePair<string, string>()))
+			{
+				return retVal.Value;
+			}
+
+			return null;
+		}
+
+		public bool HasElementModelsBaseClassName
+        {
+            get { return !string.IsNullOrWhiteSpace(ElementModelsBaseClassName); }
+        }
+
+
         public string ModelsBaseClassName { get; private set; }
+        public string ElementModelsBaseClassName { get; private set; }
+
+
 
         public bool HasModelsNamespace
         {

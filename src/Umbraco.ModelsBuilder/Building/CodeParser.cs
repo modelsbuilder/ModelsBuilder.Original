@@ -196,7 +196,22 @@ namespace Umbraco.ModelsBuilder.Building
                         disco.SetModelsBaseClassName(SymbolDisplay.ToDisplayString(modelsBaseClass));
                         break;
 
-                    case "Umbraco.ModelsBuilder.ModelsNamespaceAttribute":
+                    case "Umbraco.ModelsBuilder.ElementModelsBaseClassAttribute":
+                        var elementModelsBaseClass = (INamedTypeSymbol)attrData.ConstructorArguments[0].Value;
+                        if (elementModelsBaseClass is IErrorTypeSymbol)
+                            throw new Exception($"Invalid base class type \"{elementModelsBaseClass.Name}\".");
+                        disco.SetElementModelsBaseClassName(SymbolDisplay.ToDisplayString(elementModelsBaseClass));
+                        break;
+
+										case "Umbraco.ModelsBuilder.SelectiveElementModelsBaseClassAttribute":
+											var selectiveElementModelsBaseClass = (INamedTypeSymbol)attrData.ConstructorArguments[0].Value;
+											if (selectiveElementModelsBaseClass is IErrorTypeSymbol)
+												throw new Exception($"Invalid base class type \"{selectiveElementModelsBaseClass.Name}\".");
+											var elementAliasToInclude = (string)attrData.ConstructorArguments[1].Value;
+											disco.SetSelectiveElement(elementAliasToInclude, SymbolDisplay.ToDisplayString(selectiveElementModelsBaseClass));
+											break;
+
+					case "Umbraco.ModelsBuilder.ModelsNamespaceAttribute":
                         var modelsNamespace= (string) attrData.ConstructorArguments[0].Value;
                         disco.SetModelsNamespace(modelsNamespace);
                         break;
@@ -205,6 +220,14 @@ namespace Umbraco.ModelsBuilder.Building
                         var usingNamespace = (string)attrData.ConstructorArguments[0].Value;
                         disco.SetUsingNamespace(usingNamespace);
                         break;
+                    case "Umbraco.ModelsBuilder.SelectiveModelsBaseClassAttribute":
+                        var selectiveModelsBaseClass = (INamedTypeSymbol)attrData.ConstructorArguments[0].Value;
+                        if (selectiveModelsBaseClass is IErrorTypeSymbol)
+                            throw new Exception($"Invalid base class type \"{selectiveModelsBaseClass.Name}\".");
+                        var contentAliasToInclude = (string)attrData.ConstructorArguments[1].Value;
+                        disco.SetSelectiveContent(contentAliasToInclude, SymbolDisplay.ToDisplayString(selectiveModelsBaseClass));
+                        break;
+
                 }
             }
         }

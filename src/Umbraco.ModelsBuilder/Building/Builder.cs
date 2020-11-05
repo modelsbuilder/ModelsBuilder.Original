@@ -329,11 +329,27 @@ namespace Umbraco.ModelsBuilder.Building
         protected string GetModelsBaseClassName(TypeModel type)
         {
             // code attribute overrides everything
-            if (ParseResult.HasModelsBaseClassName)
+            if (ParseResult.HasModelsBaseClassName && !type.IsElement && !ParseResult.HasSelectiveModelsBaseClassName(type.Alias))
                 return ParseResult.ModelsBaseClassName;
 
-            // default
-            return type.IsElement ? "PublishedElementModel" : "PublishedContentModel";
+            if (ParseResult.HasElementModelsBaseClassName && type.IsElement && !ParseResult.HasSelectiveElementsModelsBaseClassName(type.Alias))
+                return ParseResult.ElementModelsBaseClassName;
+
+            if (ParseResult.HasSelectiveModelsBaseClassName(type.Alias) && !type.IsElement) {
+                var selectiveBaseClass = ParseResult.GetSelectiveModelsBaseClassName(type.Alias);
+                if (!string.IsNullOrEmpty(selectiveBaseClass))
+                    return selectiveBaseClass;
+            }
+
+						if (ParseResult.HasSelectiveElementsModelsBaseClassName(type.Alias) && type.IsElement)
+						{
+							var selectiveBaseClass = ParseResult.GetSelectiveElementsModelsBaseClassName(type.Alias);
+							if (!string.IsNullOrEmpty(selectiveBaseClass))
+								return selectiveBaseClass;
+						}
+
+			// default
+			return type.IsElement ? "PublishedElementModel" : "PublishedContentModel";
         }
     }
 }
