@@ -41,6 +41,7 @@ namespace Our.ModelsBuilder.Options
             var directory = GetSetting("ModelsDirectory", "");
             if (string.IsNullOrWhiteSpace(directory))
             {
+            
                 options.ModelsDirectory = HostingEnvironment.IsHosted
                     ? HostingEnvironment.MapPath(options.ModelsDirectory)
                     : options.ModelsDirectory.TrimStart("~/");
@@ -161,8 +162,15 @@ namespace Our.ModelsBuilder.Options
 
             if (config.StartsWith("~/"))
             {
+                var isOutside =   config.StartsWith("~/..");
+                if (isOutside && !acceptUnsafe)
+                    throw new ConfigurationErrorsException($"Invalid models directory \"{config}\".");
+
+                var path = isOutside
+                    ? Path.GetFullPath(Path.Combine(HostingEnvironment.MapPath("~/") + config.TrimStart("~/")))
+                    : HostingEnvironment.MapPath(config);
                 var dir = HostingEnvironment.IsHosted
-                    ? HostingEnvironment.MapPath(config)
+                    ? path
                     : Path.Combine(root, config.TrimStart("~/"));
 
                 if (dir == null) throw new Exception("panic");
@@ -171,11 +179,7 @@ namespace Our.ModelsBuilder.Options
                 // segments in path, eg '../../foo.tmp' - it may throw a SecurityException
                 // if the combined path reaches illegal parts of the filesystem
                 dir = Path.GetFullPath(dir);
-                root = Path.GetFullPath(root);
-
-                if (!dir.StartsWith(root) && !acceptUnsafe)
-                    throw new ConfigurationErrorsException($"Invalid models directory \"{config}\".");
-
+                
                 return dir;
             }
 
