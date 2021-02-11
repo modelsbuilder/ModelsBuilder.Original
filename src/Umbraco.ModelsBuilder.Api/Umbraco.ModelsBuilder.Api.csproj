@@ -53,6 +53,11 @@
     <Reference Include="System.Web.ApplicationServices" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub">
+      <Version>1.0.0-beta2-18618-05</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="UmbracoCms.Web">
       <Version>8.1.3</Version>
     </PackageReference>
