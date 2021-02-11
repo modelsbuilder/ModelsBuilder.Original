@@ -26,15 +26,18 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
         public static IPublishedContentType GetModelContentType(PublishedItemType itemType, string alias)
         {
-            var facade = Current.UmbracoContext.PublishedSnapshot; // fixme inject!
+            var umbracoContext = Current.UmbracoContext;
+            if (umbracoContext == null) throw new InvalidOperationException("This method requires an UmbracoContext, ensure this is created using IUmbracoContextFactory.EnsureUmbracoContext().");
+
+            var publishedSnapshot = umbracoContext.PublishedSnapshot;
             switch (itemType)
             {
                 case PublishedItemType.Content:
-                    return facade.Content.GetContentType(alias);
+                    return publishedSnapshot.Content.GetContentType(alias);
                 case PublishedItemType.Media:
-                    return facade.Media.GetContentType(alias);
+                    return publishedSnapshot.Media.GetContentType(alias);
                 case PublishedItemType.Member:
-                    return facade.Members.GetContentType(alias);
+                    return publishedSnapshot.Members.GetContentType(alias);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(itemType));
             }
