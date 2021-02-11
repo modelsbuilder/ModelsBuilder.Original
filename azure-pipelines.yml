@@ -1,0 +1,72 @@
+trigger:
+- '*'
+
+pool:
+  vmImage: 'windows-2019'
+
+stages:
+- stage: build
+  displayName: Build
+
+  jobs:
+  - job: Build
+    pool:
+      vmImage: 'windows-2019'
+    steps:
+    - task: NuGetToolInstaller@1
+    - task: NuGetCommand@2
+      inputs:
+        command: 'restore'
+        restoreSolution: '**/*.sln'
+        feedsToUse: 'select'
+    - task: VSBuild@1
+      inputs:
+        solution: '**\*.sln'
+        configuration: "DevOps"
+    - task: PowerShell@2
+      inputs:
+        filePath: '$(System.DefaultWorkingDirectory)\build\SetVersion.ps1'
+        workingDirectory: '$(System.DefaultWorkingDirectory)\build'
+    - task: NuGetCommand@2
+      inputs:
+        command: 'pack'
+        packagesToPack: '**/*.nuspec'
+        versioningScheme: 'off'
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: 'src\Our.ModelsBuilder.Tests\bin\DevOps'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/Tests.zip'
+        replaceExistingArchive: true
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
+- stage: test
+  displayName: test
+  jobs:
+  - job: Test
+    pool:
+      vmImage: 'windows-2019'
+    steps:
+    - task: DownloadBuildArtifacts@0
+      inputs:
+        buildType: 'current'
+        downloadType: 'specific'
+        itemPattern: '**\Tests*.zip'
+        downloadPath: '$(System.DefaultWorkingDirectory)'
+    - task: ExtractFiles@1
+      inputs:
+        archiveFilePatterns: '**/Tests.zip'
+        destinationFolder: '$(System.DefaultWorkingDirectory)\test'
+        cleanDestinationFolder: true    
+    - task: VSTest@2
+      inputs:
+        testSelector: 'testAssemblies'
+        testAssemblyVer2: |
+          **\*test*.dll
+          !**\*TestAdapter.dll
+          !**\obj\**
+        searchFolder: '$(System.DefaultWorkingDirectory)\test'

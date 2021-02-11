@@ -49,6 +49,9 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <DeployExtension>True</DeployExtension>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DevOps|AnyCPU' ">
+    <OutputPath>bin\DevOps\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />

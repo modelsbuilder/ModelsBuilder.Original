@@ -12,21 +12,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{C7
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{42C3FC1A-26BA-4FAB-9585-AC8C25449B8F}"
 	ProjectSection(SolutionItems) = preProject
-		..\build\build-bootstrap.ps1 = ..\build\build-bootstrap.ps1
 		..\build\build.ps1 = ..\build\build.ps1
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModelsBuilder", "ModelsBuilder", "{1FFB7043-4B35-4A92-80FC-A2306511C8D5}"
-	ProjectSection(SolutionItems) = preProject
-		..\build\Nuspecs\ModelsBuilder\web.config.install.xdt = ..\build\Nuspecs\ModelsBuilder\web.config.install.xdt
-		..\build\Nuspecs\ModelsBuilder\web.config.uninstall.xdt = ..\build\Nuspecs\ModelsBuilder\web.config.uninstall.xdt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuspecs", "Nuspecs", "{30368E85-95E0-4A26-AC5A-D8570DB16FDA}"
 	ProjectSection(SolutionItems) = preProject
 		..\build\Nuspecs\logo.png = ..\build\Nuspecs\logo.png
-		..\build\Nuspecs\Our.ModelsBuilder.nuspec = ..\build\Nuspecs\Our.ModelsBuilder.nuspec
-		..\build\Nuspecs\Our.ModelsBuilder.Web.nuspec = ..\build\Nuspecs\Our.ModelsBuilder.Web.nuspec
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Our.ModelsBuilder", "Our.ModelsBuilder\Our.ModelsBuilder.csproj", "{998FB014-303A-4146-B3E4-B927BAB0210F}"
@@ -43,33 +34,43 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		DevOps|Any CPU = DevOps|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{998FB014-303A-4146-B3E4-B927BAB0210F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{998FB014-303A-4146-B3E4-B927BAB0210F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{998FB014-303A-4146-B3E4-B927BAB0210F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{998FB014-303A-4146-B3E4-B927BAB0210F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{998FB014-303A-4146-B3E4-B927BAB0210F}.DevOps|Any CPU.ActiveCfg = DevOps|Any CPU
+		{998FB014-303A-4146-B3E4-B927BAB0210F}.DevOps|Any CPU.Build.0 = DevOps|Any CPU
 		{CF597D44-04EA-4FD7-89C8-E4849D1355C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CF597D44-04EA-4FD7-89C8-E4849D1355C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF597D44-04EA-4FD7-89C8-E4849D1355C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF597D44-04EA-4FD7-89C8-E4849D1355C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF597D44-04EA-4FD7-89C8-E4849D1355C8}.DevOps|Any CPU.ActiveCfg = DevOps|Any CPU
+		{CF597D44-04EA-4FD7-89C8-E4849D1355C8}.DevOps|Any CPU.Build.0 = DevOps|Any CPU
 		{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}.DevOps|Any CPU.ActiveCfg = DevOps|Any CPU
+		{F0B757DF-0CF7-4AAF-8DD0-F46EDF25C3A3}.DevOps|Any CPU.Build.0 = DevOps|Any CPU
 		{2317BE7F-1723-4512-B863-5B6835E583A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2317BE7F-1723-4512-B863-5B6835E583A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2317BE7F-1723-4512-B863-5B6835E583A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2317BE7F-1723-4512-B863-5B6835E583A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2317BE7F-1723-4512-B863-5B6835E583A2}.DevOps|Any CPU.ActiveCfg = DevOps|Any CPU
+		{2317BE7F-1723-4512-B863-5B6835E583A2}.DevOps|Any CPU.Build.0 = DevOps|Any CPU
 		{0419A43D-78C2-46C9-95A9-2470F224D60F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0419A43D-78C2-46C9-95A9-2470F224D60F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0419A43D-78C2-46C9-95A9-2470F224D60F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0419A43D-78C2-46C9-95A9-2470F224D60F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0419A43D-78C2-46C9-95A9-2470F224D60F}.DevOps|Any CPU.ActiveCfg = DevOps|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{1FFB7043-4B35-4A92-80FC-A2306511C8D5} = {30368E85-95E0-4A26-AC5A-D8570DB16FDA}
 		{30368E85-95E0-4A26-AC5A-D8570DB16FDA} = {42C3FC1A-26BA-4FAB-9585-AC8C25449B8F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
