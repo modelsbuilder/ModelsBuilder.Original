@@ -78,7 +78,10 @@ namespace Umbraco.ModelsBuilder.Building
                         if (x.Parameters.Length != 1) return false;
                         var type1 = x.Parameters[0].Type;
                         var type2 = typeof (IPublishedContent);
-                        return type1.ToDisplayString() == type2.FullName;
+                        var type3 = typeof(IPublishedElement);
+                        if (type1.ToDisplayString() == type2.FullName || type1.ToDisplayString() == type3.FullName) return true;
+
+                        return false;
                     });
 
                 if (hasCtor)
