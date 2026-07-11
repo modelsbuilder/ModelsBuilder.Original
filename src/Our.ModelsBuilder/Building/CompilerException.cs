@@ -1,25 +1,22 @@
-﻿using System;
+﻿namespace Our.ModelsBuilder.Building;
 
-namespace Our.ModelsBuilder.Building
+public class CompilerException : Exception
 {
-    public class CompilerException : Exception
+    public CompilerException(string message)
+        : base(message)
+    { }
+
+    public CompilerException(string message, string path, string sourceCode, int line)
+        : base($"{message} (at {path}:line {line}).")
     {
-        public CompilerException(string message)
-            : base(message)
-        { }
-
-        public CompilerException(string message, string path, string sourceCode, int line)
-            : base($"{message} (at {path}:line {line}).")
-        {
-            Path = path;
-            SourceCode = sourceCode;
-            Line = line;
-        }
-
-        public string Path { get; } = string.Empty;
-
-        public string SourceCode { get; } = string.Empty;
-
-        public int Line { get; } = -1;
+        Path = path;
+        SourceCode = sourceCode;
+        Line = line;
     }
+
+    public string Path { get; } = string.Empty;
+
+    public string SourceCode { get; } = string.Empty;
+
+    public int Line { get; } = -1;
 }

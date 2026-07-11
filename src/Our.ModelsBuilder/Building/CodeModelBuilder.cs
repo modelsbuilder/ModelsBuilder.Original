@@ -1,125 +1,63 @@
-using System.Collections.Generic;
+using Microsoft.Extensions.Options;
 using Our.ModelsBuilder.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Strings;
 
-namespace Our.ModelsBuilder.Building
+namespace Our.ModelsBuilder.Building;
+
+/// <summary>
+/// Implements the default <see cref="ICodeModelBuilder"/>.
+/// </summary>
+public class CodeModelBuilder : ICodeModelBuilder
 {
     /// <summary>
-    /// Implements the default <see cref="ICodeModelBuilder"/>.
+    /// Initializes a new instance of the <see cref="CodeModelBuilder"/> class.
     /// </summary>
-    public class CodeModelBuilder : ICodeModelBuilder
+    public CodeModelBuilder(IOptions<ModelsBuilderSettings> settings, IOptions<ModelsBuilderOurOptions> options, IShortStringHelper shortStringHelper)
+        : this(settings.Value, options.Value, new ContentTypesCodeModelBuilder(settings.Value, options.Value, shortStringHelper))
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CodeModelBuilder"/> class.
+    /// </summary>
+    protected CodeModelBuilder(ModelsBuilderSettings settings, ModelsBuilderOurOptions options, ContentTypesCodeModelBuilder contentTypes)
     {
-        // FIXME but we still need ... to 'build' options vs to 'query' options
-        // ICodeFactory / CodeFactory
-        //    provides the key services to generate models
-        //  CodeModelSourceProvider
-        //    provides a CodeModelSource
-        //  CodeModelSource
-        //    represents a source of models, i.e. raw from Umbraco
-        //  CodeOptionsBuilder
-        //    is passed to CodeParser
-        //    builds a CodeOptions
-        //  ICodeParser / CodeParser
-        //    parses existing code and updates the CodeOptionsBuilder
-        //  CodeOptions
-        //    provides options for building a code model
-        //  ICodeModelBuilder / CodeModelBuilder
-        //    + ContentTypesCodeModelBuilder
-        //    builds a code model, from a CodeModelSource, CodeOptions and a Configuration
-        //  CodeModel
-        //    provides a complete description of the code to be written
-        //  ICodeWriter / CodeWriter
-        //    + ContentTypesCodeWriter
-        //    writes code defined in a code model
+        Settings = settings;
+        Options = options;
+        ContentTypes = contentTypes;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CodeModelBuilder"/> class.
-        /// </summary>
-        public CodeModelBuilder(ModelsBuilderOptions options, CodeOptions codeOptions)
-            : this(options, codeOptions, new ContentTypesCodeModelBuilder(options, codeOptions))
-        { }
+    /// <summary>
+    /// Gets the content types code model builder.
+    /// </summary>
+    protected ContentTypesCodeModelBuilder ContentTypes { get; }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CodeModelBuilder"/> class.
-        /// </summary>
-        protected CodeModelBuilder(ModelsBuilderOptions options, CodeOptions codeOptions, ContentTypesCodeModelBuilder contentTypes)
+    /// <summary>
+    /// Gets the models builder settings.
+    /// </summary>
+    protected ModelsBuilderSettings Settings { get; }
+
+    /// <summary>
+    /// Gets the model build options.
+    /// </summary>
+    protected ModelsBuilderOurOptions Options { get; }
+
+    /// <inheritdoc />
+    public virtual CodeModel Build(CodeModelData data)
+    {
+        var model = new CodeModel(data, Options.LanguageVersion)
         {
-            Options = options;
-            CodeOptions = codeOptions;
-            ContentTypes = contentTypes;
-        }
-
-        /// <summary>
-        /// Gets the content types code model builder.
-        /// </summary>
-        protected ContentTypesCodeModelBuilder ContentTypes { get; }
-
-        protected ModelsBuilderOptions Options { get; }
-
-        protected CodeOptions CodeOptions { get; }
-
-        /// <inheritdoc />
-        public virtual CodeModel Build(CodeModelData data)
-        {
-            var model = new CodeModel(data, Options.LanguageVersion)
-            {
-                ModelsNamespace = GetModelsNamespace(), 
-                CustomAssemblyName = GetAssemblyName(),
-                Using = GetUsing()
-            };
-
-            // TODO: refactor using, have transform.Use("namespace")
-
-            ContentTypes.Build(model);
-
-            return model;
-        }
-        public virtual string GetAssemblyName()
-        {
-            // use namespace from code options... or from options
-            var modelsNamespace = CodeOptions.HasCustomAssemblyName
-                ? CodeOptions.CustomAssemblyName
-                : Options.AssemblyName;
-
-            // otherwise, use const
-            if (string.IsNullOrWhiteSpace(modelsNamespace))
-                modelsNamespace = GetDefaultAssemblyName();
-
-            return modelsNamespace;
-        }
-        public virtual string GetDefaultAssemblyName() => null;
-
-        protected virtual string GetDefaultModelsNamespace() => "Umbraco.Web.PublishedModels";
-
-        protected virtual string GetModelsNamespace()
-        {
-            // use namespace from code options... or from options
-            var modelsNamespace = CodeOptions.HasModelsNamespace
-                ? CodeOptions.ModelsNamespace
-                : Options.ModelsNamespace;
-
-            // otherwise, use const
-            if (string.IsNullOrWhiteSpace(modelsNamespace))
-                modelsNamespace = GetDefaultModelsNamespace();
-
-            return modelsNamespace;
-        }
-
-        /// <summary>
-        /// Gets the namespace to use in 'using' section.
-        /// </summary>
-        protected virtual ISet<string> GetUsing() => new HashSet<string>
-        {
-            // initialize with default values
-            "System",
-            "System.Collections.Generic",
-            "System.Linq.Expressions",
-            "System.Web",
-            "Umbraco.Core.Models",
-            "Umbraco.Core.Models.PublishedContent",
-            "Umbraco.Web",
-            "Our.ModelsBuilder",
-            "Our.ModelsBuilder.Umbraco",
+            ModelsNamespace = Settings.ModelsNamespace, 
+            FallbackStyle = Options.FallbackStyle,
+            PropertyStyle = Options.PropertyStyle,
+            //CustomAssemblyName = GetAssemblyName(),
+            Using = Using.Defaults // FIXME why?
         };
 
+        // TODO: refactor using, have transform.Use("namespace")
+
+        ContentTypes.Build(model);
+
+        return model;
     }
 }

@@ -1,13 +1,12 @@
-namespace Our.ModelsBuilder.Building
+namespace Our.ModelsBuilder.Building;
+
+/// <summary>
+/// Provides <see cref="CodeModelData"/>.
+/// </summary>
+public interface ICodeModelDataSource
 {
     /// <summary>
-    /// Provides <see cref="CodeModelData"/>.
+    /// Gets <see cref="CodeModelData"/>.
     /// </summary>
-    public interface ICodeModelDataSource
-    {
-        /// <summary>
-        /// Gets <see cref="CodeModelData"/>.
-        /// </summary>
-        CodeModelData GetCodeModelData();
-    }
+    CodeModelData GetCodeModelData();
 }

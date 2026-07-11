@@ -1,119 +1,89 @@
 ﻿using System.Text;
 
-namespace Our.ModelsBuilder.Building
+namespace Our.ModelsBuilder.Building;
+
+/// <summary>
+/// Provides the default code writer.
+/// </summary>
+public class CodeWriter : ModelsCodeWriter, ICodeWriter
 {
+    private ContentTypesCodeWriter? _contentTypesContentTypesCodeWriter;
+    private InfosCodeWriter? _infosCodeWriter;
+
     /// <summary>
-    /// Provides the default code writer.
+    /// Initializes a new instance of the <see cref="CodeWriter"/> class.
     /// </summary>
-    public class CodeWriter : ModelsCodeWriter, ICodeWriter
+    public CodeWriter(StringBuilder? text = null) 
+        : base(text)
+    { }
+
+    /// <inheritdoc />
+    public virtual ContentTypesCodeWriter ContentTypesCodeWriter 
+        => _contentTypesContentTypesCodeWriter ??= new ContentTypesCodeWriter(this);
+
+    /// <inheritdoc />
+    public virtual InfosCodeWriter InfosCodeWriter
+        => _infosCodeWriter ??= new InfosCodeWriter(this);
+
+    #region Write Complete Files
+
+    /// <inheritdoc />
+    public virtual void WriteModelFile(CodeModel codeModel, ContentTypeModel model)
     {
-        private ContentTypesCodeWriter _contentTypesContentTypesCodeWriter;
-        private InfosCodeWriter _infosCodeWriter;
+        WriteFileHeader();
+        WriteLine();
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CodeWriter"/> class.
-        /// </summary>
-        public CodeWriter(CodeModel model, StringBuilder text = null) 
-            : base(model, text)
-        { }
+        var u = new Using(this);
+        u.WriteUsing(codeModel.Using);
+        u.WriteUsing("System.CodeDom.Compiler"); // FIXME??
+        WriteLine();
 
-        /// <inheritdoc />
-        public virtual ContentTypesCodeWriter ContentTypesCodeWriter 
-            => _contentTypesContentTypesCodeWriter ??= new ContentTypesCodeWriter(this);
-
-        /// <inheritdoc />
-        public virtual InfosCodeWriter InfosCodeWriter
-            => _infosCodeWriter ??= new InfosCodeWriter(this);
-
-        #region Write Complete Files
-
-        /// <summary>
-        /// Writes a using statement if it is not already defined by the code model.
-        /// </summary>
-        protected virtual void WriteUsing(string ns)
-        {
-            if (!CodeModel.Using.Contains(ns))
-                WriteIndentLine($"using {ns};");
-        }
-
-        /// <summary>
-        /// Writes the using statements defined by the code model.
-        /// </summary>
-        public virtual void WriteUsing()
-        {
-            foreach (var t in CodeModel.Using)
-                WriteIndentLine($"using {t};");
-        }
-
-        /// <inheritdoc />
-        public virtual void WriteModelFile(ContentTypeModel model)
-        {
-            WriteFileHeader();
-            WriteLine();
-
-            WriteUsing();
-            WriteUsing("System.CodeDom.Compiler");
-            WriteLine();
-
-            WriteBlockStart($"namespace {CodeModel.ModelsNamespace}");
-            ContentTypesCodeWriter.WriteModel(model);
-            WriteBlockEnd();
-        }
-
-        /// <inheritdoc />
-        public virtual void WriteSingleFile()
-        {
-            WriteFileHeader();
-            WriteLine();
-
-            WriteUsing();
-            WriteUsing("System");
-            WriteUsing("System.Linq");
-            WriteUsing("System");
-            WriteUsing("System.Linq");
-            WriteUsing("System.Collections.Generic");
-            WriteUsing("System.CodeDom.Compiler");
-            WriteUsing("Umbraco.Core.Models.PublishedContent");
-            WriteUsing("Our.ModelsBuilder");
-            WriteUsing("Our.ModelsBuilder.Umbraco");
-            WriteLine();
-
-            // assembly attributes marker
-            WriteIndentLine("//ASSATTR");
-            WriteLine();
-
-            WriteBlockStart($"namespace {CodeModel.ModelsNamespace}");
-            ContentTypesCodeWriter.WriteModels(CodeModel.ContentTypes.ContentTypes);
-            WriteBlockEnd();
-
-            WriteLine();
-
-            WriteBlockStart($"namespace {CodeModel.ModelInfosClassNamespace}");
-            InfosCodeWriter.WriteInfosClass(CodeModel);
-            WriteBlockEnd();
-        }
-
-        /// <inheritdoc />
-        public virtual void WriteModelInfosFile()
-        {
-            WriteFileHeader();
-            WriteLine();
-
-            WriteUsing();
-            WriteUsing("System");
-            WriteUsing("System.Linq");
-            WriteUsing("System.Collections.Generic");
-            WriteUsing("System.CodeDom.Compiler");
-            WriteUsing("Umbraco.Core.Models.PublishedContent");
-            WriteUsing("Our.ModelsBuilder");
-            WriteUsing("Our.ModelsBuilder.Umbraco");
-            WriteLine();
-
-            WriteBlockStart($"namespace {CodeModel.ModelInfosClassNamespace}");
-            InfosCodeWriter.WriteInfosClass(CodeModel);
-            WriteBlockEnd();
-        }
-
-        #endregion
+        WriteBlockStart($"namespace {codeModel.ModelsNamespace}");
+        ContentTypesCodeWriter.WriteModel(codeModel, model);
+        WriteBlockEnd();
     }
+
+    /// <inheritdoc />
+    public virtual void WriteSingleFile(CodeModel codeModel)
+    {
+        WriteFileHeader();
+        WriteLine();
+
+        var u = new Using(this);
+        u.WriteUsing(codeModel.Using);
+        u.WriteUsing(Using.Defaults); // FIXME??
+        WriteLine();
+
+        // assembly attributes marker
+        WriteIndentLine("//ASSATTR");
+        WriteLine();
+
+        WriteBlockStart($"namespace {codeModel.ModelsNamespace}");
+        ContentTypesCodeWriter.WriteModels(codeModel, codeModel.ContentTypes.ContentTypes);
+        WriteBlockEnd();
+
+        WriteLine();
+
+        WriteBlockStart($"namespace {codeModel.ModelInfosClassNamespace}");
+        InfosCodeWriter.WriteInfosClass(codeModel);
+        WriteBlockEnd();
+    }
+
+    /// <inheritdoc />
+    public virtual void WriteModelInfosFile(CodeModel codeModel)
+    {
+        WriteFileHeader();
+        WriteLine();
+
+        var u = new Using(this);
+        u.WriteUsing(codeModel.Using);
+        u.WriteUsing(Using.Defaults); // FIXME??
+        WriteLine();
+
+        WriteBlockStart($"namespace {codeModel.ModelInfosClassNamespace}");
+        InfosCodeWriter.WriteInfosClass(codeModel);
+        WriteBlockEnd();
+    }
+
+    #endregion
 }

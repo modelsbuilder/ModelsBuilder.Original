@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Our.ModelsBuilder.Options;
 
 namespace Our.ModelsBuilder.Building
 {
@@ -48,10 +46,24 @@ namespace Our.ModelsBuilder.Building
         /// <summary>
         /// Gets or sets the content types code model.
         /// </summary>
-        public ContentTypesCodeModel ContentTypes { get; set; } // FIXME rename ContentTypesModel (ContentTypesOptions etc)
+        // FIXME rename ContentTypesModel (ContentTypesOptions etc)
+        public ContentTypesCodeModel ContentTypes { get; set; }
 
+
+        /// <summary>
+        /// Gets or sets the fallback generation style.
+        /// </summary>
+        // TODO: could this be per content/property type?
+        public FallbackStyle FallbackStyle { get; set; } = FallbackStyle.Modern;
+
+        /// <summary>
+        /// Gets or sets the property generation style.
+        /// </summary>
+        // TODO: could this be per content/property type?
+        public PropertyStyle PropertyStyle { get; set; } = PropertyStyle.Methods;
 
         // FIXME everything below belong to the content types code model?
+        // but no, why would they?!?!?!
 
 
         /// <summary>
@@ -60,27 +72,27 @@ namespace Our.ModelsBuilder.Building
         // TODO: per-model namespace
         public string ModelsNamespace { get; set; }
         
-        /// <summary>
-        /// Gets or sets the models assembly name.
-        /// </summary>
-        // TODO: per-model assembly name
-        public string CustomAssemblyName { get; set; }
+        ///// <summary>
+        ///// Gets or sets the models assembly name.
+        ///// </summary>
+        //// TODO: per-model assembly name
+        //public string CustomAssemblyName { get; set; }
         
         /// <summary>
         /// Gets models assembly name or fallback to the models namespace
         /// </summary>
-        public string AssemblyName
-        {
-            get
-            {
-                if (CustomAssemblyName != null)
-                {
-                    return CustomAssemblyName;
-                }
+        //public string AssemblyName
+        //{
+        //    get
+        //    {
+        //        if (CustomAssemblyName != null)
+        //        {
+        //            return CustomAssemblyName;
+        //        }
 
-                return ModelsNamespace;
-            }
-        }
+        //        return ModelsNamespace;
+        //    }
+        //}
 
         public ISet<string> Using { get; set; } = new HashSet<string>();
 
@@ -95,7 +107,7 @@ namespace Our.ModelsBuilder.Building
 
             codeBuilder.AppendFormat("namespace {0}\n{{ }}\n", ModelsNamespace);
 
-            var compiler = new Compiler(_languageVersion);
+            var compiler = new Compiler(languageVersion: _languageVersion);
             var compilation = compiler.GetCompilation("MyCompilation", new Dictionary<string, string> { { "code", codeBuilder.ToString() } }, out var trees);
             var tree = trees[0];
             _ambiguousSymbolsModel = compilation.GetSemanticModel(tree);

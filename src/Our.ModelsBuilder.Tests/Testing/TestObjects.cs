@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
+﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 
 namespace Our.ModelsBuilder.Tests.Testing
 {
@@ -32,6 +29,11 @@ namespace Our.ModelsBuilder.Tests.Testing
                 return this;
             }
 
+            public object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
+            {
+                throw new NotImplementedException();
+            }
+
             public IPublishedPropertyType PropertyType { get; }
 
             bool IPublishedProperty.HasValue(string culture, string segment)
@@ -57,7 +59,7 @@ namespace Our.ModelsBuilder.Tests.Testing
 
         public class PublishedContent : IPublishedContent
         {
-            private readonly List<IPublishedProperty> _properties = new List<IPublishedProperty>();
+            private readonly List<IPublishedProperty> _properties = new();
 
             public PublishedContent(IPublishedContentType contentType)
             {
@@ -102,7 +104,7 @@ namespace Our.ModelsBuilder.Tests.Testing
                 throw new NotImplementedException();
             }
 
-            public int Id => throw new NotImplementedException();
+            public int Id => 0; //throw new NotImplementedException();
 
             public Guid Key => throw new NotImplementedException();
 
