@@ -5,12 +5,25 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="..\SolutionInfo.cs" Link="Properties\SolutionInfo.cs" />
-  </ItemGroup>
+  <PropertyGroup>
+    <PackageId>Our.ModelsBuilder</PackageId>
+
+    <ProductName>Our ModelsBuilder</ProductName>
+    <Title>Our ModelsBuilder</Title>
+    <Description>Our ModelsBuilder</Description>
+    <Authors>"The Umbraco Community"</Authors>
+    <Company>"The Umbraco Community"</Company>
+    <Copyright>Copyright (C) The Umbraco Community 2013-2026</Copyright>
+    
+    <Version>4.1.0-alpha.1</Version>
+    <ProductVersion>4.1.0</ProductVersion>
+    <AssemblyVersion>4.1.0</AssemblyVersion>
+    <AssemblyFileVersion>4.1.0</AssemblyFileVersion>
+    <InformationalVersion>4.1.0-alpha.1</InformationalVersion>    
+</PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.6.0" />

@@ -1,9 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 
-//[assembly: AssemblyTitle("Our ModelsBuilder")]
-[assembly: AssemblyDescription("Our ModelsBuilder.")]
-
 [assembly: InternalsVisibleTo("Our.ModelsBuilder.Tests")]
 
 // dynamic assembly that is built during tests - do not remove!
