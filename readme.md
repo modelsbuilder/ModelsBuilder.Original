@@ -26,10 +26,10 @@ All other projects or packages are not supported anymore, you are on your own.
 
 #### Projects
 
-*Umbraco.ModelsBuilder - the main project, installed on the website
-*Umbraco.ModelsBuilder.Api - the api server **OBSOLETE**
-*Umbraco.ModelsBuilder.Console - a console tool **OBSOLETE**
-*Umbraco.ModelsBuilder.CustomTool - the Visual Studio extension **OBSOLETE**
-*Umbraco.ModelsBuilder.Tests - the tests suite
+* Umbraco.ModelsBuilder - the main project, installed on the website
+* Umbraco.ModelsBuilder.Tests - the tests suite
 
-Both .Console and .CustomTool require that the .Api is installed on the website (not installed by default).
+* Umbraco.ModelsBuilder.Api - the api server **OBSOLETE**
+* Umbraco.ModelsBuilder.Console - a console tool **OBSOLETE**
+* Umbraco.ModelsBuilder.CustomTool - the Visual Studio extension **OBSOLETE**
+
